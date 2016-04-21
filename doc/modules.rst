@@ -36,6 +36,22 @@ jgem.calccov module
     :undoc-members:
     :show-inheritance:
 
+jgem.convert module
+--------------------
+
+.. automodule:: jgem.convert
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+jgem.evaluate module
+--------------------
+
+.. automodule:: jgem.evaluate
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 jgem.filenames module
 ---------------------
 
@@ -64,14 +80,6 @@ jgem.merge module
 ------------------
 
 .. automodule:: jgem.merge
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-jgem.togtfbed module
---------------------
-
-.. automodule:: jgem.togtfbed
     :members:
     :undoc-members:
     :show-inheritance:

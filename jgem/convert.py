@@ -1,4 +1,5 @@
-"""
+"""Copyright (c) 2015-2016 Ken Sugino
+
 .. module:: convert
     :synopsis: convert sj,ex to bed, gtf  or gtf to sj,ex
 
@@ -50,7 +51,7 @@ def gtf2exonsj(gtf):
     sj['locus'] = UT.calc_locus_strand(sj)
     sj = sj.groupby('locus').first().reset_index()
 
-    cols = ['chr','st','ed','gene_id','sc1','strand']
+    #cols = ['chr','st','ed','gene_id','sc1','strand']
     ex = exons #[cols]
     ex['locus'] = UT.calc_locus_strand(ex)
     ex = ex.groupby('locus').first().reset_index()

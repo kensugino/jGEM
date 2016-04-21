@@ -1,3 +1,12 @@
+"""Copyright (c) 2015-2016 Ken Sugino
+
+.. module:: bw.pyx
+    :synopsis: cython speedup of wiggle/bigwig related stuffs
+
+..  moduleauthor:: Ken Sugino <ken.sugino@gmail.com>
+
+"""
+
 import numpy as N
 cimport numpy as N
 

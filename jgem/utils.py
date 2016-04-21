@@ -1,4 +1,5 @@
-"""
+"""Copyright (c) 2015-2016 Ken Sugino
+
 .. module:: utils
     :synopsis: a collection of utility functions
 
@@ -21,6 +22,7 @@ import uuid
 
 import pandas as PD
 import numpy as N
+import scipy.optimize as SO
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -549,6 +551,21 @@ def calc_binned_percentile(xs, ys, percent=99, minbinw=0.25, minnum=500):
     px = N.array([N.mean([x[0] for x in tmp[st:ed]]) for st,ed in sted])
     py = N.array([N.percentile([ys[x[1]] for x in tmp[st:ed]], percent) for st,ed in sted])
     return px,py
+
+#### Sigmoid fitting #########################################################
+
+def sigmoid(x,x0,k):
+    return 1./(1.+N.exp(-k*(x-x0)))
+
+def invsig(y,x0,k):
+    return x0 - N.log((1.-y)/y)/k
+
+def fit_sigmoid(x,y,xlim=(0,7),yth=0.99):
+    popt,pcov= SO.curve_fit(sigmoid, x, y)
+    x2 = N.linspace(*xlim)
+    y2 = sigmoid(x2, *popt)
+    xth = invsig(yth, *popt)
+    return x2,y2,xth
 
 
 #### Genome info #############################################################

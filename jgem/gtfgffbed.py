@@ -1,4 +1,5 @@
-"""
+"""Copyright (c) 2015-2016 Ken Sugino
+
 .. module:: gtfgffbed
     :synopsis: GTF/GFF/BED related functions
 
@@ -23,7 +24,7 @@ from jgem import utils as UT
 GTFCOLS = ['chr','src','typ','st','ed','sc1','strand','sc2','extra']
 GFFCOLS = ['chr','src','typ','st','ed','sc1','strand','sc2','attr']
 BEDCOLS = ['chr', 'st', 'ed', 'name', 'sc1', 'strand', 'tst', 'ted', 'sc2', '#exons', 'esizes', 'estarts']
-DEFAULT_GTF_PARSE = ['gene_id','transcript_id','exon_number','gene_name','cov']
+DEFAULT_GTF_PARSE = ['gene_id','transcript_id','exon_number','gene_name','cov','FPKM']
 
 # SJ.out.tab to SJBED ###################################################################
 
@@ -132,7 +133,7 @@ def read_gff(gffname, onlytypes=[], parseattrs=[]):
 #         return ''
 #     return [_attr(line) for line in gtf['extra']]
 
-def read_gtf(gtfname, onlytypes=['exon'], parseattrs=DEFAULT_GTF_PARSE, rename={}):
+def read_gtf(gtfname, onlytypes=[], parseattrs=DEFAULT_GTF_PARSE, rename={}):
     """ Read in whole GTF, parse gene_id, transcript_id from column 9
 
     Args:
@@ -160,6 +161,10 @@ def read_gtf(gtfname, onlytypes=['exon'], parseattrs=DEFAULT_GTF_PARSE, rename={
     cols = gtf[['chr']].copy()
     for c in tmp.columns:
         kv = tmp[c].str.split(expand=True) # key col(0) and value col(1)
+        if kv.shape[1]<2: # split unsuccessful
+            LOG.debug('column {0} did not split'.format(c))
+            LOG.debug('col:{0} first line:{1}, kv.shape:{2}'.format(c, tmp[c].iloc[0], kv.shape))
+            continue
         #LOG.debug((kv[0].unique(),kv.shape, kv.columns))
         LOG.debug(kv[0].unique())
         if len(kv[0].unique())==1:

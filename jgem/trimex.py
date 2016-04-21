@@ -1,6 +1,7 @@
-"""
-.. module:: assembler
-    :synopsis: assemble genes from RNASeq data (normalized genome coverage (bigwig) and junctions)
+"""Copyright (c) 2015-2016 Ken Sugino
+
+.. module:: trimex
+    :synopsis: makes trimed genes (to avoid length bias in coverage variance)
 
 ..  moduleauthor:: Ken Sugino <ken.sugino@gmail.com>
 

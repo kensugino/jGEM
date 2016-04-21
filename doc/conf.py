@@ -15,7 +15,7 @@ from unittest.mock import MagicMock, Mock
 #             return MagicMock()
 
 MOCK_MODULES = ['numpy','scipy','matplotlib','pandas','jgem.bxbbi.bigwig_file',
-                'matplotlib.pyplot','jgem.cy.bw']
+                'matplotlib.pyplot','jgem.cy.bw','scipy.optimize']
 sys.modules.update((mod_name, MagicMock()) for mod_name in MOCK_MODULES)
 # Above does not work. Results in recursion error. 
 

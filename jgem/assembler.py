@@ -1,4 +1,5 @@
-"""
+"""Copyright (c) 2015-2016 Ken Sugino
+
 .. module:: assembler
     :synopsis: assemble genes from RNASeq data (normalized genome coverage (bigwig) and junctions)
 
@@ -387,14 +388,15 @@ class SELECTSJ(SUBASE):
         LOG.debug(c)
         LOG.debug(o.head())
         sjgr = o.groupby(['chr','st','ed','strand'])
+        # BEDCOLUMNS sc1(5th), tst(7th) contains unique count (ucnt) and non-unique count (mcnt)
         sj2 = sjgr[['name','sc1','tst']].first()
         sj2['ucnt_sum'] = sjgr['b_sc1'].sum()
         sj2['mcnt_sum'] = sjgr['b_tst'].sum()
         sj2['sum'] = sj2['ucnt_sum']+sj2['mcnt_sum']
         sj2['cnt'] = sj2['sc1']+sj2['tst']
         self.sj2 = sj2 = sj2.reset_index()
-        sj2['st'] = sj2['st']#+self.sjexpand
-        sj2['ed'] = sj2['ed']#-self.sjexpand
+        # sj2['st'] = sj2['st']#+self.sjexpand
+        # sj2['ed'] = sj2['ed']#-self.sjexpand
         sj2['locus'] = UT.calc_locus_strand(sj2)
         sj2['ratio'] = sj2['sc1']/sj2['ucnt_sum']
         sj2['ratio_m'] = sj2['tst']/sj2['mcnt_sum']
@@ -689,9 +691,6 @@ class SJ2EX(SUBASE):
 class MERGEEXONS(SUBASE):
     """Merge overlapping exons.
 
-    TODO:
-        Currently only two overlapping exons are merged. Generalized to n.
-
     Args:
         me: exon DataFrame
 
@@ -703,6 +702,9 @@ class MERGEEXONS(SUBASE):
         sjex.inte.txt.gz
 
     """.format(**PARAMSDOC)
+    # TODO:
+    #     Currently only two overlapping exons are merged. Generalized to n.
+
 
     def call(self):
         ex = self.asm.me

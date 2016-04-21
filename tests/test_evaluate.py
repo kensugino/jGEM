@@ -59,9 +59,10 @@ def test_evalmatch(sjexprefix, g4sjexprefix, outdir, bigwig, sjbed):
 	# sensitivity plot
 	axr = em.plot_sensitivity()
 	# ratio fig
-	fig = em.plot_ratio()
+	axr = em.plot_ratio()
 	# number fig
 	# completeness calc, fig
+	axr = em.plot_completeness()
 
 
 

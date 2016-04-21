@@ -1,4 +1,5 @@
-"""
+"""Copyright (c) 2015-2016 Ken Sugino
+
 .. module:: evaluate
     :synopsis: evaluate performance by comparing to a reference annotation
 
@@ -135,8 +136,11 @@ class EvalMatch(object):
     
     abbr = {'i':'internal exons',
             '5':"5' exons",
+            '5b':"5' exons (b)",
             '3':"3' exons",
+            '3b':"3' exons (b)",
             's':'single exons',
+            'sb':'single exons (b)',
             'j':'junctions'}
 
     def __init__(self, en1, en2, bigwig, sjfile, datacode, binsize=1000):
@@ -172,6 +176,7 @@ class EvalMatch(object):
         self.prep_sjex(self.en2, np)
         self.find_match()
         self.calc_stats()
+        self.calc_completeness()
 
     def save_stats(self):
         pass
@@ -182,7 +187,6 @@ class EvalMatch(object):
 
     def colname2(self, x, code):
         return '{0}_{1}_{2}'.format(x, self.datacode, code)
-
 
     def prep_sjex(self, en, np=1):
         """ Assign ecov, gcov, jcnt """
@@ -284,6 +288,13 @@ class EvalMatch(object):
         self.e3 = e3 = ov[idxchr&((idxn&idxed)|(idxp&idxst))&idxcat&(ov['cat']=='3')] .copy()
         # se cat='s' and chr,
         self.es = es = ov[idxchr&(ov['cat']=='s')&idxcat].copy()
+
+        # allow overlap to ther categories
+        self.e5b = e5b = ov[idxchr&((idxp&idxed)|(idxn&idxst))&(ov['cat']=='5')].copy()
+        # 3' cat='3' and chr,acceptor (+,st)|(-,ed) match
+        self.e3b = e3b = ov[idxchr&((idxn&idxed)|(idxp&idxst))&(ov['cat']=='3')] .copy()
+        # se cat='s' and chr,
+        self.esb = esb = ov[idxchr&(ov['cat']=='s')].copy()
         
         # splice junction
         self.s1 = s1 = en1.model('sj')
@@ -295,7 +306,7 @@ class EvalMatch(object):
         self.sj= sj = s1[s1[jhitname]>0].copy() # only consider s2 count > 0
         
         # for batch processing
-        self.e = {'i':ei,'5':e5,'3':e3,'s':es, 'j':sj}
+        self.e = {'i':ei,'5':e5,'3':e3,'s':es, 'j':sj, '5b':e5b, '3b':e3b, 'sb':esb}
         
     def calc_stats(self):
 
@@ -326,12 +337,14 @@ class EvalMatch(object):
             return auc,maxx,avgy,x0,y0
 
         def _count(dw, da, which):
-            hit = set(dw['_id'].values)
             if which != 'j':
                 da = da[da[ecovname]>0]
+                dw = dw[dw[ecovname]>0]
             else:
-                da = da[da[jcntname]>0]
+                da = da[da[jcntname]>0]                
+                dw = dw[dw[jcntname]>0]                
             pop = set(da['_id'].values)
+            hit = set(dw['_id'].values)
             dif = pop.difference(hit)
             if len(pop)==0:
                 LOG.warning('no elements in {0} for population'.format(self.abbr[which]))
@@ -342,13 +355,13 @@ class EvalMatch(object):
             return hit, pop, dif
 
 
-        for which in ['i','5','3','s','j']:
+        for which in ['i','5','3','s','j','5b','3b','sb']:
             LOG.info(which+'='*10)
             cn = 'hit{0}'.format(which)
             if which != 'j':
                 e1 = self.e1
                 # use exons with reads
-                ea = e1[(e1['cat']==which)][['_id',ecovname]].copy() # all exons
+                ea = e1[(e1['cat']==which[0])][['_id',ecovname]].copy() # all exons
                 ew = self.e[which] # matched exons
                 hit, pop, dif = _count(ew, ea, which)
                 ew2 = _findclosest(ew, which) # calculate ratio
@@ -376,11 +389,13 @@ class EvalMatch(object):
             # auc2,maxx2,avgy2,x2,y2 = _calc(x2,y2)
 
             # gen4 ecov>0, detected or not
-            # idx2 = x>0
-            # x2 = x[idx2]
-            # y4 = N.array(y[idx2]>0, dtype=int)
-            x2 = x
-            y4 = N.array(y>0, dtype=int)
+            if which != 'j':
+                idx2 = x>0
+                x2 = x[idx2]
+                y4 = N.array(y[idx2]>0, dtype=int)
+            else:
+                x2 = x
+                y4 = N.array(y>0, dtype=int)
             auc4,maxx4,avgy4,x4,y4 = _calc(x2,y4)
 
             #self.stats[which] = (pop,hit,dif,auc,maxx,avgy,x,y,auc2,maxx2,avgy2,x2,y2,auc4,maxx4,avgy4,x4,y4)
@@ -388,25 +403,99 @@ class EvalMatch(object):
                                 'x':x,'y':y,'xpd':x4,'ypd':y4,
                                 'auc':auc4,'maxx':maxx4,'avgy':avgy4,}
 
+    # Not implemented yet:
+    # (4. ELC: exon length completeness = max(ratio of exon length covered by overlapping target gene))
+    # use ci overlaps  
     def calc_completeness(self):
-        """Completeness measures how much of the reference structure is recovered.
+        """Completeness measures how much of the reference gene structure is recovered.
 
-        1. ELC: exon length completeness = max(ratio of exon length covered by overlapping target gene)
-        2. GLC: gene length completeness = max(ratio of gene length covered by overlapping target gene)
-        3. ECC: exon count completeness = max(ratio of overlapping exon counts)
-        4. JCC: junction count completeness = max(ratio of overlapping junction counts)
-
+        1. GLC: gene length completeness = max(ratio of gene length covered by overlapping target gene)
+        2. ECC: exon count completeness = max(ratio of overlapping exon counts)
+        3. JCC: junction count completeness = max(ratio of overlapping junction counts)
 
         """
+        ov = self.ov # all
+        ov2 = ov[(ov['b__gidx']!='.')&((ov['strand']==ov['b_strand'])|(ov['b_strand']=='.'))] # actual overlap with correct strand
+        gcovname = self.colname('gcov')
+        g2gcov = UT.df2dict(self.e1, '_gidx', gcovname)
+        # GLC
+        g1 = ov.groupby('_gidx')
+        glc = (g1['ed'].max()-g1['st'].min()).to_frame('glen')
+        g2 = ov2.groupby(['_gidx','b__gidx'])
+        gl2 = (g2['ed'].max()-g2['st'].min()).to_frame('b_glen').reset_index()
+        gl2 = gl2.groupby('_gidx')['b_glen'].max()
+        g2gl2 = UT.series2dict(gl2)
+        glc['b_glen'] = [g2gl2.get(x,0) for x in glc.index]
+        glc['GLC'] = glc['b_glen']/glc['glen']
+        glc['gcov'] = [g2gcov[x] for x in glc.index]
+        self.glc = glc
+        # ECC
+        ecc = ov.groupby(['_gidx','_id']).first().reset_index().groupby('_gidx').size().to_frame('#exons')
+        ec2 = ov2.groupby(['_gidx','b__gidx','_id']).first().reset_index()
+        ec2 = ec2.groupby(['_gidx','b__gidx']).size().to_frame('ec').reset_index()
+        ec2 = ec2.groupby('_gidx')['ec'].max()
+        g2ec2 = UT.series2dict(ec2)
+        ecc['b_#exons'] = [g2ec2.get(x,0) for x in ecc.index]
+        ecc['ECC'] = ecc['b_#exons']/ecc['#exons']
+        ecc['gcov'] = [g2gcov[x] for x in ecc.index]
+        self.ecc = ecc
+        # JCC
+        s1 = self.s1
+        jcc = s1.groupby('_gidx').size().to_frame('jc')
+        l2g2 = UT.df2dict(self.s2, 'locus', '_gidx')
+        s1['b__gidx'] = [l2g2.get(x,'.') for x in s1['locus'].values]
+        s1o = s1[s1['b__gidx']!='.'] # overlapping
+        jc2 = s1o.groupby(['_gidx','b__gidx']).size().to_frame('jc2').reset_index()
+        jc2 = jc2.groupby('_gidx')['jc2'].max()
+        g2jc2 = UT.series2dict(jc2)
+        jcc['b_jc'] = [g2jc2.get(x,0) for x in jcc.index]
+        jcc['JCC'] = jcc['b_jc']/jcc['jc']
+        jcc['gcov'] = [g2gcov[x] for x in jcc.index]
+        self.jcc = jcc
 
-    def plot_sensitivity(self, color='b', ypos=0, axr=None, lineonly=False):
-        ws = ['i','5','3','s','j']
+    def _plot(self, x, y, ax, ca='go-', cf='r.-', cd='b.',which='dfat',
+                binsize=25,xlim=(0,7),yth=0.99,scale=100):
+        """Plot dots or sigmoid fit or binned average.
+
+        Args:
+            x,y: data points, y should be in the range [0,1]
+            scale: scale factor for y, default 100, i.e. [0,1]=>[0,100]
+            ax: Axes object
+            which: code to indicate what to plot d:dot, f:sigmoid fit, 
+              a:binned average, t:sigmoid threshold, default 'daft'
+            cd: color for dot
+            cf: color for sigmoid fit
+            ca: color for binned average
+            binsize: for binned average
+            xlim: x xlimit, default (0,7)
+            yth: Y threshold for sigmoid fit, xth is calculated and indicated (if 't' in which)
+
+        """
+        if 'f' in which or 't' in which:
+            x2,y2,xth = UT.fit_sigmoid(x,y,xlim,yth)
+        if 'd' in which: # dot
+            ax.plot(x,scale*y,'b.', alpha=0.3)
+        if 'f' in which: # fit
+            ax.plot(x2,scale*y2,cf)
+        if 'a' in which: # avg
+            avgx,avgy = UT.calc_binned(x,y,num=binsize)
+            ax.plot(avgx,scale*avgy, ca)
+        if 't' in which: # threshold
+            ax.plot([xth,xth],[0,scale],cf+'-')
+            ax.text(xth, 10, '{0:.2f}'.format(xth))
+        ax.set_xlim([-0.5,xlim[1]])
+        ax.set_ylim([-5,105])
+
+    def plot_sensitivity(self, color='b.-', ypos=0, axr=None, lineonly=False, ws = ['i','5','3','s','j']):
         p1c = self.en1.code # gen4
         p2c = self.en2.code
 
-        def _plot_one(ax, which, label):
+        def _plot_one(ax, which, label, color, ypos):
             s = self.stats[which]
-            ax.plot(s['maxx'],100*s['avgy'],color+'.-',ms=5, label=label)
+            x = N.concatenate([s['maxx'],[0]])
+            y = N.concatenate([100*s['avgy'],[0]])
+            # ax.plot(s['maxx'],100*s['avgy'],color+'.-',ms=5, label=label)
+            ax.plot(x,y,color,ms=5, label=label)
             ma = int(N.max(s['maxx']))
             ax.set_xlim([-0.5,ma+0.5])
             ax.text(ma/2,10*(1+ypos),'{0}:{1:.2f}'.format(label,s['auc']))
@@ -420,7 +509,12 @@ class EvalMatch(object):
 
         for i,w in enumerate(ws):
             ax = axr[i]
-            _plot_one(ax, w, p2c)
+            if isinstance(w, tuple):
+                _plot_one(ax, w[0], p2c, color, ypos)
+                _plot_one(ax, w[1], p2c, color+'-', ypos+1)
+                w = w[0]
+            else:
+                _plot_one(ax, w, p2c, color, ypos)
             if not lineonly:
                 ax.set_title(self.abbr[w])
                 if w!='j':
@@ -470,6 +564,32 @@ class EvalMatch(object):
             fig.suptitle('{1}/{0}'.format(p1c,p2c))
         return axr
         
+    def plot_completeness(self, axr=None, tgts=['glc','ecc','jcc'], pw='dft', disp='both', **kw):
+        p1c = self.en1.code # gen4
+        p2c = self.en2.code
+        if axr is None:
+            fig,axr = P.subplots(1,len(tgts),figsize=(3*len(tgts),3),sharex=True,sharey=True)
+            P.subplots_adjust(wspace=0.07,hspace=0.15,top=0.85)
+        else:
+            fig = None
+        for i, w in enumerate(tgts):
+            ax = axr[i]
+            d = getattr(self, w)
+            x = N.log2(d['gcov'].values+1)
+            y = d[w.upper()].values
+            self._plot(x,y,ax,which=pw,scale=100, **kw)
+            if disp!='png':
+                if i==0:
+                    ax.set_ylabel('% covered')
+                    ax.set_xlabel('log2({0}_gcov+1)'.format(p1c))
+                ax.set_title(w.upper())
+            else:
+                ax.set_yticks([])
+                ax.set_xticks([])
+            ax.locator_params(axis='x', nbins=4)
+        if fig is not None:
+            fig.suptitle('{1}/{0}'.format(p1c,p2c))
+        return axr
 
 
 class CompareMatches(object):
