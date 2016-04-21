@@ -203,6 +203,13 @@ class GTF2SJEX(object):
 
 # SJ,EX => GTF, BED ###########################################################
 
+
+def sjex2bed12(sj,ex,dstpath):
+    mg = GP.MEGraph4(sj,ex,dstpath+'genegraph-')
+    w = BEDWriter(mg)
+    LOG.info(' writing bed12 genes to {0}...'.format(dstpath))
+    w.write(dstpath)
+
 class BEDWriter(object):
 
     def __init__(self, mg, se=None):
