@@ -1,0 +1,1 @@
+jGEM is a gene structure assembler for RNASeq data. 
