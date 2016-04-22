@@ -111,7 +111,7 @@ class FileNames(FileNamesBase):
     - bigwig coverage file path (bwfile)
     - junction file path (sjfile)
     - output directory (outdir)
-    - reference (refgtf) if using for SE (single exon) coverage threshold finding
+    - reference (refgtf) if using it for finding SE (single exon) coverage threshold
 
     All filenames have **outdir+sname** as prefix.
 

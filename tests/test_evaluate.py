@@ -56,6 +56,8 @@ def test_evalmatch(sjexprefix, g4sjexprefix, outdir, bigwig, sjbed):
 	assert len(em.stats) == 5
 	assert len(em.ov) == 30449
 	assert len(em.e['i']) == 5635
+	# detected percentage
+	df = em.get_detection_percentages()
 	# sensitivity plot
 	axr = em.plot_sensitivity()
 	# ratio fig
@@ -63,6 +65,10 @@ def test_evalmatch(sjexprefix, g4sjexprefix, outdir, bigwig, sjbed):
 	# number fig
 	# completeness calc, fig
 	axr = em.plot_completeness()
-
+	# save
+	em.save()
+	# load
+	em.load()
+	
 
 
