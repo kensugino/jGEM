@@ -3,7 +3,110 @@ import os
 import pytest
 
 from jgem import bedtools as BT
+from jgem import gtfgffbed as GGB
 import gzip
+
+def test_get_total_bp(testbed, testbed12):
+	bed = GGB.read_bed(testbed)
+	r1 = BT.get_total_bp(bed)
+	r2 = BT.get_total_bp_bedfile(testbed, bed12=False)
+	r3 = BT.get_total_bp_bedfile(testbed12, bed12=True)
+	assert r1 == r2
+	assert r1 == r3
+	assert r1 == (1641348, 405746)
+
+def test_wig2bw(testwig, testchromsizes, outdir):
+	opath = os.path.join(outdir, 'testwig.bw')
+	if os.path.exists(opath):
+		os.unlink(opath)
+	BT.wig2bw(testwig, testchromsizes, opath)
+	assert os.path.exists(opath)
+
+def test_bam2bw(testbam, testchromsizes, outdir):
+	opath = os.path.join(outdir, 'testbam.bw')
+	if os.path.exists(opath):
+		os.unlink(opath)
+	BT.bam2bw(testbam, testchromsizes, opath)
+	assert os.path.exists(opath)
+
+def test_bed2bw(testbed, testchromsizes, outdir):
+	opath = os.path.join(outdir, 'testbed.bw')
+	if os.path.exists(opath):
+		os.unlink(opath)
+	BT.bed2bw(testbed, testchromsizes, opath)
+	assert os.path.exists(opath)
+
+
+def test_bam2wig(testbam, testchromsizes, outdir):
+	opath = os.path.join(outdir, 'test3.wig.gz')
+	if os.path.exists(opath):
+		os.unlink(opath)
+	ret = BT.bam2wig(testbam, testchromsizes, opath)
+	assert os.path.exists(ret)
+	assert opath==ret
+
+	opath = os.path.join(outdir, 'test4.wig')
+	if os.path.exists(opath):
+		os.unlink(opath)
+	ret = BT.bam2wig(testbam, testchromsizes, opath, scale=2.)
+	assert os.path.exists(ret)
+	assert opath==ret
+	assert len(open(opath).readlines())==60352
+
+def test_bed2wig(testbed, testbed12, testchromsizes, outdir):
+	opath = os.path.join(outdir, 'test.wig.gz')
+	if os.path.exists(opath):
+		os.unlink(opath)
+	ret = BT.bed2wig(testbed, testchromsizes, opath)
+	assert os.path.exists(ret)
+	assert opath==ret
+
+	opath = os.path.join(outdir, 'test2.wig')
+	if os.path.exists(opath):
+		os.unlink(opath)
+	ret = BT.bed2wig(testbed, testchromsizes, wigpath=opath, scale=2.)
+	assert os.path.exists(ret)
+	assert opath==ret
+	assert len(open(opath).readlines())==60352
+
+	opath = os.path.join(outdir, 'test.bed12.wig')
+	if os.path.exists(opath):
+		os.unlink(opath)
+	ret = BT.bed2wig(testbed12, testchromsizes, wigpath=opath)
+	assert os.path.exists(ret)
+	assert opath==ret
+	assert len(open(opath).readlines())==60352
+
+def test_bam2bed12(testbam, outdir):
+	opath = os.path.join(outdir, 'test.bed12.gz')
+	if os.path.exists(opath):
+		os.unlink(opath)
+	ret = BT.bam2bed12(testbam, opath)
+	assert os.path.exists(ret)
+	assert opath==ret
+
+	opath = os.path.join(outdir, 'test.bed12')
+	if os.path.exists(opath):
+		os.unlink(opath)
+	ret = BT.bam2bed12(testbam, opath)
+	assert os.path.exists(ret)
+	assert opath==ret
+	assert len(open(opath).readlines())==45593
+
+def test_bam2bed(testbam, outdir):
+	opath = os.path.join(outdir, 'test.bed.gz')
+	if os.path.exists(opath):
+		os.unlink(opath)
+	ret = BT.bam2bed(testbam, opath)
+	assert os.path.exists(ret)
+	assert opath==ret
+	opath = os.path.join(outdir, 'test2.bed')
+	if os.path.exists(opath):
+		os.unlink(opath)
+	ret = BT.bam2bed(testbam, opath)
+	assert os.path.exists(ret)
+	assert opath==ret
+	assert len(open(opath).readlines())==46624
 
 
 def test_bedtoolintersect(tmpdir):

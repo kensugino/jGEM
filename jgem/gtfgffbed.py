@@ -24,17 +24,18 @@ from jgem import utils as UT
 GTFCOLS = ['chr','src','typ','st','ed','sc1','strand','sc2','extra']
 GFFCOLS = ['chr','src','typ','st','ed','sc1','strand','sc2','attr']
 BEDCOLS = ['chr', 'st', 'ed', 'name', 'sc1', 'strand', 'tst', 'ted', 'sc2', '#exons', 'esizes', 'estarts']
+SJCOLS = ['chr', 'st', 'ed', 'name', 'ucnt', 'strand', 'mcnt']
 DEFAULT_GTF_PARSE = ['gene_id','transcript_id','exon_number','gene_name','cov','FPKM']
 
 # SJ.out.tab to SJBED ###################################################################
 
-def sjtab2sjbed(sjtab, sjbed, aligned):
+def sjtab2sjbed(sjtab, sjbed, scale):
     """Generate splice junction input file from STAR SJ.out.tab
 
     Args:
         sjtab (str): path to SJ.out.tab file
         sjbed (str): path to output bed
-        aligned (int): mapped reads 
+        scale (float): scale (= 1/average_coverage = covbp/totbp)
 
     Returns:
         Pandas dataframe
@@ -47,7 +48,7 @@ def sjtab2sjbed(sjtab, sjbed, aligned):
     sj['name'] = ['%s-k%d-u%d-m%d-o%d' % (SJMOTIF[x], a, u, m, o) for x,a, u,m,o in \
                   sj[['motif','annotated','ureads','mreads','maxoverhang']].values]
     sj['strand'] = [SJSTRAND[x] for x in sj['strand2']]
-    scale = 1e6/float(aligned)
+    #scale = 1e6/float(aligned)
     sj['ucnt'] = sj['ureads']*scale
     sj['mcnt'] = sj['mreads']*scale
     #sj['jcnt'] = [x or y for x, y in sj[['ucnt','mcnt']].values]
@@ -60,6 +61,11 @@ def sjtab2sjbed(sjtab, sjbed, aligned):
     write_bed(sj, sjbed, ncols=7)
     return sj
 
+def read_sj(path):
+    # read BED (input) or TXT (output) with consistent column names
+    if path[-7:]=='.bed.gz' or path[-4:]=='.bed':
+        return read_bed(path).rename(columns={'sc1':'ucnt','tst':'mcnt'})
+    return UT.read_pandas(path) # header should be there
 
 
 # READ/WRITE       ######################################################################    
@@ -186,12 +192,11 @@ def read_gtf(gtfname, onlytypes=[], parseattrs=DEFAULT_GTF_PARSE, rename={}):
         gtf = gtf.rename(columns=rename)
     return gtf
 
-def read_bed(fpath, calcextra=False):
+def read_bed(fpath):
     """Read BED file
 
     Args:
-        fpath: path to BED file
-        calcextra: calculate extra fields (locus, min.exon.size, max.exon.size, length)
+        fpath: path to BED file (no header)
 
     Returns:
         Pandas DataFrame containing BED data
@@ -206,11 +211,11 @@ def read_bed(fpath, calcextra=False):
     else:
         d = PD.read_table(fpath, header=None)
         d.columns = BEDCOLS[:len(d.columns)]
-    if calcextra:
-        d['locus'] = d['chr'].astype(str) + ':'+ d['st'].astype(str)+'-'+ d['ed'].astype(str)
-        d['min.exon.size'] = d['esizes'].apply(lambda x: N.min(list(map(int, x[:-1].split(',')))))
-        d['max.exon.size'] = d['esizes'].apply(lambda x: N.max(list(map(int, x[:-1].split(',')))))
-        d['length'] = d['ed']-d['st']
+    # if calcextra:
+    #     d['locus'] = d['chr'].astype(str) + ':'+ d['st'].astype(str)+'-'+ d['ed'].astype(str)
+    #     d['min.exon.size'] = d['esizes'].apply(lambda x: N.min(list(map(int, x[:-1].split(',')))))
+    #     d['max.exon.size'] = d['esizes'].apply(lambda x: N.max(list(map(int, x[:-1].split(',')))))
+    #     d['length'] = d['ed']-d['st']
     return d
 
 def write_gff(df, fname, compress=True):
@@ -412,6 +417,7 @@ def bed2gtf(fpath, compress=True):
         subprocess.call(['gzip',fpath[:-3]])
     return bdpath
 
+    
 # UTILS         ######################################################################
 
 def chop_chrs_gtf(gtfname, chrs, outdir=None):
@@ -455,3 +461,5 @@ def fasta2panda(fname):
     recs = [_parse(x) for x in fa.split('>') if x.strip()]
     fadf = PD.DataFrame(recs, columns=['tid','seq'])
     return fadf
+
+

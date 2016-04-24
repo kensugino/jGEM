@@ -48,7 +48,7 @@ class EvalNames(FN.FileNamesBase):
         self.code = code
         self.outdir = outdir
         for x in ['sj','ex','ci']:
-            setattr(self, x+'path', '{0}.{1}.txt.gz'.format(sjexprefix,x))
+            setattr(self, x+'path', '{0}.{1}.txt.gz'.format(sjexbase,x))
 
         prefix = os.path.join(outdir, code)
         super(EvalNames, self).__init__(prefix)
@@ -399,7 +399,7 @@ class EvalMatch(object):
             if which != 'j':
                 e1,e2 = self.e1,self.e2
                 # use exons with reads
-                ea1 = e1[(e1['cat']==which[0])][['_id',ecovname]].copy() # all exons
+                ea1 = e1[(e1['cat']==which[0])][['_id',ecovname,'name']].copy() # all exons
                 if len(which)==1:
                     ea2 = e2[(e2['cat']==which[0])]
                 else: # all of exons allowed
@@ -409,39 +409,40 @@ class EvalMatch(object):
                 ew2 = _findclosest(ew, which) # calculate ratio
                 i2r = UT.df2dict(ew2,'_id','ratio')
                 ea1[cn] = [i2r.get(x,0) for x in ea1['_id']]
+                ea1 = ea1.set_index('_id')
                 x = N.log2(ea1[ecovname]+1) # log coverage
                 y = ea1[cn]
+                ns = ea1['name']
             else:
                 sa = self.s1
                 hit, pop, pop2 = _count(self.e['j'], sa, self.s2, which)
                 sa[cn] = [1 if x>0 else 0 for x in sa[jhitname]] # in case of NaN
+                sa = sa.set_index('_id')
                 x = N.log2(sa[jcntname]+1)
                 y = sa[cn]
+                ns = sa['name']
                 
-            # # positive ratio
-            # idx = y>0
-            # y0 = y[idx]
-            # x0 = x[idx]                
-            # auc,maxx,avgy,x0,y0 = _calc(x0,y0)
-            # # gen4 ecov>0, ratio
-            # idx2 = x>0 
-            # y2 = y[idx2]
-            # x2 = x[idx2]
-            # auc2,maxx2,avgy2,x2,y2 = _calc(x2,y2)
-
             # gen4 ecov>0, detected or not
-            if which != 'j':
-                idx2 = x>0
-                x2 = x[idx2].values
-                y4 = N.array(y[idx2]>0, dtype=int)
-            else:
-                x2 = x.values
-                y4 = N.array(y>0, dtype=int)
+            # if which != 'j':
+            #     idx2 = x>0
+            #     x2 = x[idx2].values
+            #     y4 = N.array(y[idx2]>0, dtype=int)
+            # else:
+            #     x2 = x.values
+            #     y4 = N.array(y>0, dtype=int)
 
-            x3,y3,xth = UT.fit_sigmoid(x2,y4,xlim,0.99)
+            # only consider ones detected in the reference (en1)
+            idx2 = x>0
+            x2 = x[idx2].values
+            y4 = N.array(y[idx2]>0, dtype=int) # binary detection indicator (ratio>0)
+
+            try:
+                x3,y3,xth = UT.fit_sigmoid(x2,y4,(0,5),0.99)
+            except:
+                xth = N.NaN
             auc4,maxx4,avgy4,x4,y4 = self._calc_binned(x2,y4,self.binsize)
 
-            self.ratios[which] = PD.DataFrame({'x':x, 'y':y})
+            self.ratios[which] = PD.DataFrame({'x':x, 'y':y, 'name':ns})
             self.stats[which] = {'detected1':pop,
                                  'matched':hit,
                                  'detected2':pop2,
@@ -682,7 +683,7 @@ class EvalMatch(object):
             d = self.ratios[w]
             x = d['x'].values
             y = d['y'].values
-            self._plot(x,y,ax,which=pw,scale=100, which=w,**kw)
+            self._plot(x,y,ax,pw=pw,scale=100, which=w,**kw)
             if disp!='png':
                 if i==0:
                     ax.set_ylabel('% covered')

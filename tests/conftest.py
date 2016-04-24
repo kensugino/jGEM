@@ -8,6 +8,7 @@ from jgem import gtfgffbed as GGB
 from jgem import filenames as FN
 from jgem import assembler as AS
 from jgem import convert as CV
+from jgem import utils as UT
 
 # def pytest_addoption(parser):
 #     parser.addoption("--runslow", action="store_true",
@@ -33,6 +34,9 @@ def sampleinfo(datadir):
 	"returns pandas dataframe containing sample info"
 	sipath = os.path.join(datadir, 'sampleinfo.xlsx')
 	si = PD.read_excel(sipath)
+	si['bwfile'] = [os.path.join(datadir, 'bigwig', x) for x in si['bigwig']]
+	si['sjfile'] = [os.path.join(datadir, 'SJ', x) for x in si['sjbed']]
+	si['sjexpre'] = [os.path.join(datadir, 'assemblies', x) for x in si['name']]
 	return si
 
 @pytest.fixture(scope='session')
@@ -146,4 +150,31 @@ def asm(fnobj, sj):
 	a.params['np'] = 2
 	a.params['override'] = True
 	return a
+
+@pytest.fixture(scope='session')
+def testbam(datadir):
+	return os.path.join(datadir, 'bedtools/test.bam')
+
+@pytest.fixture(scope='session')
+def testbed(datadir):
+	return os.path.join(datadir, 'bedtools/test.bed.gz')
+
+@pytest.fixture(scope='session')
+def testbed12(datadir):
+	return os.path.join(datadir, 'bedtools/test.bed12.gz')
+
+@pytest.fixture(scope='session')
+def testwig(datadir):
+	return os.path.join(datadir, 'bedtools/test.wig')
+
+@pytest.fixture(scope='session')
+def testchromsizes():
+	return UT.chromsizes('dm3')
+
+@pytest.fixture(scope='session')
+def testsampleinfo(datadir):
+	si = UT.read_pandas(os.path.join(datadir, 'bedtools/test-si.txt'))
+	si['bwfile'] = datadir + '/' + si['bwfile']
+	return si
+
 

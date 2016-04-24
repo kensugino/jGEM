@@ -179,11 +179,11 @@ class Assembler(object):
         self.params = pr
         self.stats = {}
 
-    def delete_intermediates(self):
-        "Delete intermediate files."
-        fn = self.fnobj
-        categories = [x for x in fn._fnames.keys() if x !='output']
-        fn.delete(dcats=categories, ocats=['output'])
+    # def delete_intermediates(self):
+    #     "Delete intermediate files."
+    #     fn = self.fnobj
+    #     categories = [x for x in fn._fnames.keys() if x !='output']
+    #     fn.delete(delete=categories, protect=['output'])
 
     def check_params(self):
         "Check parameter change (if run previously) and save current parameter set."
@@ -221,7 +221,7 @@ class Assembler(object):
             
     def save_stats(self):
         df = PD.DataFrame(self.stats, index=['value']).T
-        fname = self.fnobj.txtname('assemble.stats',category='output')
+        fname = self.fnobj.fname('assemble.stats.txt',category='stats')
         UT.write_pandas(df, fname, 'ih')
 
     def assemble(self):
@@ -268,14 +268,15 @@ class Assembler(object):
 
         self.save_stats()
         if not self.saveintermediates:
-            self.delete_intermediates()
+            # self.delete_intermediates()
+            fn.delete(delete=[], protect=['output','stats'])
 
 
 # assembler modules #######################################################
 
-def mp_worker(args):
-    func, arg = args
-    return func(*arg)
+# def mp_worker(args):
+#     func, arg = args
+#     return func(*arg)
 
 class SUBASE(object):
     """Base class of assembler modules."""
@@ -288,7 +289,7 @@ class SUBASE(object):
         self.info = ''
 
     def __call__(self, *args, **kwargs):
-        LOG.info('Executing {0} ...'.format(self.__class__.__name__))
+        LOG.info('Executing {0} '.format(self.__class__.__name__)+'='*20)
         _sttime = time.time()
         rslt = self.call(*args, **kwargs)
         if self.info:
@@ -322,23 +323,23 @@ class SUBASE(object):
         chroms0 = set(df['chr'].unique())
         return [x for x in UT.chroms(pr['genome']) if x in chroms0]
 
-    def _process_mp(self, func, args):
-        np = self.params['np']
-        rslts = []
-        if np==1:
-            for i, arg in enumerate(args):
-                rslts += func(*arg)
-                LOG.debug(' processing: {0}/{1}...'.format(i+1,len(args)))
-        else:
-            try:
-                p = multiprocessing.Pool(np)
-                a = zip(repeat(func), args)
-                tmp = p.map(mp_worker, a)
-            finally:
-                LOG.debug('closing pool')
-                p.close()
-            rslts = reduce(iadd, tmp)
-        return rslts
+    # def _process_mp(self, func, args):
+    #     np = self.params['np']
+    #     rslts = []
+    #     if np==1:
+    #         for i, arg in enumerate(args):
+    #             rslts += func(*arg)
+    #             LOG.debug(' processing: {0}/{1}...'.format(i+1,len(args)))
+    #     else:
+    #         try:
+    #             p = multiprocessing.Pool(np)
+    #             a = zip(repeat(func), args)
+    #             tmp = p.map(mp_worker, a)
+    #         finally:
+    #             LOG.debug('closing pool')
+    #             p.close()
+    #         rslts = reduce(iadd, tmp)
+    #     return rslts
 
     def sjfile(self):
         fn = self.fnobj
@@ -377,8 +378,6 @@ class SELECTSJ(SUBASE):
         fn = self.fnobj
         pr = self.params
 
-        if 'tst' not in sj.columns: # 7th columns mcnt
-            sj['tst'] = sj['name'].str.split('-').str[3].str[1:].astype(int)
         a = b = GGB.write_bed(sj, fn.bedname('selectsj'), ncols=7)
         c = fn.txtname('selectsj.inte')
         c = BT.bedtoolintersect(a,b,c,wao=True) # somehow -s (force same strand) doesn't work
@@ -395,13 +394,12 @@ class SELECTSJ(SUBASE):
         sj2['sum'] = sj2['ucnt_sum']+sj2['mcnt_sum']
         sj2['cnt'] = sj2['sc1']+sj2['tst']
         self.sj2 = sj2 = sj2.reset_index()
-        # sj2['st'] = sj2['st']#+self.sjexpand
-        # sj2['ed'] = sj2['ed']#-self.sjexpand
         sj2['locus'] = UT.calc_locus_strand(sj2)
         sj2['ratio'] = sj2['sc1']/sj2['ucnt_sum']
         sj2['ratio_m'] = sj2['tst']/sj2['mcnt_sum']
         sj2['ratio_a'] = sj2['cnt']/sj2['sum']        
         self.sj2 = sj2
+        UT.write_pandas(sj2, fn.txtname('selectsj.sj2',category='output'), 'h') # TODO change cat to 'temp'
 
         # select 
         th_ratio = pr['selectsj_ratio']
@@ -459,7 +457,8 @@ class CHECKSJSUPPORT(SUBASE):
         oed = oed.set_index('name')
         sjsupp = sj.set_index('_id')[(ost['ovlratio']>0)&(oed['ovlratio']>0)].copy()
         self.info ='#sj: {0}=>{1}'.format(len(sj), len(sjsupp))
-        self.stats['CHECKSJSUPPORT.#sj'] = len(sjsupp)
+        self.stats['CHECKSJSUPPORT.#sj'] = len(sj)
+        self.stats['CHECKSJSUPPORT.#sjsupp'] = len(sjsupp)
         #return sjsupp
         fn.write_bed(sjsupp, 'checksjsupport.sj', ncols=7)
         self.asm.sj = sjsupp
@@ -506,8 +505,12 @@ class REMOVEJIE(SUBASE):
         sj['str_id'] = UT.calc_locus(sj)
         sid2ovl = UT.df2dict(sjmp, 'str_id','ovlratio')
         sj['ovlratio'] = [sid2ovl.get(x,N.nan) for x in sj['str_id']]
+        
+        # should use count ratios instead of actual reads as threshold ?
         th = pr['jie_sjth']
         idx = (sj['ovlratio']==1)&(sj['sc1']<th)&(sj['tst']<th)
+        
+
         sj1 = sj[~idx].copy() # use these for "nearest donor/acceptor" exon extraction
         jie = sj[idx].copy() # junctions in exon, add later
         self.info = '#sj:{0}=>{1}, jie {2}'.format(len(sj), len(sj1), len(jie))
@@ -857,7 +860,7 @@ class FINDEDGES2(SUBASE):
             mechr = me[me['chr']==chrom][['chr','st','ed','name','strand','_id2']].copy()
             cichr = ci[ci['chr']==chrom].copy()
             args.append((cichr,mechr,bwname,pr,chrom))
-        rslts = self._process_mp(func, args)
+        rslts = UT.process_mp(func, args, pr['np'])
         # rslts = []
         # if pr['np']==1:
         #     for i,arg in enumerate(args):
@@ -1555,6 +1558,7 @@ class EDGEFIXER(SUBASE):
 
 
     def process_edges(self, exons, bindf, utr, gap=300, covfactor=0.2):
+        pr = self.params
         LOG.debug('  preparing data...')
         args = []
         for chrom in self.chroms(exons): # exons['chr'].unique():
@@ -1563,7 +1567,7 @@ class EDGEFIXER(SUBASE):
                 if len(exs)==0:
                     continue
                 args.append((posarr, exs, strand, gap, utr, False, covfactor))#,printerr))
-        rslts = self._process_mp(fixedge, args)
+        rslts = UT.process_mp(fixedge, args, pr['np'])
         # rslts = []
         # if np==1:
         #     for arg in args:
@@ -1590,7 +1594,7 @@ class EDGEFIXER(SUBASE):
                 posarr, exs = self._make_arr(chrom,strand,bindf,exons,utr)
                 exs = targets[idx]
                 args.append((posarr, exs, strand, gap, utr, True, covfactor))#,printerr))
-        rslts = self._process_mp(fixedge, args)
+        rslts = UT.process_mp(fixedge, args, self.params['np'])
         # rslts = []
         # if np==1:
         #     for arg in args:
@@ -1766,7 +1770,7 @@ class FINDIRETS(SUBASE):
             sjchr = sj[sj['chr']==chrom][['chr','st','ed','name','_id','st_id','ed_id']].copy()
             irchr = irets[irets['chr']==chrom][['chr','ovlratio','strand','st_id','ed_id','cov']]
             args.append((sjchr,mechr,irchr,chrom,covratio,covth))
-        rslts = self._process_mp(findirets, args)
+        rslts = UT.process_mp(findirets, args, pr['np'])
         # rslts = []
         # np = pr['np']
         # if np==1:
@@ -2094,18 +2098,17 @@ class FIND53IR(SUBASE):
         # calc SE candidates (subtract ME) and calc cov
         fname = fn.txtname('se.cov.tmp')
         aname = fn.txtname('se.cov.all')
-        if (not override):
-            if (os.path.exists(fname)):
-                LOG.info('  reading cached SECOV {0}...'.format(fname))
-                secov = UT.read_pandas(fname)
-                secov['len'] = secov['ed']-secov['st']
-                secov = secov[secov['len']>sizeth]
-            elif os.path.exists(aname):
-                LOG.info('  reading cached SECOV {0}...'.format(aname))
-                # use cov calculated at FINDSECOVTH 
-                secov = UT.read_pandas(aname)
-                secov['len'] = secov['ed']-secov['st']
-                secov = secov[secov['len']>sizeth]
+        if (not override) and os.path.exists(fname):
+            LOG.info('  reading cached SECOV {0}...'.format(fname))
+            secov = UT.read_pandas(fname)
+            secov['len'] = secov['ed']-secov['st']
+            secov = secov[secov['len']>sizeth]
+        elif (not override) and os.path.exists(aname):
+            LOG.info('  reading cached SECOV {0}...'.format(aname))
+            # use cov calculated at FINDSECOVTH 
+            secov = UT.read_pandas(aname)
+            secov['len'] = secov['ed']-secov['st']
+            secov = secov[secov['len']>sizeth]
         else:
             # if not using FINDSECOV then just calculate len>sizeth
             LOG.info('  calculating SECOV...')
@@ -2148,9 +2151,10 @@ class FIND53IR(SUBASE):
         # somehow ['chr','st','ed','name','_id','strand','cov'] this order segfaults
         # when intersected with others
         mecols2 = ['echr','est','eed','ename','eid','ecov','strand']
-        a = UT.save_tsv_nidx_nhead(secov[secols],fn.bedname('find53ir.se'))
-        b = UT.save_tsv_nidx_nhead(me[mecols],fn.bedname('find53ir.me'))
-        c = BT.bedtoolintersect(a,b,fn.txtname('find53ir.ovl'),wao=True)
+        a = UT.write_pandas(secov[secols],fn.bedname('find53ir.se'),'')
+        b = UT.write_pandas(me[mecols],fn.bedname('find53ir.me'),'')
+        c = fn.txtname('find53ir.ovl')
+        c = BT.bedtoolintersect(a,b,c,wao=True)
         cols = secols+mecols2+['ovl']
         d = UT.read_pandas(c, names=cols)
         d['attachleft'] = d['ed+1']-1==d['est']
@@ -2161,7 +2165,7 @@ class FIND53IR(SUBASE):
         dse = dse[dse['cov']>secovth]
         dse['sc1'] = dse['cov'] # for writing BED
         # ME
-        dme = d[(d['attachleft']&d['bound'])|(d['attachright']&d['bound'])]
+        dme = d[(d['attachleft']&d['bound'])|(d['attachright']&d['bound'])].copy()
         dme['covratio'] = dme['cov'].astype(float)/dme['ecov'].astype(float)
         dme = dme[dme['covratio']>pr['find53ir_covratio']] # and substantial portion
 
@@ -2186,6 +2190,8 @@ class FIND53IR(SUBASE):
         # mecols: ['chr','st','ed','name','strand','_id2']
         # ci.name == str(me._id2)
         def _calc(id2s,direction,func):
+            if len(id2s)==0:
+                return None
             me = sei.ix[id2s].reset_index()[['chr','st','ed','name','strand','_id2']].copy()
             ci = me[['chr','st','ed']].copy()
             ci['name'] = me['_id2'].astype(str)
@@ -2199,16 +2205,18 @@ class FIND53IR(SUBASE):
 
         # attach exons
         dmi = dme.set_index('_id2')
-        i2c = dict(UT.izipcols(secov, ['_id2','cov']))
+        i2c = UT.df2dict(secov, '_id2','cov')
         def _makedics(id2s, boolcol):
             t = dmi.ix[id2s].reset_index()
             t = t[t[boolcol]]
             tg = t.groupby('_id2')['eid'].apply(lambda x: list(x)).reset_index()
-            s2eids = dict(UT.izipcols(tg, ['_id2','eid']))
+            s2eids = UT.df2dict(tg, '_id2','eid')
             tg2 = t.groupby('eid').first()
             e2row = dict(zip(tg2.index.values, UT.izipcols(tg2,['est','eed','ename','strand'])))
             return s2eids, e2row
         def _algen():
+            if alr is None:
+                return            
             s2eids,e2row = _makedics(al,'attachleft')
             for c,s,e,n,i2 in UT.izipcols(alr,['chr','st','ed','name','_id2']):
                 # SE|[mel] # (chr,sst,eed,sn|en,i2,estrand)
@@ -2218,6 +2226,8 @@ class FIND53IR(SUBASE):
                     name = n+'|'+erow[2]
                     yield (c,s,erow[1],name,cov,erow[3])
         def _argen():
+            if arr is None:
+                return            
             s2eids,e2row = _makedics(ar,'attachright')
             for c,s,e,n,i2 in UT.izipcols(arr,['chr','st','ed','name','_id2']):
                 # [mer]|SE, (chr,est,sed,name,i2,estrand)
@@ -2227,6 +2237,8 @@ class FIND53IR(SUBASE):
                     name = erow[2]+'|'+n
                     yield (c,erow[0],e,name,cov,erow[3])
         def _irgen():
+            if irr is None:
+                return
             s2le,le2row = _makedics(ir,'attachleft')
             s2re,re2row = _makedics(ir,'attachright')
             for c,s,e,n,i2 in UT.izipcols(irr,['chr','st','ed','name','_id2']):
@@ -2265,7 +2277,7 @@ class FIND53IR(SUBASE):
             mechr = me[me['chr']==chrom][['chr','st','ed','name','strand','_id2']].copy()
             cichr = ci[ci['chr']==chrom].copy()
             args.append((cichr,mechr,bwname,pr,chrom))
-        rslts = self._process_mp(func, args)
+        rslts = UT.process_mp(func, args, pr['np'])
         # rslts = []
         # if pr['np']==1:
         #     for i,arg in enumerate(args):
@@ -2347,7 +2359,8 @@ class FINDSECOVTH(SUBASE):
         for a in attrs:
             st['FINDSECOVTH.'+a] = pr[a]
         prdf = PD.DataFrame(pr,index=[fn.sname]).T
-        fn.write_txt(prdf, 'findsecovth.params', fm='ih', category='output')
+        fname = fn.fname('findsecovth.params.txt', category='stats')
+        UT.write_pandas(prdf, fname, fm='ih')
         
     def calc_refexcov(self):
         fn = self.fnobj
@@ -2778,7 +2791,7 @@ class FIXEDGES2(SUBASE):
         for chrom in self.chroms(ex):
             exc = ex[ex['chr']==chrom]
             args.append((exc, find, params,chrom))
-        rslts = self._process_mp(fixedge2, args)
+        rslts = UT.process_mp(fixedge2, args, pr['np'])
         # rslts = []
         # np = p['np']
         # if np==1:

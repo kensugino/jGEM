@@ -28,10 +28,11 @@ import numpy as N
 #from bx.bbi.bigwig_file import BigWigFile
 #from ngslib import wWigIO
 #bx-python is not compatible with Python3 => use modified version 
-from jgem.bxbbi.bigwig_file import BigWigFile
 
 from jgem import utils as UT
-from jgem.cy.bw import array2wiggle_chr # Cython version
+from jgem import bedtools as BT
+import jgem.cy.bw  as cybw #import array2wiggle_chr # Cython version
+import jgem.bxbbi.bigwig_file as cybx #import BigWigFile
 
 MAXSIZE = int(300e6)  # 300Mbp bigger than chr1,chrX
 
@@ -57,13 +58,17 @@ def cnt_bam(fpath):
         cmd = ['samtools', 'index', fpath]
         subprocess.call(cmd)
     if os.path.exists(cache) and os.path.getmtime(cache)>os.path.getmtime(fpath):
-        out = open(cache).read()
+        out = open(cache,'r').read()
     else:
         cmd = ['samtools', 'flagstat', fpath]
         out = subprocess.check_output(cmd)
         open(cache,'w').write(out)
     firstline = out.split('\n')[0].split()
     return int(firstline[0])+int(firstline[2])
+
+
+def wig2bw(wigpath, chromsizes, bwpath):
+    pass
 
 def bam2bw(fpath, chromsizes, bpath, aligned=None):
     """
@@ -105,7 +110,7 @@ def bam2bw(fpath, chromsizes, bpath, aligned=None):
 def block_iter(infile, chrom, chunk=int(10e6)):
     "BigWig file iterator"
     with open(infile, mode='rb') as fobj:
-        bw = BigWigFile(fobj)
+        bw = cybx.BigWigFile(fobj)
         for x in range(0,MAXSIZE,chunk): # 10Mbp chunk
             iterator = bw.get(chrom, x, x+chunk)
             if iterator is None:
@@ -175,7 +180,7 @@ def bw2bed(bwfile, bedfile, chroms, th):
         return bedfile+'.gz'
     # make sure bwfile exists
     if not ( os.path.exists(bwfile) ):
-        raise RuntimeError('BigWig file {0} does not exist.'.formoat(bwfile))
+        raise RuntimeError('BigWig file {0} does not exist.'.format(bwfile))
     processor = apply_threshold(bwfile,th, chroms)
     out = open(bedfile,'w')
     out.write(''.join(['%s\t%i\t%i\n' % x for x in processor]))
@@ -199,77 +204,62 @@ def get_bigwig_as_array(bwfile, chrom, st, ed):
         Numpy array of size (ed-st)
     """
     # with open(bwfile, mode='rb') as fobj:
-    #     bw = BigWigFile(fobj)
+    #     bw = cybx.BigWigFile(fobj)
     #     it = bw.get(chrom,st,ed)
     #     a = N.zeros(ed-st)
     #     for s,e,v in it:
     #         a[s-st:e-st] += v
     # return a
     with open(bwfile, mode='rb') as fobj:
-        bw = BigWigFile(fobj)
+        bw = cybx.BigWigFile(fobj)
         a = bw.get_as_array(chrom,st,ed)
         a[N.isnan(a)]=0.
     return a
 
-def merge_bigwigs_chr(args):
-    bwfiles, chrom, chromsize, dstpath = args
+def merge_bigwigs_chr(bwfiles, chrom, chromsize, dstpath, scale):
     # merge4-allsample.bw chr1 89026991 intervals ~50%
     # better to just use dense array than sparse array
     a = N.zeros(chromsize)
     for fpath in bwfiles:
         with open(fpath,mode='rb') as fobj:
-            bw = BigWigFile(fobj)
+            bw = cybx.BigWigFile(fobj)
             it = bw.get(chrom, 0, chromsize)
             if it is not None:
                 for s,e,v in it:
                     a[s:e] += v
-    a = a/float(len(bwfiles))
-    array2wiggle_chr(a, chrom, dstpath)
+    #a = a/float(len(bwfiles))
+    if scale is not None:
+        a = a*scale
+    a = N.array(a, dtype=N.float32)
+    cybw.array2wiggle_chr(a, chrom, dstpath)
     return (chrom, dstpath)
 
-def merge_bigwigs_mp(bwfiles, genome, dstpath, np=7):
-    #chroms = sorted(chromsizes.keys())
+def merge_bigwigs_mp(bwfiles, genome, dstpath, scale=None, np=7):
     chroms = UT.chroms(genome)
     chromfile = UT.chromsizes(genome)
-    # chromfile = os.path.join(os.path.dirname(dstpath), 'chrom.sizes')
-    # with open(chromfile, 'w') as fobj:
-    #     fobj.write('\n'.join(['{0}\t{1}'.format(c,chromsizes[c]) for c in chroms]))
     chromsizes = UT.df2dict(UT.chromdf(genome), 'chr', 'size')
+    args = [(bwfiles, c, chromsizes[c], dstpath+'.{0}.wig'.format(c), scale) for c in chroms]
 
-    args = [(bwfiles, c, chromsizes[c], dstpath+'.{0}.wig'.format(c)) for c in chroms]
+    rslts = UT.process_mp(merge_bigwigs_chr, args, np, doreduce=False)
 
-    if np==1:
-        rslts = []
-        for arg in args:
-            c = arg[1]
-            LOG.debug('bigwig merge: processing {0}...'.format(c))
-            rslts.append(merge_bigwigs_chr(arg))
-    else:
-        print('bigwig merge: np={0}'.format(np))
-        try:
-            p = multiprocessing.Pool(np)
-            rslts = p.map(merge_bigwigs_chr, args)
-        finally:
-            LOG.debug('closing pool')
-            p.close()
     dic = dict(rslts)
     LOG.debug('concatenating chromosomes...')
-    with open(dstpath+'.wig', 'w') as dst:
+    wigpath = dstpath+'.wig'
+    with open(wigpath, 'w') as dst:
         for c in chroms:
-            shutil.copyfileobj(open(dic[c],'r'), dst)
+            with open(dic[c],'r') as src:
+                shutil.copyfileobj(src, dst)
+
     LOG.debug('converting wiggle to bigwig')
-    cmd = ['wigToBigWig', dstpath+'.wig', chromfile, dstpath]
-    err = subprocess.call(cmd)
-    if err != 0:
-        raise RuntimeError('wigToBigWig failed err:{0}'.format(err))
+    BT.wig2bw(wigpath, chromfile, dstpath)
+
     # clean up 
     for c in chroms:
         f = dstpath+'.{0}.wig'.format(c)
         if os.path.exists(f):
             os.unlink(f)
-    f = dstpath+'.wig'
-    if os.path.exists(f):
-        os.unlink(f)
+    if os.path.exists(wigpath):
+        os.unlink(wigpath)
     
 # def array2wiggle_chr(a, chrom, dstpath):
     # possibly Cythonify

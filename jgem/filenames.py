@@ -19,6 +19,7 @@ import numpy as N
 # library imports
 from jgem import gtfgffbed as GGB
 from jgem import utils as UT
+from jgem import convert as CV
 
 class FileNamesBase(object):
     """Base calss for handling tons of (temporary) filenames.
@@ -56,20 +57,22 @@ class FileNamesBase(object):
     def bedname(self, suffix, category='temp'):
         return self.fname(suffix+'.bed.gz', category)
 
-    def delete(self, dcats=['temp'], ocats=[]):
+    def delete(self, delete=['temp'], protect=[]):
         """Delete temporary files.
 
         Args:
-            dcats (list): categories to delete default ['temp']
-            ocats (list): output categories (files in these cateogries 
+            delete (list): categories to delete default ['temp']
+            protect (list): output categories (files in these cateogries 
              are protpected)
 
         """
         outputs = []
-        for c in ocats:
+        for c in protect:
             if c in self._fnames:
                 outputs += self._fnames[c]
-        for c in dcats:
+        if len(delete)==0:
+            delete = [x for x in self._fnames.keys() if x not in outputs]
+        for c in delete:
             if c in self._fnames:
                 for fpath in self._fnames[c]:
                     if os.path.exists(fpath) and fpath not in outputs:
@@ -131,7 +134,7 @@ class FileNames(FileNamesBase):
         self.bwfile = bwfile
         self.sjfile = sjfile
         self.outdir = outdir
-        self.refgtf = GGB.GTF2SJEX(refgtf)
+        self.refgtf = CV.GTF2SJEX(refgtf)
         
         # FileNamesBase init
         prefix = os.path.join(outdir, sname)
@@ -146,4 +149,12 @@ class FileNames(FileNamesBase):
     def refsjex(self):
         return self.refgtf.sjex()
 
+    def ex_out(self):
+        return self.txtname('ex', category='output')
+
+    def sj_out(self):
+        return self.txtname('sj', category='output')
+
+    def genes_out(self):
+        return self.bedname('genes', category='output')
 

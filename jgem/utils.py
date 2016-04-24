@@ -16,9 +16,17 @@ import csv
 import time
 import collections
 import functools
-from functools import partial
+from functools import partial, reduce
+from operator import iadd
+from itertools import repeat 
+try:
+    from itertools import izip_longest as zip_longest
+except:
+    from itertools import zip_longest
+
 import shutil
 import uuid
+import multiprocessing
 
 import pandas as PD
 import numpy as N
@@ -265,7 +273,11 @@ def write_pandas(df, path, fm='h', **kwargs):
         kwargs['header'] = True
     else:
         kwargs['header'] = False
-    return save_tsv(df, path, gzip=True, **kwargs)
+    if path[-3:]=='.gz':
+        gzip=True
+    else:
+        gzip=False
+    return save_tsv(df, path, gzip=gzip, **kwargs)
 
 
 def read_pandas(path,**kwargs):
@@ -511,7 +523,20 @@ def me_se(ex):
     me = ex[~seidx]
     return me, se
 
-
+def calc_tlen(ex, ci):
+    """ calculate gene transcript length, here just union of exons """
+    ci['len'] = ci['ed']-ci['st']
+    ci['eid'] = ci['name'].astype(str).apply(lambda x: [int(y) for y in x.split(',')])
+    if ('id' not in ci.columns):
+        ci['id'] = ci['sc1']
+    ccf = flattendf(ci[['eid','chr','st','ed','len','id','name']], 'eid')
+    e2g = df2dict(ex, '_id','_gidx')
+    ccf['_gidx'] = [e2g[x] for x in ccf['eid']]
+    # ignore duplicated ci, just take unique set within the gene
+    ccf1 = ccf.groupby(['_gidx','id']).first().reset_index() 
+    gbed = ccf1.groupby('_gidx')['len'].sum().to_frame('tlen')
+    gbed['ltlen'] = N.log10(gbed['tlen'])
+    return gbed # column: tlen, ltlen, index:_gidx
 
 #### BINNED AVG ########################################################
 def calc_binned(xs, ys, num=500, yth=0, returnsorted=False, returnminmax=False, method='mean'):
@@ -632,5 +657,39 @@ def chopintervals(exons, fname=None, sort=True, idcol='_id'):
     ci = PD.DataFrame([x for x in _gen()], columns=['chr','st','ed','name'])
     ci['id'] = N.arange(len(ci))
     if fname:
-        save_tsv_nidx_nhead(ci, fname)
+        write_pandas(ci, fname, '')
     return ci
+
+
+#### multiprocessing ##################################################
+
+def mp_worker(args):
+    func, arg = args
+    return func(*arg)
+
+def process_mp(func, args, np, doreduce=True):
+    rslts = []
+    if np==1:
+        for i, arg in enumerate(args):
+            rslts.append(func(*arg))
+            LOG.debug(' processing: {0}/{1}...'.format(i+1,len(args)))
+    else:
+        try:
+            p = multiprocessing.Pool(np)
+            a = zip(repeat(func), args)
+            rslts = p.map(mp_worker, a)
+        finally:
+            LOG.debug('closing pool')
+            p.close()
+    if doreduce:
+        rslts = reduce(iadd, rslts, [])
+    return rslts    
+
+def grouper(iterable, n, fill=None):
+    "Collect data into fixed-length chunks or blocks"
+    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
+    args = [iter(iterable)] * n
+    return zip_longest(fillvalue=fillvalue, *args)
+
+
+
