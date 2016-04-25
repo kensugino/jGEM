@@ -69,10 +69,16 @@ def logerr(noerr=0):
 
 @compressQ('bedpath', None)
 def bam2bed(bampath, bedpath):
-    """Runs BEDTOOLS bamtobed. Convert to BED6 (lose splice info). Change name to '.' to reduce size."""
+    """Convert BAM to BED7
+
+    BED name field (column 4) contains read id (so that together with map id (col 7) multi-mapper can be identified)
+    BED tst field (column 7) contains map id (so that split reads can be identified)
+
+    BED sc1 field (column 5) is from bedtools bamtobed and contains mapping quality
+    """
 
     cmd1 = ['bedtools','bamtobed','-i', bampath, '-split','-bed12']
-    awkscript = 'BEGIN{OFS="\t"}{$4=NR; n=split($11,a,","); n=split($12,b,","); for(i=1;i<=n;i++){st=$2+b[i]; print $1,st,st+a[i],$4,$5,$6}}' 
+    awkscript = 'BEGIN{OFS="\t";c=1;}{if(d[$4]){$4=d[$4];}else{d[$4]=c;$4=c;c++;} n=split($11,a,","); n=split($12,b,","); for(i=1;i<=n;i++){st=$2+b[i]; print $1,st,st+a[i],$4,$5,$6,NR}}'
     cmd2 = ['awk',awkscript]
     with open(bedpath, 'w') as fp:
         p1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE)
@@ -82,10 +88,16 @@ def bam2bed(bampath, bedpath):
 
 @compressQ('bedpath', None)
 def bam2bed12(bampath, bedpath):
-    """Runs BEDTOOLS bamtobed. Convert to BED12. Change name to '.' to reduce size."""
+    """Convert BAM to BED12
+
+    BED name field (column 4) contains read id (so that multi-mapper can be identified)
+    BED tst field (column 7) contains map id 
+    BED sc1 field (column 5) is from bedtools bamtobed and contains mapping quality
+    """
 
     cmd1 = ['bedtools','bamtobed','-i', bampath, '-split', '-bed12']
-    cmd2 = ['awk','-v', "OFS=\t", '$4="."']
+    awkscript = 'BEGIN{OFS="\t";c=1;}{if(a[$4]){$4=a[$4];}else{a[$4]=c;$4=c;c++;}; $7=NR; print $0;}'
+    cmd2 = ['awk',awkscript]
     with open(bedpath, 'w') as fp:
         p1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE)
         p2 = subprocess.Popen(cmd2, stdin=p1.stdout, stdout=fp)
@@ -194,7 +206,7 @@ def save_bed_covstats(bedpath, dstpath, bed12=False):
     df = df.sort_values('covbp',ascending=False)
     return UT.write_pandas(df, dstpath, 'ih')
 
-def get_total_bp_bedfile(bedpath, bed12=False, chroms=None, returndics=False):
+def get_total_bp_bedfile(bedpath, bed12=False, chroms=None, returndics=False, checkuniq=False):
     """ Returns total mapped base pairs (totbp) and covered base pairs (covbp).
     The ratio totbp/covbp gives average coverage. Process without reading entire data
     into the RAM. Process non BED12 file.
@@ -211,7 +223,10 @@ def get_total_bp_bedfile(bedpath, bed12=False, chroms=None, returndics=False):
     if bed12:
         totbpdic,covbpdic = cybw.get_total_bp_bed12file_helper(bedpath)
     else:
-        totbpdic,covbpdic = cybw.get_total_bp_bedfile_helper(bedpath)
+        if checkuniq:
+            totbpdic,covbpdic = cybw.get_total_bp_bedfile_helper_check_uniq(bedpath)
+        else:
+            totbpdic,covbpdic = cybw.get_total_bp_bedfile_helper(bedpath)
     # fix key bytes => str
     tdic = {}
     cdic = {}

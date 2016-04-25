@@ -84,7 +84,8 @@ cpdef get_total_bp_bed12file_helper(str bed12path):
     fp.close()
     # union intervals
     for chrom, v in chrdic.items():
-        a = N.array(sorted(list(v)), dtype=N.int32)
+        a = N.array(sorted(list(v)), dtype=N.int32) 
+        # numpy a.sort(axis=1) will sort two columns independently! Be careful.
         b = union_intervals(a) # union intervals
         covbpdic[chrom] = N.sum([ed1-st1 for st1,ed1 in b])
     return totbpdic, covbpdic
@@ -134,10 +135,69 @@ cpdef get_total_bp_bedfile_helper(str bedpath):
     # union intervals
     for chrom, v in chrdic.items():
         a = N.array(sorted(list(v)), dtype=N.int32)
+        # numpy a.sort(axis=1) will sort two columns independently! Be careful.
         b = union_intervals(a) # union intervals
         covbpdic[chrom] = N.sum([ed0-st0 for st0,ed0 in b])
     return totbpdic, covbpdic
-    
+
+@cython.boundscheck(False) # turns off bounds-checking for entire function
+@cython.wraparound(False) # turns off negative indexing checking
+cpdef get_total_bp_bedfile_helper_check_uniq(str bedpath):
+    """ Returns total mapped base pairs (totbp) and covered base pairs (covbp).
+    The ratio totbp/covbp gives average coverage. Process without reading entire data
+    into the RAM. Process non BED12 file.
+
+    Check the 4th column (name) as read id. Omits duplicates (but take the first one).
+
+    Args:
+        bedpath: a path to non BED12 (BED3,...)
+
+    Returns:
+        totbp: total base pairs in BED
+        covbp: covered base pairs
+    """
+    cdef dict chrdic = {}
+    cdef dict covbpdic = {}
+    cdef dict totbpdic = {}
+    # cdef set chrsted = set()
+    cdef int st0,ed0,cid0,pid0,rid0, prid0
+    #cdef str line,chrom,st,ed,y,z
+    cdef bytes line,chrom,st,ed,y,z,cid,sc1,strand,rid
+    cdef set v
+    cdef list b
+    cdef ADTYPE_t[I32_t,ndim=2] a
+
+    if bedpath[len(bedpath)-3:len(bedpath)]=='.gz':
+        fp = gzip.open(bedpath,'r')
+        #reader = codecs.getreader("utf-8")
+        #fp = reader( gfp )
+    else:
+        fp = open(bedpath,'r')
+        #gfp = fp
+    pid0 = 0 # previous read id 
+    prid0 = 0 # previous map id
+    for line in fp:#.readlines():
+        chrom,st,ed,cid,sc1,strand,rid = line.split(b'\t')[:7]
+        cid0,rid0 = int(cid),int(rid)
+        if (cid0>pid0) or (rid0==prid0):
+            if chrom not in chrdic:
+                chrdic[chrom] = set()
+                totbpdic[chrom] = 0
+            st0,ed0 = int(st),int(ed)
+            chrdic[chrom].add((st0,ed0))
+            totbpdic[chrom] += ed0-st0
+        pid0 = cid0
+        prid0 = rid0
+    #gfp.close()
+    fp.close()
+    # union intervals
+    for chrom, v in chrdic.items():
+        a = N.array(sorted(list(v)), dtype=N.int32)
+        # numpy a.sort(axis=1) will sort two columns independently! Be careful.
+        b = union_intervals(a) # union intervals
+        covbpdic[chrom] = N.sum([ed0-st0 for st0,ed0 in b])
+    return totbpdic, covbpdic
+
 @cython.boundscheck(False) # turns off bounds-checking for entire function
 @cython.wraparound(False) # turns off negative indexing checking
 cpdef list flatten_bed8(ADTYPE_t bed8):
