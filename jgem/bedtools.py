@@ -199,8 +199,8 @@ def bed12ToBed6(bed12path, bed6path):
 
 ### Normalization Scale ##############################################
 
-def save_bed_covstats(bedpath, dstpath, bed12=False):
-    tdic,cdic = get_total_bp_bedfile(bedpath, bed12, returndics=True)
+def save_bed_covstats(bedpath, dstpath, bed12=False, checkuniq=False):
+    tdic,cdic = get_total_bp_bedfile(bedpath, bed12, returndics=True, checkuniq=checkuniq)
     df = PD.DataFrame({c: {'totbp':tdic[c], 'covbp':cdic[c]} for c in cdic}).T
     df['acov'] = df['totbp']/df['covbp']
     df = df.sort_values('covbp',ascending=False)
