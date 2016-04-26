@@ -7,9 +7,6 @@ jGEM packages
     :show-inheritance:
 
 
-Submodules
-----------
-
 assembler module
 ----------------
 
