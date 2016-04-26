@@ -1,5 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -8,8 +7,11 @@
     
     <title>jGEM packages &mdash; jGEM 0.9.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-3.3.4/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-3.3.4/css/bootstrap-theme.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -24,20 +26,124 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="top" title="jGEM 0.9.0 documentation" href="index.html" />
     <link rel="prev" title="Tutorial" href="quickstart.html" />
-   
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body role="document">  
+  <body role="document">
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          jGEM</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.9.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
             
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">jGEM packages</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">jGEM packages</a><ul>
+<li><a class="reference internal" href="#module-jgem.assembler">assembler module</a></li>
+<li><a class="reference internal" href="#module-jgem.annotate">annotate module</a></li>
+<li><a class="reference internal" href="#module-jgem.bedtools">bedtools module</a></li>
+<li><a class="reference internal" href="#module-jgem.bigwig">bigwig module</a></li>
+<li><a class="reference internal" href="#module-jgem.calccov">calccov module</a></li>
+<li><a class="reference internal" href="#module-jgem.collector">collector module</a></li>
+<li><a class="reference internal" href="#module-jgem.convert">convert module</a></li>
+<li><a class="reference internal" href="#module-jgem.evaluate">evaluate module</a></li>
+<li><a class="reference internal" href="#module-jgem.filenames">filenames module</a></li>
+<li><a class="reference internal" href="#module-jgem.graph">graph module</a></li>
+<li><a class="reference internal" href="#module-jgem.gtfgffbed">gtfgffbed module</a></li>
+<li><a class="reference internal" href="#module-jgem.merge">merge module</a></li>
+<li><a class="reference internal" href="#module-jgem.trimex">trimex module</a></li>
+<li><a class="reference internal" href="#module-jgem.utils">utils module</a></li>
+<li><a class="reference internal" href="#module-jgem">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="quickstart.html" title="Previous Chapter: Tutorial"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Tutorial</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/modules.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
   
 <style>
 /* CSS for nbsphinx extension */
@@ -173,9 +279,6 @@ div.nboutput  > :nth-child(2).stderr {
 <div class="section" id="module-jgem">
 <span id="jgem-packages"></span><h1>jGEM packages<a class="headerlink" href="#module-jgem" title="Permalink to this headline">¶</a></h1>
 <p>Copyright (c) 2015-2016 Ken Sugino</p>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
 <div class="section" id="module-jgem.assembler">
 <span id="assembler-module"></span><h2>assembler module<a class="headerlink" href="#module-jgem.assembler" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-assembler"></span><dl class="class">
@@ -1594,7 +1697,7 @@ and junction counts (sjfile).</p>
 </dl>
 <dl class="attribute">
 <dt id="jgem.evaluate.EvalMatch.abbr">
-<code class="descname">abbr</code><em class="property"> = {'5b': &quot;5' exons (b)&quot;, '5': &quot;5' exons&quot;, 's': 'single exons', 'i': 'internal exons', 'sb': 'single exons (b)', '3': &quot;3' exons&quot;, '3b': &quot;3' exons (b)&quot;, 'j': 'junctions'}</em><a class="headerlink" href="#jgem.evaluate.EvalMatch.abbr" title="Permalink to this definition">¶</a></dt>
+<code class="descname">abbr</code><em class="property"> = {'s': 'single exons', '3b': &quot;3' exons (b)&quot;, '3': &quot;3' exons&quot;, '5b': &quot;5' exons (b)&quot;, 'sb': 'single exons (b)', 'i': 'internal exons', 'j': 'junctions', '5': &quot;5' exons&quot;}</em><a class="headerlink" href="#jgem.evaluate.EvalMatch.abbr" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -3224,76 +3327,21 @@ Set ptyp (exon type, internal 3prime, 5prime, single, etc.) according to exon na
 </div>
 
 
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">jGEM packages</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-jgem.assembler">assembler module</a></li>
-<li><a class="reference internal" href="#module-jgem.annotate">annotate module</a></li>
-<li><a class="reference internal" href="#module-jgem.bedtools">bedtools module</a></li>
-<li><a class="reference internal" href="#module-jgem.bigwig">bigwig module</a></li>
-<li><a class="reference internal" href="#module-jgem.calccov">calccov module</a></li>
-<li><a class="reference internal" href="#module-jgem.collector">collector module</a></li>
-<li><a class="reference internal" href="#module-jgem.convert">convert module</a></li>
-<li><a class="reference internal" href="#module-jgem.evaluate">evaluate module</a></li>
-<li><a class="reference internal" href="#module-jgem.filenames">filenames module</a></li>
-<li><a class="reference internal" href="#module-jgem.graph">graph module</a></li>
-<li><a class="reference internal" href="#module-jgem.gtfgffbed">gtfgffbed module</a></li>
-<li><a class="reference internal" href="#module-jgem.merge">merge module</a></li>
-<li><a class="reference internal" href="#module-jgem.trimex">trimex module</a></li>
-<li><a class="reference internal" href="#module-jgem.utils">utils module</a></li>
-<li><a class="reference internal" href="#module-jgem">Module contents</a></li>
-</ul>
-</li>
-</ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="quickstart.html" title="previous chapter">Tutorial</a></li>
-  </ul></li>
-</ul>
-</div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/modules.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2016, Ken Sugino.
       
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
       
-      |
-      <a href="_sources/modules.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-
-    
+    </p>
+    <p>
+        &copy; Copyright 2016, Ken Sugino.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.<br/>
+    </p>
+  </div>
+</footer>
   </body>
 </html>

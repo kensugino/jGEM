@@ -1,5 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -8,8 +7,11 @@
     
     <title>Tutorial &mdash; jGEM 0.9.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-3.3.4/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-3.3.4/css/bootstrap-theme.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -24,21 +26,124 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="top" title="jGEM 0.9.0 documentation" href="index.html" />
     <link rel="next" title="jGEM packages" href="modules.html" />
     <link rel="prev" title="Installation" href="install.html" />
-   
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body role="document">  
+  <body role="document">
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          jGEM</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.9.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
             
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">jGEM packages</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Tutorial</a><ul>
+<li><a class="reference internal" href="#Sample-Info">Sample Info</a></li>
+<li><a class="reference internal" href="#Preparing-Inputs-to-the-assembler">Preparing Inputs to the assembler</a><ul>
+<li><a class="reference internal" href="#SJBED-file-format">SJBED file format</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Assembling-individual-samples">Assembling individual samples</a></li>
+<li><a class="reference internal" href="#Evaluation-of-individual-assemblies">Evaluation of individual assemblies</a></li>
+<li><a class="reference internal" href="#Preparing-for-merge">Preparing for merge</a></li>
+<li><a class="reference internal" href="#Merging">Merging</a></li>
+<li><a class="reference internal" href="#Annotating-assembly">Annotating assembly</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="install.html" title="Previous Chapter: Installation"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Installation</span>
+    </a>
+  </li>
+  <li>
+    <a href="modules.html" title="Next Chapter: jGEM packages"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">jGEM packages &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/quickstart.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
   
 <style>
 /* CSS for nbsphinx extension */
@@ -258,7 +363,8 @@ using the wrapper
 </div>
 <p>STAR also creates a file named SJ.out.tab which contains junction
 information.</p>
-<p>We&#8217;ll create columns containing actual locations of these files.</p>
+<p>First, we&#8217;ll create columns containing actual paths of these files in
+the sampleinfo dataframe.</p>
 <div class="nbinput container">
 <div class="highlight-none"><div class="highlight"><pre>
 <span></span>In [3]:
@@ -300,7 +406,7 @@ information.</p>
 appropriately formatted BED file containing junction information for the
 inputs to the assembler.</p>
 <p>To normalize coverage, we use average coverage which is the number of
-the total base pairs mapped divided by the number of covered base pairs.
+the total mapped base pairs divided by the number of covered base pairs.
 This can be calculated using
 <a class="reference external" href="modules.html#jgem.bedtools.get_total_bp_bedfile">jgem.bedtools.get_total_bp_bedfile</a>:</p>
 <div class="nbinput container">
@@ -331,7 +437,7 @@ This can be calculated using
 3  Fev_CSm_m71_1626.chr1  161885717  11661445  13.882132
 </pre></div></div>
 </div>
-<p>Now normalized BIGWIG coverage file can be generated using
+<p>Now normalized BIGWIG coverage files can be generated using
 <a class="reference external" href="modules.html#jgem.bedtools.bed2bw">jgem.bedtools.bed2bw</a> function:</p>
 <div class="nbinput nblast container">
 <div class="highlight-none"><div class="highlight"><pre>
@@ -902,21 +1008,21 @@ INFO:[sb] detected1:969,        matched:256,    (detected2:10388),      ratio:0.
 </pre></div></div>
 </div>
 <p>INFO outputs are as follows:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">detected1</span><span class="p">:</span> <span class="n">counts</span> <span class="n">of</span> <span class="n">gencode</span> <span class="n">exons</span><span class="o">/</span><span class="n">junctions</span> <span class="k">with</span> <span class="n">positive</span> <span class="n">coverage</span>
-<span class="n">matched</span><span class="p">:</span> <span class="n">number</span> <span class="n">of</span> <span class="n">matched</span> <span class="n">exons</span><span class="o">/</span><span class="n">junctions</span>
-<span class="n">detected2</span><span class="p">:</span> <span class="n">counts</span> <span class="n">of</span> <span class="n">elements</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">assembly</span>
-<span class="n">ratio</span><span class="p">:</span> <span class="n">matched</span><span class="o">/</span><span class="n">detected1</span>
-<span class="n">ratio2</span><span class="p">:</span> <span class="n">matched</span><span class="o">/</span><span class="n">detected2</span>
-</pre></div>
-</div>
+<ul class="simple">
+<li>detected1: counts of gencode exons/junctions with positive coverage</li>
+<li>matched: number of matched exons/junctions</li>
+<li>detected2: counts of elements in the assembly</li>
+<li>ratio: matched/detected1</li>
+<li>ratio2: matched/detected2</li>
+</ul>
 <p>These are assesed within different exon classes:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">**</span><span class="n">i</span><span class="o">**</span> <span class="n">internal</span> <span class="n">exon</span> <span class="p">(</span><span class="n">exons</span> <span class="n">bounded</span> <span class="n">by</span> <span class="n">splice</span> <span class="n">junctions</span><span class="p">)</span>
-<span class="o">**</span><span class="mi">5</span><span class="o">**</span> <span class="mi">5</span><span class="s1">&#39;exons</span>
-<span class="o">**</span><span class="mi">3</span><span class="o">**</span> <span class="mi">3</span><span class="s1">&#39;exons</span>
-<span class="o">**</span><span class="n">s</span><span class="o">**</span> <span class="n">single</span> <span class="n">exons</span>
-<span class="o">**</span><span class="n">j</span><span class="o">**</span> <span class="n">junctions</span>
-</pre></div>
-</div>
+<ul class="simple">
+<li><strong>i</strong>: internal exon (exons bounded by splice junctions)</li>
+<li><strong>5</strong>: 5&#8217;exons</li>
+<li><strong>3</strong>: 3&#8217;exons</li>
+<li><strong>s</strong>: single exons</li>
+<li><strong>j</strong>: junctions</li>
+</ul>
 <p>Classes with <strong>b</strong>, (<strong>5b</strong>,<strong>3b</strong>,<strong>sb</strong>) allow matching to
 different classes of exons.</p>
 <p>Matching exons with junction boundary requires the boundaries to match.
@@ -965,7 +1071,7 @@ internal exons. Single exon detection rates are bad and about 10%.</p>
 </div>
 </div>
 <p>We can also plot the detection sensitivity against coverages. We expect
-detection rate is better at bigger coverage.</p>
+the detection rate is better at the bigger coverage.</p>
 <div class="nbinput container">
 <div class="highlight-none"><div class="highlight"><pre>
 <span></span>In [14]:
@@ -1119,8 +1225,8 @@ transcriptomes. Moreover, merging should also improve the sensitivity
 and the completeness of the reconstruction.</p>
 <p>For merging, we will repeat the assembly process but uses aggregated
 junctions and coverage bigwigs generated from all exons from all
-assemblies. We need to prepare these two files first. For this, we use
-<a class="reference external" href="modules.html#jgem.merge.MergeInputs">MergeInputs class</a>.</p>
+assemblies. We need to prepare these two kinds of files first. For this,
+we use <a class="reference external" href="modules.html#jgem.merge.MergeInputs">MergeInputs class</a>.</p>
 <div class="nbinput nblast container">
 <div class="highlight-none"><div class="highlight"><pre>
 <span></span>In [18]:
@@ -1554,9 +1660,10 @@ INFO:[sb] detected1:969,        matched:284,    (detected2:10700),      ratio:0.
 </div>
 </div>
 <p>So we have much better detection of internal exons (~10% improvement)
-and slight improvement in 5&#8217;exons, 3&#8217;exons and junctions.</p>
-<p>We can also see the improvements in the reconstruction in GLC,ECC,JCC as
-well:</p>
+and slight improvements in the detection of 5&#8217;exons, 3&#8217;exons and
+junctions.</p>
+<p>We can also see the improvements in the gene structure reconstruction in
+the changes in GLC,ECC,JCC:</p>
 <div class="nbinput container">
 <div class="highlight-none"><div class="highlight"><pre>
 <span></span>In [33]:
@@ -1616,7 +1723,7 @@ class</a>.</p>
 </div>
 </div>
 <p>When overwrite is True, it overwrites the original sj,ex files. If
-False, it creats files in output direcotry:</p>
+False, it creats files in the output direcotry:</p>
 <div class="nbinput container">
 <div class="highlight-none"><div class="highlight"><pre>
 <span></span>In [35]:
@@ -1734,71 +1841,21 @@ False, it creats files in output direcotry:</p>
 </div>
 
 
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Tutorial</a><ul>
-<li><a class="reference internal" href="#Sample-Info">Sample Info</a></li>
-<li><a class="reference internal" href="#Preparing-Inputs-to-the-assembler">Preparing Inputs to the assembler</a><ul>
-<li><a class="reference internal" href="#SJBED-file-format">SJBED file format</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#Assembling-individual-samples">Assembling individual samples</a></li>
-<li><a class="reference internal" href="#Evaluation-of-individual-assemblies">Evaluation of individual assemblies</a></li>
-<li><a class="reference internal" href="#Preparing-for-merge">Preparing for merge</a></li>
-<li><a class="reference internal" href="#Merging">Merging</a></li>
-<li><a class="reference internal" href="#Annotating-assembly">Annotating assembly</a></li>
-</ul>
-</li>
-</ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="install.html" title="previous chapter">Installation</a></li>
-      <li>Next: <a href="modules.html" title="next chapter">jGEM packages</a></li>
-  </ul></li>
-</ul>
-</div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/quickstart.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2016, Ken Sugino.
       
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
       
-      |
-      <a href="_sources/quickstart.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-
-    
+    </p>
+    <p>
+        &copy; Copyright 2016, Ken Sugino.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.<br/>
+    </p>
+  </div>
+</footer>
   </body>
 </html>
