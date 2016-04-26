@@ -119,7 +119,7 @@ class EvalNames(FN.FileNamesBase):
             if code2 is None:
                 path = self.modelpath(which)
             else:
-                path = self.fname2('{0}.txt.gz'.format(which),code2)
+                path = self.fname2('{0}.txt.gz'.format(which),code2, category=category)
             return UT.write_pandas(getattr(self, which), path, 'h')
         return None
 
@@ -221,6 +221,12 @@ class EvalMatch(object):
         ex = en.model('ex')
         savesj = False
         saveex = False
+        # check support
+        dids = set(ex['d_id'].values)
+        aids = set(ex['a_id'].values)
+        idx = sj['a_id'].isin(aids) & sj['d_id'].isin(dids)
+        sj = sj[idx].copy()
+        en.sj = sj 
         # length
         if 'len' not in sj.columns:
             sj['len'] = sj['ed'] - sj['st']
@@ -619,9 +625,9 @@ class EvalMatch(object):
             if not lineonly:
                 ax.set_title(self.abbr[w])
                 if w!='j':
-                    ax.set_xlabel('log2({0}_ecov+1)'.format(p1c))
+                    ax.set_xlabel('log2({0}.{1}_ecov+1)'.format(p1c, self.datacode))
                 else:
-                    ax.set_xlabel('log2({0}_jcnt+1)'.format(p1c))
+                    ax.set_xlabel('log2({0}.{1}_jcnt+1)'.format(p1c, self.datacode))
         if not lineonly:
             axr[0].set_ylim([-5,105])
             axr[0].set_ylabel('%detected')
@@ -658,7 +664,7 @@ class EvalMatch(object):
                 if i==0:
                     ax.set_ylabel('{1}_len/{0}_len+1'.format(p1c,p2c))
                 if plotxlabel:
-                    ax.set_xlabel('log2({0}_ecov+1)'.format(p1c))
+                    ax.set_xlabel('log2({0}.{1}_ecov+1)'.format(p1c, self.datacode))
                 ax.set_title(label+self.abbr[w])
                 m = 10**(N.nanmean(N.log10(y[(x>0)&(y>0)])))
                 ax.text(5,10**2,'avg:{0:.2f}'.format(m))
@@ -688,7 +694,7 @@ class EvalMatch(object):
                 if i==0:
                     ax.set_ylabel('% covered')
                 if i==1:
-                    ax.set_xlabel('log2({0}_gcov+1)'.format(p1c))
+                    ax.set_xlabel('log2({0}.{1}_gcov+1)'.format(p1c, self.datacode))
                 ax.set_title(w.upper())
             else:
                 ax.set_yticks([])

@@ -263,13 +263,14 @@ class Assembler(object):
         if not pr['merging']:
             FIXEDGES2(self)() # TRIM 3',5' edges
 
+        CONSISTENTSJ(self)() # remove sj without ex support
         WRITESJEX(self)()
         WRITEGENES(self)()
 
         self.save_stats()
         if not self.saveintermediates:
             # self.delete_intermediates()
-            fn.delete(delete=[], protect=['output','stats'])
+            fn.delete(delete=['temp'], protect=['output','stats'])
 
 
 # assembler modules #######################################################
@@ -406,6 +407,7 @@ class SELECTSJ(SUBASE):
         idx1 = (sj2['ratio']>=th_ratio)|(sj2['ratio_a']>=th_ratio)
         self.sj4 = sj4 = sj2[idx1]
         self.info = '#sj:{0}=>{1}'.format(len(sj), len(sj4))
+        self.stats['SELECTSJ.#sj0'] = len(sj)
         self.stats['SELECTSJ.#sj'] = len(sj4)
         #return sj4
         self.asm.sj = sj4
@@ -551,6 +553,8 @@ class SJ2EX(SUBASE):
         sj['mreads'] = sj['tst']
         sj1 = sj[(sj['ureads']>ureadth)|(sj['mreads']>mreadth)].copy()
         LOG.info('#sj:{0}=>{1} after ureadth, mreadth'.format(len(sj), len(sj1)))
+        self.stats['SJ2EX.#sj_before_uth_mth'] = len(sj)
+        self.stats['SJ2EX.#sj_after_uth_mth'] = len(sj1)
 
         ex = PD.DataFrame([x for x in self._sj2ex(sj1)],columns=GGB.BEDCOLS[:6])
         # there are small cases of duplicates
@@ -1351,9 +1355,9 @@ def fixedge(posarr,exs,strand,gap,utr,ignorefirstdonors,covfactor):
                 else:
                     ex[3] = NAME[flag][kind]+ex[3]
                 ex[tgt2] = npos
-                #if printerr and kind.startswith('assert'):
-                LOG.debug('  error:{0}/{1}/{2}/{3}/{4}'.format(UT.exid(ex), kind, npos, i0,ex[3]))
-                LOG.debug(posarr[i0-3:i0+3])
+                if kind.startswith('assert'):
+                    LOG.debug('  error:{0}/{1}/{2}/{3}/{4}'.format(UT.exid(ex), kind, npos, i0,ex[3]))
+                    LOG.debug(posarr[i0-3:i0+3])
                 yield ex
             else:
                 #if printerr:
@@ -2507,6 +2511,9 @@ class FINDSECOVTH(SUBASE):
             refcov = self.rex['cov'].values
         else: # use ME cov
             ex = self.ex
+            if 'cat' not in ex.columns:
+                sj = self.asm.sj
+                UT.set_exon_category(sj,ex)
             refcov = ex[ex['cat']!='s']['cov'].values
         refcov = refcov[refcov>0] # only use expressed 
         return refcov
@@ -2996,8 +3003,6 @@ class WRITESJEX(SUBASE):
         #     fn.write_txt(ae, 'ex', category='output')
         #     fn.write_bed(ae, 'ex', category='output', ncols=6)
 
-
-
 class WRITEGENES(SUBASE):
     """Write genes (and isoform) BED (and GTF) files for viewing on browsers.
 
@@ -3041,6 +3046,29 @@ class WRITEGENES(SUBASE):
                 LOG.info(' writing gtf isoforms...')
                 fname = fn.fname('genes.iso{0}.gtf.gz'.format(maxiso), category='output')
                 gw.write_iso(fname, maxiso)
+
+class CONSISTENTSJ(SUBASE):
+    """Remove junctions without connections to exons
+
+    Args:
+        sj: junction dataframe
+        ae: exon dataframe
+
+    Output:
+        sj: modify assembler sj
+
+    """
+    def call(self):
+        sj = self.asm.sj
+        ae = self.asm.ae
+        dids = set(ae['d_id'].values)
+        aids = set(ae['a_id'].values)
+        idx = sj['a_id'].isin(aids) & sj['d_id'].isin(dids)
+        sj2 = sj[idx]
+        self.info = ' #sj {0} => {1}'.format(len(sj), len(sj2))
+        self.stats['CONSISTENTSJ.#sj'] = len(sj2)
+        self.asm.sj = sj2
+
 
 
 # EdgeDetector ##########################################################

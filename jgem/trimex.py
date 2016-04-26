@@ -7,6 +7,10 @@
 
 """
 import multiprocessing
+import logging
+logging.basicConfig(level=logging.DEBUG)
+LOG = logging.getLogger(__name__)
+
 # 3rd party imports
 import pandas as PD
 import numpy as N

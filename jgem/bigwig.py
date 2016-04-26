@@ -32,7 +32,8 @@ import numpy as N
 from jgem import utils as UT
 from jgem import bedtools as BT
 import jgem.cy.bw  as cybw #import array2wiggle_chr # Cython version
-import jgem.bxbbi.bigwig_file as cybx #import BigWigFile
+from jgem.cy.bw import array2wiggle_chr
+from jgem.bxbbi.bigwig_file import BigWigFile
 
 MAXSIZE = int(300e6)  # 300Mbp bigger than chr1,chrX
 
@@ -110,7 +111,7 @@ def bam2bw(fpath, chromsizes, bpath, aligned=None):
 def block_iter(infile, chrom, chunk=int(10e6)):
     "BigWig file iterator"
     with open(infile, mode='rb') as fobj:
-        bw = cybx.BigWigFile(fobj)
+        bw = BigWigFile(fobj)
         for x in range(0,MAXSIZE,chunk): # 10Mbp chunk
             iterator = bw.get(chrom, x, x+chunk)
             if iterator is None:
@@ -204,14 +205,14 @@ def get_bigwig_as_array(bwfile, chrom, st, ed):
         Numpy array of size (ed-st)
     """
     # with open(bwfile, mode='rb') as fobj:
-    #     bw = cybx.BigWigFile(fobj)
+    #     bw = BigWigFile(fobj)
     #     it = bw.get(chrom,st,ed)
     #     a = N.zeros(ed-st)
     #     for s,e,v in it:
     #         a[s-st:e-st] += v
     # return a
     with open(bwfile, mode='rb') as fobj:
-        bw = cybx.BigWigFile(fobj)
+        bw = BigWigFile(fobj)
         a = bw.get_as_array(chrom,st,ed)
         a[N.isnan(a)]=0.
     return a
@@ -222,7 +223,7 @@ def merge_bigwigs_chr(bwfiles, chrom, chromsize, dstpath, scale):
     a = N.zeros(chromsize)
     for fpath in bwfiles:
         with open(fpath,mode='rb') as fobj:
-            bw = cybx.BigWigFile(fobj)
+            bw = BigWigFile(fobj)
             it = bw.get(chrom, 0, chromsize)
             if it is not None:
                 for s,e,v in it:

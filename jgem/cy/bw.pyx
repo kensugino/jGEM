@@ -10,6 +10,7 @@
 import numpy as N
 cimport numpy as N
 import gzip
+import codecs
 
 ctypedef N.float32_t F32_t
 ctypedef N.float64_t F64_t
@@ -276,3 +277,62 @@ cpdef str array2wiggle_chr64(N.ndarray[F64_t] a, str chrom, str dstpath):
         fobj.write(u'{0}\t{1}\t{2}\t{3}\n'.format(chrom,st,i,c))
     fobj.close()
     return dstpath
+
+
+@cython.boundscheck(False) # turns off bounds-checking for entire function
+@cython.wraparound(False) # turns off negative indexing checking
+cpdef read_gtf_helper(str gtfpath, list parseattrs, str comment='#'):
+    """ Returns total mapped base pairs (totbp) and covered base pairs (covbp).
+    The ratio totbp/covbp gives average coverage. Process without reading entire data
+    into the RAM.
+
+    Args:
+        bedpath: path to GTF
+        parseattrs: attributes (in extra fields) to parse
+        comment: comment string at the beginning of the lines
+
+    Returns:
+        row: list of parsed rows
+        cols: column names
+
+    """
+    cdef str line,chrom,src,typ,st,ed,sc1,strand,sc2,extra,x,y
+    cdef list l,r
+    cdef list GTFCOLS = ['chr','src','typ','st','ed','sc1','strand','sc2','extra']
+    cdef list recs = []
+    cdef int st0, ed0
+    cdef dict dic
+    cdef list cols0 = GTFCOLS+parseattrs
+    cdef list e = ['']*len(parseattrs)
+
+    if gtfpath[len(gtfpath)-3:len(gtfpath)]=='.gz':
+        gfp = gzip.open(gtfpath,'r')
+        reader = codecs.getreader("utf-8")
+        fp = reader( gfp )
+    else:
+        fp = open(gtfpath,'r')
+        gfp = fp
+
+    for line in fp: # skip initial comments
+        if len(line)>0 and line[0]!=comment:
+            break
+    # process the first line
+    r = line.strip().split('\t')
+    if len(r)==9:
+        chrom,src,typ,st,ed,sc1,strand,sc2,extra = r
+        dic = dict([(l[0],l[1][1:-1]) for l in [y.split() for y in extra.split(';')] if len(l)>1])
+        recs.append(r+[dic.get(x,'') for x in parseattrs])
+    else:
+        recs.append(r)        
+    for line in fp: # process the rest
+        r = line.strip().split('\t')
+        if len(r)==9:
+            chrom,src,typ,st,ed,sc1,strand,sc2,extra = r
+            dic = dict([(l[0],l[1][1:-1]) for l in [y.split() for y in extra.split(';')] if len(l)>1])
+            recs.append(r+[dic.get(x,'') for x in parseattrs])
+        else:
+            recs.append(r)
+    gfp.close()
+
+    return recs, cols0
+

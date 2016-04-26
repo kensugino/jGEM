@@ -389,8 +389,8 @@ def calc_ecov(expath, cipath, bwpath, dstprefix, override=False, np=4):
         2. dstprefix+'.ecov.txt.gz' : DataFrame(cols: eid, chr, st, ed, ecov)
 
     """
-    covcipath = dstprefix+'.covci.txt.gz'
-    ecovpath = dstprefix+'.ecov.txt.gz'
+    covcipath = dstprefix+'covci.txt.gz'
+    ecovpath = dstprefix+'ecov.txt.gz'
 
     if UT.notstale([expath, cipath], covcipath, override):
         cc = UT.read_pandas(covcipath)
@@ -447,8 +447,8 @@ def calc_gcov(expath, cipath, bwpath, dstprefix, override=False, np=4):
             cids: cid with cov > for the gene ','.joined
     """
     ex = UT.read_pandas(expath)
-    covcipath = dstprefix+'.covci.txt.gz'
-    gcovpath = dstprefix+'.gcov.txt.gz'
+    covcipath = dstprefix+'covci.txt.gz'
+    gcovpath = dstprefix+'gcov.txt.gz'
 
     if UT.notstale([expath, cipath], covcipath, override):
         cc = UT.read_pandas(covcipath)

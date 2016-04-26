@@ -21,7 +21,7 @@ from jgem import graph as GP
 
 # GTF <=> EX,SJ    ######################################################################
 
-def gtf2exonsj(gtf):
+def gtf2exonsj(gtf, np=1):
     """Extract exons and sj from GTF
     exon, junction coordinates = zero based (same as BED)
     junction start-1 = exon end
@@ -60,6 +60,14 @@ def gtf2exonsj(gtf):
 
     UT.set_info(sj,ex)
     UT.set_exon_category(sj, ex)
+
+    # find genes (connected components) set '_gidx'
+    prefix = os.path.abspath('./graphpre-')
+    genes = GP.find_genes4(sj,ex,
+        filepre=prefix,
+        np=np,
+        override=False,
+        separatese=True)
 
     return sj, ex
 
@@ -159,12 +167,6 @@ class GTF2SJEX(object):
         #     gtf['cov'] = GGB.get_gtf_attr_col(gtf, 'cov')
         # convert gtf to sjex
         sj, ex = gtf2exonsj(gtf)
-        # find genes (connected components) set '_gidx'
-        genes = GP.find_genes4(sj,ex,
-            filepre=self.prefix+'graphpre-',
-            np=np,
-            override=False,
-            separatese=True)
         # save
         UT.write_pandas(sj, sjpath, 'h')
         UT.write_pandas(ex, expath, 'h')

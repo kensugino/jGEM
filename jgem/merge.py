@@ -36,7 +36,7 @@ MERGECOVPARAM = dict(
     th_ratio=1e-3, # discard junctions less than this portion within overlapping junctions
     th_detected=2, # at least observed in 3 samples
     th_maxcnt1=0.1, # max read count should be larger than this
-    th_maxcnt2=4, # if max read count is larger than this then single sample observation is OK
+    th_maxcnt2=1, # if max read count is larger than this then single sample observation is OK
 )
 MERGEASMPARAM = dict(
     se_maxth=0.5,   # SE maxcov threshold
@@ -187,6 +187,13 @@ class MergeInputs(object):
         self.chroms = UT.chroms(genome)
         self.tgts =  ['mep','men','se'] #'sep','sen']
 
+    def prepare(self):
+        """ Prepare merged bigwig coverage files, merged junction files and aggregated bigwig file (average cov)."""
+        self.make_ex_bigwigs()
+        self.make_sj_bed()
+        self.aggregate_bigwigs()
+        fn.delete(delete=['temp'],protect=['output'])
+
     def make_ex_bigwigs(self):
         """Make 5 bigwig files from assembly exon outputs by treating each exon as reads weighted by coverage. """
         fn = self.fnobj
@@ -198,8 +205,8 @@ class MergeInputs(object):
             bedpath = fn.ex_bed(k) #fn.fname('ex.{0}.bed.gz'.format(k))
             bwpath = fn.ex_bw(k) #fn.fname('ex.{0}.bw'.format(k), category='output')
             LOG.debug('converting {0} to BIGWIG...'.format(bedpath))
-            totbp,covbp = UT.get_total_bp_befile(bedpath, bed12=False)
-            scale = 50*float(covbp)/totbp # normalize average coverage to 50: 50 is arbitrary
+            totbp,covbp = BT.get_total_bp_bedfile(bedpath, bed12=False)
+            scale = float(covbp)/totbp # normalize average coverage to 1.
             LOG.info('{0}:totbp={1},covbp={2},scale={3}'.format(bedpath,totbp,covbp,scale))
             # scale = 1e8/totbp # old normalization = 1e6/totaligned when readlen=100bp
             # ^==== TODO: Is normalizing to totaligned good? 
@@ -239,8 +246,7 @@ class MergeInputs(object):
                     with open(sf,'rb') as src:
                         shutil.copyfileobj(src, dst)
                         #dst.write(src.read())
-        fn.delete(delete=['temp'],protect=['output'])
-
+        
     def make_sj_bed(self):
         """Make merged junction input file. """
         self.make_sj0_bed() # aggregate junctions
@@ -282,17 +288,15 @@ class MergeInputs(object):
         msj['mcnt'] = scale*msj['mcnt']
         # unique junctions
         msjg = msj.groupby(['chr','st','ed','strand'])[['ucnt','mcnt']].sum().reset_index()
-        msjg['sc1'] = msjg['ucnt'] # for BED
-        msjg['tst'] = msjg['mcnt'] # for BED
+        # msjg['sc1'] = msjg['ucnt'] # for BED
+        # msjg['tst'] = msjg['mcnt'] # for BED
         u = msjg['ucnt'].map('{:.2}'.format)
         m = msjg['mcnt'].map('{:.2}'.format)
         msjg['_id'] = N.arange(len(msjg))
         msjg['name'] = msjg['_id'].astype(str)+'_u:'+u+'_m:'+m
-        cols = GGB.BEDCOLS[:7] # chr,st,ed,name,sc1,strand,tst
+        cols = GGB.SJCOLS #GGB.BEDCOLS[:7] # chr,st,ed,name,sc1,strand,tst
         UT.write_pandas(msjg[cols], dstpath, '') # BED file
         self.sj0 = msjg
-        # delete temp files
-        fn.delete(delete=['temp'],protect=['output'])
 
     def collect_sj(self):
         """From aggregated junctions, collect original reads for each samples.
@@ -373,10 +377,16 @@ class MergeInputs(object):
 
         # select 
         idx1 = (sj2['ratio']>=pr['th_ratio'])|(sj2['ratio_a']>=pr['th_ratio'])
-        idx2 = (sj2['#detected']>pr['th_detected'])&(sj2['maxcnt']>pr['th_maxcnt1'])
-        idx3 = sj2['maxcnt']>pr['th_maxcnt2']
+        idx2 = sj2['#detected']>pr['th_detected']
+        idx3 = sj2['maxcnt']>pr['th_maxcnt1']
+        idx4 = sj2['maxcnt']>pr['th_maxcnt2']
 
-        self.sj4 = sj4 = sj2[idx1&(idx2|idx3)]
+        self.sj4 = sj4 = sj2[idx1&((idx2&idx3)|idx4)]
+        LOG.info('selectsj: in {0}'.format(len(sj2)))
+        LOG.info('selectsj: {0} smaller than th_ratio({1})'.format(N.sum(~idx1),pr['th_ratio']))
+        LOG.info('selectsj: {0} smaller than th_detected({1})'.format(N.sum(~idx2),pr['th_detected']))
+        LOG.info('selectsj: {0} smaller than th_maxcnt1({1})'.format(N.sum(~idx3),pr['th_maxcnt1']))
+        LOG.info('selectsj: {0} larger than th_maxcnt2({1})'.format(N.sum(idx4),pr['th_maxcnt2']))
         LOG.info('#selected SJ:{0}<={1}'.format(len(sj4),len(sj2)))
         cols = GGB.SJCOLS
         sjg = allsj.set_index('locus')[cols]
@@ -751,9 +761,9 @@ class MergeAssemble(object):
         cipath = fna.ci_out()
         bwpath = fni.agg_bw()
         dstpre = fna.fname('')
-        covciname = fna.fname('.covci.txt.gz')
-        gcovname = fna.fname('.gcov.txt.gz')
-        ecovname = fna.fname('.ecov.txt.gz')
+        covciname = fna.fname('covci.txt.gz') # register as temp files, delete later
+        gcovname = fna.fname('gcov.txt.gz')
+        ecovname = fna.fname('ecov.txt.gz')
 
         gcov = CC.calc_gcov(expath, cipath, bwpath, dstpre, override=True, np=pr['np'])
         ecov = CC.calc_ecov(expath, cipath, bwpath, dstpre, override=False, np=pr['np'])

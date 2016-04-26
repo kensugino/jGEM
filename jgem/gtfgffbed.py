@@ -19,12 +19,19 @@ import pandas as PD
 import numpy as N
 
 from jgem import utils as UT
+import jgem.cy.bw as cybw
 
 
 GTFCOLS = ['chr','src','typ','st','ed','sc1','strand','sc2','extra']
 GFFCOLS = ['chr','src','typ','st','ed','sc1','strand','sc2','attr']
 BEDCOLS = ['chr', 'st', 'ed', 'name', 'sc1', 'strand', 'tst', 'ted', 'sc2', '#exons', 'esizes', 'estarts']
+
 SJCOLS = ['chr', 'st', 'ed', 'name', 'ucnt', 'strand', 'mcnt']
+
+SJTABCOLS = ['chr','st','ed','strand2','motif','annotated','ureads','mreads','maxoverhang']
+SJTABMOTIF = {0:'non-canonical',1:'GT/AG',2:'CT/AC',3:'GC/AG',4:'CT/GC',5:'AT/AC',6:'GT/AT'}
+SJTABSTRAND = {1:'+',2:'-',0:'.'}
+
 DEFAULT_GTF_PARSE = ['gene_id','transcript_id','exon_number','gene_name','cov','FPKM']
 
 # SJ.out.tab to SJBED ###################################################################
@@ -41,13 +48,10 @@ def sjtab2sjbed(sjtab, sjbed, scale):
         Pandas dataframe
 
     """
-    SJCOLS = ['chr','st','ed','strand2','motif','annotated','ureads','mreads','maxoverhang']
-    SJMOTIF = {0:'non-canonical',1:'GT/AG',2:'CT/AC',3:'GC/AG',4:'CT/GC',5:'AT/AC',6:'GT/AT'}
-    SJSTRAND = {1:'+',2:'-',0:'.'}
-    sj = PD.read_table(sjtab, names=SJCOLS)
-    sj['name'] = ['%s-k%d-u%d-m%d-o%d' % (SJMOTIF[x], a, u, m, o) for x,a, u,m,o in \
+    sj = PD.read_table(sjtab, names=SJTABCOLS)
+    sj['name'] = ['%s-k%d-u%d-m%d-o%d' % (SJTABMOTIF[x], a, u, m, o) for x,a, u,m,o in \
                   sj[['motif','annotated','ureads','mreads','maxoverhang']].values]
-    sj['strand'] = [SJSTRAND[x] for x in sj['strand2']]
+    sj['strand'] = [SJTABSTRAND[x] for x in sj['strand2']]
     #scale = 1e6/float(aligned)
     sj['ucnt'] = sj['ureads']*scale
     sj['mcnt'] = sj['mreads']*scale
@@ -128,18 +132,43 @@ def read_gff(gffname, onlytypes=[], parseattrs=[]):
     return gff
 
 # this function is awfully slow => replace with vectorized version
-# def get_gtf_attr_col(gtf, aname):
-#     "helper function for read_gtf"
-#     def _attr(line):
-#         #if isinstance(line, basestring):
-#         #if isinstance(line, str):
-#         if UT.isstring(line):
-#             dic = dict([(x[0],x[1][1:-1]) for x in [y.split() for y in line.split(';')] if len(x)>1])
-#             return dic.get(aname,'')
-#         return ''
-#     return [_attr(line) for line in gtf['extra']]
+def get_gtf_attr_col(gtf, aname):
+    "helper function for read_gtf"
+    def _attr(line):
+        #if isinstance(line, basestring):
+        #if isinstance(line, str):
+        if UT.isstring(line):
+            dic = dict([(x[0],x[1][1:-1]) for x in [y.split() for y in line.split(';')] if len(x)>1])
+            return dic.get(aname,'')
+        return ''
+    return [_attr(line) for line in gtf['extra']]
 
+# ~35 sec to read Gencode.vM4
 def read_gtf(gtfname, onlytypes=[], parseattrs=DEFAULT_GTF_PARSE, rename={}):
+    """ Read in whole GTF, parse gene_id, transcript_id from column 9
+
+    Args:
+        gtfname: path to GTF file
+        onlytypes: only keep these types. If [] or None, then keep all (default).
+        parseattrs: which column attributes to parse.
+
+    Returns:
+        Pandas DataFrame containing GTF data
+
+    """
+    recs,cols = cybw.read_gtf_helper(gtfname, parseattrs, '#')
+    df = PD.DataFrame(recs, columns=cols)
+    df['st'] = df['st'].astype(int)
+    df['ed'] = df['ed'].astype(int)
+    df.replace('', N.nan, inplace=True)
+    if onlytypes:
+        df = df[df['typ'].isin(onlytypes)].copy()
+    if rename:
+        df.rename(columns=rename, inplace=True)    
+    return df
+
+# ~3.5 min to read Gencode.vM4
+def read_gtf1(gtfname, onlytypes=[], parseattrs=DEFAULT_GTF_PARSE, rename={}):
     """ Read in whole GTF, parse gene_id, transcript_id from column 9
 
     Args:
@@ -189,7 +218,37 @@ def read_gtf(gtfname, onlytypes=[], parseattrs=DEFAULT_GTF_PARSE, rename={}):
         else:
             LOG.warning('column {0} not found'.format(c))
     if rename:
-        gtf = gtf.rename(columns=rename)
+        gtf.rename(columns=rename, inplace=True)
+    return gtf
+
+# ~3.5 min to read Gencode.vM4 (original version)
+def read_gtf0(gtfname, onlytypes=[], parseattrs=DEFAULT_GTF_PARSE, rename={}):
+    """ Read in whole GTF, parse gene_id, transcript_id from column 9
+
+    Args:
+        gtfname: path to GTF file
+        onlytypes: only keep these types. If [] or None, then keep all (default).
+        parseattrs: which column attributes to parse.
+
+    Returns:
+        Pandas DataFrame containing GTF data
+
+    """
+    if not UT.isstring(gtfname):
+        return gtfname
+        
+    if gtfname.endswith('.gz'):
+        gtf = PD.read_table(gtfname, names=GTFCOLS, compression='gzip', comment='#')
+    else:
+        gtf = PD.read_table(gtfname, names=GTFCOLS, comment='#')
+    if onlytypes:
+        gtf = gtf[gtf['typ'].isin(onlytypes)].copy()
+    LOG.debug( "extracting ids...")
+    # field1 "field1 value"; field2 "field2 value"; ...
+    for c in parseattrs:
+        gtf[c] = get_gtf_attr_col(gtf, c)
+    if rename:
+        gtf.rename(columns=rename, inplace=True)
     return gtf
 
 def read_bed(fpath):
@@ -417,7 +476,7 @@ def bed2gtf(fpath, compress=True):
         subprocess.call(['gzip',fpath[:-3]])
     return bdpath
 
-    
+
 # UTILS         ######################################################################
 
 def chop_chrs_gtf(gtfname, chrs, outdir=None):

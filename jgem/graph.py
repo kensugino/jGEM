@@ -544,6 +544,8 @@ def find_genes4(sj, ae, filepre, cachename=None, np=1, override=False, depth=500
         UT.set_ids(sj)
     if 'cat' not in ae.columns:
         UT.set_exon_category(sj,ae)
+    if 'a_id' not in ae.columns:
+        UT.set_ad_info(sj,ae)
 
     ### FIND GENES
     if cachename and os.path.exists(cachename) and not override:
