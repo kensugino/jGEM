@@ -1,4 +1,4 @@
-"""Copyright (c) 2015-2016 Ken Sugino
+"""
 
 .. module:: gtfgffbed
     :synopsis: GTF/GFF/BED related functions

@@ -1,4 +1,4 @@
-"""Copyright (c) 2015-2016 Ken Sugino
+"""
 
 .. module:: calccov
     :synopsis: calculate coverages, gene length using nnls or 

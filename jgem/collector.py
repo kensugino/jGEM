@@ -1,4 +1,4 @@
-"""Copyright (c) 2015-2016 Ken Sugino
+"""
 
 .. module:: collector
     :synopsis: Calculate and collect coverages for all samples against a specific assembly.

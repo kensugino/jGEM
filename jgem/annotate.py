@@ -1,4 +1,4 @@
-"""Copyright (c) 2015-2016 Ken Sugino
+"""
 
 .. module:: compare
     :synopsis: compare to a reference and annotate known genes

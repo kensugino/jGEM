@@ -1,4 +1,4 @@
-"""Copyright (c) 2015-2016 Ken Sugino
+"""
 
 .. module:: convert
     :synopsis: convert sj,ex to bed, gtf  or gtf to sj,ex

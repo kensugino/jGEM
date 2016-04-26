@@ -1,4 +1,4 @@
-"""Copyright (c) 2015-2016 Ken Sugino
+"""
 
 .. module:: assembler
     :synopsis: assemble genes from RNASeq data (normalized genome coverage (bigwig) and junctions)

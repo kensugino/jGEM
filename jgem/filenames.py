@@ -1,4 +1,4 @@
-"""Copyright (c) 2015-2016 Ken Sugino
+"""
 
 .. module:: filenlames
     :synopsis: deals with (mostly temporary) files 

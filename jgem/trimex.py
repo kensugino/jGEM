@@ -1,4 +1,4 @@
-"""Copyright (c) 2015-2016 Ken Sugino
+"""
 
 .. module:: trimex
     :synopsis: makes trimed genes (to avoid length bias in coverage variance)

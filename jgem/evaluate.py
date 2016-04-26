@@ -1,4 +1,4 @@
-"""Copyright (c) 2015-2016 Ken Sugino
+"""
 
 .. module:: evaluate
     :synopsis: evaluate performance by comparing to a reference annotation
