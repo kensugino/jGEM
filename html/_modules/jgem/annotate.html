@@ -1,0 +1,453 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>jgem.annotate &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<h1>Source code for jgem.annotate</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">.. module:: compare</span>
+<span class="sd">    :synopsis: compare to a reference and annotate known genes</span>
+
+<span class="sd">..  moduleauthor:: Ken Sugino &lt;ken.sugino@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># system imports</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">iadd</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="nb">reduce</span>
+
+<span class="c1"># 3rd party libraries</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">PD</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">N</span>
+<span class="c1">#import matplotlib.pyplot as P</span>
+
+<span class="c1"># library imports</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">UT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">gtfgffbed</span> <span class="k">as</span> <span class="n">GGB</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">bedtools</span> <span class="k">as</span> <span class="n">BT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">filenames</span> <span class="k">as</span> <span class="n">FN</span> 
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">evaluate</span> <span class="k">as</span> <span class="n">EV</span>
+
+<div class="viewcode-block" id="ComparatorNames"><a class="viewcode-back" href="../../modules.html#jgem.annotate.ComparatorNames">[docs]</a><span class="k">class</span> <span class="nc">ComparatorNames</span><span class="p">(</span><span class="n">EV</span><span class="o">.</span><span class="n">EvalNames</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filename manager for evaluation process. Same as EvalNames</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        sjexbase: path prefix to junction, exon files (*.sj.txt.gz and *.ex.txt.gz)</span>
+<span class="sd">        code: assembly identifier</span>
+<span class="sd">        outdir: output directory</span>
+
+<span class="sd">    All outputs and temporary files are prefixed by **outdir/code**</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sjexbase</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">outdir</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ComparatorNames</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">sjexbase</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">outdir</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Comparator"><a class="viewcode-back" href="../../modules.html#jgem.annotate.Comparator">[docs]</a><span class="k">class</span> <span class="nc">Comparator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Compare to reference and annotate. </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cn_ref</span><span class="p">,</span> <span class="n">cn_tgt</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">gnamecol</span><span class="o">=</span><span class="s1">&#39;gene_name&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            cn_ref: Reference ComparatorNames object</span>
+<span class="sd">            cn_tgt: Target ComparatorNames object</span>
+<span class="sd">            outdir: output directory</span>
+<span class="sd">            gnamecol: name of the column containing gene names (gene_name for Gencode, symbol for RefSeq)</span>
+<span class="sd">             (default gene_name)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cn_ref</span> <span class="o">=</span> <span class="n">cn_ref</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cn_tgt</span> <span class="o">=</span> <span class="n">cn_tgt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refgnamecol</span> <span class="o">=</span> <span class="n">gnamecol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_overlaps</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Comparator.calc_overlaps"><a class="viewcode-back" href="../../modules.html#jgem.annotate.Comparator.calc_overlaps">[docs]</a>    <span class="k">def</span> <span class="nf">calc_overlaps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cn_ref</span>
+        <span class="n">ctgt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cn_tgt</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">ctgt</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;ex.bed.gz&#39;</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">cref</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;ex.bed.gz&#39;</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">ctgt</span><span class="o">.</span><span class="n">fname2</span><span class="p">(</span><span class="s1">&#39;ex.ovl.txt.gz&#39;</span><span class="p">,</span> <span class="n">cref</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;len&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ex_tgt</span> <span class="o">=</span> <span class="n">etgt</span> <span class="o">=</span> <span class="n">ctgt</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="s1">&#39;ex&#39;</span><span class="p">)</span> <span class="c1">#UT.read_pandas(p1.ex)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ex_ref</span> <span class="o">=</span> <span class="n">eref</span> <span class="o">=</span> <span class="n">cref</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="s1">&#39;ex&#39;</span><span class="p">)</span> <span class="c1">#UT.read_pandas(p2.ex)</span>
+        <span class="k">if</span> <span class="s1">&#39;len&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">etgt</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">etgt</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">etgt</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">etgt</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;len&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">eref</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">eref</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eref</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">eref</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">etgt</span><span class="p">[</span><span class="n">cols</span><span class="p">],</span><span class="n">a</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">eref</span><span class="p">[</span><span class="n">cols</span><span class="p">],</span><span class="n">b</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">BT</span><span class="o">.</span><span class="n">bedtoolintersect</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">wao</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">ocols</span> <span class="o">=</span> <span class="n">cols</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;b_&#39;</span><span class="o">+</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;ovl&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ov</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">ocols</span><span class="p">)</span>
+
+        <span class="c1"># gene overlap</span>
+        <span class="n">gcols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span>
+        <span class="k">def</span> <span class="nf">_gbed</span><span class="p">(</span><span class="n">ex</span><span class="p">):</span>
+            <span class="n">gr</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">gr</span><span class="p">[</span><span class="n">gcols</span><span class="p">]</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+            <span class="n">g</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gr</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="n">g</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gr</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">g</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">gtgt</span> <span class="o">=</span> <span class="n">_gbed</span><span class="p">(</span><span class="n">etgt</span><span class="p">)</span>
+        <span class="n">gref</span> <span class="o">=</span> <span class="n">_gbed</span><span class="p">(</span><span class="n">eref</span><span class="p">)</span>
+        <span class="n">gcols2</span> <span class="o">=</span> <span class="n">gcols</span><span class="o">+</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span>
+        <span class="n">a2</span> <span class="o">=</span> <span class="n">ctgt</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;gene.bed.gz&#39;</span><span class="p">)</span>
+        <span class="n">b2</span> <span class="o">=</span> <span class="n">cref</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;gene.bed.gz&#39;</span><span class="p">)</span>
+        <span class="n">c2</span> <span class="o">=</span> <span class="n">ctgt</span><span class="o">.</span><span class="n">fname2</span><span class="p">(</span><span class="s1">&#39;gene.ovl.txt.gz&#39;</span><span class="p">,</span> <span class="n">cref</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+        <span class="n">a2</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">gtgt</span><span class="p">[</span><span class="n">gcols2</span><span class="p">],</span><span class="n">a2</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">b2</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">gref</span><span class="p">[</span><span class="n">gcols2</span><span class="p">],</span><span class="n">b2</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">c2</span> <span class="o">=</span> <span class="n">BT</span><span class="o">.</span><span class="n">bedtoolintersect</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span><span class="n">b2</span><span class="p">,</span><span class="n">c2</span><span class="p">,</span><span class="n">wao</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">gocols</span> <span class="o">=</span> <span class="n">gcols2</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;b_&#39;</span><span class="o">+</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gcols2</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;ovl&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gov</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span><span class="n">names</span><span class="o">=</span><span class="n">gocols</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="Comparator.assign_tcode_ex"><a class="viewcode-back" href="../../modules.html#jgem.annotate.Comparator.assign_tcode_ex">[docs]</a>    <span class="k">def</span> <span class="nf">assign_tcode_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ov</span>
+        <span class="c1"># restrict to proper ones (e.g. strand)</span>
+        <span class="n">idxchr</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b_chr&#39;</span><span class="p">]</span> 
+        <span class="n">idxstrand</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b_strand&#39;</span><span class="p">]</span> <span class="c1"># strand should be same</span>
+        <span class="c1"># above will remove all known SE (which have &#39;.&#39;), add them back</span>
+        <span class="n">idxstrand</span> <span class="o">=</span> <span class="n">idxstrand</span><span class="o">|</span><span class="p">(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;.&#39;</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">eo</span> <span class="o">=</span> <span class="n">eo</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="n">idxchr</span><span class="o">&amp;</span><span class="n">idxstrand</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="c1"># exon overlap subset</span>
+        <span class="n">eo</span><span class="p">[</span><span class="s1">&#39;dlen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">eo</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">eo</span><span class="p">[</span><span class="s1">&#39;b_len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span> <span class="c1"># diff(length)</span>
+        <span class="n">eo</span> <span class="o">=</span> <span class="n">eo</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;dlen&#39;</span><span class="p">],</span><span class="n">ascending</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c1"># chose closest in length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eog</span> <span class="o">=</span> <span class="n">eog</span> <span class="o">=</span> <span class="n">eo</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="n">sort</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="c1"># exons: eknown, etcode</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_tgt</span>
+        <span class="n">e2k</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;k&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">eog</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]])</span> <span class="c1"># overlapping exons</span>
+        <span class="n">rcode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cn_ref</span><span class="o">.</span><span class="n">code</span>
+        <span class="n">ekfld</span> <span class="o">=</span> <span class="s1">&#39;eknown_&#39;</span><span class="o">+</span><span class="n">rcode</span>
+        <span class="n">etfld</span> <span class="o">=</span> <span class="s1">&#39;etcode_&#39;</span><span class="o">+</span><span class="n">rcode</span>
+        <span class="n">ex</span><span class="p">[</span><span class="n">ekfld</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e2k</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;u&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]]</span>
+        <span class="n">idxse</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;s&#39;</span>
+        <span class="n">idxek</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="n">ekfld</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;k&#39;</span>
+        <span class="n">ex</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxek</span><span class="o">&amp;</span><span class="n">idxse</span><span class="p">,</span><span class="n">etfld</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;k.se&#39;</span>
+        <span class="n">ex</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxek</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="n">idxse</span><span class="p">),</span><span class="n">etfld</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;k.me&#39;</span>
+        <span class="n">ex</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="o">~</span><span class="n">idxek</span><span class="p">)</span><span class="o">&amp;</span><span class="n">idxse</span><span class="p">,</span><span class="n">etfld</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;u.se&#39;</span>
+        <span class="n">ex</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="o">~</span><span class="n">idxek</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="n">idxse</span><span class="p">),</span><span class="n">etfld</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;u.me&#39;</span></div>
+
+<div class="viewcode-block" id="Comparator.assign_antisense"><a class="viewcode-back" href="../../modules.html#jgem.annotate.Comparator.assign_antisense">[docs]</a>    <span class="k">def</span> <span class="nf">assign_antisense</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check whether exons overlap in anti-sense direction.</span>
+<span class="sd">        Assign code (ex_as_ovl_(refcode)) to exon-wise and then gene-wise (gene_as_ovl_(refcode)).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ov</span>
+        <span class="c1"># restrict to anti-sense</span>
+        <span class="n">idxchr</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b_chr&#39;</span><span class="p">]</span>
+        <span class="n">idxstrand</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">!=</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b_strand&#39;</span><span class="p">]</span> <span class="c1"># opposite strand </span>
+        <span class="c1"># above will include all exons with strand &#39;.&#39; =&gt; exclude</span>
+        <span class="n">idxstrand</span> <span class="o">=</span> <span class="n">idxstrand</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eoas</span> <span class="o">=</span> <span class="n">eoas</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="n">idxchr</span><span class="o">&amp;</span><span class="n">idxstrand</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> 
+        <span class="c1"># take closest in length</span>
+        <span class="n">eoas</span><span class="p">[</span><span class="s1">&#39;dlen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">eoas</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">eoas</span><span class="p">[</span><span class="s1">&#39;b_len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
+        <span class="n">eoas</span> <span class="o">=</span> <span class="n">eoas</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;dlen&#39;</span><span class="p">],</span><span class="n">ascending</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eoasg</span> <span class="o">=</span> <span class="n">eoasg</span> <span class="o">=</span> <span class="n">eoas</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="n">sort</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="c1"># exons: eknown, etcode</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_tgt</span>
+        <span class="n">e2k</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">eoasg</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]])</span>
+        <span class="n">rcode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cn_ref</span><span class="o">.</span><span class="n">code</span>
+        <span class="n">easfld</span> <span class="o">=</span> <span class="s1">&#39;ex_as_ovl_&#39;</span><span class="o">+</span><span class="n">rcode</span>
+        <span class="n">gasfld</span> <span class="o">=</span> <span class="s1">&#39;gene_as_ovl_&#39;</span><span class="o">+</span><span class="n">rcode</span>
+        <span class="n">ex</span><span class="p">[</span><span class="n">easfld</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e2k</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;n&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="n">gasovl</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)[</span><span class="n">easfld</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;y&#39;</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">g2k</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gasovl</span><span class="p">[</span><span class="n">gasovl</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">])</span>
+        <span class="n">ex</span><span class="p">[</span><span class="n">gasfld</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2k</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;n&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Comparator.assign_intergenic"><a class="viewcode-back" href="../../modules.html#jgem.annotate.Comparator.assign_intergenic">[docs]</a>    <span class="k">def</span> <span class="nf">assign_intergenic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check whether gene is intergenic or not &quot;&quot;&quot;</span>
+        <span class="n">gov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gov</span>  
+        <span class="n">ex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_tgt</span>
+        <span class="n">gov2</span> <span class="o">=</span> <span class="n">gov</span><span class="p">[</span><span class="n">gov</span><span class="p">[</span><span class="s1">&#39;ovl&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># [&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;,&#39;strand&#39;,&#39;_gidx&#39;,&#39;b_chr&#39;,&#39;b_st&#39;,&#39;b_ed&#39;,&#39;b_strand&#39;,&#39;b__gidx&#39;,&#39;ovl&#39;]</span>
+        <span class="n">ovlgids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">gov2</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">g2o</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;n&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ovlgids</span><span class="p">])</span>
+        <span class="n">rcode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cn_ref</span><span class="o">.</span><span class="n">code</span>
+        <span class="n">itgfld</span> <span class="o">=</span> <span class="s1">&#39;intergenic_&#39;</span><span class="o">+</span><span class="n">rcode</span>
+        <span class="n">ex</span><span class="p">[</span><span class="n">itgfld</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2o</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span></div>
+        
+<div class="viewcode-block" id="Comparator.assign_tcode_gene"><a class="viewcode-back" href="../../modules.html#jgem.annotate.Comparator.assign_tcode_gene">[docs]</a>    <span class="k">def</span> <span class="nf">assign_tcode_gene</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">eog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eog</span> <span class="c1"># overlapping exons</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_tgt</span>
+        <span class="c1"># genes: gknown, gtcode</span>
+        <span class="n">g2k</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;k&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">eog</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)])</span>
+        <span class="n">rcode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cn_ref</span><span class="o">.</span><span class="n">code</span>
+        <span class="n">gkfld</span> <span class="o">=</span> <span class="s1">&#39;gknown_&#39;</span><span class="o">+</span><span class="n">rcode</span>
+        <span class="n">gtfld</span> <span class="o">=</span> <span class="s1">&#39;gtcode_&#39;</span><span class="o">+</span><span class="n">rcode</span>
+        <span class="n">ex</span><span class="p">[</span><span class="n">gkfld</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2k</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;u&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span>
+        <span class="n">idxse</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;s&#39;</span>
+        <span class="n">idxgk</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="n">gkfld</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;k&#39;</span>
+        <span class="n">ex</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxgk</span><span class="o">&amp;</span><span class="n">idxse</span><span class="p">,</span><span class="n">gtfld</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;k.se&#39;</span>
+        <span class="n">ex</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxgk</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="n">idxse</span><span class="p">),</span><span class="n">gtfld</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;k.me&#39;</span>
+        <span class="n">ex</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="o">~</span><span class="n">idxgk</span><span class="p">)</span><span class="o">&amp;</span><span class="n">idxse</span><span class="p">,</span><span class="n">gtfld</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;u.se&#39;</span>
+        <span class="n">ex</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="o">~</span><span class="n">idxgk</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="n">idxse</span><span class="p">),</span><span class="n">gtfld</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;u.me&#39;</span>
+
+        <span class="c1"># ref_gidxs, ref_gidx0</span>
+        <span class="n">eogg</span> <span class="o">=</span> <span class="n">eog</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)[</span><span class="s1">&#39;b__gidx&#39;</span><span class="p">]</span> <span class="c1"># overlapping ref gene _gidx&#39;s</span>
+        <span class="n">g2cnt</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">Counter</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">eogg</span><span class="p">}</span>
+        <span class="n">g2gi</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="n">v</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">g2cnt</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="c1"># all of ovl _gidx</span>
+        <span class="n">g2gi0</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span><span class="o">.</span><span class="n">most_common</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">g2cnt</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="c1"># most common _gidx</span>
+        <span class="n">ex</span><span class="p">[</span><span class="n">rcode</span><span class="o">+</span><span class="s1">&#39;_gidxs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2gi</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">N</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span>
+        <span class="n">ex</span><span class="p">[</span><span class="n">rcode</span><span class="o">+</span><span class="s1">&#39;_gidx0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2gi0</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">N</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span>
+
+        <span class="c1"># ref_symbols, ref_symbol0</span>
+        <span class="n">sfld</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">refgnamecol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e2g</span> <span class="o">=</span> <span class="n">e2g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_ref</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)[</span><span class="n">sfld</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g2s</span> <span class="o">=</span> <span class="n">g2s</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">e2g</span><span class="p">,</span> <span class="s1">&#39;_gidx&#39;</span><span class="p">,</span> <span class="n">sfld</span><span class="p">)</span> <span class="c1"># gidx =&gt; list of syms</span>
+        <span class="c1"># convert _gidx =&gt; sym</span>
+        <span class="n">g2gs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">reduce</span><span class="p">(</span><span class="n">iadd</span><span class="p">,[</span><span class="n">g2s</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">z</span><span class="p">)]</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">keys</span><span class="p">()])))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">g2cnt</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">g2gs0</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">g2s</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">most_common</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])])</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">g2cnt</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">ex</span><span class="p">[</span><span class="n">rcode</span><span class="o">+</span><span class="s1">&#39;_syms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2gs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">N</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span>
+        <span class="n">ex</span><span class="p">[</span><span class="n">rcode</span><span class="o">+</span><span class="s1">&#39;_sym0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2gs0</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">N</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span></div>
+        
+<div class="viewcode-block" id="Comparator.assign_tcode_sj"><a class="viewcode-back" href="../../modules.html#jgem.annotate.Comparator.assign_tcode_sj">[docs]</a>    <span class="k">def</span> <span class="nf">assign_tcode_sj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sj_tgt</span> <span class="o">=</span> <span class="n">stgt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cn_tgt</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="s1">&#39;sj&#39;</span><span class="p">)</span> <span class="c1">#UT.read_pandas(self.p1.sj)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sj_ref</span> <span class="o">=</span> <span class="n">sref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cn_ref</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="s1">&#39;sj&#39;</span><span class="p">)</span> <span class="c1">#UT.read_pandas(self.p2.sj)</span>
+        <span class="k">if</span> <span class="s1">&#39;locus&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stgt</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">stgt</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">stgt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;locus&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sref</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">sref</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">sref</span><span class="p">)</span>
+        <span class="n">l2c</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;k.me&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sref</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]])</span>
+        <span class="n">rcode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cn_ref</span><span class="o">.</span><span class="n">code</span>
+        <span class="n">setfld</span> <span class="o">=</span> <span class="s1">&#39;etcode_&#39;</span><span class="o">+</span><span class="n">rcode</span>
+        <span class="n">sgtfld</span> <span class="o">=</span> <span class="s1">&#39;gtcode_&#39;</span><span class="o">+</span><span class="n">rcode</span>
+        <span class="n">stgt</span><span class="p">[</span><span class="n">setfld</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l2c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;u.me&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">stgt</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]]</span>
+        <span class="n">g2c</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ex_tgt</span><span class="p">,</span> <span class="s1">&#39;_gidx&#39;</span><span class="p">,</span> <span class="s1">&#39;gtcode_&#39;</span><span class="o">+</span><span class="n">rcode</span><span class="p">)</span>
+        <span class="n">stgt</span><span class="p">[</span><span class="n">sgtfld</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;u.me&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">stgt</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span></div>
+                
+<div class="viewcode-block" id="Comparator.annotate"><a class="viewcode-back" href="../../modules.html#jgem.annotate.Comparator.annotate">[docs]</a>    <span class="k">def</span> <span class="nf">annotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Annotate target by overlaps to reference.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            overwrite (bool): overwrite original sj,ex files (default True)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_tcode_ex</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_intergenic</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_antisense</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_tcode_gene</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_tcode_sj</span><span class="p">()</span>
+        <span class="n">cntgt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cn_tgt</span>
+        <span class="n">cnref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cn_ref</span>
+        <span class="k">if</span> <span class="n">overwrite</span><span class="p">:</span>
+            <span class="n">cntgt</span><span class="o">.</span><span class="n">savemodel</span><span class="p">(</span><span class="s1">&#39;ex&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+            <span class="n">cntgt</span><span class="o">.</span><span class="n">savemodel</span><span class="p">(</span><span class="s1">&#39;sj&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">refcode</span> <span class="o">=</span> <span class="n">cnref</span><span class="o">.</span><span class="n">code</span>
+            <span class="n">cntgt</span><span class="o">.</span><span class="n">savemodel</span><span class="p">(</span><span class="s1">&#39;ex&#39;</span><span class="p">,</span> <span class="n">code2</span><span class="o">=</span><span class="n">refcode</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+            <span class="n">cntgt</span><span class="o">.</span><span class="n">savemodel</span><span class="p">(</span><span class="s1">&#39;sj&#39;</span><span class="p">,</span> <span class="n">code2</span><span class="o">=</span><span class="n">refcode</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+        <span class="n">cntgt</span><span class="o">.</span><span class="n">delete</span><span class="p">([</span><span class="s1">&#39;temp&#39;</span><span class="p">],</span><span class="n">protect</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">])</span>
+        <span class="n">cnref</span><span class="o">.</span><span class="n">delete</span><span class="p">([</span><span class="s1">&#39;temp&#39;</span><span class="p">],</span><span class="n">protect</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">])</span></div></div>
+
+
+        
+   
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

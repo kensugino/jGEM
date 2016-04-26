@@ -1,0 +1,72 @@
+# Supplemental Material: jGEM document
+
+The basic idea of the assembler is very simple. It uses splice junctions and read coverage to find exon boundaries. Candidate exons whose boundaries are spliced can be easily constructed from junctions. Using read coverage, these candidate exons are further refined into internal exons and edge exons (5' or 3' exons). Then, intron retensions and single exons are added with the aid of read coverage. A gene (locus) is defined as a connected component of extracted exons, where junctions and overlaps are connections (Supplemental Figure 7A, B). This assembler does not attempt to estimate isoform abundance. Instead it aims to obtain complete collections of exons and junctions. In the followings, more details of the each step will be described.  
+
+## Finding exon candidates from junctions
+
+Because of the strandedness of the canonical splice junctions, most of the junction reads can be assigned with strandedness even for unstranded RANSeq experiments. All of the following steps are separately performed for each strand. Junctions with unknown strand are used in both cases to construct initial exon candidates but afterwards strandedness is assigned to these unstranded junctions or exons through strandedness of the connected components defined by the majority. 
+
+Junctions with the same strandedness define collections of start positions and end positions of candidate exons. A candidate exon is defined as a pair of nearest start and end (Supplemental Figure 7A). However, when the size of candidate exon is larger than a set size (currently 35kbp), then it is broken into two edge exons with temporary size (100bp). ( In the GencodeVM4, average exon size is 350bp. Well known big gene Titin (Ttn) has a 17kbp exon. There are four exons larger than 35kbp, largest being 84kbp exon in Kcnq1ot1. )
+
+## Finding internal, edge exons
+
+These candidate exons found in the previous step are further refined into internal exons and edge exons using read coverage information. We define "mapped portion" as the portion of the interval covered by mapped reads. This quantity is also called "coverage" but we will call it "mapped portion" here to distinguish with the other "coverage" which is the sum of all the base pairs of the mapped reads on the interval divided by the length of the interval. The candidate exons with mapped portion greater than a set value (here 0.95) are categorized as internal exons and the rest are broken into edge exons. 
+
+## Assigning strandedness
+
+After previous step of breaking possible connections between genes, connected components are used to assign strands to unstranded elements. Junctions are used as connections and the most abundant strand of the elements of a connected component is used as the strand of the connected compnent. 
+
+## Refining edge exons
+
+So far, edge exons are assigned with arbitrary temporary size. In this step, using read coverage, the other boundaries of the edge exons are searched. From one end (spliced end), the interval is extended while the interval is covered by reads ignoring gaps smaller than a set value (currently 50bp for both 5' and 3' exons). However, when a donor (for 3' exon) or an acceptor (for 5' exon) site is encountered, then extension is terminated at that position. To avoid inclusion of noise, when there is a sudden decrease of coverage (<x0.1) after a gap, then extension is also terminated before the gap. 
+
+## Finding intron retensions
+
+In the first step, candidate internal exons are defined by "nearest" start and end positions. Other possible combinations of start and end positions occur when there are intron retentions. Intron retentions are detected as the junctions with mapped portion larger than a set value (0.98). 
+
+## Finding threshold for single exon coverage
+
+We can find candidates of single exons as read mapped intervals outside of already extracted multi-exon models. However, since single exon genes do not have well defined spliced boundaries, it is very difficult to distinguish them from noise. Often used property to limit noise is the coverage, but how to find appropriate threshold value has not been explored and rather arbitrary values have been used in other programs. 
+
+We found that read coverage of exons with some number (gamma) added follows power law distribution (Supplemental Figure 7C,D). For each sample, using GencodeVM4 annotation (or using multi-exon models extracted up to the previous step), we find optimum gamma by fitting log-log histogram by a line (Supplemental Figure 7D top). Optimum gammas are usually in the range of 0.5 to 1. Interestingly gamma found using all exons including single exons in GencodeVM4 usually fit well for extracted multi-exon models, indicating that extracted single exons also should follow this power law. Using this, we can find a threshold coverage for 1% false positive rate for single exons (Supplemental Figure 7D bottom). 
+
+## Finding single exons
+
+Using the coverage threshold found in the previous step and length threshold (>200bp), single exon candidates are extracted. Some of these candidates are next to already extracted (spliced) exons and these were joined and made into 5' or 3' exons. 
+
+## Calculating exon coverages
+
+To calculate coverages of exons which may have overlaps, we first divide exon intervals into intervals with constant set of overlaps, which we call "chopped interval". Over one of these intervals, the set of exons overlapping are not changing. First, for each of these chopped interval read coverage are calculated. Then, to estimate exon coverages, linear equations defined by the relationships between exon intervals and chopped intervals (assuming constancy of coverage over each interval) are solved with non-negativity constraint. 
+
+## Finding genes
+
+After finding spliced exons and single exons, genes (loci) are found as connected components where connections are junctions and exon overlaps. 
+
+## Calculating gene coverages
+
+A coverage for a gene is calculated using the union of the intervals of the exons belonging to the gene. To account for the overlaps between exons, chopped interval method described above was used but instead of solving linear equations, coverage calculated from the lengths and the coverages of unique chopped intervals belonging to the gene is used. 
+
+## Evaluation of assemblies at individual sample level
+
+Sensitivity of the assemblers were evaluated against GencodeVM4 annotation. For each GencodeVM4 exon with positive coverage, whether that exon is detected or not is scored. GencodeVM4 exons are sorted by their coverage values and for each bin of 1000 exons average detection rate is calculated and plotted against average coverage within the bin (Supplemental Figure 7E). Normalized area under the curves (AUCs) for all the samples are plotted in Supplemental Figure 7F. jGEM consistently performed better than Cufflinks and StringTie. 
+
+Number of detected genes are plotted in Supplemental Figure 7G (1st and 2nd rows). Number of GencodeVM4 genes with coverage >0 and jGEM gene numbers are very close and they both increase in tissue samples (toward the right end) compared to cell type-specific samples, which is consistent with the complexity of the tissue samples. 
+
+The number of jGEM single exon genes were slightly lower than that of GencodeVM4 single exon genes with coverage > 0 (2nd row) due to stringent thresholding, however, other assemblers had an order of magnitude larger number of single exon genes (note that y-axis is in log scale). 
+
+## Merging
+
+Upon examining extracted gene/exon models from all the samples, it turned out that a lot of 5',3'-exons were actually incomplete internal exons. Therefore, to obtain more complete models, an assembly process is repeated using extracted exons from all the samples as pseudo reads. 
+
+An exon from a sample is treated as reads which span the same interval as the exon and the read number proportional to the coverage of the exon. However, we only used exons with coverage > 0.2	5. From the collection of these pseudo reads, coverage (bigwig) is calculated and used as the input to the assembler. For junctions, all the junctions from all the samples were aggregated and then junctions with aggregated unique reads > 50 or non-unique reads > 200 were used as the input to the assembler. The junction counts were normalized to library sizes before aggregation. Positive strand and negative strand were treated separately. Unstranded elements, especially single exons, were added to both strands. 
+
+Slightly different parameters were used for assembly for merging (e.g. threshold mapped portion for defining internal exons is 0.999 instead of 0.95, gap for extending edge exons is 1bp instead of 50bp).  Since the extracted models were used to construct the genome coverage, the "shape" of the coverage contained information on different ends of 5' or 3' exons or on intron retension, therefore, an algorithm analyzing coverage "shape" is used for extending edge exons and finding intron retentions. 
+
+The separately merged models from positive strand and negative strand are combined but single exons overlapping to the opposite strand are removed as artefacts. Models with extremely low transcript length to gene length ratio (Supplemental Figure 7H red dashed region) are removed.  These models mostly consisted with two exon models with extremely low exon lengths or incomplete models (usually 5' portion of a long gene). 
+
+## Evalulation of merged assembly
+
+Evaluation of merged models are shown in Figure 2C, D. In general merged models have much better sensitivity than that of individual samples. 
+
+
+

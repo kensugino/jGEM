@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>jgem.trimex &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<h1>Source code for jgem.trimex</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">.. module:: trimex</span>
+<span class="sd">    :synopsis: makes trimed genes (to avoid length bias in coverage variance)</span>
+
+<span class="sd">..  moduleauthor:: Ken Sugino &lt;ken.sugino@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="c1"># 3rd party imports</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">PD</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">N</span>
+<span class="c1"># library imports</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">UT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">bigwig</span> <span class="k">as</span> <span class="n">BW</span>
+
+
+<span class="c1"># Trim from 3&#39; end    </span>
+<div class="viewcode-block" id="trim_ex_worker"><a class="viewcode-back" href="../../modules.html#jgem.trimex.trim_ex_worker">[docs]</a><span class="k">def</span> <span class="nf">trim_ex_worker</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">ex</span><span class="p">,</span><span class="n">length</span><span class="p">,</span><span class="n">gidfld</span><span class="o">=</span><span class="n">args</span>
+    <span class="c1"># for each gene collect exons from 3&#39; end up to length</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ex</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">idxst</span> <span class="o">=</span> <span class="n">cols</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;st&#39;</span><span class="p">)</span>
+    <span class="n">idxed</span> <span class="o">=</span> <span class="n">cols</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;ed&#39;</span><span class="p">)</span>
+    <span class="n">idxlen</span> <span class="o">=</span> <span class="n">cols</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;len&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_gen</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">_gidx</span><span class="p">,</span> <span class="n">gr</span> <span class="ow">in</span> <span class="n">ex</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">gidfld</span><span class="p">):</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="n">gr</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">total</span><span class="o">&lt;</span><span class="n">length</span><span class="p">:</span> <span class="c1"># too short to trim</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">gr</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># look from 3&#39; end</span>
+                <span class="n">strand</span> <span class="o">=</span> <span class="n">gr</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">strand</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span><span class="p">:</span>
+                    <span class="n">gr</span> <span class="o">=</span> <span class="n">gr</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">],</span><span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">gr</span> <span class="o">=</span> <span class="n">gr</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">],</span><span class="n">ascending</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">grv</span> <span class="o">=</span> <span class="n">gr</span><span class="o">.</span><span class="n">values</span>
+                <span class="c1"># if the first one already larger than length?</span>
+                <span class="n">first</span> <span class="o">=</span> <span class="n">grv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">clen</span> <span class="o">=</span> <span class="n">first</span><span class="p">[</span><span class="n">idxlen</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">clen</span><span class="o">&gt;</span><span class="n">length</span><span class="p">:</span> <span class="c1"># trim this one and go next</span>
+                    <span class="k">if</span> <span class="n">strand</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span><span class="p">:</span>
+                        <span class="n">first</span><span class="p">[</span><span class="n">idxed</span><span class="p">]</span> <span class="o">=</span> <span class="n">first</span><span class="p">[</span><span class="n">idxst</span><span class="p">]</span> <span class="o">+</span> <span class="n">length</span>
+                        <span class="k">yield</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">first</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">first</span><span class="p">[</span><span class="n">idxst</span><span class="p">]</span> <span class="o">=</span> <span class="n">first</span><span class="p">[</span><span class="n">idxed</span><span class="p">]</span> <span class="o">-</span> <span class="n">length</span>
+                        <span class="k">yield</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">first</span><span class="p">)</span>
+                <span class="c1"># start collecting until it reaches the length</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">first</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">gr</span><span class="p">)):</span>
+                        <span class="n">cur</span> <span class="o">=</span> <span class="n">grv</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="n">clen</span> <span class="o">+=</span> <span class="n">cur</span><span class="p">[</span><span class="n">idxlen</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">clen</span><span class="o">&lt;=</span><span class="n">length</span><span class="p">:</span> <span class="c1"># not enough yet</span>
+                            <span class="k">yield</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">clen</span><span class="o">==</span><span class="n">length</span><span class="p">:</span>
+                                <span class="k">break</span>
+                        <span class="k">else</span><span class="p">:</span> <span class="c1"># exceeded =&gt; trim</span>
+                            <span class="k">if</span> <span class="n">strand</span><span class="o">==</span><span class="s1">&#39;+&#39;</span><span class="p">:</span>
+                                <span class="n">cur</span><span class="p">[</span><span class="n">idxst</span><span class="p">]</span> <span class="o">=</span> <span class="n">cur</span><span class="p">[</span><span class="n">idxst</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">clen</span><span class="o">-</span><span class="n">length</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">cur</span><span class="p">[</span><span class="n">idxed</span><span class="p">]</span> <span class="o">=</span> <span class="n">cur</span><span class="p">[</span><span class="n">idxed</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">clen</span><span class="o">-</span><span class="n">length</span><span class="p">)</span>
+                            <span class="k">yield</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span>
+                            <span class="k">break</span>
+    <span class="c1">#nex = PD.DataFrame([x for x in _gen()], columns = cols)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_gen</span><span class="p">()]</span></div>
+
+<div class="viewcode-block" id="trim_ex"><a class="viewcode-back" href="../../modules.html#jgem.trimex.trim_ex">[docs]</a><span class="k">def</span> <span class="nf">trim_ex</span><span class="p">(</span><span class="n">expath</span><span class="p">,</span> <span class="n">dstpath</span><span class="p">,</span> <span class="n">dstcipath</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">gidfld</span><span class="o">=</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate trimmed version of genes for calculating coverage to avoid length bias. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        expath (str): path exon tsv</span>
+<span class="sd">        dstpath (str): path to trimmed exon</span>
+<span class="sd">        dstcipath (str): path to ci (chopped interval) </span>
+<span class="sd">        length (pos int): length to trim from 3&#39; end in base pair (default 1000 bp)</span>
+<span class="sd">        gidfld (str): column name for gene id (default _gidx)</span>
+<span class="sd">        np (pos int): number of CPU to use</span>
+
+<span class="sd">    Generates:</span>
+<span class="sd">        Two files (dstpath, dstcipath).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a dataframe containing trimmed exons</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#ex = UT.read_pandas(MD.paths[code][&#39;ex&#39;])</span>
+    <span class="c1">#dstpath = MD.trimmedex[code][length][&#39;ex&#39;]</span>
+    <span class="c1">#dstcipath = MD.trimmedex[code][length][&#39;ci&#39;]</span>
+    <span class="n">ex</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">expath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;len&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ex</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">recs</span> <span class="o">=</span> <span class="n">trim_ex_worker</span><span class="p">((</span><span class="n">ex</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">gidfld</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">chroms</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">ex</span><span class="p">[</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">c</span><span class="p">],</span> <span class="n">length</span><span class="p">,</span> <span class="n">gidfld</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">]</span>
+        <span class="n">recs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">np</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">trim_ex_worker</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+                <span class="n">recs</span> <span class="o">+=</span> <span class="n">v</span>
+            <span class="c1">#recs = reduce(iadd, p.map(trim_ex_worker, *zip(*data)))</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="c1"># p.join()</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ex</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">nex</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">recs</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">cols</span><span class="p">)</span>
+    <span class="n">nex</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nex</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">nex</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+    <span class="c1"># edge case</span>
+    <span class="n">nex</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">nex</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">nex</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">],</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nex</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">save_tsv_nidx_whead</span><span class="p">(</span><span class="n">nex</span><span class="p">,</span> <span class="n">dstpath</span><span class="p">)</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">chopintervals</span><span class="p">(</span><span class="n">nex</span><span class="p">,</span> <span class="n">dstcipath</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">nex</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

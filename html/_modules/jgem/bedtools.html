@@ -1,0 +1,625 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>jgem.bedtools &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<h1>Source code for jgem.bedtools</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">.. module:: bedtools</span>
+<span class="sd">    :synopsis: interface to bedtools</span>
+
+<span class="sd">..  moduleauthor:: Ken Sugino &lt;ken.sugino@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">PD</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">N</span>
+
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">UT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">gtfgffbed</span> <span class="k">as</span> <span class="n">GGB</span>
+<span class="kn">import</span> <span class="nn">jgem.cy.bw</span> <span class="kn">as</span> <span class="nn">cybw</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+
+
+<span class="c1">### BAM,BED,WIGGLE,BIGWIG ##############################################</span>
+
+<span class="c1"># decorators to separate logic</span>
+<div class="viewcode-block" id="compressQ"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.compressQ">[docs]</a><span class="k">def</span> <span class="nf">compressQ</span><span class="p">(</span><span class="n">outname</span><span class="p">,</span> <span class="n">noerr</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">deco</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="n">argnames</span><span class="p">,</span> <span class="n">varargs</span><span class="p">,</span> <span class="n">keywords</span><span class="p">,</span> <span class="n">defaults</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getargspec</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">argnames</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">outname</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="c1"># check output &#39;.gz&#39;</span>
+            <span class="k">if</span> <span class="n">outname</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">opath</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">outname</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">opath</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">opath</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
+                <span class="n">compress</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">opath</span> <span class="o">=</span> <span class="n">opath</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">compress</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">if</span> <span class="n">outname</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">outname</span><span class="p">]</span> <span class="o">=</span> <span class="n">opath</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">args</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">opath</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="n">noerr</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;bederror:{0}, err={1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">compress</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">opath</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">opath</span>
+        <span class="k">return</span> <span class="n">wrap</span>
+    <span class="k">return</span> <span class="n">deco</span></div>
+
+<div class="viewcode-block" id="logerr"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.logerr">[docs]</a><span class="k">def</span> <span class="nf">logerr</span><span class="p">(</span><span class="n">noerr</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">deco</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="n">noerr</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;bederror:{0}, err={1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">err</span>
+        <span class="k">return</span> <span class="n">wrap</span>
+    <span class="k">return</span> <span class="n">deco</span></div>
+
+<span class="nd">@compressQ</span><span class="p">(</span><span class="s1">&#39;bedpath&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<div class="viewcode-block" id="bam2bed"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.bam2bed">[docs]</a><span class="k">def</span> <span class="nf">bam2bed</span><span class="p">(</span><span class="n">bampath</span><span class="p">,</span> <span class="n">bedpath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert BAM to BED7</span>
+
+<span class="sd">    BED name field (column 4) contains read id (so that together with map id (col 7) multi-mapper can be identified)</span>
+<span class="sd">    BED tst field (column 7) contains map id (so that split reads can be identified)</span>
+
+<span class="sd">    BED sc1 field (column 5) is from bedtools bamtobed and contains mapping quality</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">cmd1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bedtools&#39;</span><span class="p">,</span><span class="s1">&#39;bamtobed&#39;</span><span class="p">,</span><span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="n">bampath</span><span class="p">,</span> <span class="s1">&#39;-split&#39;</span><span class="p">,</span><span class="s1">&#39;-bed12&#39;</span><span class="p">]</span>
+    <span class="n">awkscript</span> <span class="o">=</span> <span class="s1">&#39;BEGIN{OFS=&quot;</span><span class="se">\t</span><span class="s1">&quot;;c=1;}{if(d[$4]){$4=d[$4];}else{d[$4]=c;$4=c;c++;} n=split($11,a,&quot;,&quot;); n=split($12,b,&quot;,&quot;); for(i=1;i&lt;=n;i++){st=$2+b[i]; print $1,st,st+a[i],$4,$5,$6,NR}}&#39;</span>
+    <span class="n">cmd2</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;awk&#39;</span><span class="p">,</span><span class="n">awkscript</span><span class="p">]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd1</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd2</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">p1</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">fp</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">p2</span><span class="o">.</span><span class="n">communicate</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">err</span></div>
+
+<span class="nd">@compressQ</span><span class="p">(</span><span class="s1">&#39;bedpath&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<div class="viewcode-block" id="bam2bed12"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.bam2bed12">[docs]</a><span class="k">def</span> <span class="nf">bam2bed12</span><span class="p">(</span><span class="n">bampath</span><span class="p">,</span> <span class="n">bedpath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert BAM to BED12</span>
+
+<span class="sd">    BED name field (column 4) contains read id (so that multi-mapper can be identified)</span>
+<span class="sd">    BED tst field (column 7) contains map id </span>
+<span class="sd">    BED sc1 field (column 5) is from bedtools bamtobed and contains mapping quality</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">cmd1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bedtools&#39;</span><span class="p">,</span><span class="s1">&#39;bamtobed&#39;</span><span class="p">,</span><span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="n">bampath</span><span class="p">,</span> <span class="s1">&#39;-split&#39;</span><span class="p">,</span> <span class="s1">&#39;-bed12&#39;</span><span class="p">]</span>
+    <span class="n">awkscript</span> <span class="o">=</span> <span class="s1">&#39;BEGIN{OFS=&quot;</span><span class="se">\t</span><span class="s1">&quot;;c=1;}{if(a[$4]){$4=a[$4];}else{a[$4]=c;$4=c;c++;}; $7=NR; print $0;}&#39;</span>
+    <span class="n">cmd2</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;awk&#39;</span><span class="p">,</span><span class="n">awkscript</span><span class="p">]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd1</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd2</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">p1</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">fp</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">p2</span><span class="o">.</span><span class="n">communicate</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">err</span></div>
+
+<span class="nd">@compressQ</span><span class="p">(</span><span class="s1">&#39;wigpath&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="bed2wig"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.bed2wig">[docs]</a><span class="k">def</span> <span class="nf">bed2wig</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">wigpath</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Runs BEDTOOLS genomecov. Takes BED, makes WIGGLE.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">cmd1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bedtools&#39;</span><span class="p">,</span><span class="s1">&#39;genomecov&#39;</span><span class="p">,</span><span class="s1">&#39;-bg&#39;</span><span class="p">,</span> <span class="s1">&#39;-split&#39;</span><span class="p">,</span> <span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="n">bedpath</span><span class="p">,</span> <span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cmd1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bedtools&#39;</span><span class="p">,</span><span class="s1">&#39;genomecov&#39;</span><span class="p">,</span><span class="s1">&#39;-bg&#39;</span><span class="p">,</span> <span class="s1">&#39;-split&#39;</span><span class="p">,</span> <span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="n">bedpath</span><span class="p">,</span> <span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="s1">&#39;-scale&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">scale</span><span class="p">)]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">wigpath</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd1</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">fp</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">err</span></div>
+
+<span class="nd">@compressQ</span><span class="p">(</span><span class="s1">&#39;wigpath&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="bam2wig"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.bam2wig">[docs]</a><span class="k">def</span> <span class="nf">bam2wig</span><span class="p">(</span><span class="n">bampath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">wigpath</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Runs BEDTOOLS genomecov. Takes BAM, makes WIGGLE.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">cmd1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bedtools&#39;</span><span class="p">,</span> <span class="s1">&#39;genomecov&#39;</span><span class="p">,</span> <span class="s1">&#39;-split&#39;</span><span class="p">,</span> <span class="s1">&#39;-bg&#39;</span><span class="p">,</span> <span class="s1">&#39;-ibam&#39;</span><span class="p">,</span> <span class="n">bampath</span><span class="p">,</span> <span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cmd1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bedtools&#39;</span><span class="p">,</span> <span class="s1">&#39;genomecov&#39;</span><span class="p">,</span> <span class="s1">&#39;-split&#39;</span><span class="p">,</span> <span class="s1">&#39;-bg&#39;</span><span class="p">,</span> <span class="s1">&#39;-ibam&#39;</span><span class="p">,</span> <span class="n">bampath</span><span class="p">,</span> <span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="s1">&#39;-scale&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">scale</span><span class="p">)]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">wigpath</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd1</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">fp</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">err</span></div>
+
+<span class="nd">@logerr</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<div class="viewcode-block" id="wig2bw"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.wig2bw">[docs]</a><span class="k">def</span> <span class="nf">wig2bw</span><span class="p">(</span><span class="n">wigpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate bigwig coverage from WIGGLE.</span>
+<span class="sd">    Runs Kent&#39;s tool wigToBigWig.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;wigToBigWig&#39;</span><span class="p">,</span> <span class="n">wigpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">]</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">err</span></div>
+
+<div class="viewcode-block" id="bam2bw"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.bam2bw">[docs]</a><span class="k">def</span> <span class="nf">bam2bw</span><span class="p">(</span><span class="n">bampath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate bigwig coverage from BAM. &quot;&quot;&quot;</span>
+    <span class="n">wigpath</span> <span class="o">=</span> <span class="n">bwpath</span><span class="o">+</span><span class="s1">&#39;.wig&#39;</span>
+    <span class="n">bam2wig</span><span class="p">(</span><span class="n">bampath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">wigpath</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span>
+    <span class="n">wig2bw</span><span class="p">(</span><span class="n">wigpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">wigpath</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="bed2bw"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.bed2bw">[docs]</a><span class="k">def</span> <span class="nf">bed2bw</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate bigwig coverage from BED. &quot;&quot;&quot;</span>
+    <span class="n">wigpath</span> <span class="o">=</span> <span class="n">bwpath</span><span class="o">+</span><span class="s1">&#39;.wig&#39;</span>
+    <span class="n">bed2wig</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">wigpath</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span>
+    <span class="n">wig2bw</span><span class="p">(</span><span class="n">wigpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">wigpath</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="make_bw_from_bed"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.make_bw_from_bed">[docs]</a><span class="k">def</span> <span class="nf">make_bw_from_bed</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; convert BED to BIGWIG, normalize average coverage to 1 &quot;&quot;&quot;</span>
+    <span class="n">totbp</span><span class="p">,</span><span class="n">covbp</span> <span class="o">=</span> <span class="n">get_total_bp_bedfile</span><span class="p">(</span><span class="n">bedpath</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">covbp</span><span class="p">)</span><span class="o">/</span><span class="n">totbp</span> <span class="c1"># 1/avgcov</span>
+    <span class="n">bed2bw</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="make_bw_from_bam"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.make_bw_from_bam">[docs]</a><span class="k">def</span> <span class="nf">make_bw_from_bam</span><span class="p">(</span><span class="n">bampath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bedpath</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; convert BAM to BIGWIG, normalize average coverage to 1 &quot;&quot;&quot;</span>
+    <span class="n">bam2bed</span><span class="p">(</span><span class="n">bampath</span><span class="p">,</span> <span class="n">bedpath</span><span class="p">)</span>
+    <span class="n">make_bw_from_bed</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="bed12_bed6"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.bed12_bed6">[docs]</a><span class="k">def</span> <span class="nf">bed12_bed6</span><span class="p">(</span><span class="n">bed</span><span class="p">):</span>
+    <span class="c1"># BED12 [&#39;chr&#39;, &#39;st&#39;, &#39;ed&#39;, &#39;name&#39;, &#39;sc1&#39;, &#39;strand&#39;, &#39;tst&#39;, &#39;ted&#39;, &#39;sc2&#39;, &#39;#exons&#39;, &#39;esizes&#39;, &#39;estarts&#39;]</span>
+    <span class="c1"># BED6 [&#39;chr&#39;, &#39;st&#39;, &#39;ed&#39;, &#39;name&#39;, &#39;sc1&#39;, &#39;strand&#39;] flatten exons, collect unique</span>
+    <span class="c1"># BED12 tid =&gt; BED6 name=tid+exon_number</span>
+    <span class="n">bed8</span> <span class="o">=</span> <span class="n">bed</span><span class="p">[[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;sc1&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span><span class="s1">&#39;esizes&#39;</span><span class="p">,</span><span class="s1">&#39;estarts&#39;</span><span class="p">]]</span>
+    <span class="c1"># def _gen():</span>
+    <span class="c1">#     for x in df.values:</span>
+    <span class="c1">#         esi = str(x[-2])</span>
+    <span class="c1">#         est = str(x[-1])</span>
+    <span class="c1">#         if esi[-1]==&#39;,&#39;:</span>
+    <span class="c1">#             esi = esi[:-1]</span>
+    <span class="c1">#             est = est[:-1]</span>
+    <span class="c1">#         for y,z in zip(esi.split(&#39;,&#39;), est.split(&#39;,&#39;)):</span>
+    <span class="c1">#             x[-2] = y</span>
+    <span class="c1">#             x[-1] = z</span>
+    <span class="c1">#             yield x</span>
+    <span class="c1"># fbed = PD.DataFrame([x for x in _gen()], columns = df.columns)</span>
+    <span class="n">fbed</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cybw</span><span class="o">.</span><span class="n">flatten_bed8</span><span class="p">(</span><span class="n">bed8</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="n">bed8</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="c1"># adjust st, ed</span>
+    <span class="n">fbed</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fbed</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">fbed</span><span class="p">[</span><span class="s1">&#39;estarts&#39;</span><span class="p">]</span>
+    <span class="n">fbed</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fbed</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">fbed</span><span class="p">[</span><span class="s1">&#39;esizes&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">fbed</span><span class="p">[[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;sc1&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span><span class="s1">&#39;esizes&#39;</span><span class="p">]]</span></div>
+
+
+<span class="nd">@compressQ</span><span class="p">(</span><span class="s1">&#39;bed6path&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="bed12ToBed6"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.bed12ToBed6">[docs]</a><span class="k">def</span> <span class="nf">bed12ToBed6</span><span class="p">(</span><span class="n">bed12path</span><span class="p">,</span> <span class="n">bed6path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; uses bedtools bed12ToBed6 &quot;&quot;&quot;</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bed12ToBed6&#39;</span><span class="p">,</span> <span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="n">bed12path</span><span class="p">]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">bed6path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">fp</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">err</span></div>
+
+
+
+<span class="c1">### Normalization Scale ##############################################</span>
+
+<div class="viewcode-block" id="save_bed_covstats"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.save_bed_covstats">[docs]</a><span class="k">def</span> <span class="nf">save_bed_covstats</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="n">dstpath</span><span class="p">,</span> <span class="n">bed12</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">checkuniq</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="n">tdic</span><span class="p">,</span><span class="n">cdic</span> <span class="o">=</span> <span class="n">get_total_bp_bedfile</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="n">bed12</span><span class="p">,</span> <span class="n">returndics</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">checkuniq</span><span class="o">=</span><span class="n">checkuniq</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">c</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;totbp&#39;</span><span class="p">:</span><span class="n">tdic</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="s1">&#39;covbp&#39;</span><span class="p">:</span><span class="n">cdic</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cdic</span><span class="p">})</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;acov&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;totbp&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;covbp&#39;</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;covbp&#39;</span><span class="p">,</span><span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dstpath</span><span class="p">,</span> <span class="s1">&#39;ih&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_total_bp_bedfile"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.get_total_bp_bedfile">[docs]</a><span class="k">def</span> <span class="nf">get_total_bp_bedfile</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="n">bed12</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">chroms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">returndics</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">checkuniq</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns total mapped base pairs (totbp) and covered base pairs (covbp).</span>
+<span class="sd">    The ratio totbp/covbp gives average coverage. Process without reading entire data</span>
+<span class="sd">    into the RAM. Process non BED12 file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        bedpath (str): a path to BED file</span>
+<span class="sd">        bed12 (bool): whether format is BED12 (default False)</span>
+<span class="sd">        chroms (list): chromosomes to consider, if None (default) use all</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        totbp: total base pairs in BED</span>
+<span class="sd">        covbp: covered base pairs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">bed12</span><span class="p">:</span>
+        <span class="n">totbpdic</span><span class="p">,</span><span class="n">covbpdic</span> <span class="o">=</span> <span class="n">cybw</span><span class="o">.</span><span class="n">get_total_bp_bed12file_helper</span><span class="p">(</span><span class="n">bedpath</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">checkuniq</span><span class="p">:</span>
+            <span class="n">totbpdic</span><span class="p">,</span><span class="n">covbpdic</span> <span class="o">=</span> <span class="n">cybw</span><span class="o">.</span><span class="n">get_total_bp_bedfile_helper_check_uniq</span><span class="p">(</span><span class="n">bedpath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">totbpdic</span><span class="p">,</span><span class="n">covbpdic</span> <span class="o">=</span> <span class="n">cybw</span><span class="o">.</span><span class="n">get_total_bp_bedfile_helper</span><span class="p">(</span><span class="n">bedpath</span><span class="p">)</span>
+    <span class="c1"># fix key bytes =&gt; str</span>
+    <span class="n">tdic</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">cdic</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">covbpdic</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="n">tdic</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="n">totbpdic</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
+        <span class="n">cdic</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="n">covbpdic</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">returndics</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tdic</span><span class="p">,</span> <span class="n">cdic</span>    
+    <span class="n">totbp</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">covbp</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">chroms</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">chroms</span> <span class="o">=</span> <span class="n">cdic</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">chrom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cdic</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;{0} not found in the data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chrom</span><span class="p">))</span>
+            <span class="k">continue</span>
+        <span class="n">totbp</span> <span class="o">+=</span> <span class="n">tdic</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span>
+        <span class="n">covbp</span> <span class="o">+=</span> <span class="n">cdic</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">totbp</span><span class="p">,</span> <span class="n">covbp</span></div>
+
+<div class="viewcode-block" id="get_total_bp"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.get_total_bp">[docs]</a><span class="k">def</span> <span class="nf">get_total_bp</span><span class="p">(</span><span class="n">beddf</span><span class="p">,</span> <span class="n">returndics</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns total mapped base pairs (totbp) and covered base pairs (covbp).</span>
+<span class="sd">    The ratio totbp/covbp gives average coverage.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        beddf: a BED dataframe (a standard non BED12 format)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        totbp: total base pairs in BED</span>
+<span class="sd">        covbp: covered base pairs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># total bp</span>
+    <span class="n">beddf</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">beddf</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">beddf</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+    <span class="c1"># totbp = beddf[&#39;len&#39;].sum() # total bp</span>
+    <span class="c1"># covered bp: calculate using chopped intervals</span>
+    <span class="c1"># first remove redundancy</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span>
+    <span class="n">cdic</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">tdic</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="n">beddf</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+        <span class="n">sub</span> <span class="o">=</span> <span class="n">beddf</span><span class="p">[</span><span class="n">beddf</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">chrom</span><span class="p">]</span>
+        <span class="n">tdic</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">sted</span> <span class="o">=</span> <span class="n">sub</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sted</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">N</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">cybw</span><span class="o">.</span><span class="n">union_intervals</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">cdic</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">y</span><span class="o">-</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="n">b</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">returndics</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tdic</span><span class="p">,</span> <span class="n">cdic</span>
+    <span class="n">totbp</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">tdic</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="n">covbp</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cdic</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">totbp</span><span class="p">,</span> <span class="n">covbp</span></div>
+
+
+<span class="c1">### INTERSECT ########################################################</span>
+
+
+<div class="viewcode-block" id="bedtoolintersect"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.bedtoolintersect">[docs]</a><span class="k">def</span> <span class="nf">bedtoolintersect</span><span class="p">(</span><span class="n">aname</span><span class="p">,</span> <span class="n">bname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_bedtoolscatcherror</span><span class="p">(</span><span class="s1">&#39;intersect&#39;</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">bname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="bedtoolmerge"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.bedtoolmerge">[docs]</a><span class="k">def</span> <span class="nf">bedtoolmerge</span><span class="p">(</span><span class="n">aname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_runbedtools2</span><span class="p">(</span><span class="s1">&#39;merge&#39;</span><span class="p">,</span><span class="n">aname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="bedtoolcomplement"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.bedtoolcomplement">[docs]</a><span class="k">def</span> <span class="nf">bedtoolcomplement</span><span class="p">(</span><span class="n">aname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_runbedtools2</span><span class="p">(</span><span class="s1">&#39;complement&#39;</span><span class="p">,</span><span class="n">aname</span><span class="p">,</span><span class="n">cname</span><span class="p">,</span><span class="n">g</span><span class="o">=</span><span class="n">chromsizes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="bedtoolsubtract"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.bedtoolsubtract">[docs]</a><span class="k">def</span> <span class="nf">bedtoolsubtract</span><span class="p">(</span><span class="n">aname</span><span class="p">,</span> <span class="n">bname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_bedtoolscatcherror</span><span class="p">(</span><span class="s1">&#39;subtract&#39;</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">bname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">_runbedtools2</span><span class="p">(</span><span class="n">which</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bedtools&#39;</span><span class="p">,</span><span class="n">which</span><span class="p">,</span> <span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="n">aname</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="nb">bool</span><span class="p">):</span><span class="c1"># in [True,False]: 2016-03-27 fix</span>
+            <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cname</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">outfile</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;bederror&#39;</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">cname</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_runbedtools3</span><span class="p">(</span><span class="n">which</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">bname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bedtools&#39;</span><span class="p">,</span><span class="n">which</span><span class="p">,</span><span class="s1">&#39;-a&#39;</span><span class="p">,</span><span class="n">aname</span><span class="p">,</span><span class="s1">&#39;-b&#39;</span><span class="p">,</span><span class="n">bname</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="nb">bool</span><span class="p">):</span><span class="c1"># in [True,False]: 2016-03-27 fix</span>
+            <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cname</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">outfile</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ret</span> <span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;bederror&#39;</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ret</span>
+
+<span class="k">def</span> <span class="nf">_bedtoolscatcherror</span><span class="p">(</span><span class="n">which</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">bname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">aname</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;{0} does not exists&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aname</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">bname</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;{0} does not exists&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bname</span><span class="p">))</span>
+        
+    <span class="k">if</span> <span class="n">cname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="n">cname</span> <span class="o">=</span> <span class="n">cname</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">_runbedtools3</span><span class="p">(</span><span class="n">which</span><span class="p">,</span><span class="n">aname</span><span class="p">,</span><span class="n">bname</span><span class="p">,</span><span class="n">cname</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ret</span> <span class="o">!=</span><span class="mi">0</span><span class="p">:</span> <span class="c1"># try uncompressed </span>
+        <span class="n">aname</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">uncompresscopy</span><span class="p">(</span><span class="n">aname</span><span class="p">)</span>
+        <span class="n">bname</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">uncompresscopy</span><span class="p">(</span><span class="n">bname</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">_runbedtools3</span><span class="p">(</span><span class="n">which</span><span class="p">,</span><span class="n">aname</span><span class="p">,</span><span class="n">bname</span><span class="p">,</span><span class="n">cname</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span> <span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;bedtools error&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">cname</span><span class="p">)</span>
+
+<div class="viewcode-block" id="calc_ovlratio"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.calc_ovlratio">[docs]</a><span class="k">def</span> <span class="nf">calc_ovlratio</span><span class="p">(</span><span class="n">aname</span><span class="p">,</span> <span class="n">bname</span><span class="p">,</span> <span class="n">tname</span><span class="p">,</span> <span class="n">nacol</span><span class="p">,</span> <span class="n">nbcol</span><span class="p">,</span> <span class="n">idcol</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate overlapped portion of b onto a. </span>
+<span class="sd">    Will check existence of result file (tname) and uses it if newer than input files.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        aname (str): bed file name 1</span>
+<span class="sd">        bname (str): bed file name 2</span>
+<span class="sd">        tname (str): result file name</span>
+<span class="sd">        nacol (int): number of columns in file 1</span>
+<span class="sd">        nbcol (int): number of columns in file 2</span>
+
+<span class="sd">    Optional:</span>
+<span class="sd">        idcol (list of str): columns which specify unique entry</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A Pandas DataFrame which contains overlap info</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># requirement: no overlap within b</span>
+    <span class="c1"># cache?</span>
+    <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">notstale</span><span class="p">([</span><span class="n">aname</span><span class="p">,</span><span class="n">bname</span><span class="p">],</span> <span class="n">tname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">tname</span><span class="p">)</span>
+    <span class="c1"># calculate bedtools intersect</span>
+    <span class="n">tmpsuf</span><span class="o">=</span><span class="s1">&#39;.ovlbed.txt&#39;</span>
+    <span class="n">cname</span> <span class="o">=</span> <span class="n">aname</span><span class="o">+</span><span class="n">tmpsuf</span>
+    <span class="k">if</span> <span class="n">nacol</span><span class="o">==</span><span class="mi">12</span><span class="p">:</span>
+        <span class="n">cname</span> <span class="o">=</span> <span class="n">bedtoolintersect</span><span class="p">(</span><span class="n">aname</span><span class="p">,</span> <span class="n">bname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="n">wao</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cname</span> <span class="o">=</span> <span class="n">bedtoolintersect</span><span class="p">(</span><span class="n">aname</span><span class="p">,</span> <span class="n">bname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="n">wao</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c1"># read tmp file</span>
+    <span class="n">acols</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">BEDCOLS</span><span class="p">[:</span><span class="n">nacol</span><span class="p">]</span>
+    <span class="n">bcols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;b_&#39;</span><span class="o">+</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">GGB</span><span class="o">.</span><span class="n">BEDCOLS</span><span class="p">[:</span><span class="n">nbcol</span><span class="p">]]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">acols</span> <span class="o">+</span> <span class="n">bcols</span> <span class="o">+</span><span class="p">[</span><span class="s1">&#39;ovl&#39;</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">cname</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
+    <span class="n">dfg</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">idcol</span><span class="p">)</span> <span class="c1">#[&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;])</span>
+    <span class="n">dfa</span> <span class="o">=</span> <span class="n">dfg</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">acols</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">nacol</span><span class="o">==</span><span class="mi">12</span><span class="p">:</span><span class="c1"># sum of exon sizes</span>
+        <span class="n">dfa</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dfa</span><span class="p">[</span><span class="s1">&#39;esizes&#39;</span><span class="p">]]</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">dfa</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfa</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">dfa</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+    <span class="c1"># since b does not overlap by itself total overlap of an element of a to b is </span>
+    <span class="c1"># sum of overlap to individual b</span>
+    <span class="n">dfa</span><span class="p">[</span><span class="s1">&#39;ovl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfg</span><span class="p">[</span><span class="s1">&#39;ovl&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">dfa</span><span class="p">[</span><span class="s1">&#39;ovlratio&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfa</span><span class="p">[</span><span class="s1">&#39;ovl&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">/</span><span class="n">dfa</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span>
+    <span class="n">dfa</span><span class="p">[</span><span class="s1">&#39;notcovbp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfa</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">dfa</span><span class="p">[</span><span class="s1">&#39;ovl&#39;</span><span class="p">]</span>
+    <span class="c1"># clean up</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">cname</span><span class="p">)</span>
+    <span class="c1"># save</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">save_tsv_nidx_whead</span><span class="p">(</span><span class="n">dfa</span><span class="p">,</span> <span class="n">tname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dfa</span></div>
+
+<div class="viewcode-block" id="fillgap"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.fillgap">[docs]</a><span class="k">def</span> <span class="nf">fillgap</span><span class="p">(</span><span class="n">binfile</span><span class="p">,</span> <span class="n">gapfile</span><span class="p">,</span> <span class="n">gap</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">gapfile</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
+        <span class="n">gapfile</span> <span class="o">=</span> <span class="n">gapfile</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+    <span class="c1">#gapfile = binfile[:-7]+&#39;.gap%d.bed&#39; % gap</span>
+    <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">notstale</span><span class="p">(</span><span class="n">binfile</span><span class="p">,</span> <span class="n">gapfile</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">gapfile</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span>
+    <span class="n">gapfile</span> <span class="o">=</span> <span class="n">bedtoolmerge</span><span class="p">(</span><span class="n">binfile</span><span class="p">,</span> <span class="n">gapfile</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">gap</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gapfile</span></div>
+
+<div class="viewcode-block" id="read_ovl"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.read_ovl">[docs]</a><span class="k">def</span> <span class="nf">read_ovl</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">acols</span><span class="p">,</span> <span class="n">bcols</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">bcols</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">acols</span><span class="o">+</span><span class="p">[</span><span class="s1">&#39;b_&#39;</span><span class="o">+</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">acols</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s1">&#39;ovl&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">acols</span><span class="o">+</span><span class="p">[</span><span class="s1">&#39;b_&#39;</span><span class="o">+</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bcols</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s1">&#39;ovl&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span></div>
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,514 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>jgem.bigwig &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<h1>Source code for jgem.bigwig</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">.. module:: bigwig</span>
+<span class="sd">    :synopsis: BIGWIG file related stuffs</span>
+
+<span class="sd">..  moduleauthor:: Ken Sugino &lt;ken.sugino@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># system</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">iadd</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="c1"># 3rd party</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">PD</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">N</span>
+
+<span class="c1"># for reading BIGWIG file</span>
+<span class="c1">#ngslib is faster than bx but fails when parallerized</span>
+<span class="c1">#import bx</span>
+<span class="c1">#from bx.bbi.bigwig_file import BigWigFile</span>
+<span class="c1">#from ngslib import wWigIO</span>
+<span class="c1">#bx-python is not compatible with Python3 =&gt; use modified version </span>
+
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">UT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">bedtools</span> <span class="k">as</span> <span class="n">BT</span>
+<span class="kn">import</span> <span class="nn">jgem.cy.bw</span>  <span class="kn">as</span> <span class="nn">cybw</span> <span class="c1">#import array2wiggle_chr # Cython version</span>
+<span class="kn">from</span> <span class="nn">jgem.cy.bw</span> <span class="kn">import</span> <span class="n">array2wiggle_chr</span>
+<span class="kn">from</span> <span class="nn">jgem.bxbbi.bigwig_file</span> <span class="kn">import</span> <span class="n">BigWigFile</span>
+
+<span class="n">MAXSIZE</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">300e6</span><span class="p">)</span>  <span class="c1"># 300Mbp bigger than chr1,chrX</span>
+
+<span class="c1"># BAM to genomecov BIGWIG ##################################################</span>
+<div class="viewcode-block" id="cnt_bam"><a class="viewcode-back" href="../../modules.html#jgem.bigwig.cnt_bam">[docs]</a><span class="k">def</span> <span class="nf">cnt_bam</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Uses samtools to count reads in BAM file. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fpath (str): path to BAM file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int. The number of aligned reads.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cache</span> <span class="o">=</span> <span class="n">fpath</span><span class="o">+</span><span class="s1">&#39;.flagstat&#39;</span>
+    <span class="n">bai</span> <span class="o">=</span> <span class="n">fpath</span><span class="o">+</span><span class="s1">&#39;.bai&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;file {0} does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fpath</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">bai</span><span class="p">):</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;samtools&#39;</span><span class="p">,</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="n">fpath</span><span class="p">]</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">cache</span><span class="p">)</span><span class="o">&gt;</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;samtools&#39;</span><span class="p">,</span> <span class="s1">&#39;flagstat&#39;</span><span class="p">,</span> <span class="n">fpath</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="nb">open</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">firstline</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">firstline</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="nb">int</span><span class="p">(</span><span class="n">firstline</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="wig2bw"><a class="viewcode-back" href="../../modules.html#jgem.bigwig.wig2bw">[docs]</a><span class="k">def</span> <span class="nf">wig2bw</span><span class="p">(</span><span class="n">wigpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="bam2bw"><a class="viewcode-back" href="../../modules.html#jgem.bigwig.bam2bw">[docs]</a><span class="k">def</span> <span class="nf">bam2bw</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bpath</span><span class="p">,</span> <span class="n">aligned</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate normalized coverage from BAM</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fpath (str): path to BAM</span>
+<span class="sd">        chromsizes (str): path to chromsizes file </span>
+<span class="sd">        bpath (str): path to BIGWIG</span>
+<span class="sd">        aligned (int): number of aligned reads, if None uses samtools to find it from BAM</span>
+
+<span class="sd">    Requires Bedtools (genomeCoverageBed) and Kent Tool (wigToBigWig)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># countreads</span>
+    <span class="k">if</span> <span class="n">aligned</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">aligned</span> <span class="o">=</span>   <span class="n">cnt_bam</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="mf">1000000.</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">aligned</span><span class="p">)</span>
+    <span class="c1"># convert_to_wig</span>
+    <span class="n">tpath</span> <span class="o">=</span> <span class="n">bpath</span> <span class="o">+</span><span class="s1">&#39;.wig&#39;</span>
+    <span class="n">tfobj</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">tpath</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">cmd1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;genomeCoverageBed&#39;</span><span class="p">,</span> <span class="s1">&#39;-split&#39;</span><span class="p">,</span> <span class="s1">&#39;-bg&#39;</span><span class="p">,</span> <span class="s1">&#39;-ibam&#39;</span><span class="p">,</span> <span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="s1">&#39;-scale&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">scale</span><span class="p">)]</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd1</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">tfobj</span><span class="p">)</span>
+    <span class="n">p1</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="n">tfobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># convet_wig_to_bigwig</span>
+    <span class="n">cmd2</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;wigToBigWig&#39;</span><span class="p">,</span> <span class="n">tpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bpath</span><span class="p">]</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd2</span><span class="p">)</span>
+
+    <span class="c1"># remove_temporary_file</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tpath</span><span class="p">)</span></div>
+
+
+<span class="c1"># bw2bed based on #########################################################</span>
+<span class="c1"># https://github.com/CGATOxford/cgat/blob/master/scripts/wig2bed.py</span>
+<span class="c1"># [TODO] report bug to AndreasHeger line 80 &quot;elif =&gt; if&quot;</span>
+
+<div class="viewcode-block" id="block_iter"><a class="viewcode-back" href="../../modules.html#jgem.bigwig.block_iter">[docs]</a><span class="k">def</span> <span class="nf">block_iter</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">chunk</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">10e6</span><span class="p">)):</span>
+    <span class="s2">&quot;BigWig file iterator&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fobj</span><span class="p">:</span>
+        <span class="n">bw</span> <span class="o">=</span> <span class="n">BigWigFile</span><span class="p">(</span><span class="n">fobj</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">MAXSIZE</span><span class="p">,</span><span class="n">chunk</span><span class="p">):</span> <span class="c1"># 10Mbp chunk</span>
+            <span class="n">iterator</span> <span class="o">=</span> <span class="n">bw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">+</span><span class="n">chunk</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">iterator</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">StopIteration</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">v</span></div>
+
+<span class="c1"># def block_iter_ngs(infile, chrom, chunk=int(10e6)):</span>
+<span class="c1">#     # ngslib is faster than bx but fails when parallerized</span>
+<span class="c1">#     wWigIO.open(infile)</span>
+<span class="c1">#     for x in range(0,MAXSIZE,chunk): # 10Mbp chunk</span>
+<span class="c1">#         iterator = wWigIO.getIntervals(infile, chrom, x, x+chunk)</span>
+<span class="c1">#         if not iterator:</span>
+<span class="c1">#             raise StopIteration</span>
+<span class="c1">#         for v in iterator:</span>
+<span class="c1">#             yield v</span>
+<span class="c1">#     wWigIO.close(infile)</span>
+
+<div class="viewcode-block" id="apply_threshold"><a class="viewcode-back" href="../../modules.html#jgem.bigwig.apply_threshold">[docs]</a><span class="k">def</span> <span class="nf">apply_threshold</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">chroms</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Only returns intervals exceeding the threshold</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        infile: path to bigwig</span>
+<span class="sd">        threshold: positive float</span>
+<span class="sd">        chroms: list of chromosome names</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        intervals (chr,st,ed)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">:</span>
+        <span class="n">last_start</span><span class="p">,</span> <span class="n">last_end</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="c1">#for start, end, value in block_iter_ngs(infile, chrom):</span>
+        <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">block_iter</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">chrom</span><span class="p">):</span> 
+            <span class="c1"># start=&gt;end has value</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">start</span> <span class="o">-</span> <span class="n">last_end</span> 
+            <span class="c1"># d: distance from last_end</span>
+            <span class="c1"># d&gt; 0 =&gt; last_end==&gt;start value is 0 assume threshold&gt;=0</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">d</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">last_start</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># if there&#39;s un-yielded interval then yield</span>
+                    <span class="k">yield</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">last_start</span><span class="p">,</span> <span class="n">last_end</span>
+                <span class="n">last_start</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># reset (no hit)</span>
+            <span class="c1">#elif last_start &lt; 0 and value &gt; threshold: </span>
+            <span class="c1"># this part is a bug from the original code</span>
+            <span class="c1"># original code will skip the next interval</span>
+            <span class="k">if</span> <span class="n">last_start</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="c1"># last_start &lt;0 =&gt; no current interval</span>
+                <span class="c1"># and value above threshod ==&gt; start new interval</span>
+                <span class="n">last_start</span> <span class="o">=</span> <span class="n">start</span>
+            <span class="n">last_end</span> <span class="o">=</span> <span class="n">end</span>
+        <span class="k">if</span> <span class="n">last_start</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">last_start</span><span class="p">,</span> <span class="n">end</span></div>
+
+<div class="viewcode-block" id="bw2bed"><a class="viewcode-back" href="../../modules.html#jgem.bigwig.bw2bed">[docs]</a><span class="k">def</span> <span class="nf">bw2bed</span><span class="p">(</span><span class="n">bwfile</span><span class="p">,</span> <span class="n">bedfile</span><span class="p">,</span> <span class="n">chroms</span><span class="p">,</span> <span class="n">th</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transform BigWig genomeCov to binary BED by thresholding. </span>
+<span class="sd">    Makes result file (bwfile[:-3]+&#39;.binary%g.bed&#39;.format(th))</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        bwfile: path to BigWig file</span>
+<span class="sd">        chroms: list of chromosome names</span>
+<span class="sd">        th: coverage threshold</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        path to generated BED file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#bedfile = &#39;{0}.binary{1:g}.bed&#39;.format(bwfile[:-3], th)</span>
+    <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">notstale</span><span class="p">(</span><span class="n">bwfile</span><span class="p">,</span> <span class="n">bedfile</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">bedfile</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span>
+    <span class="c1"># make sure bwfile exists</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">bwfile</span><span class="p">)</span> <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;BigWig file {0} does not exist.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bwfile</span><span class="p">))</span>
+    <span class="n">processor</span> <span class="o">=</span> <span class="n">apply_threshold</span><span class="p">(</span><span class="n">bwfile</span><span class="p">,</span><span class="n">th</span><span class="p">,</span> <span class="n">chroms</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">bedfile</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">%s</span><span class="se">\t</span><span class="si">%i</span><span class="se">\t</span><span class="si">%i</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">processor</span><span class="p">]))</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">bedfile</span><span class="p">)</span></div>
+
+<span class="c1">### Merge BigWigs ##########################################################</span>
+
+<div class="viewcode-block" id="get_bigwig_as_array"><a class="viewcode-back" href="../../modules.html#jgem.bigwig.get_bigwig_as_array">[docs]</a><span class="k">def</span> <span class="nf">get_bigwig_as_array</span><span class="p">(</span><span class="n">bwfile</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">st</span><span class="p">,</span> <span class="n">ed</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get BIGWIG coverage values as array of size (ed-st). Array start corresponds to st.</span>
+<span class="sd">    0-based</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        bwfile: path to BIGWIG</span>
+<span class="sd">        chrom (str): chromosome name</span>
+<span class="sd">        st (int): start position</span>
+<span class="sd">        ed (int): end position</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of size (ed-st)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># with open(bwfile, mode=&#39;rb&#39;) as fobj:</span>
+    <span class="c1">#     bw = BigWigFile(fobj)</span>
+    <span class="c1">#     it = bw.get(chrom,st,ed)</span>
+    <span class="c1">#     a = N.zeros(ed-st)</span>
+    <span class="c1">#     for s,e,v in it:</span>
+    <span class="c1">#         a[s-st:e-st] += v</span>
+    <span class="c1"># return a</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">bwfile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fobj</span><span class="p">:</span>
+        <span class="n">bw</span> <span class="o">=</span> <span class="n">BigWigFile</span><span class="p">(</span><span class="n">fobj</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">bw</span><span class="o">.</span><span class="n">get_as_array</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span><span class="n">st</span><span class="p">,</span><span class="n">ed</span><span class="p">)</span>
+        <span class="n">a</span><span class="p">[</span><span class="n">N</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">a</span><span class="p">)]</span><span class="o">=</span><span class="mf">0.</span>
+    <span class="k">return</span> <span class="n">a</span></div>
+
+<div class="viewcode-block" id="merge_bigwigs_chr"><a class="viewcode-back" href="../../modules.html#jgem.bigwig.merge_bigwigs_chr">[docs]</a><span class="k">def</span> <span class="nf">merge_bigwigs_chr</span><span class="p">(</span><span class="n">bwfiles</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">chromsize</span><span class="p">,</span> <span class="n">dstpath</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="c1"># merge4-allsample.bw chr1 89026991 intervals ~50%</span>
+    <span class="c1"># better to just use dense array than sparse array</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">chromsize</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">fpath</span> <span class="ow">in</span> <span class="n">bwfiles</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fobj</span><span class="p">:</span>
+            <span class="n">bw</span> <span class="o">=</span> <span class="n">BigWigFile</span><span class="p">(</span><span class="n">fobj</span><span class="p">)</span>
+            <span class="n">it</span> <span class="o">=</span> <span class="n">bw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">chromsize</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">it</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
+                    <span class="n">a</span><span class="p">[</span><span class="n">s</span><span class="p">:</span><span class="n">e</span><span class="p">]</span> <span class="o">+=</span> <span class="n">v</span>
+    <span class="c1">#a = a/float(len(bwfiles))</span>
+    <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">scale</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">N</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">cybw</span><span class="o">.</span><span class="n">array2wiggle_chr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">dstpath</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">dstpath</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="merge_bigwigs_mp"><a class="viewcode-back" href="../../modules.html#jgem.bigwig.merge_bigwigs_mp">[docs]</a><span class="k">def</span> <span class="nf">merge_bigwigs_mp</span><span class="p">(</span><span class="n">bwfiles</span><span class="p">,</span> <span class="n">genome</span><span class="p">,</span> <span class="n">dstpath</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
+    <span class="n">chroms</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">chroms</span><span class="p">(</span><span class="n">genome</span><span class="p">)</span>
+    <span class="n">chromfile</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">chromsizes</span><span class="p">(</span><span class="n">genome</span><span class="p">)</span>
+    <span class="n">chromsizes</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">chromdf</span><span class="p">(</span><span class="n">genome</span><span class="p">),</span> <span class="s1">&#39;chr&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[(</span><span class="n">bwfiles</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">dstpath</span><span class="o">+</span><span class="s1">&#39;.{0}.wig&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">scale</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">]</span>
+
+    <span class="n">rslts</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">process_mp</span><span class="p">(</span><span class="n">merge_bigwigs_chr</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="n">doreduce</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="n">dic</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rslts</span><span class="p">)</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;concatenating chromosomes...&#39;</span><span class="p">)</span>
+    <span class="n">wigpath</span> <span class="o">=</span> <span class="n">dstpath</span><span class="o">+</span><span class="s1">&#39;.wig&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">wigpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">c</span><span class="p">],</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;converting wiggle to bigwig&#39;</span><span class="p">)</span>
+    <span class="n">BT</span><span class="o">.</span><span class="n">wig2bw</span><span class="p">(</span><span class="n">wigpath</span><span class="p">,</span> <span class="n">chromfile</span><span class="p">,</span> <span class="n">dstpath</span><span class="p">)</span>
+
+    <span class="c1"># clean up </span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">dstpath</span><span class="o">+</span><span class="s1">&#39;.{0}.wig&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">wigpath</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">wigpath</span><span class="p">)</span></div>
+    
+<span class="c1"># def array2wiggle_chr(a, chrom, dstpath):</span>
+    <span class="c1"># possibly Cythonify</span>
+    <span class="c1"># def _gen():</span>
+    <span class="c1">#     i = 0</span>
+    <span class="c1">#     # skip initial 0</span>
+    <span class="c1">#     while(a[i]==0):</span>
+    <span class="c1">#         i+=1</span>
+    <span class="c1">#     st = i</span>
+    <span class="c1">#     c = a[st] # initial non-zero</span>
+    <span class="c1">#     i+=1</span>
+    <span class="c1">#     while(i&lt;len(a)):</span>
+    <span class="c1">#         # advance until change</span>
+    <span class="c1">#         while(i&lt;len(a) and a[i]==c):</span>
+    <span class="c1">#             i+=1</span>
+    <span class="c1">#         if c!=0:</span>
+    <span class="c1">#             # 0-based =&gt; 1-based</span>
+    <span class="c1">#             yield &#39;{0}\t{1}\t{2}\t{3}\n&#39;.format(chrom,st,i,c)</span>
+    <span class="c1">#         if i&lt;len(a):</span>
+    <span class="c1">#             st = i</span>
+    <span class="c1">#             c = a[st]</span>
+    <span class="c1"># with open(dstpath,&#39;w&#39;) as fobj:</span>
+    <span class="c1">#     if N.sum(a)&gt;0: # some elements are not zero</span>
+    <span class="c1">#         cnt = 0</span>
+    <span class="c1">#         txt = []</span>
+    <span class="c1">#         for line in _gen():</span>
+    <span class="c1">#             txt.append(line)</span>
+    <span class="c1">#             cnt += 1</span>
+    <span class="c1">#             if cnt == 100000:</span>
+    <span class="c1">#                 fobj.write(&#39;&#39;.join(txt))</span>
+    <span class="c1">#                 cnt = 0</span>
+    <span class="c1">#                 txt = []</span>
+    <span class="c1">#         fobj.write(txt)</span>
+    <span class="c1"># return dstpath</span>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

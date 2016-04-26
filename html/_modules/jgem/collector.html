@@ -1,0 +1,505 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>jgem.collector &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<h1>Source code for jgem.collector</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">.. module:: collector</span>
+<span class="sd">    :synopsis: Calculate and collect coverages for all samples against a specific assembly.</span>
+
+<span class="sd">..  moduleauthor:: Ken Sugino &lt;ken.sugino@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># system imports</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">iadd</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="nb">reduce</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="c1"># 3rd party libraries</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">PD</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">N</span>
+<span class="c1">#import matplotlib.pyplot as P</span>
+
+<span class="c1"># library imports</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">UT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">gtfgffbed</span> <span class="k">as</span> <span class="n">GGB</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">bedtools</span> <span class="k">as</span> <span class="n">BT</span>
+<span class="c1">#from jgem import bigwig as BW</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">trimex</span> <span class="k">as</span> <span class="n">TE</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">filenames</span> <span class="k">as</span> <span class="n">FN</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">calccov</span> <span class="k">as</span> <span class="n">CC</span>
+
+
+<div class="viewcode-block" id="CollectorNames"><a class="viewcode-back" href="../../modules.html#jgem.collector.CollectorNames">[docs]</a><span class="k">class</span> <span class="nc">CollectorNames</span><span class="p">(</span><span class="n">FN</span><span class="o">.</span><span class="n">FileNamesBase</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samplecode</span><span class="p">,</span> <span class="n">sampleinfo</span><span class="p">,</span> <span class="n">assemblycode</span><span class="p">,</span> <span class="n">outdir</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">si</span> <span class="o">=</span> <span class="n">sampleinfo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samplecode</span> <span class="o">=</span> <span class="n">samplecode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assemblycode</span> <span class="o">=</span> <span class="n">assemblycode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outdir</span> <span class="o">=</span> <span class="n">outdir</span>
+
+        <span class="c1">#prefix = os.path.join(outdir, &#39;{0}.{1}&#39;.format(assemblycode, samplecode))</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">assemblycode</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CollectorNames</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CollectorNames.txtname2"><a class="viewcode-back" href="../../modules.html#jgem.collector.CollectorNames.txtname2">[docs]</a>    <span class="k">def</span> <span class="nf">txtname2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scode</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">txtname</span><span class="p">(</span><span class="s1">&#39;{0}.{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scode</span><span class="p">,</span> <span class="n">kind</span><span class="p">),</span> <span class="n">category</span><span class="o">=</span><span class="n">category</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CollectorNames.txtname1"><a class="viewcode-back" href="../../modules.html#jgem.collector.CollectorNames.txtname1">[docs]</a>    <span class="k">def</span> <span class="nf">txtname1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">txtname2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">samplecode</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Collector"><a class="viewcode-back" href="../../modules.html#jgem.collector.Collector">[docs]</a><span class="k">class</span> <span class="nc">Collector</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculate and collect coverages for all samples against specified assembly.</span>
+<span class="sd">    For large datasets, calculations of gcov/ecov/gcov1000 should be done separately</span>
+<span class="sd">    using a cluster of computers. T</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	assemblyprefix: assembly prefix path (+.ex.txt.gz,.sj.txt.gz)</span>
+<span class="sd">    	assemblycode: identifier for the assembly</span>
+<span class="sd">    	sampleinfo: dataframe containing sample info (required fileds= name, bwfile, sjfile)</span>
+<span class="sd">        samplecode: identidier for the sample set</span>
+<span class="sd">        outdir: output directory</span>
+
+<span class="sd">   	Methods:</span>
+<span class="sd">	    1. collect_gcov: gene coverages (row:genes, col:samples)</span>
+<span class="sd">	    2. collect_ecov: exon coverages (row:exons, col:samples)</span>
+<span class="sd">	    3. collect_jcnt: junction counts (row:junctions, col:samples)</span>
+<span class="sd">	    4. collect_gcov1000 (using trimmed model)</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        are written in files</span>
+<span class="sd">        1. outdir/assemblycode.samplecode.gcov.txt.gz</span>
+<span class="sd">        1b. outdir/assemblycode.samplecode.ugcov.txt.gz</span>
+<span class="sd">        2. outdir/assemblycode.samplecode.ecov.txt.gz</span>
+<span class="sd">        2b. outdir/assemblycode.samplecode.uecov.txt.gz</span>
+<span class="sd">        3. outdir/assemblycode.samplecode.jcnt.txt.gz</span>
+<span class="sd">        4. outdir/assemblycode.samplecode.t1000gcov.txt.gz</span>
+<span class="sd">        4b. outdir/assemblycode.samplecode.ut1000gcov.txt.gz</span>
+
+<span class="sd">        Individual sample gcov/ecov/gcov1000 should have filename</span>
+<span class="sd">        outdir/assemblycode.samplename.gcov.txt.gz etc.</span>
+<span class="sd">        If these files are generated by separate cluster computation, </span>
+<span class="sd">        this object will skip computation and just collect results.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assemblycode</span><span class="p">,</span> <span class="n">assemblyprefix</span><span class="p">,</span> <span class="n">samplecode</span><span class="p">,</span> <span class="n">sampleinfo</span><span class="p">,</span> <span class="n">outdir</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acode</span> <span class="o">=</span> <span class="n">assemblycode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apre</span> <span class="o">=</span> <span class="n">assemblyprefix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expath</span> <span class="o">=</span> <span class="n">assemblyprefix</span><span class="o">+</span><span class="s1">&#39;.ex.txt.gz&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sjpath</span> <span class="o">=</span> <span class="n">assemblyprefix</span><span class="o">+</span><span class="s1">&#39;.sj.txt.gz&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cipath</span> <span class="o">=</span> <span class="n">assemblyprefix</span><span class="o">+</span><span class="s1">&#39;.ci.txt.gz&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expath</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;{0} does not exists&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expath</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sjpath</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;{0} does not exists&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sjpath</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cipath</span><span class="p">):</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;generating CI:{0}...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cipath</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mex</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expath</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ci</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">chopintervals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mex</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cipath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">si</span> <span class="o">=</span> <span class="n">sampleinfo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scode</span> <span class="o">=</span> <span class="n">samplecode</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span> <span class="o">=</span> <span class="n">CollectorNames</span><span class="p">(</span><span class="n">samplecode</span><span class="p">,</span> <span class="n">sampleinfo</span><span class="p">,</span> <span class="n">assemblycode</span><span class="p">,</span> <span class="n">outdir</span><span class="p">)</span>
+        
+<div class="viewcode-block" id="Collector.ex"><a class="viewcode-back" href="../../modules.html#jgem.collector.Collector.ex">[docs]</a>    <span class="k">def</span> <span class="nf">ex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; assembly ex dataframe &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;mex&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mex</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expath</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mex</span></div>
+
+<div class="viewcode-block" id="Collector.sj"><a class="viewcode-back" href="../../modules.html#jgem.collector.Collector.sj">[docs]</a>    <span class="k">def</span> <span class="nf">sj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; assembly sj dataframe &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;msj&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">msj</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sjpath</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">msj</span></div>
+
+    <span class="c1"># TODO: split into chromosome and collect in separate CPU?</span>
+<div class="viewcode-block" id="Collector.collect_jcnt"><a class="viewcode-back" href="../../modules.html#jgem.collector.Collector.collect_jcnt">[docs]</a>    <span class="k">def</span> <span class="nf">collect_jcnt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;jcnt&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; which = ucnt, mcnt, jcnt(=ucnt or mcnt) &quot;&quot;&quot;</span>
+        <span class="n">msj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sj</span><span class="p">()</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="n">msj</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">msj</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">sjfile</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">si</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;sjfile&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;{1}/{2} processing {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">si</span><span class="p">)))</span>
+            <span class="n">sj</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_sj</span><span class="p">(</span><span class="n">sjfile</span><span class="p">)</span>
+            <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">sj</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">which</span> <span class="o">==</span> <span class="s1">&#39;jcnt&#39;</span><span class="p">:</span>
+                <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;jcnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="ow">or</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="n">sj</span><span class="p">[[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">,</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+            <span class="n">l2u</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="s1">&#39;locus&#39;</span><span class="p">,</span> <span class="n">which</span><span class="p">)</span>
+            <span class="n">msj</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l2u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">msj</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]]</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">msj</span><span class="p">,</span> <span class="n">fn</span><span class="o">.</span><span class="n">txtname1</span><span class="p">(</span><span class="n">which</span><span class="p">),</span><span class="s1">&#39;h&#39;</span><span class="p">)</span></div>
+        
+    <span class="c1"># TODO change to IPython parallel if iparallel=True</span>
+    <span class="c1"># need to launch each engine with np CPU </span>
+<div class="viewcode-block" id="Collector.collect_ecov"><a class="viewcode-back" href="../../modules.html#jgem.collector.Collector.collect_ecov">[docs]</a>    <span class="k">def</span> <span class="nf">collect_ecov</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">unique</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">iparallel</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Collect/calculate exon coverages.</span>
+
+<span class="sd">        If unique=True uses bigwig file with .uniq.bw suffix instead of .bw. </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex</span><span class="p">()</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="s1">&#39;uecov&#39;</span> <span class="k">if</span> <span class="n">unique</span> <span class="k">else</span> <span class="s1">&#39;ecov&#39;</span>
+        <span class="n">dpre</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">ep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expath</span>
+        <span class="n">cp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cipath</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">mex</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[(</span><span class="n">s</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">bw</span><span class="p">,</span> <span class="n">dpre</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">cp</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">np</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span><span class="n">bw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">si</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;bwfile&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;{1}/{2} processing {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
+            <span class="c1"># path = fn.txtname2(a[0], a[1]) # register path</span>
+            <span class="n">s</span><span class="p">,</span> <span class="n">ecov</span> <span class="o">=</span> <span class="n">_calc_ecov_worker</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">)</span>
+            <span class="n">mex</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">ecov</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">mex</span><span class="p">,</span> <span class="n">fn</span><span class="o">.</span><span class="n">txtname1</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="Collector.collect_gcov"><a class="viewcode-back" href="../../modules.html#jgem.collector.Collector.collect_gcov">[docs]</a>    <span class="k">def</span> <span class="nf">collect_gcov</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">unique</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">iparallel</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Collect/calculate gene coverages.</span>
+
+<span class="sd">        If unique=True uses bigwig file with .uniq.bw suffix instead of .bw. </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex</span><span class="p">()</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="s1">&#39;ugcov&#39;</span> <span class="k">if</span> <span class="n">unique</span> <span class="k">else</span> <span class="s1">&#39;gcov&#39;</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">mex</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gcov1</span> <span class="o">=</span> <span class="n">gcov1</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[[</span><span class="s1">&#39;chr&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gcov2</span> <span class="o">=</span> <span class="n">gcov2</span> <span class="o">=</span> <span class="n">gcov1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">gcov1</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">dpre</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">ep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expath</span>
+        <span class="n">cp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cipath</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[(</span><span class="n">s</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">bw</span><span class="p">,</span> <span class="n">dpre</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">cp</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">np</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span><span class="n">bw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">si</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;bwfile&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;{1}/{2} processing {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
+            <span class="c1"># path = fn.txtname2(a[0], a[1]) # register path</span>
+            <span class="n">s</span><span class="p">,</span> <span class="n">gcov</span> <span class="o">=</span> <span class="n">_calc_gcov_worker</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">)</span>
+            <span class="n">gcov1</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">gcov</span><span class="p">[</span><span class="s1">&#39;gcov&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">gcov2</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">gcov</span><span class="p">[</span><span class="s1">&#39;gcov2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="c1"># copy st,ed,glen</span>
+        <span class="n">gcov1</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gcov</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">gcov2</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gcov</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">gcov1</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gcov</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">gcov2</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gcov</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">gcov1</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gcov</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">gcov2</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gcov</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">gcov1</span><span class="p">,</span> <span class="n">fn</span><span class="o">.</span><span class="n">txtname1</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">gcov2</span><span class="p">,</span> <span class="n">fn</span><span class="o">.</span><span class="n">txtname1</span><span class="p">(</span><span class="n">w</span><span class="o">+</span><span class="s1">&#39;2&#39;</span><span class="p">),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="Collector.trimex"><a class="viewcode-back" href="../../modules.html#jgem.collector.Collector.trimex">[docs]</a>    <span class="k">def</span> <span class="nf">trimex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="n">expath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expath</span>
+        <span class="n">texpath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apre</span><span class="o">+</span><span class="s1">&#39;.trimmed{0}.ex.txt.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+        <span class="n">tcipath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apre</span><span class="o">+</span><span class="s1">&#39;.trimmed{0}.ci.txt.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">texpath</span><span class="p">):</span>
+            <span class="n">TE</span><span class="o">.</span><span class="n">trim_ex</span><span class="p">(</span><span class="n">expath</span><span class="p">,</span> <span class="n">texpath</span><span class="p">,</span> <span class="n">tcipath</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">gidfld</span><span class="o">=</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="n">np</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">tcipath</span><span class="p">):</span>
+            <span class="n">tex</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">texpath</span><span class="p">)</span>
+            <span class="n">UT</span><span class="o">.</span><span class="n">chopintervals</span><span class="p">(</span><span class="n">tex</span><span class="p">,</span> <span class="n">tcipath</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">texpath</span><span class="p">,</span> <span class="n">tcipath</span></div>
+
+<div class="viewcode-block" id="Collector.collect_gcov1000"><a class="viewcode-back" href="../../modules.html#jgem.collector.Collector.collect_gcov1000">[docs]</a>    <span class="k">def</span> <span class="nf">collect_gcov1000</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">iparallel</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Collect/calculate gene coverages. Uses trimmed model (1000bp from 3&#39;end)</span>
+
+<span class="sd">        If unique=True uses bigwig file with .uniq.bw suffix instead of .bw. </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collect_gcov_length</span><span class="p">(</span><span class="n">unique</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="n">iparallel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Collector.collect_gcov_length"><a class="viewcode-back" href="../../modules.html#jgem.collector.Collector.collect_gcov_length">[docs]</a>    <span class="k">def</span> <span class="nf">collect_gcov_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">iparallel</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Collect/calculate gene coverages. Uses trimmed model (1000bp from 3&#39;end)</span>
+
+<span class="sd">        If unique=True uses bigwig file with .uniq.bw suffix instead of .bw. </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex</span><span class="p">()</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;t{0}gcov&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="s1">&#39;u&#39;</span><span class="o">+</span><span class="n">code</span> <span class="k">if</span> <span class="n">unique</span> <span class="k">else</span> <span class="n">code</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">mex</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gcov1</span> <span class="o">=</span> <span class="n">gcov1</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[[</span><span class="s1">&#39;chr&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">gcov1</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">dpre</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="c1"># make trimmed ex if not exists</span>
+        <span class="n">ep</span><span class="p">,</span><span class="n">cp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trimex</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[(</span><span class="n">s</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">bw</span><span class="p">,</span> <span class="n">dpre</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">cp</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">np</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span><span class="n">bw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">si</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;bwfile&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;{1}/{2} processing {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">i</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
+            <span class="c1"># path = fn.txtname2(a[0], a[1]) # register path</span>
+            <span class="n">s</span><span class="p">,</span> <span class="n">gcov</span> <span class="o">=</span> <span class="n">_calc_gcov_worker</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">)</span>
+            <span class="n">gcov1</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">gcov</span><span class="p">[</span><span class="s1">&#39;gcov&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">gcov1</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gcov</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">gcov1</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gcov</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">gcov1</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gcov</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">gcov1</span><span class="p">,</span> <span class="n">fn</span><span class="o">.</span><span class="n">txtname1</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Collector.collect_all"><a class="viewcode-back" href="../../modules.html#jgem.collector.Collector.collect_all">[docs]</a>    <span class="k">def</span> <span class="nf">collect_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collect_jcnt</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collect_ecov</span><span class="p">(</span><span class="n">np</span><span class="o">=</span><span class="n">np</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collect_gcov</span><span class="p">(</span><span class="n">np</span><span class="o">=</span><span class="n">np</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="Collector.collect_unique"><a class="viewcode-back" href="../../modules.html#jgem.collector.Collector.collect_unique">[docs]</a>    <span class="k">def</span> <span class="nf">collect_unique</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collect_ecov</span><span class="p">(</span><span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="n">np</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collect_gcov</span><span class="p">(</span><span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="n">np</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_calc_ecov_worker</span><span class="p">(</span><span class="n">sname</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">bwfile</span><span class="p">,</span> <span class="n">dstpre</span><span class="p">,</span> <span class="n">expath</span><span class="p">,</span> <span class="n">cipath</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">np</span><span class="p">):</span>
+    <span class="n">pre</span> <span class="o">=</span> <span class="n">which</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;ecov&#39;</span><span class="p">)]</span> <span class="c1"># &#39;u&#39; or &#39;&#39;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pre</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">pre</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;u&#39;</span><span class="p">:</span>
+        <span class="n">unique</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">unique</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">dstpre</span><span class="o">+</span><span class="n">sname</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">which</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">ecov</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> <span class="c1"># calculate gcov</span>
+        <span class="k">if</span> <span class="n">unique</span><span class="p">:</span>
+            <span class="n">bwfile</span> <span class="o">=</span> <span class="n">bwfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.bw&#39;</span><span class="p">,</span><span class="s1">&#39;.uniq.bw&#39;</span><span class="p">)</span>    
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;using unique bigwig {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bwfile</span><span class="p">))</span>
+        <span class="n">ecov</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">calc_ecov</span><span class="p">(</span>
+            <span class="n">expath</span><span class="o">=</span><span class="n">expath</span><span class="p">,</span>
+            <span class="n">cipath</span><span class="o">=</span><span class="n">cipath</span><span class="p">,</span>
+            <span class="n">bwpath</span><span class="o">=</span><span class="n">bwfile</span><span class="p">,</span> 
+            <span class="n">dstprefix</span><span class="o">=</span><span class="n">dstpre</span><span class="o">+</span><span class="n">sname</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">pre</span><span class="p">,</span>
+            <span class="n">override</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="c1"># reuse covci from ecov calc</span>
+            <span class="n">np</span><span class="o">=</span><span class="n">np</span><span class="p">)</span>
+    <span class="n">ar</span> <span class="o">=</span> <span class="n">ecov</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;eid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">ids</span><span class="p">][</span><span class="s1">&#39;ecov&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="c1"># numpy array</span>
+    <span class="k">return</span> <span class="n">sname</span><span class="p">,</span> <span class="n">ar</span>
+
+<span class="k">def</span> <span class="nf">_calc_gcov_worker</span><span class="p">(</span><span class="n">sname</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">bwfile</span><span class="p">,</span> <span class="n">dstpre</span><span class="p">,</span> <span class="n">expath</span><span class="p">,</span> <span class="n">cipath</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">np</span><span class="p">):</span>
+    <span class="n">pre</span> <span class="o">=</span> <span class="n">which</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;gcov&#39;</span><span class="p">)]</span> <span class="c1"># &#39;u&#39; or &#39;&#39; or &#39;t1000&#39; or &#39;ut1000&#39;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pre</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">pre</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;u&#39;</span><span class="p">:</span>
+        <span class="n">unique</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">unique</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">dstpre</span><span class="o">+</span><span class="n">sname</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">which</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">override</span><span class="p">):</span>
+        <span class="n">gcov</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> <span class="c1"># calculate gcov</span>
+        <span class="k">if</span> <span class="n">unique</span><span class="p">:</span>
+            <span class="n">bwfile</span> <span class="o">=</span> <span class="n">bwfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.bw&#39;</span><span class="p">,</span><span class="s1">&#39;.uniq.bw&#39;</span><span class="p">)</span>    
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;using unique bigwig {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bwfile</span><span class="p">))</span>
+        <span class="n">gcov</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">calc_gcov</span><span class="p">(</span>
+            <span class="n">expath</span><span class="o">=</span><span class="n">expath</span><span class="p">,</span>
+            <span class="n">cipath</span><span class="o">=</span><span class="n">cipath</span><span class="p">,</span>
+            <span class="n">bwpath</span><span class="o">=</span><span class="n">bwfile</span><span class="p">,</span> 
+            <span class="n">dstprefix</span><span class="o">=</span><span class="n">dstpre</span><span class="o">+</span><span class="n">sname</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">pre</span><span class="p">,</span>
+            <span class="n">override</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="c1"># reuse covci from ecov calc</span>
+            <span class="n">np</span><span class="o">=</span><span class="n">np</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">gcov</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">ids</span><span class="p">][[</span><span class="s1">&#39;gcov&#39;</span><span class="p">,</span><span class="s1">&#39;gcov2&#39;</span><span class="p">,</span><span class="s1">&#39;len&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">]]</span> <span class="c1"># dataframe</span>
+    <span class="k">return</span> <span class="n">sname</span><span class="p">,</span> <span class="n">df</span>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

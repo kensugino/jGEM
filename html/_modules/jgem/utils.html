@@ -1,0 +1,911 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>jgem.utils &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<h1>Source code for jgem.utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">.. module:: utils</span>
+<span class="sd">    :synopsis: a collection of utility functions</span>
+
+<span class="sd">..  moduleauthor:: Ken Sugino &lt;ken.sugino@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span><span class="p">,</span> <span class="nb">reduce</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">iadd</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">repeat</span> 
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">izip_longest</span> <span class="k">as</span> <span class="n">zip_longest</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">zip_longest</span>
+
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">PD</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">N</span>
+<span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="kn">as</span> <span class="nn">SO</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="c1">#### DATE ##################################################################</span>
+<div class="viewcode-block" id="today"><a class="viewcode-back" href="../../modules.html#jgem.utils.today">[docs]</a><span class="k">def</span> <span class="nf">today</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<span class="c1">### MISC  ##################################################################</span>
+<div class="viewcode-block" id="isstring"><a class="viewcode-back" href="../../modules.html#jgem.utils.isstring">[docs]</a><span class="k">def</span> <span class="nf">isstring</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">)</span> <span class="c1">#  python 2</span>
+    <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="c1"># python 3</span></div>
+
+<span class="c1">### PANDAS UTIL     ########################################################</span>
+
+<div class="viewcode-block" id="calc_locus"><a class="viewcode-back" href="../../modules.html#jgem.utils.calc_locus">[docs]</a><span class="k">def</span> <span class="nf">calc_locus</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">chrfld</span><span class="o">=</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="n">stfld</span><span class="o">=</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="n">edfld</span><span class="o">=</span><span class="s1">&#39;ed&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create locus (chr*:start-end). </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df : Pandas.DataFrame </span>
+<span class="sd">        chrfld (str): field (column name) for chromosome </span>
+<span class="sd">        stfld (str): field (column name) for start position</span>
+<span class="sd">        edfld (str): field (column name) for end position</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pandas.Series</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">chrfld</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="n">df</span><span class="p">[</span><span class="n">stfld</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">df</span><span class="p">[</span><span class="n">edfld</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="calc_locus_strand"><a class="viewcode-back" href="../../modules.html#jgem.utils.calc_locus_strand">[docs]</a><span class="k">def</span> <span class="nf">calc_locus_strand</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">chrfld</span><span class="o">=</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span> <span class="n">stfld</span><span class="o">=</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="n">edfld</span><span class="o">=</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="n">strandfld</span><span class="o">=</span><span class="s1">&#39;strand&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create locus with strand (chr*:start-end:+ or -). </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df : Pandas.DataFrame </span>
+<span class="sd">        chrfld (str): field (column name) for chromosome </span>
+<span class="sd">        stfld (str): field (column name) for start position</span>
+<span class="sd">        edfld (str): field (column name) for end position</span>
+<span class="sd">        strandfld (str); Field (column name) for strand</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pandas.Series</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">chrfld</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="n">df</span><span class="p">[</span><span class="n">stfld</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">df</span><span class="p">[</span><span class="n">edfld</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="n">df</span><span class="p">[</span><span class="n">strandfld</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="flattendf"><a class="viewcode-back" href="../../modules.html#jgem.utils.flattendf">[docs]</a><span class="k">def</span> <span class="nf">flattendf</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Flattens a column whose elements are lists. One row gets expanded into multiple rows,</span>
+<span class="sd">    each row containing a value from the list. All other columns in the expanded rows are the</span>
+<span class="sd">    same as the original row. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: DataFrame</span>
+<span class="sd">        col: target column which contains lists</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_gen</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">izipcols</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">x1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">x1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+                <span class="k">yield</span> <span class="n">x1</span>
+    <span class="n">df1</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_gen</span><span class="p">()],</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df1</span></div>
+
+<div class="viewcode-block" id="series2dict"><a class="viewcode-back" href="../../modules.html#jgem.utils.series2dict">[docs]</a><span class="k">def</span> <span class="nf">series2dict</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
+    <span class="s2">&quot;Make dict from Pandas.Series&quot;</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">values</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="df2dict"><a class="viewcode-back" href="../../modules.html#jgem.utils.df2dict">[docs]</a><span class="k">def</span> <span class="nf">df2dict</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">f1</span><span class="p">,</span><span class="n">f2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Make dict from Pandas.DataFrame</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: DataFrame</span>
+<span class="sd">        f1: column for key</span>
+<span class="sd">        f2: column for value</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_getval</span><span class="p">(</span><span class="n">fld</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fld</span><span class="o">==</span><span class="s1">&#39;index&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">fld</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">_getval</span><span class="p">(</span><span class="n">f1</span><span class="p">),</span> <span class="n">_getval</span><span class="p">(</span><span class="n">f2</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="izipcols"><a class="viewcode-back" href="../../modules.html#jgem.utils.izipcols">[docs]</a><span class="k">def</span> <span class="nf">izipcols</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return an iterator to go through rows of Pandas.DataFrame</span>
+<span class="sd">    (Much faster than DataFrame.rows() which involves instantiation of Series objects)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: DataFrame</span>
+<span class="sd">        cols: list of column names</span>
+<span class="sd">        index: if True, includue index at the beginning (default False)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">index</span><span class="p">:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span>
+    <span class="c1">#return izip(*l) # python2</span>
+    <span class="k">return</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">l</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="remove_ercc"><a class="viewcode-back" href="../../modules.html#jgem.utils.remove_ercc">[docs]</a><span class="k">def</span> <span class="nf">remove_ercc</span><span class="p">(</span><span class="n">srcfile</span><span class="p">,</span> <span class="n">dstfile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Removes ERCC portion of the data</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        srcfile: source (GTF, GFF or BED)</span>
+<span class="sd">        dstfile: destination</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">srcfile</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">srcfile</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">srcfile</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">dstfile</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">dstfile</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">dstfile</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ERCC-&#39;</span><span class="p">):</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+
+<span class="c1">#### directory/file ########################################################</span>
+<div class="viewcode-block" id="makedirs"><a class="viewcode-back" href="../../modules.html#jgem.utils.makedirs">[docs]</a><span class="k">def</span> <span class="nf">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Make all the directories along the path, calls os.makedirs but </span>
+<span class="sd">    intercept irrelevant exceptions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">err</span><span class="o">.</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">errno</span><span class="o">.</span><span class="n">EEXIST</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="notstale"><a class="viewcode-back" href="../../modules.html#jgem.utils.notstale">[docs]</a><span class="k">def</span> <span class="nf">notstale</span><span class="p">(</span><span class="n">opath</span><span class="p">,</span><span class="n">dpath</span><span class="p">,</span><span class="n">override</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check dpath exists and newer than opath.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        opath (str or list): dependency file(s)</span>
+<span class="sd">        dpath (str): cache file</span>
+<span class="sd">        override (bool): if True always return False</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: whether dpath exists and newer than all of opath</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">override</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opath</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">opath</span> <span class="o">=</span> <span class="p">[</span><span class="n">opath</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">opath</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+            <span class="c1">#raise RuntimeError(&#39;file {0} does not exist&#39;.format(o))</span>
+            <span class="k">return</span> <span class="bp">False</span> <span class="c1"># stale</span>
+    <span class="n">notstale</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dpath</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">opath</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">notstale</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">notstale</span>
+        <span class="n">notstale</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">dpath</span><span class="p">)</span><span class="o">&gt;=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">notstale</span></div>
+
+
+<span class="c1">#### read/write PANDAS #####################################################</span>
+
+<div class="viewcode-block" id="save_tsv_nidx_nhead"><a class="viewcode-back" href="../../modules.html#jgem.utils.save_tsv_nidx_nhead">[docs]</a><span class="k">def</span> <span class="nf">save_tsv_nidx_nhead</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">gzip</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write tab separated file. No index, no header. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: Pandas DataFrame</span>
+<span class="sd">        path (str): destination path </span>
+<span class="sd">        gzip (bool): whether to gzip compress or not (default True)</span>
+<span class="sd">        kwargs: keyward arguments to be passed to Pandas.to_csv </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        saved file path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">return</span> <span class="n">save_tsv</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">path</span><span class="p">,</span><span class="n">gzip</span><span class="o">=</span><span class="n">gzip</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="save_tsv_nidx_whead"><a class="viewcode-back" href="../../modules.html#jgem.utils.save_tsv_nidx_whead">[docs]</a><span class="k">def</span> <span class="nf">save_tsv_nidx_whead</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">gzip</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write tab separated file. No index, with header. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: Pandas DataFrame</span>
+<span class="sd">        path (str): destination path </span>
+<span class="sd">        gzip (bool): whether to gzip compress or not (default True)</span>
+<span class="sd">        kwargs: keyward arguments to be passed to Pandas.to_csv </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        saved file path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="n">save_tsv</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">path</span><span class="p">,</span><span class="n">gzip</span><span class="o">=</span><span class="n">gzip</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="save_tsv"><a class="viewcode-back" href="../../modules.html#jgem.utils.save_tsv">[docs]</a><span class="k">def</span> <span class="nf">save_tsv</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">gzip</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write tab separated file. (Write index and header)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: Pandas DataFrame</span>
+<span class="sd">        path (str): destination path </span>
+<span class="sd">        gzip (bool): whether to gzip compress or not (default True)</span>
+<span class="sd">        kwargs: keyward arguments to be passed to Pandas.to_csv </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        saved file path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_NONE</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">gzip</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">compress</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">path</span></div>
+
+<div class="viewcode-block" id="write_pandas"><a class="viewcode-back" href="../../modules.html#jgem.utils.write_pandas">[docs]</a><span class="k">def</span> <span class="nf">write_pandas</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">fm</span><span class="o">=</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write gzip compressed tab separated file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: Pandas DataFrame</span>
+<span class="sd">        path (str): destination path </span>
+<span class="sd">        fm (str): &#39;i&#39;:write index, &#39;h&#39;:write header, &#39;ih&#39;:write both index and header</span>
+<span class="sd">        kwargs: keyward arguments to be passed to Pandas.to_csv </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        saved file path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># fm = &#39;i&#39;,&#39;h&#39;,&#39;ih&#39;</span>
+    <span class="k">if</span> <span class="s1">&#39;i&#39;</span> <span class="ow">in</span> <span class="n">fm</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="s1">&#39;h&#39;</span> <span class="ow">in</span> <span class="n">fm</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
+        <span class="n">gzip</span><span class="o">=</span><span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">gzip</span><span class="o">=</span><span class="bp">False</span>
+    <span class="k">return</span> <span class="n">save_tsv</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">gzip</span><span class="o">=</span><span class="n">gzip</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_pandas"><a class="viewcode-back" href="../../modules.html#jgem.utils.read_pandas">[docs]</a><span class="k">def</span> <span class="nf">read_pandas</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read tab separated file into Pandas DataFrame. </span>
+<span class="sd">    Automatically recognize gzip compressed or uncompressed files.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): path to the file</span>
+<span class="sd">        kwargs: keyward arguments to pass to Pandas.read_table</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">isstring</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">path</span>
+
+    <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">path</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;file {0} do not exists&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span></div>
+
+
+<span class="c1">#### GZIP ###############################################################</span>
+<div class="viewcode-block" id="compress"><a class="viewcode-back" href="../../modules.html#jgem.utils.compress">[docs]</a><span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="s2">&quot;Uses gzip to compress file&quot;</span>
+    <span class="k">if</span> <span class="n">fname</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fname</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">fname</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span><span class="p">)</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">ret</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Error compressing file {0}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">fname</span>
+    <span class="k">return</span> <span class="n">fname</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span></div>
+    
+<div class="viewcode-block" id="uncompress"><a class="viewcode-back" href="../../modules.html#jgem.utils.uncompress">[docs]</a><span class="k">def</span> <span class="nf">uncompress</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="s2">&quot;Unzip .gz file&quot;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">fname</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">!=</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">fname</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;gunzip&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">ret</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Error uncompressing file {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">fname</span>
+    <span class="k">return</span> <span class="n">fname</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="uncompresscopy"><a class="viewcode-back" href="../../modules.html#jgem.utils.uncompresscopy">[docs]</a><span class="k">def</span> <span class="nf">uncompresscopy</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="s2">&quot;Uses unique file name to uncompress to avoid corruption in case of parallel computation.&quot;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">fname</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">!=</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">fname</span>
+    <span class="c1"># copy</span>
+    <span class="n">fname2</span> <span class="o">=</span> <span class="n">fname</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname2</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">fname2</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">fname2</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fobj</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;gunzip&#39;</span><span class="p">,</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">fobj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Error uncompressing file {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">fname</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">fname2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fname2</span></div>
+
+
+<span class="c1">#### EX,SJ attributes ###############################################</span>
+
+<div class="viewcode-block" id="exid"><a class="viewcode-back" href="../../modules.html#jgem.utils.exid">[docs]</a><span class="k">def</span> <span class="nf">exid</span><span class="p">(</span><span class="n">ex</span><span class="p">):</span>
+    <span class="s2">&quot;calculate exon id (chr:st-ed:strand)&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span><span class="nb">list</span><span class="p">):</span> <span class="c1"># [&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;,&#39;name&#39;,&#39;sc1&#39;,&#39;strand&#39;]</span>
+            <span class="k">return</span> <span class="s1">&#39;{0}:{1}-{2}:{5}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">ex</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s1">&#39;{chr}:{st}-{ed}:{strand}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">ex</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="sjid"><a class="viewcode-back" href="../../modules.html#jgem.utils.sjid">[docs]</a><span class="k">def</span> <span class="nf">sjid</span><span class="p">(</span><span class="n">sj</span><span class="p">):</span>
+    <span class="s2">&quot;calculate junction id (chr:st^ed:strand)&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="nb">list</span><span class="p">):</span> <span class="c1"># [&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;,&#39;name&#39;,&#39;sc1&#39;,&#39;strand&#39;]</span>
+            <span class="k">return</span> <span class="s1">&#39;{0}:{1}^{2}:{5}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">sj</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s1">&#39;{chr}:{st}^{ed}:{strand}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">sj</span><span class="p">)</span></div>
+
+<span class="c1">## donor/acceptor, st/ed pos ids</span>
+<div class="viewcode-block" id="set_ids"><a class="viewcode-back" href="../../modules.html#jgem.utils.set_ids">[docs]</a><span class="k">def</span> <span class="nf">set_ids</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="s2">&quot;set &#39;_id&#39; field&quot;</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c1"># 2016-02-27 df = df.sort_values([&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;])</span>
+    <span class="c1"># is a separate copy of DataFrame and doesn&#39;t change original</span>
+    <span class="c1"># fixed</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span></div>
+    
+<div class="viewcode-block" id="set_ptyp"><a class="viewcode-back" href="../../modules.html#jgem.utils.set_ptyp">[docs]</a><span class="k">def</span> <span class="nf">set_ptyp</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;[Deprecated]</span>
+<span class="sd">    Set ptyp (exon type, internal 3prime, 5prime, single, etc.) according to exon name.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#LOG.warning(&#39;deprecated use set_info or set_category instead&#39;)</span>
+
+    <span class="n">il</span> <span class="o">=</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">)</span>
+    <span class="n">ir</span> <span class="o">=</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">)</span>
+    <span class="n">srp</span> <span class="o">=</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;+&#39;</span>
+    <span class="n">srn</span> <span class="o">=</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;-&#39;</span>
+
+    <span class="n">i3</span> <span class="o">=</span> <span class="p">((</span><span class="n">srp</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">il</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="n">ir</span><span class="p">))</span><span class="o">|</span><span class="p">((</span><span class="n">srn</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="n">il</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ir</span><span class="p">))</span>
+    <span class="n">i5</span> <span class="o">=</span> <span class="p">((</span><span class="n">srp</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="n">il</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ir</span><span class="p">))</span><span class="o">|</span><span class="p">((</span><span class="n">srn</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">il</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="n">ir</span><span class="p">))</span>
+    <span class="n">ie</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">srp</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="n">srn</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(((</span><span class="o">~</span><span class="n">il</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ir</span><span class="p">))</span><span class="o">|</span><span class="p">((</span><span class="n">il</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="n">ir</span><span class="p">)))</span>
+    <span class="n">ii</span> <span class="o">=</span> <span class="n">il</span><span class="o">&amp;</span><span class="n">ir</span>
+    <span class="n">ise</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">il</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="n">ir</span><span class="p">)</span>
+
+    <span class="n">e</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ii</span><span class="p">,</span><span class="s1">&#39;ptyp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;i&#39;</span> <span class="c1"># internal</span>
+    <span class="n">e</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i3</span><span class="p">,</span><span class="s1">&#39;ptyp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;3&#39;</span> <span class="c1"># 3prime</span>
+    <span class="n">e</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i5</span><span class="p">,</span><span class="s1">&#39;ptyp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;5&#39;</span> <span class="c1"># 5prime</span>
+    <span class="n">e</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ie</span><span class="p">,</span><span class="s1">&#39;ptyp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;e&#39;</span> <span class="c1"># edge exon</span>
+    <span class="n">e</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ise</span><span class="p">,</span><span class="s1">&#39;ptyp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span> <span class="c1"># single exon</span></div>
+
+<span class="k">def</span> <span class="nf">_set_pos</span><span class="p">(</span><span class="n">bed</span><span class="p">,</span> <span class="n">fld</span><span class="p">,</span> <span class="n">stfld</span><span class="p">,</span> <span class="n">edfld</span><span class="p">):</span>
+    <span class="s2">&quot;helper for set_ad_info&quot;</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">bed</span><span class="p">[</span><span class="n">stfld</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">neg</span> <span class="o">=</span> <span class="n">bed</span><span class="p">[</span><span class="n">edfld</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">ppos</span> <span class="o">=</span> <span class="n">bed</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="n">pos</span><span class="o">+</span><span class="s1">&#39;:+&#39;</span>
+    <span class="n">npos</span> <span class="o">=</span> <span class="n">bed</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="n">neg</span><span class="o">+</span><span class="s1">&#39;:-&#39;</span>
+    <span class="n">opos</span> <span class="o">=</span> <span class="n">bed</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="n">pos</span><span class="o">+</span><span class="s1">&#39;:.&#39;</span>
+    <span class="n">bed</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">bed</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">fld</span><span class="p">]</span> <span class="o">=</span> <span class="n">ppos</span>
+    <span class="n">bed</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">bed</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">fld</span><span class="p">]</span> <span class="o">=</span> <span class="n">npos</span>
+    <span class="n">bed</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">bed</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">fld</span><span class="p">]</span> <span class="o">=</span> <span class="n">opos</span>
+
+<div class="viewcode-block" id="set_ad_info"><a class="viewcode-back" href="../../modules.html#jgem.utils.set_ad_info">[docs]</a><span class="k">def</span> <span class="nf">set_ad_info</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;assign donor/acceptor id</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sj: splice junction DataFrame</span>
+<span class="sd">        me: (multi-)exon DataFrame</span>
+
+<span class="sd">    SideEffects:</span>
+<span class="sd">        add d_pos (donor position), a_pos (acceptor position), d_id, a_id, </span>
+<span class="sd">        d_degree, a_degree to sj and me</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;st-1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span>
+
+    <span class="n">_set_pos</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="s1">&#39;d_pos&#39;</span><span class="p">,</span> <span class="s1">&#39;st-1&#39;</span><span class="p">,</span> <span class="s1">&#39;ed&#39;</span><span class="p">)</span>
+    <span class="n">_set_pos</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="s1">&#39;a_pos&#39;</span><span class="p">,</span> <span class="s1">&#39;ed&#39;</span><span class="p">,</span> <span class="s1">&#39;st-1&#39;</span><span class="p">)</span>
+    <span class="n">_set_pos</span><span class="p">(</span><span class="n">me</span><span class="p">,</span> <span class="s1">&#39;d_pos&#39;</span><span class="p">,</span> <span class="s1">&#39;ed&#39;</span><span class="p">,</span> <span class="s1">&#39;st&#39;</span><span class="p">)</span>
+    <span class="n">_set_pos</span><span class="p">(</span><span class="n">me</span><span class="p">,</span> <span class="s1">&#39;a_pos&#39;</span><span class="p">,</span> <span class="s1">&#39;st&#39;</span><span class="p">,</span> <span class="s1">&#39;ed&#39;</span><span class="p">)</span>
+
+    <span class="n">nullid</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># donor id (did)</span>
+    <span class="n">dids</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;d_pos&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="c1">#dids = dids[dids!=&#39;&#39;]</span>
+    <span class="n">dpos2did</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dids</span><span class="p">)])</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;d_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dpos2did</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;d_pos&#39;</span><span class="p">]]</span>
+    <span class="c1">#me[&#39;d_id&#39;] = [dpos2did.get(x,-1) for x in me[&#39;d_pos&#39;]]</span>
+    <span class="n">me</span><span class="p">[</span><span class="s1">&#39;d_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dpos2did</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">nullid</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">me</span><span class="p">[</span><span class="s1">&#39;d_pos&#39;</span><span class="p">]]</span>
+    <span class="c1"># acceptor id (aid)</span>
+    <span class="n">aids</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;a_pos&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="c1">#aids = aids[aids!=&#39;&#39;]</span>
+    <span class="n">apos2aid</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">aids</span><span class="p">)])</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">apos2aid</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;a_pos&#39;</span><span class="p">]]</span>
+    <span class="c1">#me[&#39;a_id&#39;] = [apos2aid.get(x,-1) for x in me[&#39;a_pos&#39;]]</span>
+    <span class="n">me</span><span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">apos2aid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">nullid</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">me</span><span class="p">[</span><span class="s1">&#39;a_pos&#39;</span><span class="p">]]</span>
+    
+    <span class="c1"># donor degree, acceptor degree (how many edges)</span>
+    <span class="n">ddeg</span> <span class="o">=</span> <span class="n">sj</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;d_pos&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">adeg</span> <span class="o">=</span> <span class="n">sj</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;a_pos&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">dpos2deg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ddeg</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">ddeg</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+    <span class="n">apos2deg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">adeg</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">adeg</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;d_degree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dpos2deg</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;d_pos&#39;</span><span class="p">]]</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;a_degree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">apos2deg</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;a_pos&#39;</span><span class="p">]]</span>
+    <span class="n">me</span><span class="p">[</span><span class="s1">&#39;d_degree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dpos2deg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">me</span><span class="p">[</span><span class="s1">&#39;d_pos&#39;</span><span class="p">]]</span>
+    <span class="n">me</span><span class="p">[</span><span class="s1">&#39;a_degree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">apos2deg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">me</span><span class="p">[</span><span class="s1">&#39;a_pos&#39;</span><span class="p">]]</span>    </div>
+    
+<div class="viewcode-block" id="set_pos_info"><a class="viewcode-back" href="../../modules.html#jgem.utils.set_pos_info">[docs]</a><span class="k">def</span> <span class="nf">set_pos_info</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">):</span>
+    <span class="c1"># assign donor/acceptor id</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;st-1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span>
+    
+    <span class="k">def</span> <span class="nf">_set_sted_pos</span><span class="p">(</span><span class="n">bed</span><span class="p">,</span> <span class="n">stfld</span><span class="p">,</span> <span class="n">edfld</span><span class="p">):</span>
+        <span class="n">bed</span><span class="p">[</span><span class="s1">&#39;st_pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bed</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="n">bed</span><span class="p">[</span><span class="n">stfld</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">bed</span><span class="p">[</span><span class="s1">&#39;ed_pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bed</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="n">bed</span><span class="p">[</span><span class="n">edfld</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="n">_set_sted_pos</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="s1">&#39;st-1&#39;</span><span class="p">,</span> <span class="s1">&#39;ed&#39;</span><span class="p">)</span>
+    <span class="n">_set_sted_pos</span><span class="p">(</span><span class="n">me</span><span class="p">,</span> <span class="s1">&#39;ed&#39;</span><span class="p">,</span> <span class="s1">&#39;st&#39;</span> <span class="p">)</span>
+
+    <span class="c1"># st_pos id (stid)</span>
+    <span class="n">dids</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;st_pos&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">dpos2did</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dids</span><span class="p">)])</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;st_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dpos2did</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;st_pos&#39;</span><span class="p">]]</span>
+    <span class="n">me</span><span class="p">[</span><span class="s1">&#39;st_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dpos2did</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">me</span><span class="p">[</span><span class="s1">&#39;st_pos&#39;</span><span class="p">]]</span>
+    <span class="c1"># acceptor id (aid)</span>
+    <span class="n">aids</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ed_pos&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">apos2aid</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">aids</span><span class="p">)])</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ed_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">apos2aid</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ed_pos&#39;</span><span class="p">]]</span>
+    <span class="n">me</span><span class="p">[</span><span class="s1">&#39;ed_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">apos2aid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">me</span><span class="p">[</span><span class="s1">&#39;ed_pos&#39;</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="find_nullidx"><a class="viewcode-back" href="../../modules.html#jgem.utils.find_nullidx">[docs]</a><span class="k">def</span> <span class="nf">find_nullidx</span><span class="p">(</span><span class="n">ex</span><span class="p">):</span>
+    <span class="n">amin</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">amin</span><span class="o">&lt;-</span><span class="mi">1</span><span class="p">:</span> <span class="c1"># merged</span>
+        <span class="n">nullidx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">elif</span> <span class="n">amin</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span> <span class="c1"># old</span>
+        <span class="n">nullidx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nullidx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">nullidx</span></div>
+
+<div class="viewcode-block" id="set_exon_category"><a class="viewcode-back" href="../../modules.html#jgem.utils.set_exon_category">[docs]</a><span class="k">def</span> <span class="nf">set_exon_category</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">ex</span><span class="p">):</span>
+    <span class="c1"># 5&#39;, 3&#39;, i, s</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;a_pos&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;a_pos&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ex</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">set_ad_info</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span> 
+    <span class="n">nullidx</span> <span class="o">=</span> <span class="n">find_nullidx</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+    <span class="n">aidx</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">]</span><span class="o">!=</span><span class="n">nullidx</span>
+    <span class="n">didx</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;d_id&#39;</span><span class="p">]</span><span class="o">!=</span><span class="n">nullidx</span>
+    <span class="n">idxs</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">aidx</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="n">didx</span><span class="p">)</span>
+    <span class="n">idx3</span> <span class="o">=</span> <span class="n">aidx</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="n">didx</span><span class="p">)</span>
+    <span class="n">idx5</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">aidx</span><span class="p">)</span><span class="o">&amp;</span><span class="n">didx</span>
+    <span class="n">idxi</span> <span class="o">=</span> <span class="n">aidx</span><span class="o">&amp;</span><span class="n">didx</span>
+    <span class="n">ex</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxs</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>
+    <span class="n">ex</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx5</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;5&#39;</span>
+    <span class="n">ex</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx3</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;3&#39;</span>
+    <span class="n">ex</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxi</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;i&#39;</span></div>
+    
+<div class="viewcode-block" id="set_info"><a class="viewcode-back" href="../../modules.html#jgem.utils.set_info">[docs]</a><span class="k">def</span> <span class="nf">set_info</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">me</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s1">&#39;_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">set_ids</span><span class="p">(</span><span class="n">sj</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">me</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">set_ids</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;a_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;d_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">or</span> \
+       <span class="p">(</span><span class="s1">&#39;a_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">me</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;d_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">me</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">set_ad_info</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">)</span> </div>
+    
+
+<span class="c1">## ME/SE</span>
+<div class="viewcode-block" id="mese"><a class="viewcode-back" href="../../modules.html#jgem.utils.mese">[docs]</a><span class="k">def</span> <span class="nf">mese</span><span class="p">(</span><span class="n">ex</span><span class="p">):</span>
+    <span class="c1">#LOG.warning(&#39;deprecated, use me_se instead&#39;)</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;s&#39;</span>
+    <span class="n">se</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">me</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="o">~</span><span class="n">idx</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">me</span><span class="p">,</span> <span class="n">se</span></div>
+    
+<div class="viewcode-block" id="me_se"><a class="viewcode-back" href="../../modules.html#jgem.utils.me_se">[docs]</a><span class="k">def</span> <span class="nf">me_se</span><span class="p">(</span><span class="n">ex</span><span class="p">):</span>
+    <span class="s2">&quot;Separate exons into multi-exons and single-exons&quot;</span>
+    <span class="n">nullidx</span> <span class="o">=</span> <span class="n">find_nullidx</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+    <span class="n">seidx</span> <span class="o">=</span> <span class="p">(</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">nullidx</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;d_id&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">nullidx</span><span class="p">)</span>
+    <span class="n">se</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="n">seidx</span><span class="p">]</span>
+    <span class="n">me</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="o">~</span><span class="n">seidx</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">me</span><span class="p">,</span> <span class="n">se</span></div>
+
+<div class="viewcode-block" id="calc_tlen"><a class="viewcode-back" href="../../modules.html#jgem.utils.calc_tlen">[docs]</a><span class="k">def</span> <span class="nf">calc_tlen</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">ci</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; calculate gene transcript length, here just union of exons &quot;&quot;&quot;</span>
+    <span class="n">ci</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">ci</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+    <span class="n">ci</span><span class="p">[</span><span class="s1">&#39;eid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)])</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ci</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">ci</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span><span class="p">[</span><span class="s1">&#39;sc1&#39;</span><span class="p">]</span>
+    <span class="n">ccf</span> <span class="o">=</span> <span class="n">flattendf</span><span class="p">(</span><span class="n">ci</span><span class="p">[[</span><span class="s1">&#39;eid&#39;</span><span class="p">,</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;len&#39;</span><span class="p">,</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">]],</span> <span class="s1">&#39;eid&#39;</span><span class="p">)</span>
+    <span class="n">e2g</span> <span class="o">=</span> <span class="n">df2dict</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span>
+    <span class="n">ccf</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e2g</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ccf</span><span class="p">[</span><span class="s1">&#39;eid&#39;</span><span class="p">]]</span>
+    <span class="c1"># ignore duplicated ci, just take unique set within the gene</span>
+    <span class="n">ccf1</span> <span class="o">=</span> <span class="n">ccf</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;id&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span> 
+    <span class="n">gbed</span> <span class="o">=</span> <span class="n">ccf1</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;tlen&#39;</span><span class="p">)</span>
+    <span class="n">gbed</span><span class="p">[</span><span class="s1">&#39;ltlen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">gbed</span><span class="p">[</span><span class="s1">&#39;tlen&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">gbed</span> <span class="c1"># column: tlen, ltlen, index:_gidx</span></div>
+
+<span class="c1">#### BINNED AVG ########################################################</span>
+<div class="viewcode-block" id="calc_binned"><a class="viewcode-back" href="../../modules.html#jgem.utils.calc_binned">[docs]</a><span class="k">def</span> <span class="nf">calc_binned</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">yth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">returnsorted</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">returnminmax</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">):</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">idx</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">num</span><span class="p">)))</span> <span class="c1"># number of bins</span>
+    <span class="n">bidx</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="o">*</span><span class="n">num</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span><span class="o">+</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)])</span> <span class="c1"># start (&amp; end) indices for bins</span>
+    <span class="n">h0</span> <span class="o">=</span> <span class="n">bidx</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">bidx</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># number of items in each bin</span>
+    <span class="n">sted</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">bidx</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">bidx</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span> <span class="c1"># starts and ends</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+    <span class="n">avgx</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">func</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">[</span><span class="n">st</span><span class="p">:</span><span class="n">ed</span><span class="p">]])</span> <span class="k">for</span> <span class="n">st</span><span class="p">,</span><span class="n">ed</span> <span class="ow">in</span> <span class="n">sted</span><span class="p">])</span>
+    <span class="n">avgy</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">func</span><span class="p">([</span><span class="n">ys</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">[</span><span class="n">st</span><span class="p">:</span><span class="n">ed</span><span class="p">]</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">yth</span><span class="p">])</span> <span class="k">for</span> <span class="n">st</span><span class="p">,</span><span class="n">ed</span> <span class="ow">in</span> <span class="n">sted</span><span class="p">])</span>
+    <span class="n">idxst</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">st</span> <span class="k">for</span> <span class="n">st</span><span class="p">,</span><span class="n">ed</span> <span class="ow">in</span> <span class="n">sted</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">returnsorted</span><span class="p">:</span>
+        <span class="n">sx</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">]</span>
+        <span class="n">sy</span> <span class="o">=</span> <span class="p">[</span><span class="n">ys</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">avgx</span><span class="p">,</span><span class="n">avgy</span><span class="p">,</span><span class="n">idxst</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">sx</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">sy</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">returnminmax</span><span class="p">:</span>
+        <span class="n">minx</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">N</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">[</span><span class="n">st</span><span class="p">:</span><span class="n">ed</span><span class="p">]])</span> <span class="k">for</span> <span class="n">st</span><span class="p">,</span><span class="n">ed</span> <span class="ow">in</span> <span class="n">sted</span><span class="p">])</span>
+        <span class="n">maxx</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">N</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">[</span><span class="n">st</span><span class="p">:</span><span class="n">ed</span><span class="p">]])</span> <span class="k">for</span> <span class="n">st</span><span class="p">,</span><span class="n">ed</span> <span class="ow">in</span> <span class="n">sted</span><span class="p">])</span>
+        <span class="n">cnt</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">st</span><span class="p">:</span><span class="n">ed</span><span class="p">])</span> <span class="k">for</span> <span class="n">st</span><span class="p">,</span><span class="n">ed</span> <span class="ow">in</span> <span class="n">sted</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">avgx</span><span class="p">,</span><span class="n">avgy</span><span class="p">,</span><span class="n">minx</span><span class="p">,</span><span class="n">maxx</span><span class="p">,</span> <span class="n">cnt</span>
+    <span class="k">return</span> <span class="n">avgx</span><span class="p">,</span> <span class="n">avgy</span></div>
+
+<div class="viewcode-block" id="calc_binned_percentile"><a class="viewcode-back" href="../../modules.html#jgem.utils.calc_binned_percentile">[docs]</a><span class="k">def</span> <span class="nf">calc_binned_percentile</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">99</span><span class="p">,</span> <span class="n">minbinw</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">minnum</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">idx</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_genbin</span><span class="p">():</span>
+        <span class="n">ci</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">yield</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">ci</span> <span class="o">&gt;</span> <span class="n">minnum</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">ci</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">minbinw</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">i</span>
+                <span class="n">ci</span> <span class="o">=</span> <span class="n">i</span>
+    <span class="n">bidx</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_genbin</span><span class="p">()]</span>
+    <span class="n">sted</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">bidx</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">bidx</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span> <span class="c1"># starts and ends</span>
+    <span class="n">px</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">N</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">[</span><span class="n">st</span><span class="p">:</span><span class="n">ed</span><span class="p">]])</span> <span class="k">for</span> <span class="n">st</span><span class="p">,</span><span class="n">ed</span> <span class="ow">in</span> <span class="n">sted</span><span class="p">])</span>
+    <span class="n">py</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">N</span><span class="o">.</span><span class="n">percentile</span><span class="p">([</span><span class="n">ys</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">[</span><span class="n">st</span><span class="p">:</span><span class="n">ed</span><span class="p">]],</span> <span class="n">percent</span><span class="p">)</span> <span class="k">for</span> <span class="n">st</span><span class="p">,</span><span class="n">ed</span> <span class="ow">in</span> <span class="n">sted</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">px</span><span class="p">,</span><span class="n">py</span></div>
+
+<span class="c1">#### Sigmoid fitting #########################################################</span>
+
+<div class="viewcode-block" id="sigmoid"><a class="viewcode-back" href="../../modules.html#jgem.utils.sigmoid">[docs]</a><span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">x0</span><span class="p">,</span><span class="n">k</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="n">N</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">k</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">x0</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="invsig"><a class="viewcode-back" href="../../modules.html#jgem.utils.invsig">[docs]</a><span class="k">def</span> <span class="nf">invsig</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">x0</span><span class="p">,</span><span class="n">k</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x0</span> <span class="o">-</span> <span class="n">N</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="mf">1.</span><span class="o">-</span><span class="n">y</span><span class="p">)</span><span class="o">/</span><span class="n">y</span><span class="p">)</span><span class="o">/</span><span class="n">k</span></div>
+
+<div class="viewcode-block" id="fit_sigmoid"><a class="viewcode-back" href="../../modules.html#jgem.utils.fit_sigmoid">[docs]</a><span class="k">def</span> <span class="nf">fit_sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span><span class="n">yth</span><span class="o">=</span><span class="mf">0.99</span><span class="p">):</span>
+    <span class="n">popt</span><span class="p">,</span><span class="n">pcov</span><span class="o">=</span> <span class="n">SO</span><span class="o">.</span><span class="n">curve_fit</span><span class="p">(</span><span class="n">sigmoid</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">*</span><span class="n">xlim</span><span class="p">)</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="o">*</span><span class="n">popt</span><span class="p">)</span>
+    <span class="n">xth</span> <span class="o">=</span> <span class="n">invsig</span><span class="p">(</span><span class="n">yth</span><span class="p">,</span> <span class="o">*</span><span class="n">popt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">xth</span></div>
+
+
+<span class="c1">#### Genome info #############################################################</span>
+
+<div class="viewcode-block" id="chromsizes"><a class="viewcode-back" href="../../modules.html#jgem.utils.chromsizes">[docs]</a><span class="k">def</span> <span class="nf">chromsizes</span><span class="p">(</span><span class="n">genome</span><span class="p">):</span>
+    <span class="s2">&quot;returns the path to chrom.sizes file&quot;</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;{0}.chrom.sizes&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">genome</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="chromdf"><a class="viewcode-back" href="../../modules.html#jgem.utils.chromdf">[docs]</a><span class="k">def</span> <span class="nf">chromdf</span><span class="p">(</span><span class="n">genome</span><span class="p">):</span>
+    <span class="s2">&quot;returns chromosome size dataframe&quot;</span>
+    <span class="k">return</span> <span class="n">read_pandas</span><span class="p">(</span><span class="n">chromsizes</span><span class="p">(</span><span class="n">genome</span><span class="p">),</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;size&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="chroms"><a class="viewcode-back" href="../../modules.html#jgem.utils.chroms">[docs]</a><span class="k">def</span> <span class="nf">chroms</span><span class="p">(</span><span class="n">genome</span><span class="p">):</span>
+    <span class="s2">&quot;returns chromosome names&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">read_pandas</span><span class="p">(</span><span class="n">chromsizes</span><span class="p">(</span><span class="n">genome</span><span class="p">),</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;size&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">])</span></div>
+
+
+<span class="c1">### Atomic Intervals ##################################################</span>
+
+<div class="viewcode-block" id="chopintervals"><a class="viewcode-back" href="../../modules.html#jgem.utils.chopintervals">[docs]</a><span class="k">def</span> <span class="nf">chopintervals</span><span class="p">(</span><span class="n">exons</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">idcol</span><span class="o">=</span><span class="s1">&#39;_id&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Separate into intervals where overlaps are constant over each interval.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        exons: DataFrame containing exons</span>
+<span class="sd">        fname (str): (optional) save results into this file</span>
+<span class="sd">        sort (bool): whether to sort the DataFrame</span>
+<span class="sd">        idcol (str): column name to use for id</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A DataFrame containing chopped intervals</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Assumes st&lt;ed (not even st==ed)</span>
+    <span class="k">if</span> <span class="n">sort</span><span class="p">:</span>
+        <span class="n">exons</span> <span class="o">=</span> <span class="n">exons</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">idcol</span><span class="o">==</span><span class="s1">&#39;_id&#39;</span> <span class="ow">and</span> <span class="s1">&#39;_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exons</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">exons</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">exons</span><span class="p">))</span>
+        <span class="n">exons</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">exons</span><span class="p">))</span>
+    <span class="c1"># process by chrom</span>
+    <span class="k">def</span> <span class="nf">_todf2</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">tgt</span><span class="p">,</span><span class="n">kval</span><span class="p">,</span><span class="n">idfld</span><span class="p">):</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">tgt</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">])</span>
+        <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kval</span>
+        <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">idfld</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">return</span> <span class="n">tmp</span>
+    <span class="k">def</span> <span class="nf">_gen</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="n">exons</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+            <span class="n">ec</span> <span class="o">=</span> <span class="n">exons</span><span class="p">[</span><span class="n">exons</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">chrom</span><span class="p">]</span>
+            <span class="c1"># generate array with positions (st,ed) and kind (st,ed) and id (_id)</span>
+            <span class="n">posarr</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">_todf2</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">idcol</span><span class="p">),</span>
+                                <span class="n">_todf2</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">idcol</span><span class="p">)],</span>
+                               <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;pos&#39;</span><span class="p">)</span>
+            <span class="n">posarr</span><span class="p">[</span><span class="s1">&#39;cumsum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">posarr</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">])</span>
+            <span class="n">p1</span><span class="p">,</span><span class="n">cs1</span><span class="p">,</span><span class="n">id1</span> <span class="o">=</span> <span class="n">posarr</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][[</span><span class="s1">&#39;pos&#39;</span><span class="p">,</span><span class="s1">&#39;cumsum&#39;</span><span class="p">,</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
+            <span class="n">idset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">id1</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">p2</span><span class="p">,</span><span class="n">cs2</span><span class="p">,</span><span class="n">id2</span> <span class="ow">in</span> <span class="n">posarr</span><span class="p">[[</span><span class="s1">&#39;pos&#39;</span><span class="p">,</span><span class="s1">&#39;cumsum&#39;</span><span class="p">,</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">idset</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cs2</span><span class="o">&gt;</span><span class="n">cs1</span><span class="p">:</span> <span class="c1"># start</span>
+                    <span class="n">idset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">id2</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">idset</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">id2</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">cs1</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">p2</span><span class="o">&gt;</span><span class="n">p1</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="p">(</span><span class="n">chrom</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">,</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">p1</span><span class="p">,</span><span class="n">cs1</span><span class="p">,</span><span class="n">id1</span> <span class="o">=</span> <span class="n">p2</span><span class="p">,</span><span class="n">cs2</span><span class="p">,</span><span class="n">id2</span>
+    <span class="n">ci</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_gen</span><span class="p">()],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+    <span class="n">ci</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ci</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">fname</span><span class="p">:</span>
+        <span class="n">write_pandas</span><span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ci</span></div>
+
+
+<span class="c1">#### multiprocessing ##################################################</span>
+
+<div class="viewcode-block" id="mp_worker"><a class="viewcode-back" href="../../modules.html#jgem.utils.mp_worker">[docs]</a><span class="k">def</span> <span class="nf">mp_worker</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">func</span><span class="p">,</span> <span class="n">arg</span> <span class="o">=</span> <span class="n">args</span>
+    <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">arg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="process_mp"><a class="viewcode-back" href="../../modules.html#jgem.utils.process_mp">[docs]</a><span class="k">def</span> <span class="nf">process_mp</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="n">doreduce</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">rslts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+            <span class="n">rslts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">arg</span><span class="p">))</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39; processing: {0}/{1}...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">np</span><span class="p">)</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">repeat</span><span class="p">(</span><span class="n">func</span><span class="p">),</span> <span class="n">args</span><span class="p">)</span>
+            <span class="n">rslts</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mp_worker</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;closing pool&#39;</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">doreduce</span><span class="p">:</span>
+        <span class="n">rslts</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">iadd</span><span class="p">,</span> <span class="n">rslts</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="k">return</span> <span class="n">rslts</span>    </div>
+
+<div class="viewcode-block" id="grouper"><a class="viewcode-back" href="../../modules.html#jgem.utils.grouper">[docs]</a><span class="k">def</span> <span class="nf">grouper</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="s2">&quot;Collect data into fixed-length chunks or blocks&quot;</span>
+    <span class="c1"># grouper(&#39;ABCDEFG&#39;, 3, &#39;x&#39;) --&gt; ABC DEF Gxx</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="nb">iter</span><span class="p">(</span><span class="n">iterable</span><span class="p">)]</span> <span class="o">*</span> <span class="n">n</span>
+    <span class="k">return</span> <span class="n">zip_longest</span><span class="p">(</span><span class="n">fillvalue</span><span class="o">=</span><span class="n">fillvalue</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

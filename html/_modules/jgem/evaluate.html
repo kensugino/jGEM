@@ -1,0 +1,928 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>jgem.evaluate &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<h1>Source code for jgem.evaluate</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">.. module:: evaluate</span>
+<span class="sd">    :synopsis: evaluate performance by comparing to a reference annotation</span>
+
+<span class="sd">..  moduleauthor:: Ken Sugino &lt;ken.sugino@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># system imports</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">iadd</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="c1"># 3rd party libraries</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">PD</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">N</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">P</span>
+
+<span class="c1"># library imports</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">UT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">gtfgffbed</span> <span class="k">as</span> <span class="n">GGB</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">bedtools</span> <span class="k">as</span> <span class="n">BT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">bigwig</span> <span class="k">as</span> <span class="n">BW</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">filenames</span> <span class="k">as</span> <span class="n">FN</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">calccov</span> <span class="k">as</span> <span class="n">CC</span>
+
+<div class="viewcode-block" id="EvalNames"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalNames">[docs]</a><span class="k">class</span> <span class="nc">EvalNames</span><span class="p">(</span><span class="n">FN</span><span class="o">.</span><span class="n">FileNamesBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filename manager for evaluation process.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        sjexbase: path prefix to junction, exon files (*.sj.txt.gz and *.ex.txt.gz)</span>
+<span class="sd">        code: assembly identifier</span>
+<span class="sd">        outdir: output directory</span>
+
+<span class="sd">    All outputs and temporary files are prefixed by **outdir/code**</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sjexbase</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">outdir</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sjexbase</span> <span class="o">=</span> <span class="n">sjexbase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outdir</span> <span class="o">=</span> <span class="n">outdir</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;sj&#39;</span><span class="p">,</span><span class="s1">&#39;ex&#39;</span><span class="p">,</span><span class="s1">&#39;ci&#39;</span><span class="p">]:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">+</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="s1">&#39;{0}.{1}.txt.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sjexbase</span><span class="p">,</span><span class="n">x</span><span class="p">))</span>
+
+        <span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">EvalNames</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EvalNames.fname2"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalNames.fname2">[docs]</a>    <span class="k">def</span> <span class="nf">fname2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">code2</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;temp&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate filenames furthre prefixed by code2.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            suffix: (str)</span>
+<span class="sd">            code2: (str) identifier (comparison target)</span>
+<span class="sd">            category: (str)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (outdir)/(code).(code2).(suffix)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">suf</span> <span class="o">=</span> <span class="s1">&#39;{0}.{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">code2</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="n">suf</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EvalNames.modelpath"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalNames.modelpath">[docs]</a>    <span class="k">def</span> <span class="nf">modelpath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns path to junction(sj)/exon(ex)/choppedinterval(ci) file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            which: one of &#39;sj&#39;,&#39;ex&#39;,&#39;ci&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;{0}.{1}.txt.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sjexbase</span><span class="p">,</span> <span class="n">which</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EvalNames.model"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalNames.model">[docs]</a>    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns model dataframe (junction/exon/chopped intervals).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            which: one of &#39;sj&#39;,&#39;ex&#39;, &#39;ci&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">):</span> <span class="c1"># cached</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">)</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modelpath</span><span class="p">(</span><span class="n">which</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span> <span class="c1"># file exists</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="c1"># file does not exists, if ci then make from ex</span>
+        <span class="k">if</span> <span class="n">which</span><span class="o">==</span><span class="s1">&#39;ci&#39;</span><span class="p">:</span>
+            <span class="n">expath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modelpath</span><span class="p">[</span><span class="s1">&#39;ex&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">expath</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ci</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">chopintervals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;ex&#39;</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;file {0} does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expath</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;file {0} does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span></div>
+        
+<div class="viewcode-block" id="EvalNames.savemodel"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalNames.savemodel">[docs]</a>    <span class="k">def</span> <span class="nf">savemodel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">code2</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;temp&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save model. If code2 is None, overwrite original, if code2 is provided,</span>
+<span class="sd">        writes to outdir/(code).(code2).(which).txt.gz. </span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            which: &#39;sj&#39;,&#39;ex&#39;,&#39;ci&#39;</span>
+<span class="sd">            code2: 2nd identifier</span>
+<span class="sd">            category: filename category (default &#39;temp&#39;)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            file path or None (if model is not loaded)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">code2</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modelpath</span><span class="p">(</span><span class="n">which</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname2</span><span class="p">(</span><span class="s1">&#39;{0}.txt.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">which</span><span class="p">),</span><span class="n">code2</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">category</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">),</span> <span class="n">path</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span></div></div>
+
+<span class="n">WSDEFAULT</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">,(</span><span class="s1">&#39;5&#39;</span><span class="p">,</span><span class="s1">&#39;5b&#39;</span><span class="p">),(</span><span class="s1">&#39;3&#39;</span><span class="p">,</span><span class="s1">&#39;3b&#39;</span><span class="p">),(</span><span class="s1">&#39;s&#39;</span><span class="p">,</span><span class="s1">&#39;sb&#39;</span><span class="p">),</span><span class="s1">&#39;j&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="EvalMatch"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch">[docs]</a><span class="k">class</span> <span class="nc">EvalMatch</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compare two models against a genome coverage (bigwig) </span>
+<span class="sd">    and junction counts (sjfile).</span>
+
+<span class="sd">    Usage:</span>
+<span class="sd">        &gt;&gt;&gt; en1 = EvalNames(sjexpre_to_ref, &#39;ref&#39;, outdir)</span>
+<span class="sd">        &gt;&gt;&gt; en2 = EvalNames(sjexpre_to_target, &#39;tgt&#39;, outdir)</span>
+<span class="sd">        &gt;&gt;&gt; em = EvalMatch(en1,en2,bwfile,sjfile,datacode)</span>
+<span class="sd">        &gt;&gt;&gt; figs = em.calculate(outdir)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">abbr</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;i&#39;</span><span class="p">:</span><span class="s1">&#39;internal exons&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;5&#39;</span><span class="p">:</span><span class="s2">&quot;5&#39; exons&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;5b&#39;</span><span class="p">:</span><span class="s2">&quot;5&#39; exons (b)&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;3&#39;</span><span class="p">:</span><span class="s2">&quot;3&#39; exons&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;3b&#39;</span><span class="p">:</span><span class="s2">&quot;3&#39; exons (b)&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;s&#39;</span><span class="p">:</span><span class="s1">&#39;single exons&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;sb&#39;</span><span class="p">:</span><span class="s1">&#39;single exons (b)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;j&#39;</span><span class="p">:</span><span class="s1">&#39;junctions&#39;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">en1</span><span class="p">,</span> <span class="n">en2</span><span class="p">,</span> <span class="n">bigwig</span><span class="p">,</span> <span class="n">sjfile</span><span class="p">,</span> <span class="n">datacode</span><span class="p">,</span> <span class="n">binsize</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            en1: EvalNames object, reference</span>
+<span class="sd">            en2: EvalNames object, sensitivity of this model against en1 is calculated</span>
+<span class="sd">            bigwig: path to normalized bigwig coverage file</span>
+<span class="sd">            sjfile: path to normalized junction counts file</span>
+<span class="sd">            datacode: code indicating data (bigwig &amp; sjfile)</span>
+<span class="sd">            binsize (int): for sensitivity plot (default 1000)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">en1</span> <span class="o">=</span> <span class="n">en1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">en2</span> <span class="o">=</span> <span class="n">en2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bigwig</span> <span class="o">=</span> <span class="n">bigwig</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sjfile</span> <span class="o">=</span> <span class="n">sjfile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datacode</span> <span class="o">=</span> <span class="n">datacode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closest</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># holds closest exon matched (for 5&#39;,3&#39;,single exons)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;code1&#39;</span><span class="p">:</span><span class="n">en1</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="s1">&#39;code2&#39;</span><span class="p">:</span><span class="n">en2</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="s1">&#39;datacode&#39;</span><span class="p">:</span><span class="n">datacode</span><span class="p">,</span> 
+                      <span class="s1">&#39;binsize&#39;</span><span class="p">:</span><span class="n">binsize</span><span class="p">,</span><span class="s1">&#39;bigwig&#39;</span><span class="p">:</span><span class="n">bigwig</span><span class="p">,</span> <span class="s1">&#39;sjfile&#39;</span><span class="p">:</span><span class="n">sjfile</span><span class="p">}</span>     
+        <span class="bp">self</span><span class="o">.</span><span class="n">ratios</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># holds dataframes of cov(x) and ratio(y)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">binsize</span> <span class="o">=</span> <span class="n">binsize</span>
+
+<div class="viewcode-block" id="EvalMatch.calculate"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate necessary data.</span>
+
+<span class="sd">        1. for en1 and en2 calculate ecov,gcov,jcnt (prep_sjex)</span>
+<span class="sd">        2. calculate match between en1 and en2 (find_match)</span>
+<span class="sd">        3. calculate length ratio, detected numbers, sensitivity, etc. (calc_stats)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># calc exon, junction, gene coverage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prep_sjex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">en1</span><span class="p">,</span> <span class="n">np</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prep_sjex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">en2</span><span class="p">,</span> <span class="n">np</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">find_match</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_stats</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_completeness</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EvalMatch.save"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># [i,5,5b,3,3b,s,sb,j,glc,ecc,jcc]</span>
+        <span class="c1"># light weight stats also usable from others ==&gt; dict </span>
+        <span class="c1">#   auc, detected1, ..., sigmoid,...,maxx,avgx,avgy,...</span>
+        <span class="c1"># ==&gt; pickle or json</span>
+        <span class="n">fname1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">en2</span><span class="o">.</span><span class="n">fname2</span><span class="p">(</span><span class="s1">&#39;stats.json&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">en1</span><span class="o">.</span><span class="n">code</span><span class="p">,</span><span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname1</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
+        <span class="c1"># [i,5,5b,3,3b,s,sb,j] cov(x),ratio(y) =&gt; in a dataframe</span>
+        <span class="c1"># [glc,ecc,jcc] gcov(x), ratio(y) =&gt; in a dataframe</span>
+        <span class="c1"># ==&gt; put all in one four column dataframe (kind, id, x, y) </span>
+        <span class="n">fname2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">en2</span><span class="o">.</span><span class="n">fname2</span><span class="p">(</span><span class="s1">&#39;ratios.txt.gz&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">en1</span><span class="o">.</span><span class="n">code</span><span class="p">,</span><span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratios</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">v</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">ratios</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fname2</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EvalMatch.load"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fname1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">en2</span><span class="o">.</span><span class="n">fname2</span><span class="p">(</span><span class="s1">&#39;stats.json&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">en1</span><span class="o">.</span><span class="n">code</span><span class="p">,</span><span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname1</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+        <span class="n">fname2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">en2</span><span class="o">.</span><span class="n">fname2</span><span class="p">(</span><span class="s1">&#39;ratios.txt.gz&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">en1</span><span class="o">.</span><span class="n">code</span><span class="p">,</span><span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">fname2</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ratios</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">k</span><span class="p">][[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="EvalMatch.colname"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.colname">[docs]</a>    <span class="k">def</span> <span class="nf">colname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;{0}_{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datacode</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EvalMatch.colname2"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.colname2">[docs]</a>    <span class="k">def</span> <span class="nf">colname2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;{0}_{1}_{2}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datacode</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EvalMatch.prep_sjex"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.prep_sjex">[docs]</a>    <span class="k">def</span> <span class="nf">prep_sjex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">en</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Assign ecov, gcov, jcnt &quot;&quot;&quot;</span>
+        <span class="n">sj</span> <span class="o">=</span> <span class="n">en</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="s1">&#39;sj&#39;</span><span class="p">)</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="n">en</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="s1">&#39;ex&#39;</span><span class="p">)</span>
+        <span class="n">savesj</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">saveex</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c1"># check support</span>
+        <span class="n">dids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;d_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">aids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">aids</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;d_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">dids</span><span class="p">)</span>
+        <span class="n">sj</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">en</span><span class="o">.</span><span class="n">sj</span> <span class="o">=</span> <span class="n">sj</span> 
+        <span class="c1"># length</span>
+        <span class="k">if</span> <span class="s1">&#39;len&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+            <span class="n">savesj</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="s1">&#39;len&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ex</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+            <span class="n">saveex</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="c1"># ecov</span>
+        <span class="n">ecovname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colname</span><span class="p">(</span><span class="s1">&#39;ecov&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ecovname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ex</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">ecov</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">calc_ecov</span><span class="p">(</span>
+                <span class="n">expath</span><span class="o">=</span><span class="n">en</span><span class="o">.</span><span class="n">modelpath</span><span class="p">(</span><span class="s1">&#39;ex&#39;</span><span class="p">),</span> 
+                <span class="n">cipath</span><span class="o">=</span><span class="n">en</span><span class="o">.</span><span class="n">modelpath</span><span class="p">(</span><span class="s1">&#39;ci&#39;</span><span class="p">),</span> 
+                <span class="n">bwpath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bigwig</span><span class="p">,</span> 
+                <span class="n">dstprefix</span><span class="o">=</span><span class="n">en</span><span class="o">.</span><span class="n">fname2</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">datacode</span><span class="p">),</span>  <span class="c1"># cov is data dependent</span>
+                <span class="n">override</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="c1"># override previous?</span>
+                <span class="n">np</span><span class="o">=</span><span class="n">np</span><span class="p">)</span>
+            <span class="n">ex</span><span class="p">[</span><span class="n">ecovname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ecov</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;eid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">][</span><span class="s1">&#39;ecov&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">saveex</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="c1"># gcov, glen</span>
+        <span class="n">gcovname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colname</span><span class="p">(</span><span class="s1">&#39;gcov&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">gcovname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ex</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">gcov</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">calc_gcov</span><span class="p">(</span>
+                <span class="n">expath</span><span class="o">=</span><span class="n">en</span><span class="o">.</span><span class="n">modelpath</span><span class="p">(</span><span class="s1">&#39;ex&#39;</span><span class="p">),</span> 
+                <span class="n">cipath</span><span class="o">=</span><span class="n">en</span><span class="o">.</span><span class="n">modelpath</span><span class="p">(</span><span class="s1">&#39;ci&#39;</span><span class="p">),</span> 
+                <span class="n">bwpath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bigwig</span><span class="p">,</span> 
+                <span class="n">dstprefix</span><span class="o">=</span><span class="n">en</span><span class="o">.</span><span class="n">fname2</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">datacode</span><span class="p">),</span> 
+                <span class="n">override</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="c1"># reuse covci from ecov calc</span>
+                <span class="n">np</span><span class="o">=</span><span class="n">np</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">gcov</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+            <span class="n">ex</span><span class="p">[</span><span class="n">gcovname</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;gcov&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;glen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;glen&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="c1"># glen is only dependent on model not data</span>
+            <span class="n">saveex</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="c1"># sjcnt</span>
+        <span class="n">ucntname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colname</span><span class="p">(</span><span class="s1">&#39;ucnt&#39;</span><span class="p">)</span>
+        <span class="n">mcntname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colname</span><span class="p">(</span><span class="s1">&#39;mcnt&#39;</span><span class="p">)</span>
+        <span class="n">jcntname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colname</span><span class="p">(</span><span class="s1">&#39;jcnt&#39;</span><span class="p">)</span>
+        <span class="n">sjfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sjfile</span>
+        <span class="k">if</span> <span class="n">ucntname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sjfile</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.bed&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">sjfile</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.bed.gz&#39;</span><span class="p">):</span> <span class="c1"># no header</span>
+                <span class="n">dsj</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">sjfile</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;ucnt&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span><span class="s1">&#39;mcnt&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c1"># assume txt file with header</span>
+                <span class="n">dsj</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">sjfile</span><span class="p">)</span> 
+            <span class="c1"># locus based matching</span>
+            <span class="n">dsj</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">dsj</span><span class="p">)</span>
+            <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">sj</span><span class="p">)</span>
+            <span class="n">l2u</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">dsj</span><span class="p">,</span> <span class="s1">&#39;locus&#39;</span><span class="p">,</span> <span class="s1">&#39;ucnt&#39;</span><span class="p">)</span>
+            <span class="n">l2m</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">dsj</span><span class="p">,</span> <span class="s1">&#39;locus&#39;</span><span class="p">,</span> <span class="s1">&#39;mcnt&#39;</span><span class="p">)</span>
+            <span class="n">sj</span><span class="p">[</span><span class="n">ucntname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l2u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]]</span>
+            <span class="n">sj</span><span class="p">[</span><span class="n">mcntname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l2m</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]]</span>
+            <span class="n">sj</span><span class="p">[</span><span class="n">jcntname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="ow">or</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="n">sj</span><span class="p">[[</span><span class="n">ucntname</span><span class="p">,</span><span class="n">mcntname</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+            <span class="n">savesj</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="n">saveex</span><span class="p">:</span>
+            <span class="n">en</span><span class="o">.</span><span class="n">savemodel</span><span class="p">(</span><span class="s1">&#39;ex&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">datacode</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">savesj</span><span class="p">:</span>
+            <span class="n">en</span><span class="o">.</span><span class="n">savemodel</span><span class="p">(</span><span class="s1">&#39;sj&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">datacode</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EvalMatch.find_match"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.find_match">[docs]</a>    <span class="k">def</span> <span class="nf">find_match</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">en1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">en1</span>
+        <span class="n">en2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">en2</span>
+        <span class="c1"># write internal,3,5,se exons separately for finding match</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">en1</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;ex.bed.gz&#39;</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">en2</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;ex.bed.gz&#39;</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">en1</span><span class="o">.</span><span class="n">fname2</span><span class="p">(</span><span class="s1">&#39;ex.ovl.txt.gz&#39;</span><span class="p">,</span> <span class="n">en2</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e1</span> <span class="o">=</span> <span class="n">e1</span> <span class="o">=</span> <span class="n">en1</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="s1">&#39;ex&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e2</span> <span class="o">=</span> <span class="n">e2</span> <span class="o">=</span> <span class="n">en2</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="s1">&#39;ex&#39;</span><span class="p">)</span>
+        <span class="n">ecovname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colname</span><span class="p">(</span><span class="s1">&#39;ecov&#39;</span><span class="p">)</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="n">ecovname</span><span class="p">,</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;len&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">e1</span><span class="p">[</span><span class="n">cols</span><span class="p">],</span><span class="n">a</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">e2</span><span class="p">[</span><span class="n">cols</span><span class="p">],</span><span class="n">b</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">BT</span><span class="o">.</span><span class="n">bedtoolintersect</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">wao</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">ocols</span> <span class="o">=</span> <span class="n">cols</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;b_&#39;</span><span class="o">+</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;ovl&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ov</span> <span class="o">=</span> <span class="n">ov</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">ocols</span><span class="p">)</span> <span class="c1"># overlaps of exons</span>
+        
+        <span class="n">idxchr</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b_chr&#39;</span><span class="p">]</span> 
+        <span class="n">idxstrand</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b_strand&#39;</span><span class="p">]</span>
+        <span class="n">idxp</span> <span class="o">=</span> <span class="p">(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;+&#39;</span><span class="p">)</span><span class="o">&amp;</span><span class="n">idxstrand</span>
+        <span class="n">idxn</span> <span class="o">=</span> <span class="p">(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="o">&amp;</span><span class="n">idxstrand</span>
+        <span class="n">idxst</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b_st&#39;</span><span class="p">]</span>
+        <span class="n">idxed</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b_ed&#39;</span><span class="p">]</span>
+        <span class="n">idxcat</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b_cat&#39;</span><span class="p">]</span>
+        <span class="n">idxcov</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="n">ecovname</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span> <span class="c1"># exons with reads</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">10</span> <span class="o">+</span> <span class="s1">&#39;calculating match between {0} and {1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">en1</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">en2</span><span class="o">.</span><span class="n">code</span><span class="p">))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;len(ov):{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ov</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;idxchr&#39;</span><span class="p">,</span><span class="s1">&#39;idxstrand&#39;</span><span class="p">,</span><span class="s1">&#39;idxp&#39;</span><span class="p">,</span><span class="s1">&#39;idxn&#39;</span><span class="p">,</span><span class="s1">&#39;idxst&#39;</span><span class="p">,</span><span class="s1">&#39;idxed&#39;</span><span class="p">,</span><span class="s1">&#39;idxcat&#39;</span><span class="p">,</span><span class="s1">&#39;idxcov&#39;</span><span class="p">]:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;#{0}:{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
+        
+        <span class="c1"># internal exon cat=&#39;i&#39; and chr,st,ed,strand match</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ei</span> <span class="o">=</span> <span class="n">ei</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="n">idxchr</span><span class="o">&amp;</span><span class="n">idxstrand</span><span class="o">&amp;</span><span class="n">idxst</span><span class="o">&amp;</span><span class="n">idxed</span><span class="o">&amp;</span><span class="n">idxcat</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;i&#39;</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># 5&#39; cat=&#39;5&#39; and chr,donor (+,ed)|(-,st) match, find closest</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e5</span> <span class="o">=</span> <span class="n">e5</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="n">idxchr</span><span class="o">&amp;</span><span class="p">((</span><span class="n">idxp</span><span class="o">&amp;</span><span class="n">idxed</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">idxn</span><span class="o">&amp;</span><span class="n">idxst</span><span class="p">))</span><span class="o">&amp;</span><span class="n">idxcat</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;5&#39;</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># 3&#39; cat=&#39;3&#39; and chr,acceptor (+,st)|(-,ed) match</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e3</span> <span class="o">=</span> <span class="n">e3</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="n">idxchr</span><span class="o">&amp;</span><span class="p">((</span><span class="n">idxn</span><span class="o">&amp;</span><span class="n">idxed</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">idxp</span><span class="o">&amp;</span><span class="n">idxst</span><span class="p">))</span><span class="o">&amp;</span><span class="n">idxcat</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;3&#39;</span><span class="p">)]</span> <span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># se cat=&#39;s&#39; and chr,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">es</span> <span class="o">=</span> <span class="n">es</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="n">idxchr</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;s&#39;</span><span class="p">)</span><span class="o">&amp;</span><span class="n">idxcat</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># allow overlap to ther categories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e5b</span> <span class="o">=</span> <span class="n">e5b</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="n">idxchr</span><span class="o">&amp;</span><span class="p">((</span><span class="n">idxp</span><span class="o">&amp;</span><span class="n">idxed</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">idxn</span><span class="o">&amp;</span><span class="n">idxst</span><span class="p">))</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;5&#39;</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># 3&#39; cat=&#39;3&#39; and chr,acceptor (+,st)|(-,ed) match</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e3b</span> <span class="o">=</span> <span class="n">e3b</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="n">idxchr</span><span class="o">&amp;</span><span class="p">((</span><span class="n">idxn</span><span class="o">&amp;</span><span class="n">idxed</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">idxp</span><span class="o">&amp;</span><span class="n">idxst</span><span class="p">))</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;3&#39;</span><span class="p">)]</span> <span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># se cat=&#39;s&#39; and chr,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">esb</span> <span class="o">=</span> <span class="n">esb</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="n">idxchr</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;s&#39;</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+        <span class="c1"># splice junction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s1</span> <span class="o">=</span> <span class="n">s1</span> <span class="o">=</span> <span class="n">en1</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="s1">&#39;sj&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s2</span> <span class="o">=</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">en2</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="s1">&#39;sj&#39;</span><span class="p">)</span>
+        <span class="n">jcntname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colname</span><span class="p">(</span><span class="s1">&#39;jcnt&#39;</span><span class="p">)</span>
+        <span class="n">l2c</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="s1">&#39;locus&#39;</span><span class="p">,</span><span class="n">jcntname</span><span class="p">)</span>
+        <span class="n">jhitname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colname2</span><span class="p">(</span><span class="s1">&#39;jhit&#39;</span><span class="p">,</span> <span class="n">en2</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+        <span class="n">s1</span><span class="p">[</span><span class="n">jhitname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l2c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">s1</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]]</span> <span class="c1"># corresponding s2 count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sj</span><span class="o">=</span> <span class="n">sj</span> <span class="o">=</span> <span class="n">s1</span><span class="p">[</span><span class="n">s1</span><span class="p">[</span><span class="n">jhitname</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="c1"># only consider s2 count &gt; 0</span>
+        
+        <span class="c1"># for batch processing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;i&#39;</span><span class="p">:</span><span class="n">ei</span><span class="p">,</span><span class="s1">&#39;5&#39;</span><span class="p">:</span><span class="n">e5</span><span class="p">,</span><span class="s1">&#39;3&#39;</span><span class="p">:</span><span class="n">e3</span><span class="p">,</span><span class="s1">&#39;s&#39;</span><span class="p">:</span><span class="n">es</span><span class="p">,</span> <span class="s1">&#39;j&#39;</span><span class="p">:</span><span class="n">sj</span><span class="p">,</span> <span class="s1">&#39;5b&#39;</span><span class="p">:</span><span class="n">e5b</span><span class="p">,</span> <span class="s1">&#39;3b&#39;</span><span class="p">:</span><span class="n">e3b</span><span class="p">,</span> <span class="s1">&#39;sb&#39;</span><span class="p">:</span><span class="n">esb</span><span class="p">}</span></div>
+        
+    <span class="k">def</span> <span class="nf">_calc_binned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x0</span><span class="p">,</span><span class="n">y0</span><span class="p">,</span><span class="n">binsize</span><span class="p">):</span>
+        <span class="n">avgx</span><span class="p">,</span><span class="n">avgy</span><span class="p">,</span><span class="n">minx</span><span class="p">,</span><span class="n">maxx</span><span class="p">,</span><span class="n">cnt</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_binned</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">binsize</span><span class="p">,</span> <span class="n">returnminmax</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;len(avgx)={0},len(avgy)={1},len(minx)={2},len(maxx)={3}&#39;</span><span class="o">.</span>
+            <span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">avgx</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">avgy</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">minx</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">maxx</span><span class="p">)))</span>
+        <span class="n">avgy1</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">avgy</span><span class="p">,[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">maxx</span> <span class="o">-</span> <span class="n">minx</span>
+        <span class="n">hight</span> <span class="o">=</span> <span class="p">(</span><span class="n">avgy</span><span class="o">+</span><span class="n">avgy1</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span><span class="o">/</span><span class="mf">2.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">maxx</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">auc</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">delta</span><span class="o">*</span><span class="n">hight</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">maxx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">minx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">auc</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;len(x0)={0},len(y0)={1}, auc={2:.3f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x0</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">y0</span><span class="p">),</span><span class="n">auc</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">auc</span><span class="p">,</span><span class="n">maxx</span><span class="p">,</span><span class="n">avgy</span><span class="p">,</span><span class="n">x0</span><span class="p">,</span><span class="n">y0</span>
+
+<div class="viewcode-block" id="EvalMatch.calc_stats"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.calc_stats">[docs]</a>    <span class="k">def</span> <span class="nf">calc_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">ecovname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colname</span><span class="p">(</span><span class="s1">&#39;ecov&#39;</span><span class="p">)</span>
+        <span class="n">jcntname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colname</span><span class="p">(</span><span class="s1">&#39;jcnt&#39;</span><span class="p">)</span>
+        <span class="n">jhitname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colname2</span><span class="p">(</span><span class="s1">&#39;jhit&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">en2</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_findclosest</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">which</span><span class="p">):</span>
+            <span class="n">e</span><span class="p">[</span><span class="s1">&#39;dlen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;b_len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
+            <span class="n">e</span><span class="p">[</span><span class="s1">&#39;ratio&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;b_len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">/</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;dlen&#39;</span><span class="p">],</span><span class="n">ascending</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="n">sort</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">closest</span><span class="p">[</span><span class="n">which</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
+            <span class="k">return</span> <span class="n">f</span>
+
+        <span class="k">def</span> <span class="nf">_count</span><span class="p">(</span><span class="n">dw</span><span class="p">,</span> <span class="n">da1</span><span class="p">,</span> <span class="n">da2</span><span class="p">,</span> <span class="n">which</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">which</span> <span class="o">!=</span> <span class="s1">&#39;j&#39;</span><span class="p">:</span>
+                <span class="n">da1</span> <span class="o">=</span> <span class="n">da1</span><span class="p">[</span><span class="n">da1</span><span class="p">[</span><span class="n">ecovname</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">dw</span> <span class="o">=</span> <span class="n">dw</span><span class="p">[</span><span class="n">dw</span><span class="p">[</span><span class="n">ecovname</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">da2</span> <span class="o">=</span> <span class="n">da2</span><span class="p">[</span><span class="n">da2</span><span class="p">[</span><span class="n">ecovname</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">da1</span> <span class="o">=</span> <span class="n">da1</span><span class="p">[</span><span class="n">da1</span><span class="p">[</span><span class="n">jcntname</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>                
+                <span class="n">dw</span> <span class="o">=</span> <span class="n">dw</span><span class="p">[</span><span class="n">dw</span><span class="p">[</span><span class="n">jcntname</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>                
+                <span class="n">da2</span> <span class="o">=</span> <span class="n">da2</span><span class="p">[</span><span class="n">da2</span><span class="p">[</span><span class="n">jcntname</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">pop</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">da1</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">hit</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dw</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">pop2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">da2</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="c1">#dif = pop.difference(hit)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;no elements in {0} for population1&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">abbr</span><span class="p">[</span><span class="n">which</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop2</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;no elements in {0} for population2&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">abbr</span><span class="p">[</span><span class="n">which</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hit</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;no elements in {0} for match&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">abbr</span><span class="p">[</span><span class="n">which</span><span class="p">]))</span>
+            <span class="n">np1</span><span class="p">,</span><span class="n">nh</span><span class="p">,</span><span class="n">np2</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">hit</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">pop2</span><span class="p">)</span>
+            <span class="n">r1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">nh</span><span class="p">)</span><span class="o">/</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">np1</span><span class="p">)</span>
+            <span class="n">r2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">nh</span><span class="p">)</span><span class="o">/</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">np2</span><span class="p">)</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span> <span class="s1">&#39;[{5}] detected1:{0},</span><span class="se">\t</span><span class="s1">matched:{1},</span><span class="se">\t</span><span class="s1">(detected2:{2}),</span><span class="se">\t</span><span class="s1">ratio:{3:.2f},</span><span class="se">\t</span><span class="s1">(ratio2:{4:.2f})&#39;</span><span class="o">.</span>
+                <span class="n">format</span><span class="p">(</span><span class="n">np1</span><span class="p">,</span><span class="n">nh</span><span class="p">,</span><span class="n">np2</span><span class="p">,</span><span class="n">r1</span><span class="p">,</span><span class="n">r2</span><span class="p">,</span> <span class="n">which</span><span class="p">)</span> <span class="p">)</span>
+            <span class="c1">#return hit, pop, pop2</span>
+            <span class="k">return</span> <span class="n">nh</span><span class="p">,</span><span class="n">np1</span><span class="p">,</span><span class="n">np2</span>
+
+
+        <span class="k">for</span> <span class="n">which</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">,</span><span class="s1">&#39;5&#39;</span><span class="p">,</span><span class="s1">&#39;3&#39;</span><span class="p">,</span><span class="s1">&#39;s&#39;</span><span class="p">,</span><span class="s1">&#39;j&#39;</span><span class="p">,</span><span class="s1">&#39;5b&#39;</span><span class="p">,</span><span class="s1">&#39;3b&#39;</span><span class="p">,</span><span class="s1">&#39;sb&#39;</span><span class="p">]:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">which</span><span class="o">+</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">cn</span> <span class="o">=</span> <span class="s1">&#39;hit{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">which</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">which</span> <span class="o">!=</span> <span class="s1">&#39;j&#39;</span><span class="p">:</span>
+                <span class="n">e1</span><span class="p">,</span><span class="n">e2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">e1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">e2</span>
+                <span class="c1"># use exons with reads</span>
+                <span class="n">ea1</span> <span class="o">=</span> <span class="n">e1</span><span class="p">[(</span><span class="n">e1</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">which</span><span class="p">[</span><span class="mi">0</span><span class="p">])][[</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="n">ecovname</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="c1"># all exons</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">which</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">ea2</span> <span class="o">=</span> <span class="n">e2</span><span class="p">[(</span><span class="n">e2</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">which</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+                <span class="k">else</span><span class="p">:</span> <span class="c1"># all of exons allowed</span>
+                    <span class="n">ea2</span> <span class="o">=</span> <span class="n">e2</span>
+                <span class="n">ew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">[</span><span class="n">which</span><span class="p">]</span> <span class="c1"># matched exons</span>
+                <span class="n">hit</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">pop2</span> <span class="o">=</span> <span class="n">_count</span><span class="p">(</span><span class="n">ew</span><span class="p">,</span> <span class="n">ea1</span><span class="p">,</span> <span class="n">ea2</span><span class="p">,</span> <span class="n">which</span><span class="p">)</span>
+                <span class="n">ew2</span> <span class="o">=</span> <span class="n">_findclosest</span><span class="p">(</span><span class="n">ew</span><span class="p">,</span> <span class="n">which</span><span class="p">)</span> <span class="c1"># calculate ratio</span>
+                <span class="n">i2r</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">ew2</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;ratio&#39;</span><span class="p">)</span>
+                <span class="n">ea1</span><span class="p">[</span><span class="n">cn</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i2r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ea1</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]]</span>
+                <span class="n">ea1</span> <span class="o">=</span> <span class="n">ea1</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;_id&#39;</span><span class="p">)</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">ea1</span><span class="p">[</span><span class="n">ecovname</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># log coverage</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">ea1</span><span class="p">[</span><span class="n">cn</span><span class="p">]</span>
+                <span class="n">ns</span> <span class="o">=</span> <span class="n">ea1</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s1</span>
+                <span class="n">hit</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">pop2</span> <span class="o">=</span> <span class="n">_count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;j&#39;</span><span class="p">],</span> <span class="n">sa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s2</span><span class="p">,</span> <span class="n">which</span><span class="p">)</span>
+                <span class="n">sa</span><span class="p">[</span><span class="n">cn</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="n">x</span><span class="o">&gt;</span><span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sa</span><span class="p">[</span><span class="n">jhitname</span><span class="p">]]</span> <span class="c1"># in case of NaN</span>
+                <span class="n">sa</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;_id&#39;</span><span class="p">)</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">sa</span><span class="p">[</span><span class="n">jcntname</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">sa</span><span class="p">[</span><span class="n">cn</span><span class="p">]</span>
+                <span class="n">ns</span> <span class="o">=</span> <span class="n">sa</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                
+            <span class="c1"># gen4 ecov&gt;0, detected or not</span>
+            <span class="c1"># if which != &#39;j&#39;:</span>
+            <span class="c1">#     idx2 = x&gt;0</span>
+            <span class="c1">#     x2 = x[idx2].values</span>
+            <span class="c1">#     y4 = N.array(y[idx2]&gt;0, dtype=int)</span>
+            <span class="c1"># else:</span>
+            <span class="c1">#     x2 = x.values</span>
+            <span class="c1">#     y4 = N.array(y&gt;0, dtype=int)</span>
+
+            <span class="c1"># only consider ones detected in the reference (en1)</span>
+            <span class="n">idx2</span> <span class="o">=</span> <span class="n">x</span><span class="o">&gt;</span><span class="mi">0</span>
+            <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">idx2</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">y4</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">idx2</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span> <span class="c1"># binary detection indicator (ratio&gt;0)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">x3</span><span class="p">,</span><span class="n">y3</span><span class="p">,</span><span class="n">xth</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">fit_sigmoid</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="n">y4</span><span class="p">,(</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span><span class="mf">0.99</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">xth</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">NaN</span>
+            <span class="n">auc4</span><span class="p">,</span><span class="n">maxx4</span><span class="p">,</span><span class="n">avgy4</span><span class="p">,</span><span class="n">x4</span><span class="p">,</span><span class="n">y4</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_binned</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="n">y4</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">binsize</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">ratios</span><span class="p">[</span><span class="n">which</span><span class="p">]</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="n">ns</span><span class="p">})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="n">which</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;detected1&#39;</span><span class="p">:</span><span class="n">pop</span><span class="p">,</span>
+                                 <span class="s1">&#39;matched&#39;</span><span class="p">:</span><span class="n">hit</span><span class="p">,</span>
+                                 <span class="s1">&#39;detected2&#39;</span><span class="p">:</span><span class="n">pop2</span><span class="p">,</span>
+                                 <span class="s1">&#39;p1&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">(</span><span class="n">hit</span><span class="p">)</span><span class="o">/</span><span class="n">pop</span><span class="p">,</span>
+                                 <span class="s1">&#39;p2&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">(</span><span class="n">hit</span><span class="p">)</span><span class="o">/</span><span class="n">pop2</span><span class="p">,</span>
+                                 <span class="s1">&#39;auc&#39;</span><span class="p">:</span><span class="n">auc4</span><span class="p">,</span>
+                                 <span class="s1">&#39;maxx&#39;</span><span class="p">:</span><span class="n">maxx4</span><span class="p">,</span>
+                                 <span class="s1">&#39;avgy&#39;</span><span class="p">:</span><span class="n">avgy4</span><span class="p">,</span>
+                                 <span class="s1">&#39;xth&#39;</span><span class="p">:</span><span class="n">xth</span><span class="p">}</span></div>
+
+    <span class="c1"># Not implemented yet:</span>
+    <span class="c1"># (4. ELC: exon length completeness = max(ratio of exon length covered by overlapping target gene))</span>
+    <span class="c1"># use ci overlaps  </span>
+<div class="viewcode-block" id="EvalMatch.calc_completeness"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.calc_completeness">[docs]</a>    <span class="k">def</span> <span class="nf">calc_completeness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Completeness measures how much of the reference gene structure is recovered.</span>
+
+<span class="sd">        1. GLC: gene length completeness = max(ratio of gene length covered by overlapping target gene)</span>
+<span class="sd">        2. ECC: exon count completeness = max(ratio of overlapping exon counts)</span>
+<span class="sd">        3. JCC: junction count completeness = max(ratio of overlapping junction counts)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ov</span> <span class="c1"># all</span>
+        <span class="n">ov2</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b__gidx&#39;</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">&amp;</span><span class="p">((</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b_strand&#39;</span><span class="p">])</span><span class="o">|</span><span class="p">(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b_strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;.&#39;</span><span class="p">))]</span> <span class="c1"># actual overlap with correct strand</span>
+        <span class="n">gcovname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colname</span><span class="p">(</span><span class="s1">&#39;gcov&#39;</span><span class="p">)</span>
+        <span class="n">g2gcov</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e1</span><span class="p">,</span> <span class="s1">&#39;_gidx&#39;</span><span class="p">,</span> <span class="n">gcovname</span><span class="p">)</span>
+        <span class="n">xlim</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span>
+        <span class="c1"># GLC</span>
+        <span class="n">g1</span> <span class="o">=</span> <span class="n">ov</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span>
+        <span class="n">glc</span> <span class="o">=</span> <span class="p">(</span><span class="n">g1</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">-</span><span class="n">g1</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;glen&#39;</span><span class="p">)</span>
+        <span class="n">g2</span> <span class="o">=</span> <span class="n">ov2</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;b__gidx&#39;</span><span class="p">])</span>
+        <span class="n">gl2</span> <span class="o">=</span> <span class="p">(</span><span class="n">g2</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">-</span><span class="n">g2</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;b_glen&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">gl2</span> <span class="o">=</span> <span class="n">gl2</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)[</span><span class="s1">&#39;b_glen&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">g2gl2</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">series2dict</span><span class="p">(</span><span class="n">gl2</span><span class="p">)</span>
+        <span class="n">glc</span><span class="p">[</span><span class="s1">&#39;b_glen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2gl2</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">glc</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">glc</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">glc</span><span class="p">[</span><span class="s1">&#39;b_glen&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">glc</span><span class="p">[</span><span class="s1">&#39;glen&#39;</span><span class="p">]</span>
+        <span class="n">glc</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">g2gcov</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">glc</span><span class="o">.</span><span class="n">index</span><span class="p">])</span><span class="o">+</span><span class="mf">1.</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ratios</span><span class="p">[</span><span class="s1">&#39;glc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">glc</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]]</span>
+        <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">glc</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">glc</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">xth</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">fit_sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">xlim</span><span class="p">,</span><span class="mf">0.99</span><span class="p">)</span>
+        <span class="n">auc</span><span class="p">,</span><span class="n">maxx</span><span class="p">,</span><span class="n">avgy</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_binned</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">binsize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;glc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;p1&#39;</span><span class="p">:</span><span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">glc</span><span class="p">[</span><span class="s1">&#39;b_glen&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">glc</span><span class="p">)),</span>
+                             <span class="s1">&#39;auc&#39;</span><span class="p">:</span><span class="n">auc</span><span class="p">,</span><span class="s1">&#39;maxx&#39;</span><span class="p">:</span><span class="n">maxx</span><span class="p">,</span><span class="s1">&#39;avgy&#39;</span><span class="p">:</span><span class="n">avgy</span><span class="p">,</span><span class="s1">&#39;xth&#39;</span><span class="p">:</span><span class="n">xth</span><span class="p">}</span>
+        
+
+        <span class="c1"># ECC</span>
+        <span class="n">ecc</span> <span class="o">=</span> <span class="n">ov</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;#exons&#39;</span><span class="p">)</span>
+        <span class="n">ec2</span> <span class="o">=</span> <span class="n">ov2</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;b__gidx&#39;</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">ec2</span> <span class="o">=</span> <span class="n">ec2</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;b__gidx&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;ec&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">ec2</span> <span class="o">=</span> <span class="n">ec2</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)[</span><span class="s1">&#39;ec&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">g2ec2</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">series2dict</span><span class="p">(</span><span class="n">ec2</span><span class="p">)</span>
+        <span class="n">ecc</span><span class="p">[</span><span class="s1">&#39;b_#exons&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2ec2</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ecc</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">ecc</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ecc</span><span class="p">[</span><span class="s1">&#39;b_#exons&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">ecc</span><span class="p">[</span><span class="s1">&#39;#exons&#39;</span><span class="p">]</span>
+        <span class="n">ecc</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">g2gcov</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ecc</span><span class="o">.</span><span class="n">index</span><span class="p">])</span><span class="o">+</span><span class="mf">1.</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ratios</span><span class="p">[</span><span class="s1">&#39;ecc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ecc</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]]</span>
+        <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">ecc</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">ecc</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">xth</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">fit_sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">xlim</span><span class="p">,</span><span class="mf">0.99</span><span class="p">)</span>
+        <span class="n">auc</span><span class="p">,</span><span class="n">maxx</span><span class="p">,</span><span class="n">avgy</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_binned</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">binsize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;ecc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;p1&#39;</span><span class="p">:</span><span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ecc</span><span class="p">[</span><span class="s1">&#39;b_#exons&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ecc</span><span class="p">)),</span>
+                             <span class="s1">&#39;auc&#39;</span><span class="p">:</span><span class="n">auc</span><span class="p">,</span><span class="s1">&#39;maxx&#39;</span><span class="p">:</span><span class="n">maxx</span><span class="p">,</span><span class="s1">&#39;avgy&#39;</span><span class="p">:</span><span class="n">avgy</span><span class="p">,</span><span class="s1">&#39;xth&#39;</span><span class="p">:</span><span class="n">xth</span><span class="p">}</span>
+                             
+        <span class="c1"># JCC</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s1</span>
+        <span class="n">jcc</span> <span class="o">=</span> <span class="n">s1</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;jc&#39;</span><span class="p">)</span>
+        <span class="n">l2g2</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s2</span><span class="p">,</span> <span class="s1">&#39;locus&#39;</span><span class="p">,</span> <span class="s1">&#39;_gidx&#39;</span><span class="p">)</span>
+        <span class="n">s1</span><span class="p">[</span><span class="s1">&#39;b__gidx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l2g2</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">s1</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="n">s1o</span> <span class="o">=</span> <span class="n">s1</span><span class="p">[</span><span class="n">s1</span><span class="p">[</span><span class="s1">&#39;b__gidx&#39;</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;.&#39;</span><span class="p">]</span> <span class="c1"># overlapping</span>
+        <span class="n">jc2</span> <span class="o">=</span> <span class="n">s1o</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;b__gidx&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;jc2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">jc2</span> <span class="o">=</span> <span class="n">jc2</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)[</span><span class="s1">&#39;jc2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">g2jc2</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">series2dict</span><span class="p">(</span><span class="n">jc2</span><span class="p">)</span>
+        <span class="n">jcc</span><span class="p">[</span><span class="s1">&#39;b_jc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2jc2</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">jcc</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">jcc</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">jcc</span><span class="p">[</span><span class="s1">&#39;b_jc&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">jcc</span><span class="p">[</span><span class="s1">&#39;jc&#39;</span><span class="p">]</span>
+        <span class="n">jcc</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2gcov</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">jcc</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ratios</span><span class="p">[</span><span class="s1">&#39;jcc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">jcc</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]]</span>
+        <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">jcc</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">jcc</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">xth</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">fit_sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">xlim</span><span class="p">,</span><span class="mf">0.99</span><span class="p">)</span>
+        <span class="n">auc</span><span class="p">,</span><span class="n">maxx</span><span class="p">,</span><span class="n">avgy</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_binned</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">binsize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;jcc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;p1&#39;</span><span class="p">:</span><span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">jcc</span><span class="p">[</span><span class="s1">&#39;b_jc&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">jcc</span><span class="p">)),</span>
+                             <span class="s1">&#39;auc&#39;</span><span class="p">:</span><span class="n">auc</span><span class="p">,</span><span class="s1">&#39;maxx&#39;</span><span class="p">:</span><span class="n">maxx</span><span class="p">,</span><span class="s1">&#39;avgy&#39;</span><span class="p">:</span><span class="n">avgy</span><span class="p">,</span><span class="s1">&#39;xth&#39;</span><span class="p">:</span><span class="n">xth</span><span class="p">}</span></div>
+
+    <span class="k">def</span> <span class="nf">_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">ca</span><span class="o">=</span><span class="s1">&#39;go-&#39;</span><span class="p">,</span> <span class="n">cf</span><span class="o">=</span><span class="s1">&#39;r.-&#39;</span><span class="p">,</span> <span class="n">cd</span><span class="o">=</span><span class="s1">&#39;b.&#39;</span><span class="p">,</span><span class="n">pw</span><span class="o">=</span><span class="s1">&#39;dfat&#39;</span><span class="p">,</span>
+        <span class="n">binsize</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span><span class="n">yth</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot dots or sigmoid fit or binned average.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x,y: data points, y should be in the range [0,1]</span>
+<span class="sd">            scale: scale factor for y, default 100, i.e. [0,1]=&gt;[0,100]</span>
+<span class="sd">            ax: Axes object</span>
+<span class="sd">            pw: code to indicate what to plot d:dot, f:sigmoid fit, </span>
+<span class="sd">              a:binned average, t:sigmoid threshold, default &#39;daft&#39;</span>
+<span class="sd">            cd: color for dot</span>
+<span class="sd">            cf: color for sigmoid fit</span>
+<span class="sd">            ca: color for binned average</span>
+<span class="sd">            binsize: for binned average</span>
+<span class="sd">            xlim: x xlimit, default (0,7)</span>
+<span class="sd">            yth: Y threshold for sigmoid fit, xth is calculated and indicated (if &#39;t&#39; in pw)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;f&#39;</span> <span class="ow">in</span> <span class="n">pw</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;t&#39;</span> <span class="ow">in</span> <span class="n">pw</span> <span class="ow">and</span> <span class="n">which</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">xth</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">fit_sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">xlim</span><span class="p">,</span><span class="n">yth</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;d&#39;</span> <span class="ow">in</span> <span class="n">pw</span><span class="p">:</span> <span class="c1"># dot</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">scale</span><span class="o">*</span><span class="n">y</span><span class="p">,</span><span class="s1">&#39;b.&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;f&#39;</span> <span class="ow">in</span> <span class="n">pw</span><span class="p">:</span> <span class="c1"># fit</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="n">scale</span><span class="o">*</span><span class="n">y2</span><span class="p">,</span><span class="n">cf</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;a&#39;</span> <span class="ow">in</span> <span class="n">pw</span><span class="p">:</span> <span class="c1"># avg</span>
+            <span class="k">if</span> <span class="n">which</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">auc</span><span class="p">,</span><span class="n">maxx</span><span class="p">,</span><span class="n">avgy</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_binned</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">binsize</span><span class="p">)</span>
+                <span class="c1">#avgx,avgy = UT.calc_binned(x,y,num=binsize)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="n">which</span><span class="p">]</span>
+                <span class="n">maxx</span><span class="p">,</span><span class="n">avgy</span> <span class="o">=</span> <span class="n">st</span><span class="p">[</span><span class="s1">&#39;maxx&#39;</span><span class="p">],</span><span class="n">st</span><span class="p">[</span><span class="s1">&#39;avgy&#39;</span><span class="p">]</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">maxx</span><span class="p">,</span><span class="n">scale</span><span class="o">*</span><span class="n">avgy</span><span class="p">,</span> <span class="n">ca</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;t&#39;</span> <span class="ow">in</span> <span class="n">pw</span><span class="p">:</span> <span class="c1"># threshold</span>
+            <span class="k">if</span> <span class="n">which</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">xth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="n">which</span><span class="p">][</span><span class="s1">&#39;xth&#39;</span><span class="p">]</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">xth</span><span class="p">,</span><span class="n">xth</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="n">scale</span><span class="p">],</span><span class="n">cf</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">xth</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;{0:.2f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xth</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="n">xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">105</span><span class="p">])</span>
+
+<div class="viewcode-block" id="EvalMatch.get_detection_percentages"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.get_detection_percentages">[docs]</a>    <span class="k">def</span> <span class="nf">get_detection_percentages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make a dataframe containing detection percentages. &quot;&quot;&quot;</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">,</span><span class="s1">&#39;5&#39;</span><span class="p">,</span><span class="s1">&#39;5b&#39;</span><span class="p">,</span><span class="s1">&#39;3&#39;</span><span class="p">,</span><span class="s1">&#39;3b&#39;</span><span class="p">,</span><span class="s1">&#39;s&#39;</span><span class="p">,</span><span class="s1">&#39;sb&#39;</span><span class="p">,</span><span class="s1">&#39;j&#39;</span><span class="p">]</span><span class="c1">#,&#39;glc&#39;,&#39;ecc&#39;,&#39;jcc&#39;]</span>
+        <span class="n">dp1</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="mf">100.</span><span class="o">*</span><span class="n">st</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;p1&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">order</span><span class="p">}</span>
+        <span class="n">dp2</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="mf">100.</span><span class="o">*</span><span class="n">st</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;p2&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">order</span><span class="p">}</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">etected 1&#39;</span><span class="p">:</span><span class="n">dp1</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">etected 2&#39;</span><span class="p">:</span><span class="n">dp2</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">order</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="EvalMatch.plot_detection"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.plot_detection">[docs]</a>    <span class="k">def</span> <span class="nf">plot_detection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">w1</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">,</span><span class="s1">&#39;5&#39;</span><span class="p">,</span><span class="s1">&#39;3&#39;</span><span class="p">,</span><span class="s1">&#39;s&#39;</span><span class="p">,</span><span class="s1">&#39;j&#39;</span><span class="p">],</span><span class="n">w2</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Make bar graphs of detection percentages.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Axes object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_detection_percentages</span><span class="p">()</span>
+        <span class="n">w2</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w2</span><span class="p">]</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">w1</span><span class="p">][</span><span class="n">w2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;{0}/{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">st</span><span class="p">[</span><span class="s1">&#39;code1&#39;</span><span class="p">],</span><span class="n">st</span><span class="p">[</span><span class="s1">&#39;code2&#39;</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="EvalMatch.plot_sensitivity"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.plot_sensitivity">[docs]</a>    <span class="k">def</span> <span class="nf">plot_sensitivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b.-&#39;</span><span class="p">,</span> <span class="n">ypos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">xpos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">axr</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">lineonly</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">ws</span> <span class="o">=</span> <span class="n">WSDEFAULT</span><span class="p">):</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span>
+        <span class="n">p1c</span> <span class="o">=</span> <span class="n">st</span><span class="p">[</span><span class="s1">&#39;code1&#39;</span><span class="p">]</span> <span class="c1"># gen4</span>
+        <span class="n">p2c</span> <span class="o">=</span> <span class="n">st</span><span class="p">[</span><span class="s1">&#39;code2&#39;</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">_plot_one</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">ypos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">xpos</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="n">which</span><span class="p">]</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;maxx&#39;</span><span class="p">],[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="mi">100</span><span class="o">*</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;avgy&#39;</span><span class="p">],[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="c1"># ax.plot(s[&#39;maxx&#39;],100*s[&#39;avgy&#39;],color+&#39;.-&#39;,ms=5, label=label)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">color</span><span class="p">,</span><span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">ma</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;maxx&#39;</span><span class="p">]))</span><span class="o">+</span><span class="mf">0.5</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="n">ma</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.25</span><span class="o">+</span><span class="mf">0.35</span><span class="o">*</span><span class="n">xpos</span><span class="p">,</span><span class="mf">0.07</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">ypos</span><span class="p">),</span><span class="s1">&#39;{0}: {1:.2f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">,</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;auc&#39;</span><span class="p">]),</span>
+                <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">axr</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span><span class="n">axr</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">ws</span><span class="p">),</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">ws</span><span class="p">),</span><span class="mi">3</span><span class="p">),</span><span class="n">sharey</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">P</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span><span class="o">=</span><span class="mf">0.07</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.85</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">axr</span><span class="p">)</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ws</span><span class="p">):</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="n">_plot_one</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p2c</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">ypos</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">_plot_one</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">w</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;- -&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">ypos</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_plot_one</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">p2c</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">ypos</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">lineonly</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">abbr</span><span class="p">[</span><span class="n">w</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">w</span><span class="o">!=</span><span class="s1">&#39;j&#39;</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;log2({0}.{1}_ecov+1)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p1c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datacode</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;log2({0}.{1}_jcnt+1)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p1c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datacode</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">lineonly</span><span class="p">:</span>
+            <span class="n">axr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">105</span><span class="p">])</span>
+            <span class="n">axr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">etected&#39;</span><span class="p">)</span>
+            <span class="n">axr</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">0.5</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;{1}/{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p1c</span><span class="p">,</span><span class="n">p2c</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">axr</span></div>
+
+<div class="viewcode-block" id="EvalMatch.plot_ratio"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.plot_ratio">[docs]</a>    <span class="k">def</span> <span class="nf">plot_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">axr</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">plotxlabel</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">disp</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot length ratios of best matching exons &quot;&quot;&quot;</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span>
+        <span class="n">p1c</span> <span class="o">=</span> <span class="n">st</span><span class="p">[</span><span class="s1">&#39;code1&#39;</span><span class="p">]</span> <span class="c1"># gen4</span>
+        <span class="n">p2c</span> <span class="o">=</span> <span class="n">st</span><span class="p">[</span><span class="s1">&#39;code2&#39;</span><span class="p">]</span>
+        <span class="n">tgts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;5&#39;</span><span class="p">,</span><span class="s1">&#39;3&#39;</span><span class="p">,</span><span class="s1">&#39;s&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">axr</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span><span class="n">axr</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">tgts</span><span class="p">),</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">tgts</span><span class="p">),</span><span class="mi">3</span><span class="p">),</span><span class="n">sharex</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">sharey</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">P</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span><span class="o">=</span><span class="mf">0.07</span><span class="p">,</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span><span class="n">top</span><span class="o">=</span><span class="mf">0.85</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tgts</span><span class="p">):</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="c1">#pop,hit,dif,auc,maxx,avgy,x,y = self.stats[w]</span>
+            <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="n">w</span><span class="p">]</span>
+            <span class="n">auc</span><span class="p">,</span><span class="n">maxx</span><span class="p">,</span><span class="n">avgy</span><span class="o">=</span> <span class="n">st</span><span class="p">[</span><span class="s1">&#39;auc&#39;</span><span class="p">],</span><span class="n">st</span><span class="p">[</span><span class="s1">&#39;maxx&#39;</span><span class="p">],</span><span class="n">st</span><span class="p">[</span><span class="s1">&#39;avgy&#39;</span><span class="p">]</span>
+            <span class="n">xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratios</span><span class="p">[</span><span class="n">w</span><span class="p">]</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">xy</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">xy</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">if</span> <span class="n">disp</span><span class="o">!=</span><span class="s1">&#39;pdf&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="n">ms</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+            <span class="c1">#ax.plot(maxx,avgy,&#39;ro-&#39;,ms=3,alpha=0.3)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">disp</span><span class="o">!=</span><span class="s1">&#39;png&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;{1}_len/{0}_len+1&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p1c</span><span class="p">,</span><span class="n">p2c</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">plotxlabel</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;log2({0}.{1}_ecov+1)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p1c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datacode</span><span class="p">))</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">label</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">abbr</span><span class="p">[</span><span class="n">w</span><span class="p">])</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">y</span><span class="p">[(</span><span class="n">x</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">y</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)])))</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span><span class="s1">&#39;avg:{0:.2f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+        <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;{1}/{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p1c</span><span class="p">,</span><span class="n">p2c</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">axr</span></div>
+        
+<div class="viewcode-block" id="EvalMatch.plot_completeness"><a class="viewcode-back" href="../../modules.html#jgem.evaluate.EvalMatch.plot_completeness">[docs]</a>    <span class="k">def</span> <span class="nf">plot_completeness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axr</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">tgts</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;glc&#39;</span><span class="p">,</span><span class="s1">&#39;ecc&#39;</span><span class="p">,</span><span class="s1">&#39;jcc&#39;</span><span class="p">],</span> <span class="n">pw</span><span class="o">=</span><span class="s1">&#39;dft&#39;</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span>
+        <span class="n">p1c</span> <span class="o">=</span> <span class="n">st</span><span class="p">[</span><span class="s1">&#39;code1&#39;</span><span class="p">]</span> <span class="c1"># gen4</span>
+        <span class="n">p2c</span> <span class="o">=</span> <span class="n">st</span><span class="p">[</span><span class="s1">&#39;code2&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">axr</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span><span class="n">axr</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">tgts</span><span class="p">),</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">tgts</span><span class="p">),</span><span class="mi">3</span><span class="p">),</span><span class="n">sharex</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">sharey</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">P</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span><span class="o">=</span><span class="mf">0.07</span><span class="p">,</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span><span class="n">top</span><span class="o">=</span><span class="mf">0.85</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tgts</span><span class="p">):</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratios</span><span class="p">[</span><span class="n">w</span><span class="p">]</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">ax</span><span class="p">,</span><span class="n">pw</span><span class="o">=</span><span class="n">pw</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="n">w</span><span class="p">,</span><span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">disp</span><span class="o">!=</span><span class="s1">&#39;png&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">% c</span><span class="s1">overed&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;log2({0}.{1}_gcov+1)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p1c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datacode</span><span class="p">))</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">locator_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;{1}/{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p1c</span><span class="p">,</span><span class="n">p2c</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">axr</span></div></div>
+
+
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

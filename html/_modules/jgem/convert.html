@@ -1,0 +1,552 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>jgem.convert &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<h1>Source code for jgem.convert</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">.. module:: convert</span>
+<span class="sd">    :synopsis: convert sj,ex to bed, gtf  or gtf to sj,ex</span>
+
+<span class="sd">..  moduleauthor:: Ken Sugino &lt;ken.sugino@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">PD</span>
+
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">UT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">gtfgffbed</span> <span class="k">as</span> <span class="n">GGB</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">graph</span> <span class="k">as</span> <span class="n">GP</span>
+
+
+<span class="c1"># GTF &lt;=&gt; EX,SJ    ######################################################################</span>
+
+<div class="viewcode-block" id="gtf2exonsj"><a class="viewcode-back" href="../../modules.html#jgem.convert.gtf2exonsj">[docs]</a><span class="k">def</span> <span class="nf">gtf2exonsj</span><span class="p">(</span><span class="n">gtf</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract exons and sj from GTF</span>
+<span class="sd">    exon, junction coordinates = zero based (same as BED)</span>
+<span class="sd">    junction start-1 = exon end</span>
+<span class="sd">    junction end = exon start</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gtf: Pandas.DataFrame </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        sj, ex: Pandas.DataFrames for splice junctions and exons</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">exons</span> <span class="o">=</span> <span class="n">gtf</span><span class="p">[</span><span class="n">gtf</span><span class="p">[</span><span class="s1">&#39;typ&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;exon&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="c1"># find junctions</span>
+    <span class="k">def</span> <span class="nf">_igen</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">exons</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;transcript_id&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">])</span>
+            <span class="n">chrom</span><span class="p">,</span><span class="n">strand</span><span class="p">,</span><span class="n">gid</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span><span class="s1">&#39;gene_id&#39;</span><span class="p">]]</span>
+            <span class="n">ists</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">ieds</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">st</span><span class="p">,</span><span class="n">ed</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ists</span><span class="p">,</span><span class="n">ieds</span><span class="p">):</span>
+                <span class="c1"># chr,st,ed,name=tid,sc1,strand,gene_id</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">chrom</span><span class="p">,</span><span class="n">st</span><span class="p">,</span><span class="n">ed</span><span class="p">,</span><span class="n">gid</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">strand</span><span class="p">)</span>
+    <span class="n">sj</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_igen</span><span class="p">()],</span> <span class="n">columns</span><span class="o">=</span><span class="n">GGB</span><span class="o">.</span><span class="n">BEDCOLS</span><span class="p">[:</span><span class="mi">6</span><span class="p">])</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">sj</span><span class="p">)</span>
+    <span class="n">sj</span> <span class="o">=</span> <span class="n">sj</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;locus&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="c1">#cols = [&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;,&#39;gene_id&#39;,&#39;sc1&#39;,&#39;strand&#39;]</span>
+    <span class="n">ex</span> <span class="o">=</span> <span class="n">exons</span> <span class="c1">#[cols]</span>
+    <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+    <span class="n">ex</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;locus&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;gene_id&#39;</span><span class="p">]</span>
+    <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="n">UT</span><span class="o">.</span><span class="n">set_info</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">ex</span><span class="p">)</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">set_exon_category</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
+
+    <span class="c1"># find genes (connected components) set &#39;_gidx&#39;</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;./graphpre-&#39;</span><span class="p">)</span>
+    <span class="n">genes</span> <span class="o">=</span> <span class="n">GP</span><span class="o">.</span><span class="n">find_genes4</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">ex</span><span class="p">,</span>
+        <span class="n">filepre</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">=</span><span class="n">np</span><span class="p">,</span>
+        <span class="n">override</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+        <span class="n">separatese</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sj</span><span class="p">,</span> <span class="n">ex</span></div>
+
+<div class="viewcode-block" id="bed2exonsj"><a class="viewcode-back" href="../../modules.html#jgem.convert.bed2exonsj">[docs]</a><span class="k">def</span> <span class="nf">bed2exonsj</span><span class="p">(</span><span class="n">bed12</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract exons and junctions from BED12</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        bed12: Pandas.DataFrame containing BED12 data</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        sj, ex: Pandas.DataFrames containing junction and exons</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">esizes</span> <span class="o">=</span> <span class="n">bed12</span><span class="p">[</span><span class="s1">&#39;esizes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)))))</span>
+    <span class="n">estarts0</span> <span class="o">=</span> <span class="n">bed12</span><span class="p">[</span><span class="s1">&#39;estarts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)))))</span>
+    <span class="n">bed12</span><span class="p">[</span><span class="s1">&#39;_estarts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bed12</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">estarts0</span>
+    <span class="n">bed12</span><span class="p">[</span><span class="s1">&#39;_eends&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bed12</span><span class="p">[</span><span class="s1">&#39;_estarts&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">esizes</span>
+    <span class="c1">#istarts = eends[:-1]</span>
+    <span class="c1">#iends = estarts[1:]</span>
+    <span class="n">cols</span> <span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;tname&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">_egen</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">chrom</span><span class="p">,</span><span class="n">tname</span><span class="p">,</span><span class="n">strand</span><span class="p">,</span><span class="n">est</span><span class="p">,</span><span class="n">eed</span> <span class="ow">in</span> <span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">bed12</span><span class="p">,[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span><span class="s1">&#39;_estarts&#39;</span><span class="p">,</span><span class="s1">&#39;_eends&#39;</span><span class="p">]):</span>
+            <span class="c1">#for st,ed in izip(est,eed):</span>
+            <span class="k">for</span> <span class="n">st</span><span class="p">,</span><span class="n">ed</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">est</span><span class="p">,</span><span class="n">eed</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">chrom</span><span class="p">,</span><span class="n">st</span><span class="p">,</span><span class="n">ed</span><span class="p">,</span><span class="n">tname</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">strand</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_igen</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">chrom</span><span class="p">,</span><span class="n">tname</span><span class="p">,</span><span class="n">strand</span><span class="p">,</span><span class="n">est</span><span class="p">,</span><span class="n">eed</span> <span class="ow">in</span> <span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">bed12</span><span class="p">,[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span><span class="s1">&#39;_estarts&#39;</span><span class="p">,</span><span class="s1">&#39;_eends&#39;</span><span class="p">]):</span>
+            <span class="c1">#for st,ed in izip(eed[:-1],est[1:]):</span>
+            <span class="k">for</span> <span class="n">st</span><span class="p">,</span><span class="n">ed</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">eed</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">est</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">chrom</span><span class="p">,</span><span class="n">st</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">ed</span><span class="p">,</span><span class="n">tname</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">strand</span><span class="p">)</span>
+                <span class="c1"># add 1 to match STAR SJ.tab.out </span>
+    <span class="n">ex</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_egen</span><span class="p">()],</span> <span class="n">columns</span><span class="o">=</span><span class="n">GGB</span><span class="o">.</span><span class="n">BEDCOLS</span><span class="p">[:</span><span class="mi">6</span><span class="p">])</span>
+    <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+    <span class="n">ex</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;locus&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">sj</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_igen</span><span class="p">()],</span> <span class="n">columns</span><span class="o">=</span><span class="n">GGB</span><span class="o">.</span><span class="n">BEDCOLS</span><span class="p">[:</span><span class="mi">6</span><span class="p">])</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">sj</span><span class="p">)</span>
+    <span class="n">sj</span> <span class="o">=</span> <span class="n">sj</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;locus&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="n">UT</span><span class="o">.</span><span class="n">set_info</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">ex</span><span class="p">)</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">set_exon_category</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sj</span><span class="p">,</span> <span class="n">ex</span></div>
+    
+
+<span class="c1"># convienience class ###########################################################</span>
+
+<div class="viewcode-block" id="GTF2SJEX"><a class="viewcode-back" href="../../modules.html#jgem.convert.GTF2SJEX">[docs]</a><span class="k">class</span> <span class="nc">GTF2SJEX</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convenience class for making sj (junction), ex (exon), ci (chopped interval) from GTF.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gtfpath</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gtfpath</span> <span class="o">=</span> <span class="n">gtfpath</span>
+        <span class="k">if</span> <span class="n">outdir</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">gtfpath</span><span class="p">)</span> <span class="c1"># use same place as GTF</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outdir</span> <span class="o">=</span> <span class="n">outdir</span>
+        <span class="k">if</span> <span class="n">gtfpath</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">gtfpath</span><span class="p">[</span><span class="o">-</span><span class="mi">7</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.gtf.gz&#39;</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">gtfpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">gtfpath</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.gtf&#39;</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">gtfpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outdir</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GTF2SJEX.exists"><a class="viewcode-back" href="../../modules.html#jgem.convert.GTF2SJEX.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gtfpath</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GTF2SJEX.fname"><a class="viewcode-back" href="../../modules.html#jgem.convert.GTF2SJEX.fname">[docs]</a>    <span class="k">def</span> <span class="nf">fname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">suffix</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;{0}.{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span><span class="n">suffix</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GTF2SJEX.sjexpaths"><a class="viewcode-back" href="../../modules.html#jgem.convert.GTF2SJEX.sjexpaths">[docs]</a>    <span class="k">def</span> <span class="nf">sjexpaths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sjpath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;sj.txt.gz&#39;</span><span class="p">)</span>
+        <span class="n">expath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;ex.txt.gz&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sjpath</span><span class="p">,</span> <span class="n">expath</span></div>
+
+<div class="viewcode-block" id="GTF2SJEX.cipath"><a class="viewcode-back" href="../../modules.html#jgem.convert.GTF2SJEX.cipath">[docs]</a>    <span class="k">def</span> <span class="nf">cipath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;ci.txt.gz&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GTF2SJEX.sjex"><a class="viewcode-back" href="../../modules.html#jgem.convert.GTF2SJEX.sjex">[docs]</a>    <span class="k">def</span> <span class="nf">sjex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sjpath</span><span class="p">,</span> <span class="n">expath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sjexpaths</span><span class="p">()</span>
+        <span class="c1"># check cached</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">sjpath</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">expath</span><span class="p">):</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;reading sj({0}),ex({1}) from cache...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sjpath</span><span class="p">,</span><span class="n">expath</span><span class="p">))</span>
+            <span class="n">sj</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">sjpath</span><span class="p">)</span>
+            <span class="n">ex</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">expath</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">sj</span><span class="p">,</span><span class="n">ex</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_sjex</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="GTF2SJEX.make_sjex"><a class="viewcode-back" href="../../modules.html#jgem.convert.GTF2SJEX.make_sjex">[docs]</a>    <span class="k">def</span> <span class="nf">make_sjex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="n">sjpath</span><span class="p">,</span> <span class="n">expath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sjexpaths</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gtfpath</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;file {0} does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gtfpath</span><span class="p">))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;making sj,ex...&#39;</span><span class="p">)</span>
+        <span class="n">gtf</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_gtf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gtfpath</span><span class="p">)</span> <span class="c1"># ~ 1.5 min =&gt; </span>
+        <span class="c1"># if &#39;cov&#39; in gtf.iloc[0][&#39;extra&#39;]:</span>
+        <span class="c1">#     gtf[&#39;cov&#39;] = GGB.get_gtf_attr_col(gtf, &#39;cov&#39;)</span>
+        <span class="c1"># convert gtf to sjex</span>
+        <span class="n">sj</span><span class="p">,</span> <span class="n">ex</span> <span class="o">=</span> <span class="n">gtf2exonsj</span><span class="p">(</span><span class="n">gtf</span><span class="p">)</span>
+        <span class="c1"># save</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">sjpath</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">expath</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sj</span><span class="p">,</span><span class="n">ex</span></div>
+
+<div class="viewcode-block" id="GTF2SJEX.sj"><a class="viewcode-back" href="../../modules.html#jgem.convert.GTF2SJEX.sj">[docs]</a>    <span class="k">def</span> <span class="nf">sj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sjpath</span><span class="p">,</span> <span class="n">expath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sjexpaths</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">notstale</span><span class="p">(</span><span class="n">sjpath</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">sjpath</span><span class="p">)</span>
+        <span class="n">sj</span><span class="p">,</span><span class="n">ex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sjex</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">sj</span></div>
+
+<div class="viewcode-block" id="GTF2SJEX.ex"><a class="viewcode-back" href="../../modules.html#jgem.convert.GTF2SJEX.ex">[docs]</a>    <span class="k">def</span> <span class="nf">ex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sjpath</span><span class="p">,</span> <span class="n">expath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sjexpaths</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">notstale</span><span class="p">(</span><span class="n">expath</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">expath</span><span class="p">)</span>
+        <span class="n">sj</span><span class="p">,</span><span class="n">ex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sjex</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">ex</span></div>
+
+<div class="viewcode-block" id="GTF2SJEX.ci"><a class="viewcode-back" href="../../modules.html#jgem.convert.GTF2SJEX.ci">[docs]</a>    <span class="k">def</span> <span class="nf">ci</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cicols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        <span class="n">cipath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cipath</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cipath</span><span class="p">):</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;reading ci({0}) from cache...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cipath</span><span class="p">))</span>
+            <span class="n">ci</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">cipath</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">cicols</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ci</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gtfpath</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;file {0} does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gtfpath</span><span class="p">))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;making ci..&#39;</span><span class="p">)</span>
+        <span class="n">sj</span><span class="p">,</span><span class="n">ex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sjex</span><span class="p">()</span>
+        <span class="n">ci</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">chopintervals</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">cipath</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ci</span></div></div>
+
+
+
+
+<span class="c1"># SJ,EX =&gt; GTF, BED ###########################################################</span>
+
+
+<div class="viewcode-block" id="sjex2bed12"><a class="viewcode-back" href="../../modules.html#jgem.convert.sjex2bed12">[docs]</a><span class="k">def</span> <span class="nf">sjex2bed12</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">ex</span><span class="p">,</span><span class="n">dstpath</span><span class="p">):</span>
+    <span class="n">mg</span> <span class="o">=</span> <span class="n">GP</span><span class="o">.</span><span class="n">MEGraph4</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">ex</span><span class="p">,</span><span class="n">dstpath</span><span class="o">+</span><span class="s1">&#39;genegraph-&#39;</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">BEDWriter</span><span class="p">(</span><span class="n">mg</span><span class="p">)</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39; writing bed12 genes to {0}...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dstpath</span><span class="p">))</span>
+    <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dstpath</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BEDWriter"><a class="viewcode-back" href="../../modules.html#jgem.convert.BEDWriter">[docs]</a><span class="k">class</span> <span class="nc">BEDWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mg</span><span class="p">,</span> <span class="n">se</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mg</span> <span class="o">=</span> <span class="n">mg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ex</span> <span class="o">=</span> <span class="n">ex</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">exons</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;_id&#39;</span><span class="p">)</span>
+        <span class="c1">#self.genes = genes = ex.groupby(&#39;_gidx&#39;)[&#39;_id&#39;].groups # _gidx =&gt; [_id] dict</span>
+        <span class="c1">#WARNING above does not give the desired dict it maps to index instead of _id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">genes</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">se</span> <span class="o">=</span> <span class="n">se</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i2g</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">mg</span><span class="o">.</span><span class="n">exons</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;gname&#39;</span><span class="p">]))</span>
+
+<div class="viewcode-block" id="BEDWriter.gen_subpath"><a class="viewcode-back" href="../../modules.html#jgem.convert.BEDWriter.gen_subpath">[docs]</a>    <span class="k">def</span> <span class="nf">gen_subpath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mg</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">maxisonum</span><span class="p">):</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex</span> <span class="c1">#mg.exons</span>
+        <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">starts</span><span class="p">:</span> <span class="c1"># starts is a list of list</span>
+            <span class="k">if</span> <span class="n">cnt</span><span class="o">&gt;</span><span class="n">maxisonum</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">recurse</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">mg</span><span class="o">.</span><span class="n">ex_d_ex</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span> <span class="c1"># get downstream</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
+                <span class="c1">#if not e.ix[y][&#39;name&#39;].endswith(&#39;]&#39;):</span>
+                <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="s1">&#39;d_id&#39;</span><span class="p">]</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="c1"># reached end</span>
+                    <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">yield</span> <span class="n">n</span>
+                    <span class="k">if</span> <span class="n">cnt</span><span class="o">&gt;</span><span class="n">maxisonum</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">recurse</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_subpath</span><span class="p">(</span><span class="n">mg</span><span class="p">,</span> <span class="n">recurse</span><span class="p">,</span> <span class="n">maxisonum</span><span class="o">-</span><span class="n">cnt</span><span class="p">):</span>
+                <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">yield</span> <span class="n">z</span>
+                <span class="k">if</span> <span class="n">cnt</span><span class="o">&gt;</span><span class="n">maxisonum</span><span class="p">:</span>
+                    <span class="k">break</span></div>
+        
+<div class="viewcode-block" id="BEDWriter.path2rec"><a class="viewcode-back" href="../../modules.html#jgem.convert.BEDWriter.path2rec">[docs]</a>    <span class="k">def</span> <span class="nf">path2rec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exons</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">exons</span> <span class="o">=</span> <span class="n">exons</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">])</span>
+        <span class="n">chrom</span><span class="p">,</span><span class="n">strand</span> <span class="o">=</span> <span class="n">exons</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">]]</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="n">exons</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+        <span class="n">ed</span> <span class="o">=</span> <span class="n">exons</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span>
+        <span class="n">nexons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">exons</span><span class="p">)</span>
+        <span class="n">esizes</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="p">(</span><span class="n">exons</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">exons</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;,&#39;</span>
+        <span class="n">estarts</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="p">(</span><span class="n">exons</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">st</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;,&#39;</span>
+        <span class="k">yield</span> <span class="p">(</span><span class="n">chrom</span><span class="p">,</span><span class="n">st</span><span class="p">,</span><span class="n">ed</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">strand</span><span class="p">,</span><span class="n">st</span><span class="p">,</span><span class="n">ed</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">nexons</span><span class="p">,</span><span class="n">esizes</span><span class="p">,</span><span class="n">estarts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BEDWriter.gen_iso_gene"><a class="viewcode-back" href="../../modules.html#jgem.convert.BEDWriter.gen_iso_gene">[docs]</a>    <span class="k">def</span> <span class="nf">gen_iso_gene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mg</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">maxisonum</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="c1"># kind = gtf or bed12</span>
+        <span class="c1"># create bed12 records of isoforms</span>
+        <span class="n">exons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">ids</span><span class="p">]</span> <span class="c1">#mg.exons.ix[ids]</span>
+        <span class="c1"># starts</span>
+        <span class="c1">#sidx = ~exons[&#39;name&#39;].str.startswith(&#39;[&#39;)</span>
+        <span class="n">sidx</span> <span class="o">=</span> <span class="n">exons</span><span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">]</span><span class="o">==-</span><span class="mi">1</span> <span class="c1"># not acceptor</span>
+        <span class="n">starts</span> <span class="o">=</span><span class="p">[</span> <span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">exons</span><span class="p">[</span><span class="n">sidx</span><span class="p">][</span><span class="s1">&#39;_id&#39;</span><span class="p">]]</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_subpath</span><span class="p">(</span><span class="n">mg</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">maxisonum</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;{0}.{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">path2rec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ex</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">path</span><span class="p">],</span> <span class="n">name</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">x</span></div>
+                                    
+<div class="viewcode-block" id="BEDWriter.gen_one_gene"><a class="viewcode-back" href="../../modules.html#jgem.convert.BEDWriter.gen_one_gene">[docs]</a>    <span class="k">def</span> <span class="nf">gen_one_gene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mg</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
+        <span class="c1"># kind = gtf or bed12</span>
+        <span class="c1"># create bed12 records of isoforms</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">path2rec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ex</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">ids</span><span class="p">],</span> <span class="n">gid</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">x</span></div>
+        
+<div class="viewcode-block" id="BEDWriter.gen_iso_all"><a class="viewcode-back" href="../../modules.html#jgem.convert.BEDWriter.gen_iso_all">[docs]</a>    <span class="k">def</span> <span class="nf">gen_iso_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxisonum</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">mg</span><span class="p">,</span> <span class="n">genes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">genes</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex</span> <span class="c1">#mg.exons</span>
+        <span class="n">i2g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2g</span> 
+        <span class="n">tot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">genes</span><span class="p">)</span>
+        <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">exx</span> <span class="ow">in</span> <span class="n">genes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">cnt</span> <span class="o">%</span> <span class="mi">1000</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;   writing genes: {0}/{1}...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cnt</span><span class="p">,</span><span class="n">tot</span><span class="p">))</span>
+            <span class="n">gid</span> <span class="o">=</span> <span class="n">i2g</span><span class="p">[</span><span class="n">exx</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_iso_gene</span><span class="p">(</span><span class="n">mg</span><span class="p">,</span> <span class="n">exx</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">maxisonum</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">x</span></div>
+    
+<div class="viewcode-block" id="BEDWriter.gen_all"><a class="viewcode-back" href="../../modules.html#jgem.convert.BEDWriter.gen_all">[docs]</a>    <span class="k">def</span> <span class="nf">gen_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mg</span><span class="p">,</span> <span class="n">genes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">genes</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex</span> <span class="c1">#mg.exons</span>
+        <span class="n">i2g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2g</span> 
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">exx</span> <span class="ow">in</span> <span class="n">genes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">gid</span> <span class="o">=</span> <span class="n">i2g</span><span class="p">[</span><span class="n">exx</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_one_gene</span><span class="p">(</span><span class="n">mg</span><span class="p">,</span> <span class="n">exx</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">x</span></div>
+
+<div class="viewcode-block" id="BEDWriter.write"><a class="viewcode-back" href="../../modules.html#jgem.convert.BEDWriter.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="n">bedex</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_all</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">beddf</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">bedex</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">GGB</span><span class="o">.</span><span class="n">BEDCOLS</span><span class="p">)</span>
+        <span class="n">GGB</span><span class="o">.</span><span class="n">write_bed</span><span class="p">(</span><span class="n">beddf</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BEDWriter.write_iso"><a class="viewcode-back" href="../../modules.html#jgem.convert.BEDWriter.write_iso">[docs]</a>    <span class="k">def</span> <span class="nf">write_iso</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">maxisonum</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fname</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">fname</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fobj</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_iso_all</span><span class="p">(</span><span class="n">maxisonum</span><span class="o">=</span><span class="n">maxisonum</span><span class="p">):</span>
+                <span class="n">fobj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="n">x</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="GTFWriter"><a class="viewcode-back" href="../../modules.html#jgem.convert.GTFWriter">[docs]</a><span class="k">class</span> <span class="nc">GTFWriter</span><span class="p">(</span><span class="n">BEDWriter</span><span class="p">):</span>
+
+<div class="viewcode-block" id="GTFWriter.path2rec"><a class="viewcode-back" href="../../modules.html#jgem.convert.GTFWriter.path2rec">[docs]</a>    <span class="k">def</span> <span class="nf">path2rec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exons</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">exons</span> <span class="o">=</span> <span class="n">exons</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">])</span>
+        <span class="n">chrom</span><span class="p">,</span><span class="n">strand</span> <span class="o">=</span> <span class="n">exons</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">]]</span>
+        <span class="c1"># name = gname.tidx</span>
+        <span class="n">gname</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">ex</span> <span class="ow">in</span> <span class="n">exons</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">extra</span> <span class="o">=</span> <span class="s1">&#39;gene_id:&quot;{0}&quot;; transcript_id:&quot;{1}&quot;; etype:&quot;{2}&quot;; eid:&quot;{3}&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">gname</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;ptyp&#39;</span><span class="p">],</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">chrom</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;exon&#39;</span><span class="p">,</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">],</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="n">extra</span><span class="p">)</span></div>
+                    
+<div class="viewcode-block" id="GTFWriter.write"><a class="viewcode-back" href="../../modules.html#jgem.convert.GTFWriter.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="c1"># with open(fname,&#39;w&#39;) as fobj:</span>
+        <span class="c1">#     for x in self.gen_all():</span>
+        <span class="c1">#         fobj.write(&#39;\t&#39;.join(map(str,x))+&#39;\n&#39;)</span>
+        <span class="c1"># UT.compress(fname)</span>
+        <span class="n">gtfex</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_all</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">gtfdf</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">gtfex</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">GGB</span><span class="o">.</span><span class="n">GTFCOLS</span><span class="p">)</span>
+        <span class="n">GGB</span><span class="o">.</span><span class="n">write_gtf</span><span class="p">(</span><span class="n">gtfdf</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span></div></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

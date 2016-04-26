@@ -1,0 +1,376 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>jgem.filenames &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<h1>Source code for jgem.filenames</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">.. module:: filenlames</span>
+<span class="sd">    :synopsis: deals with (mostly temporary) files </span>
+
+<span class="sd">..  moduleauthor:: Ken Sugino &lt;ken.sugino@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<span class="c1"># 3rd party imports</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">N</span>
+
+<span class="c1"># library imports</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">gtfgffbed</span> <span class="k">as</span> <span class="n">GGB</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">UT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">convert</span> <span class="k">as</span> <span class="n">CV</span>
+
+<div class="viewcode-block" id="FileNamesBase"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNamesBase">[docs]</a><span class="k">class</span> <span class="nc">FileNamesBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base calss for handling tons of (temporary) filenames.</span>
+<span class="sd">    * All filenames have a common prefix. </span>
+<span class="sd">    * Each filename belong to a category.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            prefix (str): path prefix</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span> <span class="o">=</span> <span class="n">prefix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fnames</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1">#set()</span>
+
+<div class="viewcode-block" id="FileNamesBase.fname"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNamesBase.fname">[docs]</a>    <span class="k">def</span> <span class="nf">fname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;temp&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate a filename (path).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            suffix: (str)</span>
+<span class="sd">            category: (str) default &#39;temp&#39;</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (prefix).(suffix)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="s1">&#39;{0}.{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fnames</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fn</span></div>
+
+<div class="viewcode-block" id="FileNamesBase.txtname"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNamesBase.txtname">[docs]</a>    <span class="k">def</span> <span class="nf">txtname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;temp&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="n">suffix</span><span class="o">+</span><span class="s1">&#39;.txt.gz&#39;</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileNamesBase.bedname"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNamesBase.bedname">[docs]</a>    <span class="k">def</span> <span class="nf">bedname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;temp&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="n">suffix</span><span class="o">+</span><span class="s1">&#39;.bed.gz&#39;</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileNamesBase.delete"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNamesBase.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">],</span> <span class="n">protect</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Delete temporary files.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            delete (list): categories to delete default [&#39;temp&#39;]</span>
+<span class="sd">            protect (list): output categories (files in these cateogries </span>
+<span class="sd">             are protpected)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">protect</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fnames</span><span class="p">:</span>
+                <span class="n">outputs</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fnames</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">delete</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">delete</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fnames</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">delete</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fnames</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">fpath</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fnames</span><span class="p">[</span><span class="n">c</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span> <span class="ow">and</span> <span class="n">fpath</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+                        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;deleting {0}...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fpath</span><span class="p">))</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>                </div>
+
+<div class="viewcode-block" id="FileNamesBase.delete_prefixed"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNamesBase.delete_prefixed">[docs]</a>    <span class="k">def</span> <span class="nf">delete_prefixed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">pat</span> <span class="o">=</span> <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span><span class="o">+</span><span class="s1">&#39;.{0}*&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span>
+        <span class="n">flist</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">pat</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">flist</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;deleting {0}...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="FileNamesBase.write_bed"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNamesBase.write_bed">[docs]</a>    <span class="k">def</span> <span class="nf">write_bed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ncols</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">ncols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bedname</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">GGB</span><span class="o">.</span><span class="n">write_bed</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">ncols</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileNamesBase.write_txt"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNamesBase.write_txt">[docs]</a>    <span class="k">def</span> <span class="nf">write_txt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">fm</span><span class="o">=</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">txtname</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">fm</span><span class="o">=</span><span class="n">fm</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileNamesBase.read_bed"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNamesBase.read_bed">[docs]</a>    <span class="k">def</span> <span class="nf">read_bed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;read&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_bed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bedname</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="n">category</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="FileNamesBase.read_txt"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNamesBase.read_txt">[docs]</a>    <span class="k">def</span> <span class="nf">read_txt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;read&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">txtname</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="n">category</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="FileNames"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNames">[docs]</a><span class="k">class</span> <span class="nc">FileNames</span><span class="p">(</span><span class="n">FileNamesBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filenames for the Assembler.</span>
+<span class="sd">    </span>
+<span class="sd">    Holds</span>
+<span class="sd">    - sample name (sname)</span>
+<span class="sd">    - bigwig coverage file path (bwfile)</span>
+<span class="sd">    - junction file path (sjfile)</span>
+<span class="sd">    - output directory (outdir)</span>
+<span class="sd">    - reference (refgtf) if using it for finding SE (single exon) coverage threshold</span>
+
+<span class="sd">    All filenames have **outdir+sname** as prefix.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sname</span><span class="p">,</span><span class="n">bwfile</span><span class="p">,</span><span class="n">sjfile</span><span class="p">,</span><span class="n">outdir</span><span class="p">,</span><span class="n">refgtf</span><span class="o">=</span><span class="s1">&#39;.gtf&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handles filenames.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sname (str): sample name</span>
+<span class="sd">            bwfile (str): path to normalized coverage bigwig file</span>
+<span class="sd">            sjfile (str): path to junction file</span>
+<span class="sd">            outdir (str): path to output directory</span>
+<span class="sd">            refgtf (str): (optional) path to reference GTF</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sname</span> <span class="o">=</span> <span class="n">sname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bwfile</span> <span class="o">=</span> <span class="n">bwfile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sjfile</span> <span class="o">=</span> <span class="n">sjfile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outdir</span> <span class="o">=</span> <span class="n">outdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refgtf</span> <span class="o">=</span> <span class="n">CV</span><span class="o">.</span><span class="n">GTF2SJEX</span><span class="p">(</span><span class="n">refgtf</span><span class="p">)</span>
+        
+        <span class="c1"># FileNamesBase init</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">sname</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FileNames</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FileNames.bedname2"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNames.bedname2">[docs]</a>    <span class="k">def</span> <span class="nf">bedname2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suf</span><span class="p">,</span> <span class="n">th</span><span class="p">,</span> <span class="n">cat</span><span class="o">=</span><span class="s1">&#39;temp&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bedname</span><span class="p">(</span><span class="s1">&#39;{0}{1:g}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">suf</span><span class="p">,</span> <span class="n">th</span><span class="p">),</span> <span class="n">cat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileNames.refname"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNames.refname">[docs]</a>    <span class="k">def</span> <span class="nf">refname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">suf</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">refgtf</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="n">suf</span><span class="o">+</span><span class="s1">&#39;.txt.gz&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileNames.refsjex"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNames.refsjex">[docs]</a>    <span class="k">def</span> <span class="nf">refsjex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">refgtf</span><span class="o">.</span><span class="n">sjex</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FileNames.ex_out"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNames.ex_out">[docs]</a>    <span class="k">def</span> <span class="nf">ex_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">txtname</span><span class="p">(</span><span class="s1">&#39;ex&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileNames.sj_out"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNames.sj_out">[docs]</a>    <span class="k">def</span> <span class="nf">sj_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">txtname</span><span class="p">(</span><span class="s1">&#39;sj&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileNames.genes_out"><a class="viewcode-back" href="../../modules.html#jgem.filenames.FileNames.genes_out">[docs]</a>    <span class="k">def</span> <span class="nf">genes_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bedname</span><span class="p">(</span><span class="s1">&#39;genes&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

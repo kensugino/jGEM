@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="index.html" />
+    <link rel="next" title="QuickStart" href="quickstart.html" />
+    <link rel="prev" title="Welcome to jGEM’s documentation!" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>jGEM is built with <a class="reference external" href="http://www.python.org">Python</a>. Several 3rd party
+python packages and non-python external tools are also required:</p>
+<ul class="simple">
+<li>Required Python packages<ul>
+<li><a class="reference external" href="http://www.numpy.org">numpy</a></li>
+<li><a class="reference external" href="http://www.scipy.org">scipy</a></li>
+<li><a class="reference external" href="http://matplotlib.org">matplotlib</a></li>
+<li><a class="reference external" href="http://pandas.pydata.org">pandas</a></li>
+<li><a class="reference external" href="http://cython.org">cython</a></li>
+<li><a class="reference external" href="http://www.python-excel.org/">xlrd</a> if using Excel spreadsheet to
+maintain sample info</li>
+</ul>
+</li>
+<li>Required External Tools<ul>
+<li><a class="reference external" href="https://github.com/arq5x/bedtools2">Aaron Quinlan&#8217;s bedtools</a></li>
+<li><a class="reference external" href="http://hgdownload.cse.ucsc.edu/admin/exe/">UCSC Kent&#8217;s Lib wigToBigWig</a></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="python-python-packages">
+<h2>Python &amp; Python packages<a class="headerlink" href="#python-python-packages" title="Permalink to this headline">¶</a></h2>
+<p>If you don&#8217;t already have Python installed, I recommend to install
+<a class="reference external" href="http://conda.pydata.org/miniconda.html">Miniconda</a> or <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a></p>
+<p>Once Miniconda (or Anaconda) is installed, you can use <strong>conda</strong> command
+to create a &#8220;virtual environment&#8221; for jGEM and to install required
+packages.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ conda create -n jgemenv numpy scipy matplotlib pandas cython xlrd
+</pre></div>
+</div>
+<p>Although not required, examples will be shown in jupyter (aka ipython)
+notebook, and documentation is generated by sphinx, so it is useful to
+install these packages as well.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ source activate jgemenv
+$ conda install ipython notebook sphinx
+</pre></div>
+</div>
+</div>
+<div class="section" id="bedtools">
+<h2>Bedtools<a class="headerlink" href="#bedtools" title="Permalink to this headline">¶</a></h2>
+<p>Install according to bedtools instructions
+(<a class="reference external" href="http://bedtools.readthedocs.org/en/latest/content/installation.html">http://bedtools.readthedocs.org/en/latest/content/installation.html</a>).
+(v2.25.0 is used)</p>
+</div>
+<div class="section" id="kent-s-lib-wigtobigwig">
+<h2>Kent&#8217;s Lib wigToBigWig<a class="headerlink" href="#kent-s-lib-wigtobigwig" title="Permalink to this headline">¶</a></h2>
+<p>Download &#8220;wigToBigWig&#8221; from <a class="reference external" href="http://hgdownload.cse.ucsc.edu/admin/exe/">http://hgdownload.cse.ucsc.edu/admin/exe/</a> .
+Both bedtools and wigToBigWig need to be in the PATH.</p>
+</div>
+<div class="section" id="installing-jgem">
+<h2>Installing jGEM<a class="headerlink" href="#installing-jgem" title="Permalink to this headline">¶</a></h2>
+<p>Make sure you&#8217;re in the jgem virtual environment:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ source activate jgemenv
+</pre></div>
+</div>
+<p>Then clone Git repository and install as a developmental package.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ git clone https://github.com/kensugino/jGEM.git
+$ cd jGEM
+$ python setup.py develop
+</pre></div>
+</div>
+<p>Or install jGEM from PyPi (test data is not included in PyPi version):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install jgem
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#python-python-packages">Python &amp; Python packages</a></li>
+<li><a class="reference internal" href="#bedtools">Bedtools</a></li>
+<li><a class="reference internal" href="#kent-s-lib-wigtobigwig">Kent&#8217;s Lib wigToBigWig</a></li>
+<li><a class="reference internal" href="#installing-jgem">Installing jGEM</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to jGEM&#8217;s documentation!</a></li>
+      <li>Next: <a href="quickstart.html" title="next chapter">QuickStart</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/install.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/install.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

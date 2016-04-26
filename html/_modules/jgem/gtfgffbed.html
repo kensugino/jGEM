@@ -1,0 +1,740 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>jgem.gtfgffbed &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<h1>Source code for jgem.gtfgffbed</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">.. module:: gtfgffbed</span>
+<span class="sd">    :synopsis: GTF/GFF/BED related functions</span>
+
+<span class="sd">..  moduleauthor:: Ken Sugino &lt;ken.sugino@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">PD</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">N</span>
+
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">UT</span>
+<span class="kn">import</span> <span class="nn">jgem.cy.bw</span> <span class="kn">as</span> <span class="nn">cybw</span>
+
+
+<span class="n">GTFCOLS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;src&#39;</span><span class="p">,</span><span class="s1">&#39;typ&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;sc1&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span><span class="s1">&#39;sc2&#39;</span><span class="p">,</span><span class="s1">&#39;extra&#39;</span><span class="p">]</span>
+<span class="n">GFFCOLS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;src&#39;</span><span class="p">,</span><span class="s1">&#39;typ&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;sc1&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span><span class="s1">&#39;sc2&#39;</span><span class="p">,</span><span class="s1">&#39;attr&#39;</span><span class="p">]</span>
+<span class="n">BEDCOLS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span> <span class="s1">&#39;st&#39;</span><span class="p">,</span> <span class="s1">&#39;ed&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;sc1&#39;</span><span class="p">,</span> <span class="s1">&#39;strand&#39;</span><span class="p">,</span> <span class="s1">&#39;tst&#39;</span><span class="p">,</span> <span class="s1">&#39;ted&#39;</span><span class="p">,</span> <span class="s1">&#39;sc2&#39;</span><span class="p">,</span> <span class="s1">&#39;#exons&#39;</span><span class="p">,</span> <span class="s1">&#39;esizes&#39;</span><span class="p">,</span> <span class="s1">&#39;estarts&#39;</span><span class="p">]</span>
+
+<span class="n">SJCOLS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span> <span class="s1">&#39;st&#39;</span><span class="p">,</span> <span class="s1">&#39;ed&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;ucnt&#39;</span><span class="p">,</span> <span class="s1">&#39;strand&#39;</span><span class="p">,</span> <span class="s1">&#39;mcnt&#39;</span><span class="p">]</span>
+
+<span class="n">SJTABCOLS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;strand2&#39;</span><span class="p">,</span><span class="s1">&#39;motif&#39;</span><span class="p">,</span><span class="s1">&#39;annotated&#39;</span><span class="p">,</span><span class="s1">&#39;ureads&#39;</span><span class="p">,</span><span class="s1">&#39;mreads&#39;</span><span class="p">,</span><span class="s1">&#39;maxoverhang&#39;</span><span class="p">]</span>
+<span class="n">SJTABMOTIF</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;non-canonical&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="s1">&#39;GT/AG&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">:</span><span class="s1">&#39;CT/AC&#39;</span><span class="p">,</span><span class="mi">3</span><span class="p">:</span><span class="s1">&#39;GC/AG&#39;</span><span class="p">,</span><span class="mi">4</span><span class="p">:</span><span class="s1">&#39;CT/GC&#39;</span><span class="p">,</span><span class="mi">5</span><span class="p">:</span><span class="s1">&#39;AT/AC&#39;</span><span class="p">,</span><span class="mi">6</span><span class="p">:</span><span class="s1">&#39;GT/AT&#39;</span><span class="p">}</span>
+<span class="n">SJTABSTRAND</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span><span class="s1">&#39;+&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">:</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;.&#39;</span><span class="p">}</span>
+
+<span class="n">DEFAULT_GTF_PARSE</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gene_id&#39;</span><span class="p">,</span><span class="s1">&#39;transcript_id&#39;</span><span class="p">,</span><span class="s1">&#39;exon_number&#39;</span><span class="p">,</span><span class="s1">&#39;gene_name&#39;</span><span class="p">,</span><span class="s1">&#39;cov&#39;</span><span class="p">,</span><span class="s1">&#39;FPKM&#39;</span><span class="p">]</span>
+
+<span class="c1"># SJ.out.tab to SJBED ###################################################################</span>
+
+<div class="viewcode-block" id="sjtab2sjbed"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.sjtab2sjbed">[docs]</a><span class="k">def</span> <span class="nf">sjtab2sjbed</span><span class="p">(</span><span class="n">sjtab</span><span class="p">,</span> <span class="n">sjbed</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate splice junction input file from STAR SJ.out.tab</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sjtab (str): path to SJ.out.tab file</span>
+<span class="sd">        sjbed (str): path to output bed</span>
+<span class="sd">        scale (float): scale (= 1/average_coverage = covbp/totbp)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pandas dataframe</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sj</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">sjtab</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">SJTABCOLS</span><span class="p">)</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-k</span><span class="si">%d</span><span class="s1">-u</span><span class="si">%d</span><span class="s1">-m</span><span class="si">%d</span><span class="s1">-o</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">SJTABMOTIF</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">a</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">a</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">o</span> <span class="ow">in</span> \
+                  <span class="n">sj</span><span class="p">[[</span><span class="s1">&#39;motif&#39;</span><span class="p">,</span><span class="s1">&#39;annotated&#39;</span><span class="p">,</span><span class="s1">&#39;ureads&#39;</span><span class="p">,</span><span class="s1">&#39;mreads&#39;</span><span class="p">,</span><span class="s1">&#39;maxoverhang&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">SJTABSTRAND</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;strand2&#39;</span><span class="p">]]</span>
+    <span class="c1">#scale = 1e6/float(aligned)</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ureads&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">scale</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;mreads&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">scale</span>
+    <span class="c1">#sj[&#39;jcnt&#39;] = [x or y for x, y in sj[[&#39;ucnt&#39;,&#39;mcnt&#39;]].values]</span>
+    <span class="c1">#cols = [&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;,&#39;name&#39;,&#39;strand&#39;,&#39;ucnt&#39;,&#39;mcnt&#39;]#,&#39;jcnt&#39;]</span>
+    <span class="c1">#UT.write_pandas(sj[cols], sjbed, &#39;&#39;)</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;sc1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ureads&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">scale</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;tst&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;mreads&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">scale</span>
+    <span class="c1">#cols = [&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;,&#39;name&#39;,&#39;sc1&#39;,&#39;strand&#39;,&#39;tst&#39;] </span>
+    <span class="c1">#UT.write_pandas(sj[cols], sjbed, &#39;&#39;)</span>
+    <span class="n">write_bed</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">sjbed</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sj</span></div>
+
+<div class="viewcode-block" id="read_sj"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.read_sj">[docs]</a><span class="k">def</span> <span class="nf">read_sj</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="c1"># read BED (input) or TXT (output) with consistent column names</span>
+    <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">7</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.bed.gz&#39;</span> <span class="ow">or</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.bed&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">read_bed</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;sc1&#39;</span><span class="p">:</span><span class="s1">&#39;ucnt&#39;</span><span class="p">,</span><span class="s1">&#39;tst&#39;</span><span class="p">:</span><span class="s1">&#39;mcnt&#39;</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="c1"># header should be there</span></div>
+
+
+<span class="c1"># READ/WRITE       ######################################################################    </span>
+<div class="viewcode-block" id="get_gff_attr_col"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.get_gff_attr_col">[docs]</a><span class="k">def</span> <span class="nf">get_gff_attr_col</span><span class="p">(</span><span class="n">gff</span><span class="p">,</span> <span class="n">aname</span><span class="p">):</span>
+    <span class="s2">&quot;helper function for read_gff&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">dict</span><span class="p">([</span><span class="n">y</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;=&#39;</span> <span class="ow">in</span> <span class="n">y</span><span class="p">])</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">aname</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">gff</span><span class="p">[</span><span class="s1">&#39;attr&#39;</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="read_gff"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.read_gff">[docs]</a><span class="k">def</span> <span class="nf">read_gff</span><span class="p">(</span><span class="n">gffname</span><span class="p">,</span> <span class="n">onlytypes</span><span class="o">=</span><span class="p">[],</span> <span class="n">parseattrs</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot; Read in whole GFF, parse id &amp; parent</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gffname: path to GFF file</span>
+<span class="sd">        onlytypes: only keep these types. If [] or None, then keep all (default). </span>
+<span class="sd">        parseattrs: extra attributes to parse</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pandas.DataFrame containing GFF data</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">UT</span><span class="o">.</span><span class="n">isstring</span><span class="p">(</span><span class="n">gffname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">gffname</span>
+        
+    <span class="k">if</span> <span class="n">gffname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="n">gff</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">gffname</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">GFFCOLS</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">gff</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">gffname</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">GFFCOLS</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span><span class="s1">&#39;Parent&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">parseattrs</span><span class="p">:</span>
+        <span class="n">gff</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_gff_attr_col</span><span class="p">(</span><span class="n">gff</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+    <span class="c1"># set gid, tid, eid by default</span>
+    <span class="n">gff</span><span class="p">[</span><span class="s1">&#39;gid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">gff</span><span class="p">[</span><span class="s1">&#39;tid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">gff</span><span class="p">[</span><span class="s1">&#39;eid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="c1"># genes</span>
+    <span class="n">gidx</span> <span class="o">=</span> <span class="n">gff</span><span class="p">[</span><span class="s1">&#39;typ&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;gene&#39;</span>
+    <span class="n">gff</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">gidx</span><span class="p">,</span> <span class="s1">&#39;gid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gff</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span>
+    <span class="c1"># transcripts</span>
+    <span class="n">tidx</span> <span class="o">=</span> <span class="n">gff</span><span class="p">[</span><span class="s1">&#39;typ&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;transcript&#39;</span>
+    <span class="n">gff</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">tidx</span><span class="p">,</span> <span class="s1">&#39;gid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gff</span><span class="p">[</span><span class="s1">&#39;Parent&#39;</span><span class="p">]</span>
+    <span class="n">gff</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">tidx</span><span class="p">,</span> <span class="s1">&#39;tid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gff</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span>
+    <span class="c1"># exons</span>
+    <span class="n">tid2gid</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">gff</span><span class="p">[</span><span class="n">tidx</span><span class="p">][[</span><span class="s1">&#39;tid&#39;</span><span class="p">,</span><span class="s1">&#39;gid&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">eidx</span> <span class="o">=</span> <span class="n">gff</span><span class="p">[</span><span class="s1">&#39;typ&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;exon&#39;</span>
+    <span class="n">gff</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">eidx</span><span class="p">,</span> <span class="s1">&#39;tid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gff</span><span class="p">[</span><span class="s1">&#39;Parent&#39;</span><span class="p">]</span>
+    <span class="n">gff</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">eidx</span><span class="p">,</span> <span class="s1">&#39;gid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">tid2gid</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gff</span><span class="p">[</span><span class="n">eidx</span><span class="p">][</span><span class="s1">&#39;tid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">gff</span><span class="p">[</span><span class="n">eidx</span><span class="p">][</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="c1"># ID already set</span>
+        <span class="n">gff</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">eidx</span><span class="p">,</span> <span class="s1">&#39;eid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gff</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span> <span class="c1"># sometimes exons don&#39;t have ID =&gt; create</span>
+        <span class="n">edf</span> <span class="o">=</span> <span class="n">gff</span><span class="p">[</span><span class="n">eidx</span><span class="p">]</span>
+        <span class="n">en</span> <span class="o">=</span> <span class="n">edf</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;tid&#39;</span><span class="p">)[</span><span class="s1">&#39;gid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">eids</span> <span class="o">=</span> <span class="n">edf</span><span class="p">[</span><span class="s1">&#39;tid&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span> <span class="n">en</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">gff</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">eidx</span><span class="p">,</span> <span class="s1">&#39;eid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eids</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="s1">&#39;ID=&#39;</span><span class="o">+</span><span class="n">eids</span><span class="o">+</span><span class="s1">&#39;;Parent=&#39;</span><span class="o">+</span><span class="n">edf</span><span class="p">[</span><span class="s1">&#39;Parent&#39;</span><span class="p">]</span>
+        <span class="n">gff</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">eidx</span><span class="p">,</span> <span class="s1">&#39;attr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr</span>
+
+    <span class="k">if</span> <span class="n">onlytypes</span><span class="p">:</span>
+        <span class="n">gff</span> <span class="o">=</span> <span class="n">gff</span><span class="p">[</span><span class="n">gff</span><span class="p">[</span><span class="s1">&#39;typ&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">onlytypes</span><span class="p">)]</span>
+
+    <span class="k">return</span> <span class="n">gff</span></div>
+
+<span class="c1"># this function is awfully slow =&gt; replace with vectorized version</span>
+<div class="viewcode-block" id="get_gtf_attr_col"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.get_gtf_attr_col">[docs]</a><span class="k">def</span> <span class="nf">get_gtf_attr_col</span><span class="p">(</span><span class="n">gtf</span><span class="p">,</span> <span class="n">aname</span><span class="p">):</span>
+    <span class="s2">&quot;helper function for read_gtf&quot;</span>
+    <span class="k">def</span> <span class="nf">_attr</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+        <span class="c1">#if isinstance(line, basestring):</span>
+        <span class="c1">#if isinstance(line, str):</span>
+        <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">isstring</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="n">dic</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">y</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">dic</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">aname</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">_attr</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">gtf</span><span class="p">[</span><span class="s1">&#39;extra&#39;</span><span class="p">]]</span></div>
+
+<span class="c1"># ~35 sec to read Gencode.vM4</span>
+<div class="viewcode-block" id="read_gtf"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.read_gtf">[docs]</a><span class="k">def</span> <span class="nf">read_gtf</span><span class="p">(</span><span class="n">gtfname</span><span class="p">,</span> <span class="n">onlytypes</span><span class="o">=</span><span class="p">[],</span> <span class="n">parseattrs</span><span class="o">=</span><span class="n">DEFAULT_GTF_PARSE</span><span class="p">,</span> <span class="n">rename</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot; Read in whole GTF, parse gene_id, transcript_id from column 9</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gtfname: path to GTF file</span>
+<span class="sd">        onlytypes: only keep these types. If [] or None, then keep all (default).</span>
+<span class="sd">        parseattrs: which column attributes to parse.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pandas DataFrame containing GTF data</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">recs</span><span class="p">,</span><span class="n">cols</span> <span class="o">=</span> <span class="n">cybw</span><span class="o">.</span><span class="n">read_gtf_helper</span><span class="p">(</span><span class="n">gtfname</span><span class="p">,</span> <span class="n">parseattrs</span><span class="p">,</span> <span class="s1">&#39;#&#39;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">recs</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">N</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">onlytypes</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;typ&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">onlytypes</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">rename</span><span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">rename</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>    
+    <span class="k">return</span> <span class="n">df</span></div>
+
+<span class="c1"># ~3.5 min to read Gencode.vM4</span>
+<div class="viewcode-block" id="read_gtf1"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.read_gtf1">[docs]</a><span class="k">def</span> <span class="nf">read_gtf1</span><span class="p">(</span><span class="n">gtfname</span><span class="p">,</span> <span class="n">onlytypes</span><span class="o">=</span><span class="p">[],</span> <span class="n">parseattrs</span><span class="o">=</span><span class="n">DEFAULT_GTF_PARSE</span><span class="p">,</span> <span class="n">rename</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot; Read in whole GTF, parse gene_id, transcript_id from column 9</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gtfname: path to GTF file</span>
+<span class="sd">        onlytypes: only keep these types. If [] or None, then keep all (default).</span>
+<span class="sd">        parseattrs: which column attributes to parse.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pandas DataFrame containing GTF data</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">UT</span><span class="o">.</span><span class="n">isstring</span><span class="p">(</span><span class="n">gtfname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">gtfname</span>
+        
+    <span class="k">if</span> <span class="n">gtfname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="n">gtf</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">gtfname</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">GTFCOLS</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">gtf</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">gtfname</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">GTFCOLS</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">onlytypes</span><span class="p">:</span>
+        <span class="n">gtf</span> <span class="o">=</span> <span class="n">gtf</span><span class="p">[</span><span class="n">gtf</span><span class="p">[</span><span class="s1">&#39;typ&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">onlytypes</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;extracting ids...&quot;</span><span class="p">)</span>
+    <span class="c1"># field1 &quot;field1 value&quot;; field2 &quot;field2 value&quot;; ...</span>
+    <span class="c1"># 14.283 sec (using get_gtf_attr_col) ==&gt; 5.830 sec (using below)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">gtf</span><span class="p">[</span><span class="s1">&#39;extra&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">,</span><span class="n">expand</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c1"># each column: field &quot;field val&quot;</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">gtf</span><span class="p">[[</span><span class="s1">&#39;chr&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">tmp</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">kv</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">expand</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c1"># key col(0) and value col(1)</span>
+        <span class="k">if</span> <span class="n">kv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">:</span> <span class="c1"># split unsuccessful</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;column {0} did not split&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;col:{0} first line:{1}, kv.shape:{2}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">tmp</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">kv</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+            <span class="k">continue</span>
+        <span class="c1">#LOG.debug((kv[0].unique(),kv.shape, kv.columns))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">kv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">kv</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">isstring</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="ow">and</span> <span class="n">kv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+                <span class="n">cols</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">kv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="c1"># strip &quot;</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># multiple  fields =&gt; make cols for each</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">isstring</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">kv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">k</span>
+                    <span class="n">cols</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">kv</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">parseattrs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+            <span class="n">gtf</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="c1"># get_gtf_attr_col(gtf, c)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;column {0} not found&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">rename</span><span class="p">:</span>
+        <span class="n">gtf</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">rename</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gtf</span></div>
+
+<span class="c1"># ~3.5 min to read Gencode.vM4 (original version)</span>
+<div class="viewcode-block" id="read_gtf0"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.read_gtf0">[docs]</a><span class="k">def</span> <span class="nf">read_gtf0</span><span class="p">(</span><span class="n">gtfname</span><span class="p">,</span> <span class="n">onlytypes</span><span class="o">=</span><span class="p">[],</span> <span class="n">parseattrs</span><span class="o">=</span><span class="n">DEFAULT_GTF_PARSE</span><span class="p">,</span> <span class="n">rename</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot; Read in whole GTF, parse gene_id, transcript_id from column 9</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gtfname: path to GTF file</span>
+<span class="sd">        onlytypes: only keep these types. If [] or None, then keep all (default).</span>
+<span class="sd">        parseattrs: which column attributes to parse.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pandas DataFrame containing GTF data</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">UT</span><span class="o">.</span><span class="n">isstring</span><span class="p">(</span><span class="n">gtfname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">gtfname</span>
+        
+    <span class="k">if</span> <span class="n">gtfname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="n">gtf</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">gtfname</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">GTFCOLS</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">gtf</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">gtfname</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">GTFCOLS</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">onlytypes</span><span class="p">:</span>
+        <span class="n">gtf</span> <span class="o">=</span> <span class="n">gtf</span><span class="p">[</span><span class="n">gtf</span><span class="p">[</span><span class="s1">&#39;typ&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">onlytypes</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;extracting ids...&quot;</span><span class="p">)</span>
+    <span class="c1"># field1 &quot;field1 value&quot;; field2 &quot;field2 value&quot;; ...</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">parseattrs</span><span class="p">:</span>
+        <span class="n">gtf</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_gtf_attr_col</span><span class="p">(</span><span class="n">gtf</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">rename</span><span class="p">:</span>
+        <span class="n">gtf</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">rename</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gtf</span></div>
+
+<div class="viewcode-block" id="read_bed"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.read_bed">[docs]</a><span class="k">def</span> <span class="nf">read_bed</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read BED file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fpath: path to BED file (no header)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pandas DataFrame containing BED data</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">UT</span><span class="o">.</span><span class="n">isstring</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">fpath</span>
+
+    <span class="k">if</span> <span class="n">fpath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">BEDCOLS</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">BEDCOLS</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">)]</span>
+    <span class="c1"># if calcextra:</span>
+    <span class="c1">#     d[&#39;locus&#39;] = d[&#39;chr&#39;].astype(str) + &#39;:&#39;+ d[&#39;st&#39;].astype(str)+&#39;-&#39;+ d[&#39;ed&#39;].astype(str)</span>
+    <span class="c1">#     d[&#39;min.exon.size&#39;] = d[&#39;esizes&#39;].apply(lambda x: N.min(list(map(int, x[:-1].split(&#39;,&#39;)))))</span>
+    <span class="c1">#     d[&#39;max.exon.size&#39;] = d[&#39;esizes&#39;].apply(lambda x: N.max(list(map(int, x[:-1].split(&#39;,&#39;)))))</span>
+    <span class="c1">#     d[&#39;length&#39;] = d[&#39;ed&#39;]-d[&#39;st&#39;]</span>
+    <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="write_gff"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.write_gff">[docs]</a><span class="k">def</span> <span class="nf">write_gff</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write GFF file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: Pandas.DataFrame containing GFF data</span>
+<span class="sd">        fname: path </span>
+<span class="sd">        compress: whether to gzip compress (default:True)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        actual path written</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">write_ggb</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">GFFCOLS</span><span class="p">,</span> <span class="n">compress</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="write_gtf"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.write_gtf">[docs]</a><span class="k">def</span> <span class="nf">write_gtf</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write GTF file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: Pandas.DataFrame containing GTF data</span>
+<span class="sd">        fname: path </span>
+<span class="sd">        compress: whether to gzip compress (default:True)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        actual path written</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">write_ggb</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">GTFCOLS</span><span class="p">,</span> <span class="n">compress</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="write_bed"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.write_bed">[docs]</a><span class="k">def</span> <span class="nf">write_bed</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write BED file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: Pandas.DataFrame containing BED data</span>
+<span class="sd">        fname: path </span>
+<span class="sd">        compress: whether to gzip compress (default:True)</span>
+<span class="sd">        ncols: number of bed columns (default 12)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        actual path written</span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+    <span class="k">return</span> <span class="n">write_ggb</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">BEDCOLS</span><span class="p">[:</span><span class="n">ncols</span><span class="p">],</span> <span class="n">compress</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="write_ggb"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.write_ggb">[docs]</a><span class="k">def</span> <span class="nf">write_ggb</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>    
+    <span class="c1"># df.loc[:,&#39;st&#39;] = df[&#39;st&#39;].astype(int)</span>
+    <span class="c1"># df.loc[:,&#39;ed&#39;] = df[&#39;ed&#39;].astype(int)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;st,ed not integer: copy and converting&#39;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fname</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">fname</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_NONE</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">compress</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fname</span></div>
+
+
+<span class="c1"># CONVERSION     ######################################################################</span>
+
+<div class="viewcode-block" id="gtf2gff"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.gtf2gff">[docs]</a><span class="k">def</span> <span class="nf">gtf2gff</span><span class="p">(</span><span class="n">gtfname</span><span class="p">,</span><span class="n">gffname</span><span class="p">,</span> <span class="n">memt</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert GTF to GFF.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gtfname: path to GTF file</span>
+<span class="sd">        gffname: path for converted GFF file</span>
+<span class="sd">        memt: only select multiexon, multitranscript</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pandas.DataFrame containing converted GFF data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">eids</span> <span class="o">=</span> <span class="n">read_gtf</span><span class="p">(</span><span class="n">gtfname</span><span class="p">,</span> 
+                    <span class="n">onlytypes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;exon&#39;</span><span class="p">],</span> 
+                    <span class="n">parseattrs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gene_id&#39;</span><span class="p">,</span><span class="s1">&#39;transcript_id&#39;</span><span class="p">,</span><span class="s1">&#39;exon_number&#39;</span><span class="p">,</span><span class="s1">&#39;gene_name&#39;</span><span class="p">],</span>
+                    <span class="n">rename</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gene_id&#39;</span><span class="p">:</span><span class="s1">&#39;gid&#39;</span><span class="p">,</span><span class="s1">&#39;transcript_id&#39;</span><span class="p">:</span><span class="s1">&#39;tid&#39;</span><span class="p">,</span><span class="s1">&#39;gene_name&#39;</span><span class="p">:</span><span class="s1">&#39;gname&#39;</span><span class="p">,</span><span class="s1">&#39;exon_number&#39;</span><span class="p">:</span><span class="s1">&#39;e#&#39;</span><span class="p">})</span>
+    <span class="k">if</span> <span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">eids</span><span class="p">[</span><span class="s1">&#39;e#&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span> <span class="c1"># recalculate exon_number</span>
+        <span class="n">eids</span><span class="p">[</span><span class="s1">&#39;e#&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eids</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;tid&#39;</span><span class="p">)[</span><span class="s1">&#39;gid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">eids</span><span class="p">[</span><span class="s1">&#39;e#&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eids</span><span class="p">[</span><span class="s1">&#39;e#&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">eids</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eids</span><span class="p">[</span><span class="s1">&#39;tid&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="n">eids</span><span class="p">[</span><span class="s1">&#39;e#&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">eids</span><span class="p">[</span><span class="s1">&#39;attr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ID=&#39;</span><span class="o">+</span><span class="n">eids</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;;Parent=&#39;</span><span class="o">+</span><span class="n">eids</span><span class="p">[</span><span class="s1">&#39;tid&#39;</span><span class="p">]</span>
+
+    <span class="c1"># groupby tid and get transcript records</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;calculating transcripts...&quot;</span><span class="p">)</span>
+    <span class="n">gtid</span> <span class="o">=</span> <span class="n">eids</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;tid&#39;</span><span class="p">)</span>
+    <span class="n">tids</span> <span class="o">=</span> <span class="n">gtid</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="c1"># in general get first record</span>
+    <span class="n">tids</span><span class="p">[</span><span class="s1">&#39;typ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;transcript&#39;</span>  <span class="c1"># fix typ</span>
+    <span class="n">tids</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gtid</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="c1"># fix st</span>
+    <span class="n">tids</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gtid</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="c1"># fix ed</span>
+    <span class="n">tids</span><span class="p">[</span><span class="s1">&#39;#exons&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gtid</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">memt</span><span class="p">:</span>
+        <span class="n">tids</span> <span class="o">=</span> <span class="n">tids</span><span class="p">[</span><span class="n">tids</span><span class="p">[</span><span class="s1">&#39;#exons&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">tids</span> <span class="o">=</span> <span class="n">tids</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">tids</span><span class="p">[</span><span class="s1">&#39;e#&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">tids</span><span class="p">[</span><span class="s1">&#39;attr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ID=&#39;</span><span class="o">+</span> <span class="n">tids</span><span class="p">[</span><span class="s1">&#39;tid&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;;Parent=&#39;</span><span class="o">+</span><span class="n">tids</span><span class="p">[</span><span class="s1">&#39;gid&#39;</span><span class="p">]</span><span class="o">+</span>\
+                   <span class="s1">&#39;;num_exons=&#39;</span><span class="o">+</span><span class="n">tids</span><span class="p">[</span><span class="s1">&#39;#exons&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span>\
+                   <span class="s1">&#39;;gene_name=&#39;</span><span class="o">+</span><span class="n">tids</span><span class="p">[</span><span class="s1">&#39;gname&#39;</span><span class="p">]</span>
+
+    <span class="c1"># groupby gid and get gene records</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;calculating genes...&quot;</span><span class="p">)</span>
+    <span class="n">ggid</span> <span class="o">=</span> <span class="n">tids</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;gid&#39;</span><span class="p">)</span>
+    <span class="n">gids</span> <span class="o">=</span> <span class="n">ggid</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">gids</span><span class="p">[</span><span class="s1">&#39;typ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;gene&#39;</span>
+    <span class="n">gids</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ggid</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">gids</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ggid</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">gids</span><span class="p">[</span><span class="s1">&#39;#trans&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ggid</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">gids</span> <span class="o">=</span> <span class="n">gids</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">memt</span><span class="p">:</span>
+        <span class="n">gids</span> <span class="o">=</span> <span class="n">gids</span><span class="p">[</span><span class="n">gids</span><span class="p">[</span><span class="s1">&#39;#trans&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># multi transcript</span>
+        <span class="n">tids</span> <span class="o">=</span> <span class="n">tids</span><span class="p">[</span><span class="n">tids</span><span class="p">[</span><span class="s1">&#39;gid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">gids</span><span class="p">[</span><span class="s1">&#39;gid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span>
+        <span class="n">eids</span> <span class="o">=</span> <span class="n">eids</span><span class="p">[</span><span class="n">eids</span><span class="p">[</span><span class="s1">&#39;tid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">tids</span><span class="p">[</span><span class="s1">&#39;tid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span>
+    <span class="n">gids</span><span class="p">[</span><span class="s1">&#39;tid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">gids</span><span class="p">[</span><span class="s1">&#39;e#&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">gids</span><span class="p">[</span><span class="s1">&#39;attr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ID=&#39;</span><span class="o">+</span><span class="n">gids</span><span class="p">[</span><span class="s1">&#39;gid&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;;num_trans=&#39;</span><span class="o">+</span><span class="n">gids</span><span class="p">[</span><span class="s1">&#39;#trans&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;merging exons, transcripts, genes...&quot;</span><span class="p">)</span>
+    <span class="n">gte</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">gids</span><span class="p">,</span><span class="n">tids</span><span class="p">,</span><span class="n">eids</span><span class="p">],</span><span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c1"># sort by gid,tid,st,ed</span>
+    <span class="n">gte</span> <span class="o">=</span> <span class="n">gte</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;gid&#39;</span><span class="p">,</span><span class="s1">&#39;tid&#39;</span><span class="p">,</span><span class="s1">&#39;e#&#39;</span><span class="p">])</span>
+    <span class="c1"># write out</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;writing GFF...&quot;</span><span class="p">)</span>
+    <span class="n">write_gff</span><span class="p">(</span><span class="n">gte</span><span class="p">,</span> <span class="n">gffname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gte</span></div>
+
+<div class="viewcode-block" id="gtf2bed12"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.gtf2bed12">[docs]</a><span class="k">def</span> <span class="nf">gtf2bed12</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert GTF to BED. Uses gtfToGenePred, genePredToBed (UCSC Kent Tools)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gtfname: path to GTF file</span>
+<span class="sd">        compress: whether to gzip (default True)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pandas.DataFrame containing converted BED12 data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fpath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">fpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gunzip&#39;</span><span class="p">,</span><span class="n">fpath</span><span class="p">]</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;expanding compressed ...&quot;</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">fpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gtfToGenePred&#39;</span><span class="p">,</span><span class="s1">&#39;-genePredExt&#39;</span><span class="p">,</span><span class="s1">&#39;-ignoreGroupsWithoutExons&#39;</span><span class="p">,</span><span class="n">base</span><span class="o">+</span><span class="s1">&#39;.gtf&#39;</span><span class="p">,</span><span class="n">base</span><span class="o">+</span><span class="s1">&#39;.gp&#39;</span><span class="p">]</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;converting to GenPred...&quot;</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;error converting to GenPred...code{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ret</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">Exception</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;genePredToBed&#39;</span><span class="p">,</span> <span class="n">base</span><span class="o">+</span><span class="s1">&#39;.gp&#39;</span><span class="p">,</span> <span class="n">base</span><span class="o">+</span><span class="s1">&#39;.bed&#39;</span><span class="p">]</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;converting to Bed12...&quot;</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;error converting to GenPred...code{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ret</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">Exception</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">base</span><span class="o">+</span><span class="s1">&#39;.gp&#39;</span><span class="p">)</span>
+    <span class="c1"># gzip</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;gzipping ...{0}.bed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base</span><span class="p">))</span>
+    <span class="n">bdpath</span> <span class="o">=</span> <span class="n">base</span><span class="o">+</span><span class="s1">&#39;.bed&#39;</span>
+    <span class="k">if</span> <span class="n">compress</span><span class="p">:</span>
+        <span class="n">bdpath</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">bdpath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fpath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;gzipping ...&quot;</span><span class="p">,</span> <span class="n">fpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span><span class="n">fpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]])</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;subprocess result&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bdpath</span></div>
+
+<div class="viewcode-block" id="bed2gtf"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.bed2gtf">[docs]</a><span class="k">def</span> <span class="nf">bed2gtf</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert BED to GTF. Uses bedToGenePred, genePredToGtf (UCSC Kent Tools)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gtfname: path to BED file</span>
+<span class="sd">        compress: whether to gzip (default True)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pandas.DataFrame containing converted GTF data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fpath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">fpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gunzip&#39;</span><span class="p">,</span><span class="n">fpath</span><span class="p">]</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;expanding compressed ...&quot;</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">fpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">gppath</span> <span class="o">=</span> <span class="n">base</span><span class="o">+</span><span class="s1">&#39;.genePred&#39;</span>
+    <span class="n">bdpath</span> <span class="o">=</span> <span class="n">base</span><span class="o">+</span><span class="s1">&#39;.gtf&#39;</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bedToGenePred&#39;</span><span class="p">,</span><span class="n">base</span><span class="o">+</span><span class="s1">&#39;.bed&#39;</span><span class="p">,</span> <span class="n">gppath</span><span class="p">]</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;converting to GenPred...&quot;</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;genePredToGtf&#39;</span><span class="p">,</span><span class="s1">&#39;-source=.&#39;</span><span class="p">,</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">gppath</span><span class="p">,</span> <span class="n">bdpath</span><span class="p">]</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;converting to GTF...&quot;</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">gppath</span><span class="p">)</span>
+    <span class="c1"># gzip</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;gzipping ...&quot;</span><span class="p">,</span> <span class="n">bdpath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">compress</span><span class="p">:</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">bdpath</span><span class="p">)</span>
+        <span class="n">bdpath</span><span class="o">=</span><span class="n">bdpath</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span>
+    <span class="k">if</span> <span class="n">fpath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;gzipping ...&quot;</span><span class="p">,</span> <span class="n">fpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span><span class="n">fpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]])</span>
+    <span class="k">return</span> <span class="n">bdpath</span></div>
+
+
+<span class="c1"># UTILS         ######################################################################</span>
+
+<div class="viewcode-block" id="chop_chrs_gtf"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.chop_chrs_gtf">[docs]</a><span class="k">def</span> <span class="nf">chop_chrs_gtf</span><span class="p">(</span><span class="n">gtfname</span><span class="p">,</span> <span class="n">chrs</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Separate chromosomes into different files.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gtfname: path to GTF</span>
+<span class="sd">        chrs: list of chromosome names</span>
+<span class="sd">        outdir: output directory, if None (default), then use same directory as input</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#chrs = [&#39;chr%d&#39; % (x+1,) for x in range(19)] +[&#39;chrX&#39;,&#39;chrY&#39;]</span>
+    <span class="k">if</span> <span class="n">outdir</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">outdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">gtfname</span><span class="p">)</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">gtfname</span><span class="p">)[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">outnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">base</span><span class="o">+</span><span class="s1">&#39;-</span><span class="si">%s</span><span class="s1">.gtf&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chrs</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">UT</span><span class="o">.</span><span class="n">notstale</span><span class="p">(</span><span class="n">gtfname</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outnames</span><span class="p">]):</span>
+        <span class="c1"># all files already exist and newer than gtfname</span>
+        <span class="k">return</span> <span class="n">outnames</span>
+    <span class="n">gtf</span> <span class="o">=</span> <span class="n">read_gtf</span><span class="p">(</span><span class="n">gtfname</span><span class="p">,</span> <span class="n">parseattrs</span><span class="o">=</span><span class="p">[])</span> <span class="c1"># don&#39;t parse attrs</span>
+    <span class="k">for</span> <span class="n">c</span><span class="p">,</span><span class="n">fname</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">chrs</span><span class="p">,</span><span class="n">outnames</span><span class="p">):</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;writing </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">...&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span>
+        <span class="n">sub</span> <span class="o">=</span> <span class="n">gtf</span><span class="p">[</span><span class="n">gtf</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">c</span><span class="p">]</span>
+        <span class="n">write_gtf</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">outnames</span>    </div>
+
+
+
+
+<span class="c1">#### FASTA/PANDAS ######################################################</span>
+<div class="viewcode-block" id="fasta2panda"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.fasta2panda">[docs]</a><span class="k">def</span> <span class="nf">fasta2panda</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="n">fa</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fa</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">tid</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">return</span> <span class="n">tid</span><span class="p">,</span> <span class="n">seq</span>
+    <span class="n">recs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_parse</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fa</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&gt;&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+    <span class="n">fadf</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">recs</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;tid&#39;</span><span class="p">,</span><span class="s1">&#39;seq&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">fadf</span></div>
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,1035 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>jgem.merge &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<h1>Source code for jgem.merge</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">.. module:: merge</span>
+<span class="sd">    :synopsis: module for merging multiple assemblies</span>
+
+<span class="sd">..  moduleauthor:: Ken Sugino &lt;ken.sugino@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">PD</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">N</span>
+
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">UT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">gtfgffbed</span> <span class="k">as</span> <span class="n">GGB</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">filenames</span> <span class="k">as</span> <span class="n">FN</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">assembler</span> <span class="k">as</span> <span class="n">AS</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">bedtools</span> <span class="k">as</span> <span class="n">BT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">bigwig</span> <span class="k">as</span> <span class="n">BW</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">calccov</span> <span class="k">as</span> <span class="n">CC</span>
+
+<span class="n">MERGECOVPARAM</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">np</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="c1"># number of CPU to use</span>
+    <span class="n">genome</span> <span class="o">=</span> <span class="s1">&#39;mm10&#39;</span><span class="p">,</span> <span class="c1"># UCSC genome name</span>
+    <span class="n">covth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="c1"># exon read digitization threshold</span>
+    <span class="n">covdelta</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="c1"># exon read digitization unit</span>
+    <span class="n">uth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="c1"># unique count threshold</span>
+    <span class="n">mth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="c1"># non-unique count threshold</span>
+    <span class="n">th_ratio</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="c1"># discard junctions less than this portion within overlapping junctions</span>
+    <span class="n">th_detected</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="c1"># at least observed in 3 samples</span>
+    <span class="n">th_maxcnt1</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="c1"># max read count should be larger than this</span>
+    <span class="n">th_maxcnt2</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># if max read count is larger than this then single sample observation is OK</span>
+<span class="p">)</span>
+<span class="n">MERGEASMPARAM</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">se_maxth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>   <span class="c1"># SE maxcov threshold</span>
+    <span class="n">se_gidstart</span><span class="o">=</span><span class="mi">50000</span><span class="p">,</span> <span class="c1"># SE gidx start</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="MergeInputNames"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames">[docs]</a><span class="k">class</span> <span class="nc">MergeInputNames</span><span class="p">(</span><span class="n">FN</span><span class="o">.</span><span class="n">FileNamesBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filelname manager for generating inputs for merging process.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        sampleinfo: sample info dataframe (with columns: name, sjpath, expath, bwfile, sjfile)</span>
+<span class="sd">        code: merge identifier (for merge input generation part)</span>
+<span class="sd">        outdir: output directory</span>
+
+<span class="sd">    All outputs and temporary files are prefixed by **outdir/code**</span>
+
+<span class="sd">    SampleInfo Columns:</span>
+<span class="sd">        name: sample name (unique)</span>
+<span class="sd">        sjexpre: path prefix to SJ/EX files (sj.txt.gz, ex.txt.gz will be added)</span>
+<span class="sd">        bwfile: original bigwig coverage</span>
+<span class="sd">        sjfile: original junction bed file (converted from SJ.out.tab)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampleinfo</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">outdir</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">si</span> <span class="o">=</span> <span class="n">sampleinfo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outdir</span> <span class="o">=</span> <span class="n">outdir</span>
+
+        <span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MergeInputNames</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MergeInputNames.expaths"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames.expaths">[docs]</a>    <span class="k">def</span> <span class="nf">expaths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">n</span><span class="p">,</span> <span class="s1">&#39;{0}.ex.txt.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">si</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;sjexpre&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MergeInputNames.sjopaths"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames.sjopaths">[docs]</a>    <span class="k">def</span> <span class="nf">sjopaths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">n</span><span class="p">,</span> <span class="s1">&#39;{0}.sj.txt.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">si</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;sjexpre&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MergeInputNames.sjpaths"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames.sjpaths">[docs]</a>    <span class="k">def</span> <span class="nf">sjpaths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">si</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;sjfile&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span> <span class="c1"># BED</span></div>
+
+<div class="viewcode-block" id="MergeInputNames.bwpaths"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames.bwpaths">[docs]</a>    <span class="k">def</span> <span class="nf">bwpaths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">si</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;bwfile&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span> <span class="c1"># BIGWIG</span></div>
+
+<div class="viewcode-block" id="MergeInputNames.sj0_bed"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames.sj0_bed">[docs]</a>    <span class="k">def</span> <span class="nf">sj0_bed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bedname</span><span class="p">(</span><span class="s1">&#39;sj0&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeInputNames.sj_bed"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames.sj_bed">[docs]</a>    <span class="k">def</span> <span class="nf">sj_bed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strand</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;SJ output, strand = p,n &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bedname</span><span class="p">(</span><span class="s1">&#39;sj.{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">strand</span><span class="p">),</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeInputNames.sj2_txt"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames.sj2_txt">[docs]</a>    <span class="k">def</span> <span class="nf">sj2_txt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;intermediate output with selection parameters &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">txtname</span><span class="p">(</span><span class="s1">&#39;sj2&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeInputNames.allsj_txt"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames.allsj_txt">[docs]</a>    <span class="k">def</span> <span class="nf">allsj_txt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">txtname</span><span class="p">(</span><span class="s1">&#39;allsj&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeInputNames.allsj_stats"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames.allsj_stats">[docs]</a>    <span class="k">def</span> <span class="nf">allsj_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">txtname</span><span class="p">(</span><span class="s1">&#39;allsj.stats&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeInputNames.ex_bw"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames.ex_bw">[docs]</a>    <span class="k">def</span> <span class="nf">ex_bw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;BW output, strand = p,n &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;ex.{0}.bw&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeInputNames.ex_bed"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames.ex_bed">[docs]</a>    <span class="k">def</span> <span class="nf">ex_bed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bedname</span><span class="p">(</span><span class="s1">&#39;ex.{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="MergeInputNames.agg_bw"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames.agg_bw">[docs]</a>    <span class="k">def</span> <span class="nf">agg_bw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;allsample.bw&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeInputNames.snames"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputNames.snames">[docs]</a>    <span class="k">def</span> <span class="nf">snames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">si</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span></div></div>
+
+<div class="viewcode-block" id="MergeAssemblyNames"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemblyNames">[docs]</a><span class="k">class</span> <span class="nc">MergeAssemblyNames</span><span class="p">(</span><span class="n">FN</span><span class="o">.</span><span class="n">FileNamesBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filelname manager for the assembling part of the merging process.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        code: merge identifier (for merge input generation part)</span>
+<span class="sd">        outdir: output directory</span>
+<span class="sd">        refgtf: reference gtf path if using it for finding SE cov threshold</span>
+
+<span class="sd">    All outputs and temporary files are prefixed by **outdir/code**</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">refgtf</span><span class="o">=</span><span class="s1">&#39;.gtf&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outdir</span> <span class="o">=</span> <span class="n">outdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refgtf</span> <span class="o">=</span> <span class="n">refgtf</span>
+
+        <span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MergeAssemblyNames</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MergeAssemblyNames.ex_out"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemblyNames.ex_out">[docs]</a>    <span class="k">def</span> <span class="nf">ex_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;txt&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;ex.{0}.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ext</span><span class="p">),</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeAssemblyNames.sj_out"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemblyNames.sj_out">[docs]</a>    <span class="k">def</span> <span class="nf">sj_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;txt&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;sj.{0}.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ext</span><span class="p">),</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeAssemblyNames.ci_out"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemblyNames.ci_out">[docs]</a>    <span class="k">def</span> <span class="nf">ci_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;ci.txt.gz&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeAssemblyNames.genes_out"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemblyNames.genes_out">[docs]</a>    <span class="k">def</span> <span class="nf">genes_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;txt&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;genes.{0}.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ext</span><span class="p">),</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MergeInputs"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputs">[docs]</a><span class="k">class</span> <span class="nc">MergeInputs</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates inputs to merge assembling. Creates multiple bigwig files and a junction file.</span>
+<span class="sd">    Multiple bigwig file are for exons in each strand and for single exons. </span>
+
+<span class="sd">    1. pepare 3 merged bigwigs (ME+/ME-/SE) from all assemblies</span>
+<span class="sd">    2. prepare an aggregated junction file</span>
+<span class="sd">    3. select junctions</span>
+<span class="sd">    4. calculate average bigwig from original bigwigs</span>
+
+<span class="sd">    (Note: at 1. bigwigs are from exon model outputs from each assembly, at 4. bigwig is just an</span>
+<span class="sd">    average of all original bigiwigs which were inputs to each assembly.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fnobj</span><span class="p">,</span> <span class="n">genome</span><span class="o">=</span><span class="s1">&#39;mm10&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            fnobj: MergeInputNames object</span>
+
+<span class="sd">        Other keywords arguments:</span>
+<span class="sd">            genome: UCSC genome name</span>
+<span class="sd">            np: number of CPU to use</span>
+<span class="sd">            covth: only use exons with coverage &gt; covth (default 0)</span>
+<span class="sd">            covdelta: exon coverage quantization delta</span>
+<span class="sd">            uth: unique reads threshold for junctions (default 0)</span>
+<span class="sd">            mth: non-unique reads threshold for junctions (default 5)</span>
+<span class="sd">            th_ratio: threshold for selecting junctions by overlapping ratio </span>
+<span class="sd">              (default 0.001, i.e. if a junction&#39;s read is less than 1/1000 of the sum of </span>
+<span class="sd">              all the reads of overlapping junctions then the junction is discarded)</span>
+<span class="sd">            th_detected: junctions need to be detected in more than this number of samples (default 2)</span>
+<span class="sd">              unless max junction reads across samples is larger than th_maxcnt2</span>
+<span class="sd">            th_maxcnt1: max junction reads across sample has to be larger than this (default 0.1)</span>
+<span class="sd">            th_maxcnt2: if max junction reads across samples is larger than this, ignore th_detected</span>
+<span class="sd">              (default 4)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span> <span class="o">=</span> <span class="n">fnobj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">MERGECOVPARAM</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;genome&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">genome</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chromsizes</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">chromsizes</span><span class="p">(</span><span class="n">genome</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chroms</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">chroms</span><span class="p">(</span><span class="n">genome</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tgts</span> <span class="o">=</span>  <span class="p">[</span><span class="s1">&#39;mep&#39;</span><span class="p">,</span><span class="s1">&#39;men&#39;</span><span class="p">,</span><span class="s1">&#39;se&#39;</span><span class="p">]</span> <span class="c1">#&#39;sep&#39;,&#39;sen&#39;]</span>
+
+<div class="viewcode-block" id="MergeInputs.prepare"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputs.prepare">[docs]</a>    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Prepare merged bigwig coverage files, merged junction files and aggregated bigwig file (average cov).&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_ex_bigwigs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_sj_bed</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aggregate_bigwigs</span><span class="p">()</span>
+        <span class="n">fn</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">],</span><span class="n">protect</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="MergeInputs.make_ex_bigwigs"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputs.make_ex_bigwigs">[docs]</a>    <span class="k">def</span> <span class="nf">make_ex_bigwigs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make 5 bigwig files from assembly exon outputs by treating each exon as reads weighted by coverage. &quot;&quot;&quot;</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="c1"># first make BED files</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;making BEDS...&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_ex_beds</span><span class="p">()</span>
+        <span class="c1"># then convert them to BIGWIGs</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgts</span><span class="p">:</span>
+            <span class="n">bedpath</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">ex_bed</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="c1">#fn.fname(&#39;ex.{0}.bed.gz&#39;.format(k))</span>
+            <span class="n">bwpath</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">ex_bw</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="c1">#fn.fname(&#39;ex.{0}.bw&#39;.format(k), category=&#39;output&#39;)</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;converting {0} to BIGWIG...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bedpath</span><span class="p">))</span>
+            <span class="n">totbp</span><span class="p">,</span><span class="n">covbp</span> <span class="o">=</span> <span class="n">BT</span><span class="o">.</span><span class="n">get_total_bp_bedfile</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="n">bed12</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">covbp</span><span class="p">)</span><span class="o">/</span><span class="n">totbp</span> <span class="c1"># normalize average coverage to 1.</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;{0}:totbp={1},covbp={2},scale={3}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span><span class="n">totbp</span><span class="p">,</span><span class="n">covbp</span><span class="p">,</span><span class="n">scale</span><span class="p">))</span>
+            <span class="c1"># scale = 1e8/totbp # old normalization = 1e6/totaligned when readlen=100bp</span>
+            <span class="c1"># ^==== TODO: Is normalizing to totaligned good? </span>
+            <span class="c1"># If complexity (#genes) is bigger then per element cov is smaller. </span>
+            <span class="c1"># This will affect the average cov level and noise level. </span>
+            <span class="c1"># ====&gt; make average coverage constant</span>
+
+            <span class="c1"># [Q] normalize chrom-wise? Mouse chr11,19,X seems higher than average</span>
+            <span class="c1">#     in addition to the obvious low expressing chrY</span>
+
+            <span class="n">BT</span><span class="o">.</span><span class="n">bed2bw</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+        <span class="c1"># delete temp files</span>
+        <span class="n">fn</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">],</span><span class="n">protect</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">])</span></div>
+
+    <span class="k">def</span> <span class="nf">_make_ex_beds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="n">pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+        <span class="n">np</span> <span class="o">=</span> <span class="n">pr</span><span class="p">[</span><span class="s1">&#39;np&#39;</span><span class="p">]</span>
+        <span class="n">chroms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chroms</span>
+        <span class="n">expaths</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">expaths</span><span class="p">()</span> <span class="c1"># [(name, expath), ...]</span>
+        <span class="n">dcode</span> <span class="o">=</span> <span class="s1">&#39;ex.&#39;</span>
+        <span class="n">dstpre</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="n">dcode</span><span class="p">)</span>
+        <span class="n">tgts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgts</span> <span class="c1"># [&#39;mep&#39;,&#39;men&#39;,&#39;se&#39;] #sep&#39;,&#39;sen&#39;]</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">pr</span><span class="p">[</span><span class="s1">&#39;covth&#39;</span><span class="p">]</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">pr</span><span class="p">[</span><span class="s1">&#39;covdelta&#39;</span><span class="p">]</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[(</span><span class="n">expaths</span><span class="p">,</span> <span class="n">dstpre</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">th</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">tgts</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">]</span>
+
+        <span class="n">rslts</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">process_mp</span><span class="p">(</span><span class="n">make_ex_bed_chr</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="n">doreduce</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="c1"># concatenate</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;concatenating chroms...&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tgts</span><span class="p">:</span>
+            <span class="n">bf</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">ex_bed</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="c1">#fn.fname(&#39;ex.{0}.bed.gz&#39;.format(k))</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">bf</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">:</span>
+                    <span class="n">sf</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;{0}{1}{2}.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dcode</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">k</span><span class="p">))</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">sf</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+                        <span class="c1">#dst.write(src.read())</span>
+        
+<div class="viewcode-block" id="MergeInputs.make_sj_bed"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputs.make_sj_bed">[docs]</a>    <span class="k">def</span> <span class="nf">make_sj_bed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make merged junction input file. &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_sj0_bed</span><span class="p">()</span> <span class="c1"># aggregate junctions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collect_sj</span><span class="p">()</span> <span class="c1"># collect sample junction counts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_sj</span><span class="p">()</span> <span class="c1"># select junctions ==&gt; do selection in the assembler? (keep it for now )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_sj</span><span class="p">()</span> <span class="c1"># write sj.p, sj.n </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">],</span><span class="n">protect</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="MergeInputs.make_sj0_bed"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputs.make_sj0_bed">[docs]</a>    <span class="k">def</span> <span class="nf">make_sj0_bed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Aggregate all junctions in the samples. Ucnt, mcnt will be the sum over all samples. &quot;&quot;&quot;</span>
+        <span class="n">pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="n">uth</span> <span class="o">=</span> <span class="n">pr</span><span class="p">[</span><span class="s1">&#39;uth&#39;</span><span class="p">]</span>
+        <span class="n">mth</span> <span class="o">=</span> <span class="n">pr</span><span class="p">[</span><span class="s1">&#39;mth&#39;</span><span class="p">]</span>
+        <span class="n">np</span> <span class="o">=</span> <span class="n">pr</span><span class="p">[</span><span class="s1">&#39;np&#39;</span><span class="p">]</span>
+        <span class="n">chroms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chroms</span>
+        <span class="n">sjpaths</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">sjpaths</span><span class="p">()</span> <span class="c1"># [(name, sjpath),..]</span>
+        <span class="n">scode</span> <span class="o">=</span> <span class="s1">&#39;sjbed.gz&#39;</span>
+        <span class="n">asjpath</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="n">scode</span><span class="p">)</span> <span class="c1"># aggregated sj file</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[(</span><span class="n">sjpaths</span><span class="p">,</span> <span class="n">asjpath</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">uth</span><span class="p">,</span> <span class="n">mth</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">]</span>
+
+        <span class="n">rslts</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">process_mp</span><span class="p">(</span><span class="n">make_sj_bed_chr</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="n">doreduce</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="c1"># concatenate</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;merge sj: concatenating chroms...&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">asjpath</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">:</span>
+                <span class="n">sf</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;{0}{1}.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scode</span><span class="p">,</span><span class="n">x</span><span class="p">))</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">sf</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+                    <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+        <span class="n">dstpath</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">sj0_bed</span><span class="p">()</span> <span class="c1">#fn.fname(&#39;sj0.bed.gz&#39;, category=&#39;output&#39;) # before selection</span>
+
+        <span class="c1"># group same junctions</span>
+        <span class="n">msj</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">asjpath</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span><span class="s1">&#39;src&#39;</span><span class="p">,</span><span class="s1">&#39;ucnt&#39;</span><span class="p">,</span><span class="s1">&#39;mcnt&#39;</span><span class="p">])</span>
+        <span class="c1"># average</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sjpaths</span><span class="p">))</span> 
+        <span class="n">msj</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale</span><span class="o">*</span><span class="n">msj</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span>
+        <span class="n">msj</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale</span><span class="o">*</span><span class="n">msj</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span>
+        <span class="c1"># unique junctions</span>
+        <span class="n">msjg</span> <span class="o">=</span> <span class="n">msj</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">])[[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">,</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="c1"># msjg[&#39;sc1&#39;] = msjg[&#39;ucnt&#39;] # for BED</span>
+        <span class="c1"># msjg[&#39;tst&#39;] = msjg[&#39;mcnt&#39;] # for BED</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">msjg</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="s1">&#39;{:.2}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">msjg</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="s1">&#39;{:.2}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+        <span class="n">msjg</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">msjg</span><span class="p">))</span>
+        <span class="n">msjg</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msjg</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;_u:&#39;</span><span class="o">+</span><span class="n">u</span><span class="o">+</span><span class="s1">&#39;_m:&#39;</span><span class="o">+</span><span class="n">m</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">SJCOLS</span> <span class="c1">#GGB.BEDCOLS[:7] # chr,st,ed,name,sc1,strand,tst</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">msjg</span><span class="p">[</span><span class="n">cols</span><span class="p">],</span> <span class="n">dstpath</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="c1"># BED file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sj0</span> <span class="o">=</span> <span class="n">msjg</span></div>
+
+<div class="viewcode-block" id="MergeInputs.collect_sj"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputs.collect_sj">[docs]</a>    <span class="k">def</span> <span class="nf">collect_sj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;From aggregated junctions, collect original reads for each samples.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            Aggregated junction file (&#39;sj0.bed.gz&#39;)</span>
+<span class="sd">            Sample junction files (input to original assemblies ~ SJ.out.tab)</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">            &#39;allsj.txt.gz&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;sj0&#39;</span><span class="p">):</span>
+            <span class="n">msj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sj0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sj0</span> <span class="o">=</span> <span class="n">msj</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_sj</span><span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">sj0_bed</span><span class="p">())</span>
+        <span class="c1"># sc1: ucnt, tst: mcnt</span>
+
+        <span class="c1">#sjpaths = fn.sjopaths() # [(name,sjpath),...], output of assembly (restricted)</span>
+        <span class="n">sjpaths</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">sjpaths</span><span class="p">()</span> <span class="c1"># [(name,sjpath),...], input of assembly (all observed junctions)</span>
+        <span class="n">snames</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sjpaths</span><span class="p">]</span>
+
+        <span class="n">msj</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">msj</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">sname</span><span class="p">,</span><span class="n">spath</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sjpaths</span><span class="p">):</span>
+            <span class="c1">#scale = 1e6/float(aligned)</span>
+            <span class="n">sj</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_sj</span><span class="p">(</span><span class="n">spath</span><span class="p">)</span>
+            <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">sj</span><span class="p">)</span>
+            <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;cnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">sj</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">])</span> <span class="c1">#*scale &lt;== sjbed is already normalized</span>
+            <span class="n">l2u</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">,</span><span class="s1">&#39;cnt&#39;</span><span class="p">]))</span>
+            <span class="n">msj</span><span class="p">[</span><span class="n">sname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l2u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">msj</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]]</span>  
+        <span class="n">msj</span><span class="p">[</span><span class="s1">&#39;#detected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">msj</span><span class="p">[</span><span class="n">snames</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># number of samples with reads&gt;0</span>
+        <span class="n">msj</span><span class="p">[</span><span class="s1">&#39;maxcnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msj</span><span class="p">[</span><span class="n">snames</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># max reads</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allsj</span> <span class="o">=</span> <span class="n">msj</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">msj</span><span class="p">,</span> <span class="n">fn</span><span class="o">.</span><span class="n">allsj_txt</span><span class="p">(),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">msj</span><span class="p">[[</span><span class="s1">&#39;locus&#39;</span><span class="p">,</span><span class="s1">&#39;#detected&#39;</span><span class="p">,</span><span class="s1">&#39;maxcnt&#39;</span><span class="p">]],</span> <span class="n">fn</span><span class="o">.</span><span class="n">allsj_stats</span><span class="p">(),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeInputs.select_sj"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputs.select_sj">[docs]</a>    <span class="k">def</span> <span class="nf">select_sj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Select aggregated junctions according to several metrics&quot;&quot;&quot;</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="n">pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+
+        <span class="c1"># calc self intersection to find overlapping junctions</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">b</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">sj0_bed</span><span class="p">()</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;sj0.ovl.txt.gz&#39;</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">BT</span><span class="o">.</span><span class="n">bedtoolintersect</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">wao</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="c1"># calc ratio</span>
+        <span class="n">cols0</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">SJCOLS</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">cols0</span><span class="o">+</span><span class="p">[</span><span class="s1">&#39;b_&#39;</span><span class="o">+</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cols0</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s1">&#39;ovl&#39;</span><span class="p">]</span>
+        <span class="n">sjovl</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
+
+        <span class="n">sjovl</span> <span class="o">=</span> <span class="n">sjovl</span><span class="p">[</span><span class="n">sjovl</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">sjovl</span><span class="p">[</span><span class="s1">&#39;b_strand&#39;</span><span class="p">]]</span> <span class="c1"># same strand</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;len(sjovl)={0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sjovl</span><span class="p">)))</span>
+
+        <span class="n">sjgr</span> <span class="o">=</span> <span class="n">sjovl</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">])</span>
+        <span class="n">sj2</span> <span class="o">=</span> <span class="n">sjgr</span><span class="p">[[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">,</span><span class="s1">&#39;mcnt&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;ucnt_sum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sjgr</span><span class="p">[</span><span class="s1">&#39;b_ucnt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;mcnt_sum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sjgr</span><span class="p">[</span><span class="s1">&#39;b_mcnt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;sum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;ucnt_sum&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;mcnt_sum&#39;</span><span class="p">]</span>
+        <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;cnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sj2</span> <span class="o">=</span> <span class="n">sj2</span> <span class="o">=</span> <span class="n">sj2</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span> <span class="c1"># need chr,st,ed,strand at next step</span>
+        <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">sj2</span><span class="p">)</span>
+        <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;ratio&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;ucnt_sum&#39;</span><span class="p">]</span>
+        <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;ratio_m&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;mcnt_sum&#39;</span><span class="p">]</span>
+        <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;ratio_a&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;cnt&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;sum&#39;</span><span class="p">]</span>
+
+        <span class="c1"># add #detected, maxcnt</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;allsj&#39;</span><span class="p">):</span>
+            <span class="n">allsj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">allsj</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">allsj</span> <span class="o">=</span> <span class="n">allsj</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">allsj_txt</span><span class="p">())</span>
+
+        <span class="n">l2d</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">allsj</span><span class="p">,</span> <span class="s1">&#39;locus&#39;</span><span class="p">,</span> <span class="s1">&#39;#detected&#39;</span><span class="p">)</span>
+        <span class="n">l2m</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">allsj</span><span class="p">,</span> <span class="s1">&#39;locus&#39;</span><span class="p">,</span> <span class="s1">&#39;maxcnt&#39;</span><span class="p">)</span>
+
+        <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;#detected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l2d</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]]</span>
+        <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;maxcnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l2m</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]]</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">sj2</span><span class="p">,</span> <span class="n">fn</span><span class="o">.</span><span class="n">sj2_txt</span><span class="p">(),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span>
+
+        <span class="c1"># select </span>
+        <span class="n">idx1</span> <span class="o">=</span> <span class="p">(</span><span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;ratio&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;th_ratio&#39;</span><span class="p">])</span><span class="o">|</span><span class="p">(</span><span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;ratio_a&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;th_ratio&#39;</span><span class="p">])</span>
+        <span class="n">idx2</span> <span class="o">=</span> <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;#detected&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;th_detected&#39;</span><span class="p">]</span>
+        <span class="n">idx3</span> <span class="o">=</span> <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;maxcnt&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;th_maxcnt1&#39;</span><span class="p">]</span>
+        <span class="n">idx4</span> <span class="o">=</span> <span class="n">sj2</span><span class="p">[</span><span class="s1">&#39;maxcnt&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;th_maxcnt2&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sj4</span> <span class="o">=</span> <span class="n">sj4</span> <span class="o">=</span> <span class="n">sj2</span><span class="p">[</span><span class="n">idx1</span><span class="o">&amp;</span><span class="p">((</span><span class="n">idx2</span><span class="o">&amp;</span><span class="n">idx3</span><span class="p">)</span><span class="o">|</span><span class="n">idx4</span><span class="p">)]</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;selectsj: in {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sj2</span><span class="p">)))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;selectsj: {0} smaller than th_ratio({1})&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">~</span><span class="n">idx1</span><span class="p">),</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;th_ratio&#39;</span><span class="p">]))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;selectsj: {0} smaller than th_detected({1})&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">~</span><span class="n">idx2</span><span class="p">),</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;th_detected&#39;</span><span class="p">]))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;selectsj: {0} smaller than th_maxcnt1({1})&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">~</span><span class="n">idx3</span><span class="p">),</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;th_maxcnt1&#39;</span><span class="p">]))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;selectsj: {0} larger than th_maxcnt2({1})&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">idx4</span><span class="p">),</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;th_maxcnt2&#39;</span><span class="p">]))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;#selected SJ:{0}&lt;={1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sj4</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">sj2</span><span class="p">)))</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">SJCOLS</span>
+        <span class="n">sjg</span> <span class="o">=</span> <span class="n">allsj</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;locus&#39;</span><span class="p">)[</span><span class="n">cols</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sj1</span> <span class="o">=</span> <span class="n">sjg</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sj4</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span></div>
+        <span class="c1"># # sjgp = sjg.ix[sj4[sj4[&#39;strand&#39;]==&#39;+&#39;][&#39;locus&#39;].values]</span>
+        <span class="c1"># # sjgn = sjg.ix[sj4[sj4[&#39;strand&#39;]==&#39;-&#39;][&#39;locus&#39;].values]</span>
+        <span class="c1"># sjgp = sjg.ix[sj4[sj4[&#39;strand&#39;].isin([&#39;+&#39;,&#39;.&#39;])][&#39;locus&#39;].values]</span>
+        <span class="c1"># sjgn = sjg.ix[sj4[sj4[&#39;strand&#39;].isin([&#39;-&#39;,&#39;.&#39;])][&#39;locus&#39;].values]        </span>
+        <span class="c1"># UT.write_pandas(sjgp, fn.sj_bed(&#39;p&#39;), &#39;&#39;)</span>
+        <span class="c1"># UT.write_pandas(sjgn, fn.sj_bed(&#39;n&#39;), &#39;&#39;)</span>
+
+<div class="viewcode-block" id="MergeInputs.write_sj"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputs.write_sj">[docs]</a>    <span class="k">def</span> <span class="nf">write_sj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;sj1&#39;</span><span class="p">):</span>
+            <span class="n">sjg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sj1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sjg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sj0</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">SJCOLS</span>
+        <span class="n">sjgp</span> <span class="o">=</span> <span class="n">sjg</span><span class="p">[</span><span class="n">sjg</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;+&#39;</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">])][</span><span class="n">cols</span><span class="p">]</span>
+        <span class="n">sjgn</span> <span class="o">=</span> <span class="n">sjg</span><span class="p">[</span><span class="n">sjg</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">])][</span><span class="n">cols</span><span class="p">]</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">sjgp</span><span class="p">,</span> <span class="n">fn</span><span class="o">.</span><span class="n">sj_bed</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">sjgn</span><span class="p">,</span> <span class="n">fn</span><span class="o">.</span><span class="n">sj_bed</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeInputs.aggregate_bigwigs"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeInputs.aggregate_bigwigs">[docs]</a>    <span class="k">def</span> <span class="nf">aggregate_bigwigs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="n">pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+        <span class="n">bwfiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fn</span><span class="o">.</span><span class="n">bwpaths</span><span class="p">()]</span> <span class="c1"># [(name,bwfile),...]</span>
+        <span class="n">dstpath</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">agg_bw</span><span class="p">()</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">bwfiles</span><span class="p">)</span> <span class="c1"># average</span>
+        <span class="n">BW</span><span class="o">.</span><span class="n">merge_bigwigs_mp</span><span class="p">(</span><span class="n">bwfiles</span><span class="p">,</span> <span class="n">pr</span><span class="p">[</span><span class="s1">&#39;genome&#39;</span><span class="p">],</span> <span class="n">dstpath</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;np&#39;</span><span class="p">])</span></div></div>
+
+<div class="viewcode-block" id="make_ex_bed_chr"><a class="viewcode-back" href="../../modules.html#jgem.merge.make_ex_bed_chr">[docs]</a><span class="k">def</span> <span class="nf">make_ex_bed_chr</span><span class="p">(</span><span class="n">expaths</span><span class="p">,</span> <span class="n">dstpre</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">covth</span><span class="p">,</span> <span class="n">covdelta</span><span class="p">,</span> <span class="n">tgts</span><span class="p">):</span>
+    <span class="n">withcov</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">dstpre</span><span class="o">+</span><span class="n">chrom</span><span class="o">+</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tgts</span><span class="p">}</span>
+    <span class="n">dst</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="nb">open</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="n">k</span><span class="p">],</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tgts</span> <span class="p">}</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">expaths</span><span class="p">):</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">withcov</span><span class="p">:</span>
+            <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;dup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">covth</span><span class="p">)</span><span class="o">/</span><span class="n">covdelta</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[(</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">chrom</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="n">covth</span><span class="p">)]</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;s&#39;</span><span class="p">]</span>
+        <span class="n">se</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;s&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">comb</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mep&#39;</span><span class="p">:(</span><span class="n">me</span><span class="p">,(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">)),</span>
+                <span class="s1">&#39;men&#39;</span><span class="p">:(</span><span class="n">me</span><span class="p">,(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">)),</span>
+                <span class="s1">&#39;sep&#39;</span><span class="p">:(</span><span class="n">se</span><span class="p">,(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">)),</span>
+                <span class="s1">&#39;sen&#39;</span><span class="p">:(</span><span class="n">se</span><span class="p">,(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">)),</span>
+                <span class="s1">&#39;se&#39;</span><span class="p">:(</span><span class="n">se</span><span class="p">,[</span><span class="s1">&#39;.&#39;</span><span class="p">])}</span>
+        <span class="n">comb</span> <span class="o">=</span> <span class="p">{</span><span class="n">t</span><span class="p">:</span><span class="n">comb</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tgts</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,(</span><span class="n">tgt</span><span class="p">,</span><span class="n">strand</span><span class="p">)</span> <span class="ow">in</span> <span class="n">comb</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">tgt</span> <span class="o">=</span> <span class="n">tgt</span><span class="p">[</span><span class="n">tgt</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">strand</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">withcov</span><span class="p">:</span>
+                <span class="k">def</span> <span class="nf">_gen</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">chrom</span><span class="p">,</span><span class="n">st</span><span class="p">,</span><span class="n">ed</span><span class="p">,</span><span class="n">dup</span> <span class="ow">in</span> <span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">tgt</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;dup&#39;</span><span class="p">]):</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dup</span><span class="p">):</span>
+                            <span class="k">yield</span> <span class="s1">&#39;{0}</span><span class="se">\t</span><span class="s1">{1}</span><span class="se">\t</span><span class="s1">{2}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span><span class="n">st</span><span class="p">,</span><span class="n">ed</span><span class="p">)</span>
+                <span class="n">recs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_gen</span><span class="p">()]</span>
+                <span class="n">txt</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">recs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;se&#39;</span><span class="p">:</span><span class="c1"># save srcname, cov</span>
+                    <span class="c1">#tgt[&#39;sname&#39;] = path.split(&#39;/&#39;)[-1].replace(&#39;.gz&#39;,&#39;&#39;).replace(&#39;.txt&#39;,&#39;&#39;).replace(&#39;.ex2&#39;,&#39;&#39;).replace(&#39;.ex&#39;,&#39;&#39;)</span>
+                    <span class="n">tgt</span><span class="p">[</span><span class="s1">&#39;sname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+                    <span class="n">tmp</span> <span class="o">=</span> <span class="n">tgt</span><span class="p">[[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;sname&#39;</span><span class="p">,</span><span class="s1">&#39;cov&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">x</span><span class="p">)),</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">txt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="k">else</span><span class="p">:</span>   
+                    <span class="n">txt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">tgt</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">tgt</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">tgt</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">dst</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dst</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">v</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="n">k</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="make_sj_bed_chr"><a class="viewcode-back" href="../../modules.html#jgem.merge.make_sj_bed_chr">[docs]</a><span class="k">def</span> <span class="nf">make_sj_bed_chr</span><span class="p">(</span><span class="n">sjpaths</span><span class="p">,</span><span class="n">dstpath</span><span class="p">,</span><span class="n">chrom</span><span class="p">,</span><span class="n">uth</span><span class="p">,</span><span class="n">mth</span><span class="p">):</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span><span class="s1">&#39;src&#39;</span><span class="p">,</span><span class="s1">&#39;ucnt&#39;</span><span class="p">,</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span>
+    <span class="n">wpath</span> <span class="o">=</span> <span class="n">dstpath</span><span class="o">+</span><span class="n">chrom</span>
+    <span class="c1"># n = len(sjpaths) # how many files?</span>
+    <span class="c1"># scale = 1/float(n)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">wpath</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">spath</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sjpaths</span><span class="p">):</span>
+            <span class="n">sj</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_sj</span><span class="p">(</span><span class="n">spath</span><span class="p">)</span>
+            <span class="c1">#scale = 1e6/float(aligned)</span>
+            <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sj</span><span class="p">))</span>
+            <span class="c1">#name = os.path.basename(spath)[:-len(&#39;sj.txt.gz&#39;)]</span>
+            <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="n">sj</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+            <span class="c1">#sj[&#39;ucnt&#39;] = sj[&#39;ucnt&#39;]*scale # average over all samples</span>
+            <span class="c1">#sj[&#39;mcnt&#39;] = sj[&#39;mcnt&#39;]*scale</span>
+            <span class="n">sj0</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[(</span><span class="n">sj</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">chrom</span><span class="p">)</span><span class="o">&amp;</span><span class="p">((</span><span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">uth</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">sj</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">mth</span><span class="p">))][</span><span class="n">cols</span><span class="p">]</span>
+            <span class="n">txt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj0</span><span class="o">.</span><span class="n">values</span><span class="p">])</span>
+            <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txt</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">wpath</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MergeAssemble"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemble">[docs]</a><span class="k">class</span> <span class="nc">MergeAssemble</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Merge multiple assemblies into one. </span>
+
+<span class="sd">    1. run assembler for each strand</span>
+<span class="sd">    2. combine outputs from each strand (ME: multi-exons)</span>
+<span class="sd">    3. detect SE (single-exons)</span>
+<span class="sd">    4. combine ME and SE</span>
+<span class="sd">    5. calculate coverage based on averaged bigwig</span>
+<span class="sd">    6. calculate junction coverage based on aggregated junctions</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fni</span><span class="p">,</span> <span class="n">fna</span><span class="p">,</span> <span class="n">saveintermediates</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            fni: MergeInputNames object</span>
+<span class="sd">            fna: MergeAssemblyNames object</span>
+
+<span class="sd">        Keywords:</span>
+<span class="sd">            can be used to modify assembly parameters</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fni</span> <span class="o">=</span> <span class="n">fni</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fna</span> <span class="o">=</span> <span class="n">fna</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">AS</span><span class="o">.</span><span class="n">MPARAMS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">MERGEASMPARAM</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kw</span> <span class="o">=</span> <span class="n">kw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saveintermediates</span> <span class="o">=</span> <span class="n">saveintermediates</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_assemblers</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MergeAssemble.make_assemblers"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemble.make_assemblers">[docs]</a>    <span class="k">def</span> <span class="nf">make_assemblers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fni</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fni</span>
+        <span class="n">fna</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fna</span>
+        <span class="n">pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+        <span class="n">sjexdic</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mep&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;bw&#39;</span><span class="p">:</span><span class="n">fni</span><span class="o">.</span><span class="n">ex_bw</span><span class="p">(</span><span class="s1">&#39;mep&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;sj&#39;</span><span class="p">:</span><span class="n">fni</span><span class="o">.</span><span class="n">sj_bed</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">)},</span>
+                   <span class="s1">&#39;men&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;bw&#39;</span><span class="p">:</span><span class="n">fni</span><span class="o">.</span><span class="n">ex_bw</span><span class="p">(</span><span class="s1">&#39;men&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;sj&#39;</span><span class="p">:</span><span class="n">fni</span><span class="o">.</span><span class="n">sj_bed</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">)}}</span>
+        <span class="c1"># FileNames objects for assemblers</span>
+        <span class="n">fns</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">FN</span><span class="o">.</span><span class="n">FileNames</span><span class="p">(</span><span class="n">sname</span> <span class="o">=</span> <span class="s1">&#39;{0}.{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fna</span><span class="o">.</span><span class="n">code</span><span class="p">,</span><span class="n">k</span><span class="p">),</span>
+                              <span class="n">bwfile</span> <span class="o">=</span> <span class="n">sjexdic</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;bw&#39;</span><span class="p">],</span>
+                              <span class="n">sjfile</span> <span class="o">=</span> <span class="n">sjexdic</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;sj&#39;</span><span class="p">],</span>
+                              <span class="n">outdir</span> <span class="o">=</span> <span class="n">fna</span><span class="o">.</span><span class="n">outdir</span><span class="p">,</span>
+                              <span class="n">refgtf</span> <span class="o">=</span> <span class="n">fna</span><span class="o">.</span><span class="n">refgtf</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sjexdic</span><span class="p">}</span>
+        <span class="n">savei</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveintermediates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asms</span> <span class="o">=</span> <span class="n">asms</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">AS</span><span class="o">.</span><span class="n">Assembler</span><span class="p">(</span><span class="n">fns</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">saveintermediates</span><span class="o">=</span><span class="n">savei</span><span class="p">,</span> <span class="o">**</span><span class="n">pr</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fns</span><span class="p">}</span>
+        <span class="n">asms</span><span class="p">[</span><span class="s1">&#39;men&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;binstrand&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;-&#39;</span>
+        <span class="n">asms</span><span class="p">[</span><span class="s1">&#39;mep&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;binstrand&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;+&#39;</span></div>
+
+
+<div class="viewcode-block" id="MergeAssemble.assemble"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemble.assemble">[docs]</a>    <span class="k">def</span> <span class="nf">assemble</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assemble_me1</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assemble_me2</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assemble_se</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assemble_combine</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assemble_writefiles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_merged_covs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_sjcnt</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveintermediates</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fna</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="p">[],</span><span class="n">protect</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">])</span>
+            <span class="c1"># also delete outputs of mep, men assemblies</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asms</span><span class="p">[</span><span class="s1">&#39;mep&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fnobj</span><span class="o">.</span><span class="n">delete</span><span class="p">([</span><span class="s1">&#39;output&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asms</span><span class="p">[</span><span class="s1">&#39;men&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fnobj</span><span class="o">.</span><span class="n">delete</span><span class="p">([</span><span class="s1">&#39;output&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="MergeAssemble.assemble_me1"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemble.assemble_me1">[docs]</a>    <span class="k">def</span> <span class="nf">assemble_me1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;do assembly separately for each strand&quot;&quot;&quot;</span>
+        <span class="n">asms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asms</span>
+        <span class="n">asms</span><span class="p">[</span><span class="s1">&#39;mep&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>
+        <span class="n">asms</span><span class="p">[</span><span class="s1">&#39;men&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>        
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;mep:{0}, men:{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">asms</span><span class="p">[</span><span class="s1">&#39;mep&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ae</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">asms</span><span class="p">[</span><span class="s1">&#39;men&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ae</span><span class="p">)))</span></div>
+
+    <span class="k">def</span> <span class="nf">_remove_se_from_me</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fna</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fna</span>
+        <span class="n">fnp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asms</span><span class="p">[</span><span class="s1">&#39;mep&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="n">fnn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asms</span><span class="p">[</span><span class="s1">&#39;men&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">fnp</span><span class="o">.</span><span class="n">ex_out</span><span class="p">())</span>
+        <span class="n">exn</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">fnn</span><span class="o">.</span><span class="n">ex_out</span><span class="p">())</span>
+        <span class="n">mep</span><span class="p">,</span><span class="n">sep</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">mese</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+        <span class="n">men</span><span class="p">,</span><span class="n">sen</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">mese</span><span class="p">(</span><span class="n">exn</span><span class="p">)</span>
+        <span class="c1"># FIX _gidx! 2016-03-22 </span>
+        <span class="c1">#exp[&#39;_gidx&#39;] = N.abs(exp[&#39;_gidx&#39;])</span>
+        <span class="c1">#exn[&#39;_gidx&#39;] = -N.abs(exn[&#39;_gidx&#39;])</span>
+        <span class="c1"># ====&gt; just remove all SE from this stage</span>
+        <span class="c1"># remove SE overlapping opposite strand</span>
+        <span class="c1"># def _select(se1,me2):</span>
+        <span class="c1">#     cols0 = [&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;,&#39;name&#39;,&#39;_id&#39;,&#39;strand&#39;]</span>
+        <span class="c1">#     a = fna.fname(&#39;setmp.bed.gz&#39;)</span>
+        <span class="c1">#     b = fna.fname(&#39;metmp.bed.gz&#39;)</span>
+        <span class="c1">#     c = fna.fname(&#39;semetmp.bed.gz&#39;)</span>
+        <span class="c1">#     a = UT.write_pandas(se1[cols0], a, &#39;&#39;)</span>
+        <span class="c1">#     b = UT.write_pandas(me2[cols0], b, &#39;&#39;)</span>
+        <span class="c1">#     c = PO.BT.bedtoolintersect(a,b,c,wao=True) # get original entry</span>
+        <span class="c1">#     cols = cols0+[&#39;b_&#39;+x for x in cols0]+[&#39;ovl&#39;]</span>
+        <span class="c1">#     cdf = UT.read_pandas(c,names=cols)</span>
+        <span class="c1">#     cdfg = cdf.groupby(&#39;_id&#39;)</span>
+        <span class="c1">#     ovl = cdfg[&#39;ovl&#39;].sum()</span>
+        <span class="c1">#     #siz = cdfg.size()</span>
+        <span class="c1">#     #nonovl_se = ovl[(ovl==0)|(siz&gt;1)].index.values </span>
+        <span class="c1">#     nonovl_se = ovl[ovl==0].index.values </span>
+        <span class="c1">#     se2 = se1.set_index(&#39;_id&#39;).ix[nonovl_se].reset_index()</span>
+        <span class="c1">#     return se2</span>
+        <span class="c1">#sep2 = _select(sep,men)</span>
+        <span class="c1">#sen2 = _select(sen,mep)</span>
+        <span class="c1">#exp2 = PD.concat([mep,sep2],ignore_index=True)</span>
+        <span class="c1">#exn2 = PD.concat([men,sen2],ignore_index=True)</span>
+        <span class="c1">#return exp2,exn2</span>
+        <span class="k">return</span> <span class="n">mep</span><span class="p">,</span> <span class="n">men</span>
+
+<div class="viewcode-block" id="MergeAssemble.assemble_me2"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemble.assemble_me2">[docs]</a>    <span class="k">def</span> <span class="nf">assemble_me2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;combine strands for ME&quot;&quot;&quot;</span>
+        <span class="n">fna</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fna</span>
+        <span class="n">fnp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asms</span><span class="p">[</span><span class="s1">&#39;mep&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fnobj</span>
+        <span class="n">fnn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asms</span><span class="p">[</span><span class="s1">&#39;men&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fnobj</span>
+
+        <span class="n">exp</span><span class="p">,</span><span class="n">exn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_se_from_me</span><span class="p">()</span>
+        <span class="n">sjp</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">fnp</span><span class="o">.</span><span class="n">sj_out</span><span class="p">())</span>
+        <span class="n">sjn</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">fnn</span><span class="o">.</span><span class="n">sj_out</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expn</span> <span class="o">=</span> <span class="n">expn</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">exp</span><span class="p">,</span><span class="n">exn</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sjpn</span> <span class="o">=</span> <span class="n">sjpn</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">sjp</span><span class="p">,</span><span class="n">sjn</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">expn</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">expn</span><span class="p">))</span>
+        <span class="n">sjpn</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sjpn</span><span class="p">))</span>
+        
+        <span class="c1"># stats</span>
+        <span class="n">n0</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">expn</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+        <span class="n">np</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+        <span class="n">nn</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">exn</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;n0:{0}, np:{1}, nn:{2}, np+nn:{3}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n0</span><span class="p">,</span><span class="n">np</span><span class="p">,</span><span class="n">nn</span><span class="p">,</span><span class="n">np</span><span class="o">+</span><span class="n">nn</span><span class="p">))</span>
+        
+        <span class="c1"># write EX,SJ</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ecols</span> <span class="o">=</span> <span class="n">ecols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;sc1&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;gname&#39;</span><span class="p">,</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span><span class="s1">&#39;ptyp&#39;</span><span class="p">,</span><span class="s1">&#39;cov&#39;</span><span class="p">,</span><span class="s1">&#39;len&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;a_id&#39;</span><span class="p">,</span><span class="s1">&#39;d_id&#39;</span><span class="p">,</span><span class="s1">&#39;a_degree&#39;</span><span class="p">,</span><span class="s1">&#39;d_degree&#39;</span><span class="p">,</span><span class="s1">&#39;a_pos&#39;</span><span class="p">,</span><span class="s1">&#39;d_pos&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scols</span> <span class="o">=</span> <span class="n">scols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;sc1&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;gname&#39;</span><span class="p">,</span><span class="s1">&#39;st-1&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;a_id&#39;</span><span class="p">,</span><span class="s1">&#39;d_id&#39;</span><span class="p">,</span><span class="s1">&#39;a_degree&#39;</span><span class="p">,</span><span class="s1">&#39;d_degree&#39;</span><span class="p">,</span><span class="s1">&#39;a_pos&#39;</span><span class="p">,</span><span class="s1">&#39;d_pos&#39;</span><span class="p">,</span>
+                <span class="p">]</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">expn</span><span class="p">[</span><span class="n">ecols</span><span class="p">],</span> <span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;mepn.ex.txt.gz&#39;</span><span class="p">),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">sjpn</span><span class="p">[</span><span class="n">scols</span><span class="p">],</span> <span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;mepn.sj.txt.gz&#39;</span><span class="p">),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># GENES BED</span>
+        <span class="n">gp</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_bed</span><span class="p">(</span><span class="n">fnp</span><span class="o">.</span><span class="n">genes_out</span><span class="p">())</span>
+        <span class="n">gn</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_bed</span><span class="p">(</span><span class="n">fnn</span><span class="o">.</span><span class="n">genes_out</span><span class="p">())</span>
+        <span class="n">gidp</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;gname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">gidn</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">exn</span><span class="p">[</span><span class="s1">&#39;gname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">gp</span> <span class="o">=</span> <span class="n">gp</span><span class="p">[[</span><span class="n">x</span> <span class="ow">in</span> <span class="n">gidp</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gp</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]]</span>
+        <span class="n">gn</span> <span class="o">=</span> <span class="n">gn</span><span class="p">[[</span><span class="n">x</span> <span class="ow">in</span> <span class="n">gidn</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gn</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">genes</span> <span class="o">=</span> <span class="n">genes</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">gp</span><span class="p">,</span><span class="n">gn</span><span class="p">],</span><span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">GGB</span><span class="o">.</span><span class="n">write_bed</span><span class="p">(</span><span class="n">genes</span><span class="p">,</span> <span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;mepn.genes.bed.gz&#39;</span><span class="p">),</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeAssemble.assemble_se"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemble.assemble_se">[docs]</a>    <span class="k">def</span> <span class="nf">assemble_se</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate SE candidate (subtract ME) </span>
+<span class="sd">        Currently only filter with maxcov.</span>
+
+<span class="sd">        This part needs to be improved.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># [TODO] also process sep, sen (stranded SEs)</span>
+        <span class="c1"># [TODO] do power law fitting and adaptively find secov threshold</span>
+        <span class="c1"># [Q] does power law still apply for aggregated coverages?</span>
+
+        <span class="n">fna</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fna</span>
+        <span class="n">fni</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fni</span>
+        <span class="n">pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;expn&#39;</span><span class="p">):</span>
+            <span class="n">expn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expn</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">expn</span> <span class="o">=</span> <span class="n">expn</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;mepn.ex.txt.gz&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sjpn</span> <span class="o">=</span> <span class="n">sjpn</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;mepn.sj.txt.gz&#39;</span><span class="p">))</span>
+
+        <span class="n">sebin</span> <span class="o">=</span> <span class="n">BW</span><span class="o">.</span><span class="n">bw2bed</span><span class="p">(</span>
+                    <span class="n">bwfile</span><span class="o">=</span><span class="n">fni</span><span class="o">.</span><span class="n">ex_bw</span><span class="p">(</span><span class="s1">&#39;se&#39;</span><span class="p">),</span> 
+                    <span class="n">bedfile</span><span class="o">=</span><span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;sebw0.bed.gz&#39;</span><span class="p">),</span> 
+                    <span class="n">chroms</span><span class="o">=</span><span class="n">UT</span><span class="o">.</span><span class="n">chroms</span><span class="p">(</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;genome&#39;</span><span class="p">]),</span> 
+                    <span class="n">th</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">mefile</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">write_bed</span><span class="p">(</span><span class="n">expn</span><span class="p">,</span> <span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;mepn.me.bed.gz&#39;</span><span class="p">),</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">sufile</span> <span class="o">=</span> <span class="n">BT</span><span class="o">.</span><span class="n">bedtoolintersect</span><span class="p">(</span><span class="n">sebin</span><span class="p">,</span><span class="n">mefile</span><span class="p">,</span><span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;mepn.se-me.bed.gz&#39;</span><span class="p">),</span><span class="n">v</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c1"># -v subtract</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_bed</span><span class="p">(</span><span class="n">sufile</span><span class="p">)</span>
+
+        <span class="c1"># calculate SECOV, SEMAX</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secov</span> <span class="o">=</span> <span class="n">secov</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">calc_cov_mp</span><span class="p">(</span>
+                                    <span class="n">bed</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> 
+                                    <span class="n">bwname</span><span class="o">=</span><span class="n">fni</span><span class="o">.</span><span class="n">ex_bw</span><span class="p">(</span><span class="s1">&#39;se&#39;</span><span class="p">),</span> 
+                                    <span class="n">fname</span><span class="o">=</span><span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;secov.txt.gz&#39;</span><span class="p">),</span> 
+                                    <span class="n">np</span><span class="o">=</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;np&#39;</span><span class="p">],</span> 
+                                    <span class="n">which</span><span class="o">=</span><span class="s1">&#39;cov&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">semax</span> <span class="o">=</span> <span class="n">semax</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">calc_cov_mp</span><span class="p">(</span>
+                                    <span class="n">bed</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> 
+                                    <span class="n">bwname</span><span class="o">=</span><span class="n">fni</span><span class="o">.</span><span class="n">ex_bw</span><span class="p">(</span><span class="s1">&#39;se&#39;</span><span class="p">),</span> 
+                                    <span class="n">fname</span><span class="o">=</span><span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;semax.txt.gz&#39;</span><span class="p">),</span> 
+                                    <span class="n">np</span><span class="o">=</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;np&#39;</span><span class="p">],</span> 
+                                    <span class="n">which</span><span class="o">=</span><span class="s1">&#39;max&#39;</span><span class="p">)</span>
+        <span class="n">semax</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">secov</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span>
+        <span class="c1"># threshold to get SE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">se0</span> <span class="o">=</span> <span class="n">se0</span> <span class="o">=</span> <span class="n">semax</span><span class="p">[</span><span class="n">semax</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;se_maxth&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+        <span class="c1"># save </span>
+        <span class="n">gid0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;se_gidstart&#39;</span><span class="p">],</span> <span class="n">N</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">expn</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">])))</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">gid0</span><span class="p">,</span><span class="n">gid0</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">se0</span><span class="p">))</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;S{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;gname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;sc1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
+        <span class="n">sename</span> <span class="o">=</span> <span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;se.bed.gz&#39;</span><span class="p">,</span><span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+        <span class="n">GGB</span><span class="o">.</span><span class="n">write_bed</span><span class="p">(</span><span class="n">se0</span><span class="p">,</span> <span class="n">sename</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeAssemble.assemble_combine"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemble.assemble_combine">[docs]</a>    <span class="k">def</span> <span class="nf">assemble_combine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Combine ME/SE &quot;&quot;&quot;</span>
+        <span class="n">fna</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fna</span>
+        <span class="n">fni</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fni</span>
+        <span class="n">pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+        <span class="n">ecols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ecols</span> <span class="c1"># from assemble_me2</span>
+        <span class="n">sjpn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sjpn</span>
+        <span class="n">expn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expn</span>
+        <span class="n">genes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">genes</span>
+        <span class="n">se0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">se0</span>
+
+        <span class="c1"># match SE to ME: ecols</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">expn</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">expn</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">se0</span><span class="p">))</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;ptyp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">se0</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;a_degree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;a_pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="n">se0</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;:.&#39;</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;d_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;d_degree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;d_pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="n">se0</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;:.&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">sj0</span> <span class="o">=</span> <span class="n">sj0</span> <span class="o">=</span> <span class="n">sjpn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ex0</span> <span class="o">=</span> <span class="n">ex0</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">expn</span><span class="p">[</span><span class="n">ecols</span><span class="p">],</span><span class="n">se0</span><span class="p">[</span><span class="n">ecols</span><span class="p">]],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="c1"># fix id, ad info</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">set_ids</span><span class="p">(</span><span class="n">sj0</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">set_ids</span><span class="p">(</span><span class="n">ex0</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">set_ad_info</span><span class="p">(</span><span class="n">sj0</span><span class="p">,</span><span class="n">ex0</span><span class="p">)</span>
+        
+        <span class="c1"># make ci</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ci0</span> <span class="o">=</span> <span class="n">ci0</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">chopintervals</span><span class="p">(</span><span class="n">ex0</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="n">fna</span><span class="o">.</span><span class="n">ci_out</span><span class="p">())</span>
+
+        <span class="c1"># calculate glen, tlen</span>
+        <span class="n">tlen</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_tlen</span><span class="p">(</span><span class="n">ex0</span><span class="p">,</span> <span class="n">ci0</span><span class="p">)</span>
+        <span class="n">g2tlen</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">tlen</span><span class="p">,</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;tlen&#39;</span><span class="p">)</span>
+        <span class="n">ex0</span><span class="p">[</span><span class="s1">&#39;tlen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2tlen</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex0</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span>
+        <span class="n">gr</span> <span class="o">=</span> <span class="n">ex0</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span>
+        <span class="n">glen</span> <span class="o">=</span> <span class="n">gr</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">gr</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">g2glen</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">series2dict</span><span class="p">(</span><span class="n">glen</span><span class="p">)</span>
+        <span class="n">ex0</span><span class="p">[</span><span class="s1">&#39;glen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2glen</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex0</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span>
+
+        <span class="c1"># adjust genes bed</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;tst&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;ted&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;sc2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;#exons&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;esizes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,&#39;</span>
+        <span class="n">se0</span><span class="p">[</span><span class="s1">&#39;estarts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;0,&#39;</span>
+        <span class="n">bcols</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">BEDCOLS</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">genes0</span> <span class="o">=</span> <span class="n">genes0</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">genes</span><span class="p">[</span><span class="n">bcols</span><span class="p">],</span><span class="n">se0</span><span class="p">[</span><span class="n">bcols</span><span class="p">]],</span><span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeAssemble.assemble_writefiles"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemble.assemble_writefiles">[docs]</a>    <span class="k">def</span> <span class="nf">assemble_writefiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Write EX, SJ, GENES output files &quot;&quot;&quot;</span>
+        <span class="n">fna</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fna</span>
+        <span class="n">scols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scols</span>
+        <span class="n">GGB</span><span class="o">.</span><span class="n">write_bed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sj0</span><span class="p">[</span><span class="n">scols</span><span class="p">],</span> <span class="n">fna</span><span class="o">.</span><span class="n">sj_out</span><span class="p">(</span><span class="s1">&#39;bed&#39;</span><span class="p">),</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>        
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sj0</span><span class="p">[</span><span class="n">scols</span><span class="p">],</span> <span class="n">fna</span><span class="o">.</span><span class="n">sj_out</span><span class="p">(</span><span class="s1">&#39;txt&#39;</span><span class="p">),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span>
+        
+        <span class="n">GGB</span><span class="o">.</span><span class="n">write_bed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ex0</span><span class="p">,</span> <span class="n">fna</span><span class="o">.</span><span class="n">ex_out</span><span class="p">(</span><span class="s1">&#39;bed&#39;</span><span class="p">),</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ex0</span><span class="p">,</span> <span class="n">fna</span><span class="o">.</span><span class="n">ex_out</span><span class="p">(</span><span class="s1">&#39;txt&#39;</span><span class="p">),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span>
+        
+        <span class="n">GGB</span><span class="o">.</span><span class="n">write_bed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genes0</span><span class="p">,</span> <span class="n">fna</span><span class="o">.</span><span class="n">genes_out</span><span class="p">(</span><span class="s1">&#39;bed&#39;</span><span class="p">),</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genes0</span><span class="p">,</span> <span class="n">fna</span><span class="o">.</span><span class="n">genes_out</span><span class="p">(</span><span class="s1">&#39;txt&#39;</span><span class="p">),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeAssemble.calc_merged_covs"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemble.calc_merged_covs">[docs]</a>    <span class="k">def</span> <span class="nf">calc_merged_covs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; calculate ecov, gcov against aggregated bigwig &quot;&quot;&quot;</span>
+        <span class="n">fna</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fna</span>
+        <span class="n">fni</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fni</span>
+        <span class="n">pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+
+        <span class="n">expath</span> <span class="o">=</span> <span class="n">fna</span><span class="o">.</span><span class="n">ex_out</span><span class="p">(</span><span class="s1">&#39;txt&#39;</span><span class="p">)</span>
+        <span class="n">cipath</span> <span class="o">=</span> <span class="n">fna</span><span class="o">.</span><span class="n">ci_out</span><span class="p">()</span>
+        <span class="n">bwpath</span> <span class="o">=</span> <span class="n">fni</span><span class="o">.</span><span class="n">agg_bw</span><span class="p">()</span>
+        <span class="n">dstpre</span> <span class="o">=</span> <span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">covciname</span> <span class="o">=</span> <span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;covci.txt.gz&#39;</span><span class="p">)</span> <span class="c1"># register as temp files, delete later</span>
+        <span class="n">gcovname</span> <span class="o">=</span> <span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;gcov.txt.gz&#39;</span><span class="p">)</span>
+        <span class="n">ecovname</span> <span class="o">=</span> <span class="n">fna</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;ecov.txt.gz&#39;</span><span class="p">)</span>
+
+        <span class="n">gcov</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">calc_gcov</span><span class="p">(</span><span class="n">expath</span><span class="p">,</span> <span class="n">cipath</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">,</span> <span class="n">dstpre</span><span class="p">,</span> <span class="n">override</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;np&#39;</span><span class="p">])</span>
+        <span class="n">ecov</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">calc_ecov</span><span class="p">(</span><span class="n">expath</span><span class="p">,</span> <span class="n">cipath</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">,</span> <span class="n">dstpre</span><span class="p">,</span> <span class="n">override</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;np&#39;</span><span class="p">])</span>
+        
+        <span class="c1"># set ecov, gcov columns</span>
+        <span class="n">i2g</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">gcov</span><span class="p">,</span> <span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;gcov&#39;</span><span class="p">)</span>
+        <span class="n">i2e</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">ecov</span><span class="p">,</span> <span class="s1">&#39;eid&#39;</span><span class="p">,</span><span class="s1">&#39;ecov&#39;</span><span class="p">)</span>
+        <span class="n">ex0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex0</span>
+        <span class="n">ex0</span><span class="p">[</span><span class="s1">&#39;ecov&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i2e</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex0</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]]</span>
+        <span class="n">ex0</span><span class="p">[</span><span class="s1">&#39;gcov&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i2g</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex0</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span>
+
+        <span class="c1"># set cov column for genes</span>
+        <span class="n">genes0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">genes0</span>
+        <span class="c1"># _gidx not in genes0</span>
+        <span class="k">def</span> <span class="nf">name2gidx</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;N&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;P&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">genes0</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">name2gidx</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">genes0</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span>
+        <span class="n">genes0</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i2g</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">genes0</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span>
+        
+        <span class="c1"># overwrite ex0, genes0</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">ex0</span><span class="p">,</span> <span class="n">fna</span><span class="o">.</span><span class="n">ex_out</span><span class="p">(</span><span class="s1">&#39;txt&#39;</span><span class="p">),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">genes0</span><span class="p">,</span> <span class="n">fna</span><span class="o">.</span><span class="n">genes_out</span><span class="p">(</span><span class="s1">&#39;txt&#39;</span><span class="p">),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MergeAssemble.assign_sjcnt"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemble.assign_sjcnt">[docs]</a>    <span class="k">def</span> <span class="nf">assign_sjcnt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; calculate junction counts &quot;&quot;&quot;</span>
+        <span class="n">fna</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fna</span>
+        <span class="n">fni</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fni</span>
+
+        <span class="n">sjg</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_sj</span><span class="p">(</span><span class="n">fni</span><span class="o">.</span><span class="n">sj0_bed</span><span class="p">())</span>
+        <span class="n">sjg</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">sjg</span><span class="p">)</span>
+
+        <span class="n">l2u</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">sjg</span><span class="p">,</span> <span class="s1">&#39;locus&#39;</span><span class="p">,</span><span class="s1">&#39;ucnt&#39;</span><span class="p">)</span>
+        <span class="n">l2m</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">df2dict</span><span class="p">(</span><span class="n">sjg</span><span class="p">,</span> <span class="s1">&#39;locus&#39;</span><span class="p">,</span><span class="s1">&#39;mcnt&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;sj0&#39;</span><span class="p">):</span>
+            <span class="n">sj0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sj0</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sj0</span> <span class="o">=</span> <span class="n">sj0</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">fna</span><span class="o">.</span><span class="n">sj_out</span><span class="p">(</span><span class="s1">&#39;txt&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="s1">&#39;locus&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj0</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">sj0</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">calc_locus_strand</span><span class="p">(</span><span class="n">sj0</span><span class="p">)</span>
+        <span class="n">sj0</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l2u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj0</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]]</span>
+        <span class="n">sj0</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l2m</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj0</span><span class="p">[</span><span class="s1">&#39;locus&#39;</span><span class="p">]]</span>
+        <span class="n">sj0</span><span class="p">[</span><span class="s1">&#39;jcnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="ow">or</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="n">sj0</span><span class="p">[[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">,</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="c1"># overwrite sj0</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">sj0</span><span class="p">,</span> <span class="n">fna</span><span class="o">.</span><span class="n">sj_out</span><span class="p">(</span><span class="s1">&#39;txt&#39;</span><span class="p">),</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span></div></div>
+
+
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

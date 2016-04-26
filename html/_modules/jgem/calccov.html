@@ -1,0 +1,866 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>jgem.calccov &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<h1>Source code for jgem.calccov</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">.. module:: calccov</span>
+<span class="sd">    :synopsis: calculate coverages, gene length using nnls or </span>
+
+<span class="sd">..  moduleauthor:: Ken Sugino &lt;ken.sugino@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># system imports</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">repeat</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="nb">reduce</span>
+
+<span class="c1"># 3rd party imports</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">PD</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">N</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">nnls</span>
+
+<span class="c1"># library imports</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">UT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">bigwig</span> <span class="k">as</span> <span class="n">BW</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">gtfgffbed</span> <span class="k">as</span> <span class="n">GGB</span>
+
+
+<span class="c1">### All in one func  ##################################################</span>
+
+<div class="viewcode-block" id="calc_cov_ovl_mp"><a class="viewcode-back" href="../../modules.html#jgem.calccov.calc_cov_ovl_mp">[docs]</a><span class="k">def</span> <span class="nf">calc_cov_ovl_mp</span><span class="p">(</span><span class="n">srcname</span><span class="p">,</span> <span class="n">bwname</span><span class="p">,</span> <span class="n">dstname</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">covciname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+    <span class="n">ciname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">colname</span><span class="o">=</span><span class="s1">&#39;cov&#39;</span><span class="p">,</span> <span class="n">override</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate coverage (from BigWig) over intervals (from srcname). </span>
+<span class="sd">    A column (default &#39;cov&#39;) which contains coverages is added to source dataframe </span>
+<span class="sd">    and the source is overwritten. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        srcname: path to exons tsv</span>
+<span class="sd">        bwname: path to bigwig</span>
+<span class="sd">        dstname: path for result</span>
+<span class="sd">        np: number of processors</span>
+<span class="sd">        covciname: path to covci (coverage for chopped interval dataframe)</span>
+<span class="sd">        ciname: path to ci (chopped interval dataframe)</span>
+<span class="sd">        colname: name for column which contain calculated coverages</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        source dataframe with column (cov) added</span>
+
+<span class="sd">    SideEffects:</span>
+<span class="sd">        source tsv is overwritten with new column added</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">isstring</span><span class="p">(</span><span class="n">srcname</span><span class="p">):</span>
+        <span class="n">exons</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">srcname</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">exons</span> <span class="o">=</span> <span class="n">srcname</span>
+    <span class="c1"># cache</span>
+    <span class="k">if</span> <span class="n">covciname</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">isstring</span><span class="p">(</span><span class="n">srcname</span><span class="p">))</span>
+        <span class="n">covciname</span> <span class="o">=</span> <span class="n">srcname</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;.covci.txt.gz&#39;</span>
+    <span class="k">if</span> <span class="n">ciname</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">isstring</span><span class="p">(</span><span class="n">srcname</span><span class="p">))</span>
+        <span class="n">ciname</span> <span class="o">=</span> <span class="n">srcname</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;.ci.txt.gz&#39;</span>
+
+    <span class="k">if</span> <span class="n">override</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">covciname</span><span class="p">)):</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;calculating covci...&#39;</span><span class="p">)</span>
+        <span class="n">_sttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">override</span> <span class="ow">or</span> <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ciname</span><span class="p">)):</span>
+            <span class="n">ci</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">chopintervals</span><span class="p">(</span><span class="n">exons</span><span class="p">,</span> <span class="n">ciname</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ci</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">ciname</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+        <span class="n">covci</span> <span class="o">=</span> <span class="n">calc_cov_mp</span><span class="p">(</span><span class="n">ci</span><span class="p">,</span><span class="n">bwname</span><span class="p">,</span><span class="n">covciname</span><span class="p">,</span><span class="n">np</span><span class="p">)</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39; time: {0:.3f}s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">_sttime</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;loading cached covci...&#39;</span><span class="p">)</span>
+        <span class="n">covci</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">covciname</span><span class="p">)</span>
+
+    <span class="c1"># covci: chopped interval&#39;s cov =&gt; reverse</span>
+    <span class="c1"># ci =&gt; exon id ====&gt; revers exon =&gt; ci indices</span>
+    <span class="c1"># exon cov = sum(cicov*cilen)/totlen</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;calculating exon cov...&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">covci</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;sc1&#39;</span><span class="p">]</span>
+        
+    <span class="n">_sttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">e2c</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">name</span> <span class="ow">in</span> <span class="n">covci</span><span class="p">[[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">eid</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">):</span>
+            <span class="n">e2c</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">eid</span><span class="p">),[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">covci</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+    <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">covci</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span>            
+    <span class="k">def</span> <span class="nf">_gen</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">eid</span> <span class="ow">in</span> <span class="n">exons</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">e2c</span><span class="p">[</span><span class="n">eid</span><span class="p">]:</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">cid</span><span class="p">,</span><span class="n">eid</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_gen</span><span class="p">()])),</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cid&#39;</span><span class="p">,</span><span class="s1">&#39;eid&#39;</span><span class="p">])</span>
+    <span class="n">c2len</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">covci</span><span class="p">[[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="s1">&#39;len&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">c2val</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">covci</span><span class="p">[[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="s1">&#39;val&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">c2val</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;cid&#39;</span><span class="p">]]</span>
+    <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">c2len</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;cid&#39;</span><span class="p">]]</span>
+    <span class="n">tmpg</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;eid&#39;</span><span class="p">)[[</span><span class="s1">&#39;val&#39;</span><span class="p">,</span><span class="s1">&#39;len&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">tmpg</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmpg</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">tmpg</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span>
+    <span class="n">e2cov</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">tmpg</span><span class="p">[[</span><span class="s1">&#39;eid&#39;</span><span class="p">,</span><span class="s1">&#39;cov&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">exons</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e2cov</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">exons</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]]</span>
+    
+    <span class="n">UT</span><span class="o">.</span><span class="n">save_tsv_nidx_whead</span><span class="p">(</span><span class="n">exons</span><span class="p">,</span> <span class="n">dstname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exons</span></div>
+
+<span class="c1">### ecov calc with nnls ################################################</span>
+<div class="viewcode-block" id="mp_worker"><a class="viewcode-back" href="../../modules.html#jgem.calccov.mp_worker">[docs]</a><span class="k">def</span> <span class="nf">mp_worker</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">func</span><span class="p">,</span> <span class="n">arg</span> <span class="o">=</span> <span class="n">args</span>
+    <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">arg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="calc_ecov_chrom"><a class="viewcode-back" href="../../modules.html#jgem.calccov.calc_ecov_chrom">[docs]</a><span class="k">def</span> <span class="nf">calc_ecov_chrom</span><span class="p">(</span><span class="n">covci</span><span class="p">,</span><span class="n">blocksize</span><span class="p">):</span>
+    <span class="c1"># covci: required cols</span>
+    <span class="c1"># name (eid str concat &#39;,&#39;)</span>
+    <span class="c1"># name1 ([eids,...])</span>
+    <span class="c1"># id: cid</span>
+    <span class="c1"># cov: coverage for cid</span>
+    <span class="n">covci</span> <span class="o">=</span> <span class="n">covci</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;name1&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">covci</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)])</span>
+    <span class="k">if</span> <span class="s1">&#39;eidmax&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">covci</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;eidmax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s1">&#39;eidmin&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">covci</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;eidmin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">e2c</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># dict</span>
+    <span class="c1"># find chunk boundary with approximate blocksize</span>
+    <span class="k">def</span> <span class="nf">_find_chunk</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">bs</span><span class="p">):</span>
+        <span class="c1"># first take stcid =&gt; stcid+blocksize</span>
+        <span class="c1"># reduce to self contained chunk =&gt; find isolated cid&lt;=&gt;eid (len(name1)==1) instance        </span>
+        <span class="c1"># if final size is too small increase blocksize and try again</span>
+        <span class="k">if</span> <span class="n">st</span><span class="o">+</span><span class="n">bs</span><span class="o">+</span><span class="mi">1</span><span class="o">&gt;=</span><span class="nb">len</span><span class="p">(</span><span class="n">covci</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">covci</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">st</span><span class="o">+</span><span class="n">bs</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">st</span><span class="o">+</span><span class="n">bs</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">covci</span><span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">x</span><span class="p">])</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span><span class="c1"># found isolated exon</span>
+                <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span>
+        <span class="c1"># not found =&gt; increase blocksize</span>
+        <span class="k">if</span> <span class="n">bs</span><span class="o">&gt;</span><span class="mi">500</span><span class="p">:</span> <span class="c1"># blocksize too big =&gt; NNLS take too much time</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;blocksize exceeded 500&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">st</span><span class="o">+</span><span class="n">bs</span>
+        <span class="k">return</span> <span class="n">_find_chunk</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">bs</span><span class="p">)</span>
+    <span class="c1"># calc ecov for a chunk</span>
+    <span class="k">def</span> <span class="nf">_calc_ecov</span><span class="p">(</span><span class="n">st</span><span class="p">,</span><span class="n">ed</span><span class="p">):</span>
+        <span class="c1"># construct matrix</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">covci</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">st</span><span class="p">:</span><span class="n">ed</span><span class="p">]</span>
+        <span class="n">emax</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="nb">max</span><span class="p">,</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;eidmax&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">emin</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="nb">min</span><span class="p">,</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;eidmin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;eidmax&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+        <span class="n">nc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="n">ne</span> <span class="o">=</span> <span class="n">emax</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="n">emin</span>
+        <span class="n">mat</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nc</span><span class="p">,</span><span class="n">ne</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">n1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">):</span><span class="c1"># fill in rows</span>
+            <span class="n">N</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span><span class="o">-</span><span class="n">emin</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># solve by NNLS (nonnegative least square)</span>
+        <span class="n">ecov</span><span class="p">,</span><span class="n">err</span> <span class="o">=</span> <span class="n">nnls</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">e2c</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">emin</span><span class="p">,</span><span class="n">emax</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="n">ecov</span><span class="p">)))</span><span class="c1"># e -&gt; cov</span>
+    <span class="k">def</span> <span class="nf">catcherr</span><span class="p">(</span><span class="n">stcid</span><span class="p">,</span> <span class="n">blocksize</span><span class="p">):</span>
+        <span class="n">bs</span> <span class="o">=</span> <span class="n">blocksize</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">while</span><span class="p">((</span><span class="n">bs</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="ow">not</span> <span class="n">done</span><span class="p">)):</span>
+            <span class="n">edcid</span> <span class="o">=</span> <span class="n">_find_chunk</span><span class="p">(</span><span class="n">stcid</span><span class="p">,</span><span class="n">bs</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">_calc_ecov</span><span class="p">(</span><span class="n">stcid</span><span class="p">,</span><span class="n">edcid</span><span class="p">)</span>
+                <span class="n">done</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+                <span class="n">bs</span> <span class="o">=</span> <span class="n">bs</span><span class="o">/</span><span class="mi">2</span>
+        <span class="k">if</span> <span class="n">bs</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="c1"># unsuccessfull  set to zero</span>
+            <span class="n">e2c</span><span class="p">[</span><span class="n">stcid</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;nnls did not converge for {0}, setting to 0&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stcid</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">stcid</span><span class="o">+</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">edcid</span>
+    <span class="c1"># iterate</span>
+    <span class="n">stcid</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">stcid</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">covci</span><span class="p">)):</span>
+        <span class="c1">#edcid = _find_chunk(stcid,blocksize)</span>
+        <span class="c1">#_calc_ecov(stcid,edcid)</span>
+        <span class="c1">#stcid = edcid</span>
+        <span class="n">stcid</span> <span class="o">=</span> <span class="n">catcherr</span><span class="p">(</span><span class="n">stcid</span><span class="p">,</span> <span class="n">blocksize</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">e2c</span></div>
+
+<div class="viewcode-block" id="calc_ecov_mp"><a class="viewcode-back" href="../../modules.html#jgem.calccov.calc_ecov_mp">[docs]</a><span class="k">def</span> <span class="nf">calc_ecov_mp</span><span class="p">(</span><span class="n">covci</span><span class="p">,</span><span class="n">fname</span><span class="p">,</span><span class="n">np</span><span class="p">,</span><span class="n">blocksize</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    WARNING: this assumes _id is assinged according to sorted (chr,st,ed)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;calc_ecov...&#39;</span><span class="p">)</span>
+    <span class="n">chroms</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">covci</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+    <span class="k">if</span> <span class="s1">&#39;name1&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">covci</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)])</span>
+    <span class="k">if</span> <span class="s1">&#39;eidmax&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">covci</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;eidmax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s1">&#39;eidmin&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">covci</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;eidmin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">covci</span><span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[(</span><span class="n">covci</span><span class="p">[</span><span class="n">covci</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">blocksize</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">]</span>
+    <span class="n">e2cs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># for c,bwname,chrom,d in data:</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">e2cs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">calc_ecov_chrom</span><span class="p">(</span><span class="o">*</span><span class="n">arg</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">np</span><span class="p">)</span>
+            <span class="n">rslts</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mp_worker</span><span class="p">,</span> <span class="nb">zip</span><span class="p">(</span><span class="n">repeat</span><span class="p">(</span><span class="n">calc_ecov_chrom</span><span class="p">),</span> <span class="n">args</span><span class="p">))</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;closing pool&#39;</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">rslts</span><span class="p">:</span>
+            <span class="n">e2cs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;writing rslts...&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">e2cs</span>
+    <span class="n">ccf</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">flattendf</span><span class="p">(</span><span class="n">covci</span><span class="p">,</span> <span class="s1">&#39;name1&#39;</span><span class="p">)</span>
+    <span class="n">ccfg</span> <span class="o">=</span> <span class="n">ccf</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;name1&#39;</span><span class="p">)</span>
+    <span class="n">e2chr</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">ccfg</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">,</span><span class="s1">&#39;chr&#39;</span><span class="p">]))</span>
+    <span class="n">e2st</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">ccfg</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">]))</span>
+    <span class="n">e2ed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">ccfg</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">]))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">e2cs</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ecov&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;eid&#39;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e2chr</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;eid&#39;</span><span class="p">]]</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e2st</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;eid&#39;</span><span class="p">]]</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e2ed</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;eid&#39;</span><span class="p">]]</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">save_tsv_nidx_whead</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;eid&#39;</span><span class="p">,</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;ecov&#39;</span><span class="p">]],</span> <span class="n">fname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+<span class="c1">### gcov, gmax calc low level ##########################################</span>
+
+<div class="viewcode-block" id="worker_cov"><a class="viewcode-back" href="../../modules.html#jgem.calccov.worker_cov">[docs]</a><span class="k">def</span> <span class="nf">worker_cov</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">bwname</span><span class="p">,</span><span class="n">chrom</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="n">BW</span><span class="o">.</span><span class="n">block_iter</span><span class="p">(</span><span class="n">bwname</span><span class="p">,</span> <span class="n">chrom</span><span class="p">)</span>
+    <span class="n">recs</span> <span class="o">=</span> <span class="n">calc_cov_chrom</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">it</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">recs</span></div>
+
+<div class="viewcode-block" id="worker_max"><a class="viewcode-back" href="../../modules.html#jgem.calccov.worker_max">[docs]</a><span class="k">def</span> <span class="nf">worker_max</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">bwname</span><span class="p">,</span><span class="n">chrom</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="n">BW</span><span class="o">.</span><span class="n">block_iter</span><span class="p">(</span><span class="n">bwname</span><span class="p">,</span> <span class="n">chrom</span><span class="p">)</span>
+    <span class="n">recs</span> <span class="o">=</span> <span class="n">calc_max_chrom</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">it</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">recs</span></div>
+        
+<div class="viewcode-block" id="calc_cov_mp"><a class="viewcode-back" href="../../modules.html#jgem.calccov.calc_cov_mp">[docs]</a><span class="k">def</span> <span class="nf">calc_cov_mp</span><span class="p">(</span><span class="n">bed</span><span class="p">,</span> <span class="n">bwname</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;cov&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">which</span><span class="o">==</span><span class="s1">&#39;cov&#39;</span><span class="p">:</span>
+        <span class="n">worker</span><span class="o">=</span><span class="n">worker_cov</span>
+    <span class="k">elif</span> <span class="n">which</span><span class="o">==</span><span class="s1">&#39;max&#39;</span><span class="p">:</span>
+        <span class="n">worker</span><span class="o">=</span><span class="n">worker_max</span>
+
+    <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">isstring</span><span class="p">(</span><span class="n">bed</span><span class="p">):</span>
+        <span class="n">bed</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_bed</span><span class="p">(</span><span class="n">bed</span><span class="p">)</span>
+    <span class="c1">#cols = list(bed.columns)+[&#39;cov&#39;]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bed</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">+</span><span class="p">[</span><span class="n">which</span><span class="p">]</span>
+    <span class="n">chroms</span> <span class="o">=</span> <span class="n">bed</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="c1">#LOG.debug(chroms)</span>
+    <span class="n">cdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">bed</span><span class="p">[</span><span class="n">bed</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">bwname</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">cdir</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">]</span>
+    <span class="n">recs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># for c,bwname,chrom,d in data:</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;cov calculation: processing {0}...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]))</span>
+            <span class="n">recs</span> <span class="o">+=</span> <span class="n">worker</span><span class="p">(</span><span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;{1} calculation: np={0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="p">,</span><span class="n">which</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">np</span><span class="p">)</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">repeat</span><span class="p">(</span><span class="n">worker</span><span class="p">),</span> <span class="n">data</span><span class="p">)</span>
+            <span class="n">rslts</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mp_worker</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">rslts</span><span class="p">:</span>
+                <span class="n">recs</span> <span class="o">+=</span> <span class="n">v</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;done {1} calculation: np={0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="p">,</span><span class="n">which</span><span class="p">))</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;closing pool&#39;</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="c1">#p.join()</span>
+        <span class="c1">#recs = reduce(iadd, rslts)</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;writing rslts...&#39;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">recs</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span> 
+    <span class="n">UT</span><span class="o">.</span><span class="n">save_tsv_nidx_whead</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="calc_max_chrom"><a class="viewcode-back" href="../../modules.html#jgem.calccov.calc_max_chrom">[docs]</a><span class="k">def</span> <span class="nf">calc_max_chrom</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">b_iter</span><span class="p">):</span>
+    <span class="n">nomore</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">b_iter</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+        <span class="n">nomore</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">prev</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">rslts</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">values</span><span class="p">):</span> <span class="c1">#c.iterrows():</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="n">st</span><span class="p">,</span><span class="n">ed</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="c1"># advance until intersect</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nomore</span><span class="p">:</span>
+            <span class="k">while</span><span class="p">(</span><span class="n">end</span><span class="o">&lt;</span><span class="n">st</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">prev</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">b_iter</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                        <span class="n">nomore</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span> <span class="o">=</span> <span class="n">curr</span>
+                    <span class="n">prev</span> <span class="o">=</span> <span class="bp">None</span>  
+        <span class="k">if</span> <span class="n">nomore</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">]</span>
+            <span class="n">rslts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># once intersect collect values</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="mf">0.</span>
+            <span class="n">prev</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span><span class="p">)</span> <span class="c1"># remember one before</span>
+            <span class="k">while</span><span class="p">(</span><span class="n">start</span><span class="o">&lt;</span><span class="n">ed</span><span class="p">):</span>
+                <span class="n">st0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">st</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">ed0</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">end</span><span class="p">,</span><span class="n">ed</span><span class="p">)</span>
+                <span class="c1">#v += value*(ed0 - st0)</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="n">prev</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span><span class="p">)</span> <span class="c1"># remember one before</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">b_iter</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                    <span class="n">nomore</span><span class="o">=</span><span class="bp">True</span>
+                    <span class="k">break</span>
+            <span class="c1">#row += [v/float(ed-st+1)]</span>
+            <span class="n">row</span> <span class="o">+=</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span>
+            <span class="n">rslts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span>
+            <span class="n">curr</span> <span class="o">=</span> <span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span>
+            <span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span> <span class="o">=</span> <span class="n">prev</span>
+    <span class="k">return</span> <span class="n">rslts</span></div>
+
+<div class="viewcode-block" id="calc_cov_chrom"><a class="viewcode-back" href="../../modules.html#jgem.calccov.calc_cov_chrom">[docs]</a><span class="k">def</span> <span class="nf">calc_cov_chrom</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">b_iter</span><span class="p">):</span>
+    <span class="n">nomore</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">b_iter</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+        <span class="n">nomore</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">prev</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">rslts</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">values</span><span class="p">):</span> <span class="c1">#c.iterrows():</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="n">st</span><span class="p">,</span><span class="n">ed</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="c1"># advance until intersect</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nomore</span><span class="p">:</span>
+            <span class="k">while</span><span class="p">(</span><span class="n">end</span><span class="o">&lt;=</span><span class="n">st</span><span class="p">):</span> <span class="c1"># equal boundary important, otherwise if end==st it will skip one interval</span>
+                <span class="k">if</span> <span class="n">prev</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">b_iter</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                        <span class="n">nomore</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span> <span class="o">=</span> <span class="n">curr</span>
+                    <span class="n">prev</span> <span class="o">=</span> <span class="bp">None</span>
+                    
+        <span class="k">if</span> <span class="n">nomore</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">]</span>
+            <span class="n">rslts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># once intersect collect values</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="mf">0.</span>
+            <span class="n">prev</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span><span class="p">)</span> <span class="c1"># remember one before</span>
+            <span class="k">while</span><span class="p">(</span><span class="n">start</span><span class="o">&lt;</span><span class="n">ed</span><span class="p">):</span>
+                <span class="n">st0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">st</span><span class="p">)</span>
+                <span class="n">ed0</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">end</span><span class="p">,</span><span class="n">ed</span><span class="p">)</span>
+                <span class="n">v</span> <span class="o">+=</span> <span class="n">value</span><span class="o">*</span><span class="p">(</span><span class="n">ed0</span> <span class="o">-</span> <span class="n">st0</span><span class="p">)</span>
+                <span class="n">prev</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span><span class="p">)</span> <span class="c1"># remember one before</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">b_iter</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                    <span class="n">nomore</span><span class="o">=</span><span class="bp">True</span>
+                    <span class="k">break</span>
+            <span class="n">row</span> <span class="o">+=</span> <span class="p">[</span><span class="n">v</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">ed</span><span class="o">-</span><span class="n">st</span><span class="p">)]</span>
+            <span class="n">rslts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span>
+            <span class="n">curr</span> <span class="o">=</span> <span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span>
+            <span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">value</span> <span class="o">=</span> <span class="n">prev</span>
+
+    <span class="k">return</span> <span class="n">rslts</span></div>
+
+<span class="c1">### high level        ##################################################</span>
+
+<div class="viewcode-block" id="calc_sjcnt"><a class="viewcode-back" href="../../modules.html#jgem.calccov.calc_sjcnt">[docs]</a><span class="k">def</span> <span class="nf">calc_sjcnt</span><span class="p">(</span><span class="n">sjpath1</span><span class="p">,</span> <span class="n">sjpath2</span><span class="p">,</span> <span class="n">dstprefix</span><span class="p">,</span> <span class="n">override</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="calc_ecov"><a class="viewcode-back" href="../../modules.html#jgem.calccov.calc_ecov">[docs]</a><span class="k">def</span> <span class="nf">calc_ecov</span><span class="p">(</span><span class="n">expath</span><span class="p">,</span> <span class="n">cipath</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">,</span> <span class="n">dstprefix</span><span class="p">,</span> <span class="n">override</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate exon coverages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        expath: merged ex</span>
+<span class="sd">        cipath: chopped interval for ex</span>
+<span class="sd">        bwpath: bigwig file (sample)</span>
+<span class="sd">        dstprefix: prefix for outputs</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        1. dstprefix+&#39;.covci.txt.gz&#39;: coverage for ci</span>
+<span class="sd">        2. dstprefix+&#39;.ecov.txt.gz&#39; : DataFrame(cols: eid, chr, st, ed, ecov)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">covcipath</span> <span class="o">=</span> <span class="n">dstprefix</span><span class="o">+</span><span class="s1">&#39;covci.txt.gz&#39;</span>
+    <span class="n">ecovpath</span> <span class="o">=</span> <span class="n">dstprefix</span><span class="o">+</span><span class="s1">&#39;ecov.txt.gz&#39;</span>
+
+    <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">notstale</span><span class="p">([</span><span class="n">expath</span><span class="p">,</span> <span class="n">cipath</span><span class="p">],</span> <span class="n">covcipath</span><span class="p">,</span> <span class="n">override</span><span class="p">):</span>
+        <span class="n">cc</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">covcipath</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">notstale</span><span class="p">(</span><span class="n">expath</span><span class="p">,</span> <span class="n">cipath</span><span class="p">,</span> <span class="n">override</span><span class="p">):</span>
+            <span class="n">ci</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">cipath</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ex</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">expath</span><span class="p">)</span>
+            <span class="n">ci</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">chopintervals</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">cipath</span><span class="p">,</span> <span class="n">idcol</span><span class="o">=</span><span class="s1">&#39;_id&#39;</span><span class="p">)</span>
+        <span class="n">cc</span> <span class="o">=</span> <span class="n">calc_cov_mp</span><span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">,</span> <span class="n">covcipath</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="n">np</span><span class="p">)</span>
+
+    <span class="c1"># if override or (not os.path.exists(covcipath)):</span>
+    <span class="c1">#     # calc covci</span>
+    <span class="c1">#     if not os.path.exists(cipath):</span>
+    <span class="c1">#         ex = UT.read_pandas(expath)</span>
+    <span class="c1">#         ci = UT.chopintervals(ex, cipath, idcol=&#39;_id&#39;)</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         ci = UT.read_pandas(cipath, names=[&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;,&#39;name&#39;,&#39;id&#39;])</span>
+    <span class="c1">#     cc = calc_cov_mp(ci, bwpath, covcipath, np=np)</span>
+    <span class="c1"># else:</span>
+    <span class="c1">#     cc = UT.read_pandas(covcipath)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cc</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;sc1&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;eid&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cc</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;eid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)])</span>
+        <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;eid&#39;</span><span class="p">]</span>
+    <span class="n">ccf</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">flattendf</span><span class="p">(</span><span class="n">cc</span><span class="p">[[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;eid&#39;</span><span class="p">]],</span> <span class="s1">&#39;eid&#39;</span><span class="p">)</span>
+    <span class="n">ccfg</span> <span class="o">=</span> <span class="n">ccf</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;eid&#39;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">ccfg</span><span class="p">[[</span><span class="s1">&#39;chr&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccfg</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccfg</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">e2cs</span> <span class="o">=</span> <span class="n">calc_ecov_mp</span><span class="p">(</span><span class="n">cc</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">np</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ecov&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e2cs</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;eid&#39;</span><span class="p">]]</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">save_tsv_nidx_whead</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ecovpath</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="calc_gcov"><a class="viewcode-back" href="../../modules.html#jgem.calccov.calc_gcov">[docs]</a><span class="k">def</span> <span class="nf">calc_gcov</span><span class="p">(</span><span class="n">expath</span><span class="p">,</span> <span class="n">cipath</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">,</span> <span class="n">dstprefix</span><span class="p">,</span> <span class="n">override</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate gene coverages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        expath: merged ex</span>
+<span class="sd">        cipath: chopped interval for ex</span>
+<span class="sd">        bwpath: bigwig file (sample)</span>
+<span class="sd">        dstprefix: prefix for outputs</span>
+
+<span class="sd">    Outputs:</span>
+<span class="sd">        1. dstprefix+&#39;.covci.txt.gz&#39;</span>
+<span class="sd">        2. dstprefix+&#39;.gcov.txt.gz&#39; : DataFrame(col:_gidx,len,val,gcov,len2,gcov2,cids)</span>
+<span class="sd">            len2: calculate length from ci with cov &gt; 0</span>
+<span class="sd">            (normal length = use entire ci&#39;s belonging to the gene)</span>
+<span class="sd">            gcov2 = val/len2</span>
+<span class="sd">            cids: cid with cov &gt; for the gene &#39;,&#39;.joined</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ex</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">expath</span><span class="p">)</span>
+    <span class="n">covcipath</span> <span class="o">=</span> <span class="n">dstprefix</span><span class="o">+</span><span class="s1">&#39;covci.txt.gz&#39;</span>
+    <span class="n">gcovpath</span> <span class="o">=</span> <span class="n">dstprefix</span><span class="o">+</span><span class="s1">&#39;gcov.txt.gz&#39;</span>
+
+    <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">notstale</span><span class="p">([</span><span class="n">expath</span><span class="p">,</span> <span class="n">cipath</span><span class="p">],</span> <span class="n">covcipath</span><span class="p">,</span> <span class="n">override</span><span class="p">):</span>
+        <span class="n">cc</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">covcipath</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">notstale</span><span class="p">(</span><span class="n">expath</span><span class="p">,</span> <span class="n">cipath</span><span class="p">,</span> <span class="n">override</span><span class="p">):</span>
+            <span class="n">ci</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">cipath</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ci</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">chopintervals</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">cipath</span><span class="p">,</span> <span class="n">idcol</span><span class="o">=</span><span class="s1">&#39;_id&#39;</span><span class="p">)</span>
+        <span class="n">cc</span> <span class="o">=</span> <span class="n">calc_cov_mp</span><span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">,</span> <span class="n">covcipath</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="n">np</span><span class="p">)</span>
+
+    <span class="c1"># if override or (not os.path.exists(covcipath)):</span>
+    <span class="c1">#     # calc covci</span>
+    <span class="c1">#     if not os.path.exists(cipath):</span>
+    <span class="c1">#         ci = UT.chopintervals(ex, cipath, idcol=&#39;_id&#39;)</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         ci = UT.read_pandas(cipath, names=[&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;,&#39;name&#39;,&#39;id&#39;])</span>
+    <span class="c1">#     cc = calc_cov_mp(ci, bwpath, covcipath, np=np)</span>
+    <span class="c1"># else:</span>
+    <span class="c1">#     cc = UT.read_pandas(covcipath)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cc</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;sc1&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;eid&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cc</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;eid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)])</span>
+    <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">cc</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+    <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">cc</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span>
+    <span class="n">ccf</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">flattendf</span><span class="p">(</span><span class="n">cc</span><span class="p">[[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="s1">&#39;eid&#39;</span><span class="p">,</span><span class="s1">&#39;len&#39;</span><span class="p">,</span><span class="s1">&#39;val&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">]],</span> <span class="s1">&#39;eid&#39;</span><span class="p">)</span>
+    <span class="n">e2g</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]))</span>
+    <span class="n">ccf</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e2g</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ccf</span><span class="p">[</span><span class="s1">&#39;eid&#39;</span><span class="p">]]</span>
+    <span class="c1"># for normal gcov: take unique combination of (gid, id) (id=cid)</span>
+    <span class="c1"># for gocv2 : first select ccf with val&gt;0</span>
+    <span class="n">ccf2</span> <span class="o">=</span> <span class="n">ccf</span><span class="p">[</span><span class="n">ccf</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;id&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">ccf2g</span> <span class="o">=</span> <span class="n">ccf2</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span>
+    <span class="n">df2</span> <span class="o">=</span> <span class="n">ccf2g</span><span class="p">[[</span><span class="s1">&#39;len&#39;</span><span class="p">,</span><span class="s1">&#39;val&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">df2</span><span class="p">[</span><span class="s1">&#39;gcov2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df2</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">df2</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span>
+    <span class="n">df2</span><span class="p">[</span><span class="s1">&#39;cids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccf2g</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]))</span>
+    <span class="n">df2</span><span class="p">[</span><span class="s1">&#39;gst2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccf2g</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">df2</span><span class="p">[</span><span class="s1">&#39;ged2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccf2g</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">df2</span><span class="p">[</span><span class="s1">&#39;glen2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df2</span><span class="p">[</span><span class="s1">&#39;ged2&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">df2</span><span class="p">[</span><span class="s1">&#39;gst2&#39;</span><span class="p">]</span>
+
+    <span class="n">df2</span> <span class="o">=</span> <span class="n">df2</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="n">ccf1</span> <span class="o">=</span> <span class="n">ccf</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;id&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">ccf1g</span> <span class="o">=</span> <span class="n">ccf1</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">ccf1g</span><span class="p">[[</span><span class="s1">&#39;len&#39;</span><span class="p">,</span><span class="s1">&#39;val&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;gcov&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccf1g</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccf1g</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;glen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">g2chr</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;chr&#39;</span><span class="p">]))</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2chr</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span>
+
+    <span class="k">def</span> <span class="nf">_set_df2prop</span><span class="p">(</span><span class="n">src</span><span class="p">,</span><span class="n">tgt</span><span class="p">,</span> <span class="n">default</span><span class="p">):</span>
+        <span class="n">dic</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">df2</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="n">src</span><span class="p">]))</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">tgt</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dic</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">default</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span>
+    <span class="n">_set_df2prop</span><span class="p">(</span><span class="s1">&#39;gcov2&#39;</span><span class="p">,</span><span class="s1">&#39;gcov2&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">_set_df2prop</span><span class="p">(</span><span class="s1">&#39;len&#39;</span><span class="p">,</span><span class="s1">&#39;len2&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">_set_df2prop</span><span class="p">(</span><span class="s1">&#39;cids&#39;</span><span class="p">,</span><span class="s1">&#39;cids&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">_set_df2prop</span><span class="p">(</span><span class="s1">&#39;gst2&#39;</span><span class="p">,</span><span class="s1">&#39;st2&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">_set_df2prop</span><span class="p">(</span><span class="s1">&#39;ged2&#39;</span><span class="p">,</span><span class="s1">&#39;ed2&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">_set_df2prop</span><span class="p">(</span><span class="s1">&#39;glen2&#39;</span><span class="p">,</span><span class="s1">&#39;glen2&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;len&#39;</span><span class="p">,</span><span class="s1">&#39;val&#39;</span><span class="p">,</span><span class="s1">&#39;gcov&#39;</span><span class="p">,</span><span class="s1">&#39;glen&#39;</span><span class="p">,</span><span class="s1">&#39;len2&#39;</span><span class="p">,</span><span class="s1">&#39;gcov2&#39;</span><span class="p">,</span><span class="s1">&#39;cids&#39;</span><span class="p">,</span><span class="s1">&#39;st2&#39;</span><span class="p">,</span><span class="s1">&#39;ed2&#39;</span><span class="p">,</span><span class="s1">&#39;glen2&#39;</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">save_tsv_nidx_whead</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">gcovpath</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+<span class="c1"># just use trimed ex to calculate gcov using calc_gcov</span>
+<span class="c1"># def calc_gcov1000(expath, cipath, bwpath, dstprefix, override=False, np=4):</span>
+    <span class="c1"># &quot;&quot;&quot;Calculate gene coverage but only use 1000bp from 3&#39; end.</span>
+
+    <span class="c1"># Args:</span>
+    <span class="c1">#     expath: merged ex</span>
+    <span class="c1">#     cipath: chopped interval for ex</span>
+    <span class="c1">#     bwpath: bigwig file (sample)</span>
+    <span class="c1">#     dstprefix: prefix for outputs</span>
+    <span class="c1">#     1. dstprefix+&#39;.covci.txt.gz&#39;</span>
+    <span class="c1">#     2. dstprefix+&#39;.gcov.txt.gz&#39; : DataFrame(col:_gidx,len,val,gcov,cids)</span>
+    <span class="c1">#         cids: cid with cov &gt; for the gene &#39;,&#39;.joined</span>
+    <span class="c1"># &quot;&quot;&quot;</span>
+    <span class="c1"># ex = UT.read_pandas(expath)</span>
+    <span class="c1"># covcipath = dstprefix+&#39;.covci.txt.gz&#39;</span>
+    <span class="c1"># gcovpath = dstprefix+&#39;.gcov1000.txt.gz&#39;</span>
+    <span class="c1"># if override or (not os.path.exists(covcipath)):</span>
+    <span class="c1">#     # calc covci</span>
+    <span class="c1">#     if not os.path.exists(cipath):</span>
+    <span class="c1">#         ci = UT.chopintervals(ex, cipath, idcol=&#39;_id&#39;)</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         ci = UT.read_pandas(cipath, names=[&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;,&#39;name&#39;,&#39;id&#39;])</span>
+    <span class="c1">#     cc = calc_cov_mp(ci, bwpath, covcipath, np=np)</span>
+    <span class="c1"># else:</span>
+    <span class="c1">#     cc = UT.read_pandas(covcipath)</span>
+
+    <span class="c1"># if &#39;id&#39; not in cc.columns:</span>
+    <span class="c1">#     cc[&#39;id&#39;] = cc[&#39;sc1&#39;]</span>
+    <span class="c1"># if &#39;eid&#39; not in cc.columns:</span>
+    <span class="c1">#     cc[&#39;eid&#39;] = cc[&#39;name&#39;].astype(str).apply(lambda x: map(int, x.split(&#39;,&#39;)))</span>
+    <span class="c1"># cc[&#39;len&#39;] = cc[&#39;ed&#39;]-cc[&#39;st&#39;]</span>
+    <span class="c1"># cc[&#39;val&#39;] = cc[&#39;cov&#39;]*cc[&#39;len&#39;]</span>
+    <span class="c1"># ccf = UT.flattendf(cc[[&#39;id&#39;,&#39;eid&#39;,&#39;len&#39;,&#39;val&#39;,&#39;st&#39;,&#39;ed&#39;]], &#39;eid&#39;)</span>
+    <span class="c1"># e2g = dict(UT.izipcols(ex, [&#39;_id&#39;,&#39;_gidx&#39;]))</span>
+    <span class="c1"># ccf[&#39;_gidx&#39;] = [e2g[x] for x in ccf[&#39;eid&#39;]]</span>
+    <span class="c1"># # for normal gcov: take unique combination of (gid, id) (id=cid)</span>
+    <span class="c1"># ccf1 = ccf.groupby([&#39;_gidx&#39;,&#39;id&#39;]).first().reset_index()</span>
+
+    <span class="c1"># # MODIFICATION to only use &lt;cumsum 2000bp </span>
+    <span class="c1"># g2strand = dict(UT.izipcols(ex.groupby(&#39;_gidx&#39;).first().reset_index(), [&#39;_gidx&#39;,&#39;strand&#39;]))</span>
+    <span class="c1"># ccf1[&#39;strand&#39;] = [g2strand[x] for x in ccf1[&#39;_gidx&#39;]]</span>
+    <span class="c1"># ccf1 = ccf1.sort_values([&#39;_gidx&#39;,&#39;ed&#39;,&#39;st&#39;],ascending=False)</span>
+    <span class="c1"># ccf1[&#39;cumsum+&#39;] = ccf1.groupby(&#39;_gidx&#39;)[&#39;len&#39;].cumsum()</span>
+    <span class="c1"># ccf1 = ccf1.sort_values([&#39;_gidx&#39;,&#39;st&#39;,&#39;ed&#39;],ascending=True)</span>
+    <span class="c1"># ccf1[&#39;cumsum-&#39;] = ccf1.groupby(&#39;_gidx&#39;)[&#39;len&#39;].cumsum()</span>
+    <span class="c1"># ccf1 = ccf1.sort_values([&#39;_gidx&#39;,&#39;ed&#39;,&#39;st&#39;],ascending=False)</span>
+    
+    <span class="c1"># size1p = ccf1.groupby(&#39;_gidx&#39;)[&#39;cumsum+&#39;].first().to_frame(&#39;v&#39;).reset_index()</span>
+    <span class="c1"># g2s1p = dict(UT.izipcols(size1p, [&#39;_gidx&#39;,&#39;v&#39;]))</span>
+
+    <span class="c1"># ccf1 = ccf1.sort_values([&#39;_gidx&#39;,&#39;st&#39;,&#39;ed&#39;],ascending=True)</span>
+    <span class="c1"># size1n = ccf1.groupby(&#39;_gidx&#39;)[&#39;cumsum-&#39;].first().to_frame(&#39;v&#39;).reset_index()</span>
+    <span class="c1"># g2s1n = dict(UT.izipcols(size1n, [&#39;_gidx&#39;,&#39;v&#39;]))</span>
+
+    <span class="c1"># ccf1[&#39;size1+&#39;] = [g2s1p[x] for x in ccf1[&#39;_gidx&#39;]]</span>
+    <span class="c1"># ccf1[&#39;size1-&#39;] = [g2s1n[x] for x in ccf1[&#39;_gidx&#39;]]</span>
+
+    <span class="c1"># idx =(((ccf1[&#39;strand&#39;]==&#39;+&#39;)&amp;((ccf1[&#39;cumsum+&#39;]&lt;2000)|(ccf1[&#39;size1+&#39;]&gt;=2000)))|</span>
+    <span class="c1">#       ((ccf1[&#39;strand&#39;]!=&#39;+&#39;)&amp;((ccf1[&#39;cumsum-&#39;]&lt;2000)|(ccf1[&#39;size1-&#39;]&gt;=2000))))</span>
+    <span class="c1"># ccf2 = ccf1[idx]</span>
+    <span class="c1"># ccf1g = ccf2.groupby(&#39;_gidx&#39;)</span>
+
+
+    <span class="c1"># df = ccf1g[[&#39;len&#39;,&#39;val&#39;]].sum()</span>
+    <span class="c1"># df[&#39;gcov&#39;] = df[&#39;val&#39;]/df[&#39;len&#39;]</span>
+    <span class="c1"># df[&#39;st&#39;] = ccf1g[&#39;st&#39;].min()</span>
+    <span class="c1"># df[&#39;ed&#39;] = ccf1g[&#39;ed&#39;].max()</span>
+    <span class="c1"># df[&#39;glen&#39;] = df[&#39;ed&#39;] - df[&#39;st&#39;]</span>
+    <span class="c1"># df[&#39;cids&#39;] = ccf1g[&#39;id&#39;].apply(lambda x: &#39;,&#39;.join(map(str, x)))</span>
+
+    <span class="c1"># df = df.reset_index()</span>
+    <span class="c1"># g2chr = dict(UT.izipcols(ex, [&#39;_gidx&#39;,&#39;chr&#39;]))</span>
+    <span class="c1"># df[&#39;chr&#39;] = [g2chr[x] for x in df[&#39;_gidx&#39;]]</span>
+    
+    <span class="c1"># cols = [&#39;_gidx&#39;,&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;,&#39;len&#39;,&#39;val&#39;,&#39;gcov&#39;,&#39;glen&#39;,&#39;cids&#39;]</span>
+    <span class="c1"># df = df[cols]</span>
+    <span class="c1"># UT.save_tsv_nidx_whead(df, gcovpath)</span>
+    <span class="c1"># return df</span>
+
+<span class="c1"># old method</span>
+<span class="c1"># def calc_gene_cov(ex, cc, gidfld=&#39;_gidx&#39;):</span>
+    <span class="c1"># &quot;&quot;&quot;</span>
+    <span class="c1"># ex: exon df</span>
+    <span class="c1"># cc: covci df</span>
+    <span class="c1"># return dfg [&#39;val&#39;,&#39;len&#39;,&#39;cov&#39;]</span>
+    <span class="c1"># &quot;&quot;&quot;</span>
+    <span class="c1"># if &#39;id&#39; not in cc.columns:</span>
+    <span class="c1">#     cc[&#39;id&#39;] = cc[&#39;sc1&#39;]</span>
+    <span class="c1"># if &#39;cid&#39; not in ex.columns:</span>
+    <span class="c1">#     e2c = {}</span>
+    <span class="c1">#     for i,name in cc[[&#39;id&#39;,&#39;name&#39;]].values:</span>
+    <span class="c1">#         for eid in map(int, name.split(&#39;,&#39;)):</span>
+    <span class="c1">#             e2c.setdefault(eid,[]).append(i)</span>
+    <span class="c1">#     ex[&#39;cid&#39;] = [e2c[x] for x in ex[&#39;_id&#39;]]</span>
+    <span class="c1"># # flatten</span>
+    <span class="c1"># def _gen():</span>
+    <span class="c1">#     for g,cids in UT.izipcols(ex, [gidfld,&#39;cid&#39;]):</span>
+    <span class="c1">#         for c in cids:</span>
+    <span class="c1">#             yield (c,g)</span>
+    <span class="c1"># df = PD.DataFrame(list(set([x for x in _gen()])),columns=[&#39;cid&#39;,gidfld])</span>
+    <span class="c1"># cc[&#39;len&#39;] = cc[&#39;ed&#39;] - cc[&#39;st&#39;]</span>
+    <span class="c1"># cc[&#39;val&#39;] = cc[&#39;cov&#39;]*cc[&#39;len&#39;]</span>
+    <span class="c1"># c2len = dict(cc[[&#39;id&#39;,&#39;len&#39;]].values)</span>
+    <span class="c1"># c2val = dict(cc[[&#39;id&#39;,&#39;val&#39;]].values)</span>
+    <span class="c1"># df[&#39;len&#39;] = [c2len[x] for x in df[&#39;cid&#39;]]</span>
+    <span class="c1"># df[&#39;val&#39;] = [c2val[x] for x in df[&#39;cid&#39;]]</span>
+    <span class="c1"># dfg = df.groupby(gidfld)[[&#39;val&#39;,&#39;len&#39;]].sum()</span>
+    <span class="c1"># dfg[&#39;cov&#39;] = dfg[&#39;val&#39;]/dfg[&#39;len&#39;]</span>
+    <span class="c1"># return dfg</span>
+ 
+<div class="viewcode-block" id="calc_glen"><a class="viewcode-back" href="../../modules.html#jgem.calccov.calc_glen">[docs]</a><span class="k">def</span> <span class="nf">calc_glen</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">cipath</span><span class="p">):</span>
+    <span class="n">ci</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_bed</span><span class="p">(</span><span class="n">cipath</span><span class="p">)</span> <span class="c1"># 5 col bed, name:eids, sc1:cid</span>
+    <span class="n">ci</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">ci</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span>
+    <span class="n">ci</span><span class="p">[</span><span class="s1">&#39;cid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span><span class="p">[</span><span class="s1">&#39;sc1&#39;</span><span class="p">]</span>
+    <span class="n">c2l</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;cid&#39;</span><span class="p">,</span><span class="s1">&#39;len&#39;</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="s1">&#39;cid&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ex</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">e2c</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">name</span> <span class="ow">in</span> <span class="n">ci</span><span class="p">[[</span><span class="s1">&#39;cid&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">eid</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">):</span>
+                <span class="n">e2c</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">eid</span><span class="p">),[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;cid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e2c</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]]</span>
+    <span class="k">def</span> <span class="nf">_gen</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">g</span><span class="p">,</span><span class="n">cids</span> <span class="ow">in</span> <span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">,</span><span class="s1">&#39;cid&#39;</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cids</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">g</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_gen</span><span class="p">()])),</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cid&#39;</span><span class="p">,</span><span class="s1">&#39;_gidx&#39;</span><span class="p">])</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">c2l</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cid&#39;</span><span class="p">]]</span>
+    <span class="n">glen</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_gidx&#39;</span><span class="p">)[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">glen</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">glen</span><span class="o">.</span><span class="n">values</span><span class="p">))</span></div>
+    
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,825 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>jgem.graph &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<h1>Source code for jgem.graph</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">.. module:: graph</span>
+<span class="sd">    :synopsis: Graph related stuffs</span>
+
+<span class="sd">..  moduleauthor:: Ken Sugino &lt;ken.sugino@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># system imports</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">cPickle</span> <span class="kn">as</span> <span class="nn">pickle</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="nb">reduce</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">repeat</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">iadd</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="c1"># 3rd party imports</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">PD</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">N</span>
+
+<span class="c1"># library imports</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">UT</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">bedtools</span> <span class="k">as</span> <span class="n">BT</span>
+
+
+<span class="c1"># Graph #######################################################################</span>
+
+<span class="c1">## MEGraph version 2 (no strand: start/end based)</span>
+<div class="viewcode-block" id="MEGraph2"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph2">[docs]</a><span class="k">class</span> <span class="nc">MEGraph2</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">UT</span><span class="o">.</span><span class="n">set_ids</span><span class="p">(</span><span class="n">sj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">me</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">UT</span><span class="o">.</span><span class="n">set_ids</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;st_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;st_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">me</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="n">UT</span><span class="o">.</span><span class="n">set_pos_info</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">me</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">sj</span> <span class="o">=</span> <span class="n">sj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">me</span> <span class="o">=</span> <span class="n">me</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span>
+        
+        <span class="c1"># prepare joined table  </span>
+        <span class="c1"># exon[ed_id_st,e_id_st,st_id]=&gt;junction(st_id,_id,ed_id)=&gt;exon[ed_id,e_id_ed,st_id_ed]</span>
+        <span class="n">metbl</span> <span class="o">=</span> <span class="n">me</span><span class="p">[[</span><span class="s1">&#39;ed_id&#39;</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;st_id&#39;</span><span class="p">]]</span>
+        <span class="n">metbl_a</span> <span class="o">=</span> <span class="n">metbl</span><span class="p">[</span><span class="n">metbl</span><span class="p">[</span><span class="s1">&#39;ed_id&#39;</span><span class="p">]</span><span class="o">!=-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;st_id&#39;</span><span class="p">:</span><span class="s1">&#39;st_id_ed&#39;</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span><span class="s1">&#39;e_id_ed&#39;</span><span class="p">})</span>
+        <span class="n">metbl_d</span> <span class="o">=</span> <span class="n">metbl</span><span class="p">[</span><span class="n">metbl</span><span class="p">[</span><span class="s1">&#39;st_id&#39;</span><span class="p">]</span><span class="o">!=-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ed_id&#39;</span><span class="p">:</span><span class="s1">&#39;ed_id_st&#39;</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span><span class="s1">&#39;e_id_st&#39;</span><span class="p">})</span>
+        <span class="n">sjtbl</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[[</span><span class="s1">&#39;st_id&#39;</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;ed_id&#39;</span><span class="p">]]</span>
+        <span class="c1"># join on donor</span>
+        <span class="n">j1</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">metbl_d</span><span class="p">,</span> <span class="n">sjtbl</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;st_id&#39;</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">j2</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">j1</span><span class="p">,</span> <span class="n">metbl_a</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;ed_id&#39;</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>              
+        <span class="c1"># remove dangling exons, junctions</span>
+        <span class="n">idxnd</span> <span class="o">=</span> <span class="n">j2</span><span class="p">[</span><span class="s1">&#39;e_id_ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">&amp;</span><span class="n">j2</span><span class="p">[</span><span class="s1">&#39;e_id_st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">idxnd</span><span class="p">)</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">idxnd</span><span class="p">):</span>
+            <span class="n">j2nd</span> <span class="o">=</span> <span class="n">j2</span><span class="p">[</span><span class="n">idxnd</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">j2nd</span> <span class="o">=</span> <span class="n">j2</span>
+        
+        <span class="c1"># groupby exon id</span>
+        <span class="n">j2nd</span><span class="p">[</span><span class="s1">&#39;e_id_st&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">j2nd</span><span class="p">[</span><span class="s1">&#39;e_id_st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">j2nd</span><span class="p">[</span><span class="s1">&#39;e_id_ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">j2nd</span><span class="p">[</span><span class="s1">&#39;e_id_ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">j2nd</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;e_id_ed&#39;</span><span class="p">)[</span><span class="s1">&#39;e_id_st&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">=</span> <span class="n">j2nd</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;e_id_st&#39;</span><span class="p">)[</span><span class="s1">&#39;e_id_ed&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">j2</span> <span class="o">=</span> <span class="n">j2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">j2nd</span> <span class="o">=</span> <span class="n">j2nd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gr</span> <span class="o">=</span> <span class="n">j2</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;ed_id&#39;</span><span class="p">)[</span><span class="s1">&#39;e_id_ed&#39;</span><span class="p">]</span> <span class="c1"># groupby junction right</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gl</span> <span class="o">=</span> <span class="n">j2</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;st_id&#39;</span><span class="p">)[</span><span class="s1">&#39;e_id_st&#39;</span><span class="p">]</span> <span class="c1"># groupby junction left</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exons</span> <span class="o">=</span> <span class="n">me</span>
+        
+<div class="viewcode-block" id="MEGraph2.consistent"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph2.consistent">[docs]</a>    <span class="k">def</span> <span class="nf">consistent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># return consistent subset of me, sj (i.e. non-dangling)</span>
+        <span class="n">j2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">j2</span>
+        <span class="n">_stids</span> <span class="o">=</span> <span class="n">j2</span><span class="p">[</span><span class="n">j2</span><span class="p">[</span><span class="s1">&#39;e_id_ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()][</span><span class="s1">&#39;st_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">_edids</span> <span class="o">=</span> <span class="n">j2</span><span class="p">[</span><span class="n">j2</span><span class="p">[</span><span class="s1">&#39;e_id_st&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()][</span><span class="s1">&#39;ed_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">me0</span> <span class="o">=</span> <span class="n">me</span><span class="p">[(</span><span class="o">~</span><span class="n">me</span><span class="p">[</span><span class="s1">&#39;ed_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">_edid</span><span class="p">))</span><span class="o">|</span><span class="p">(</span><span class="o">~</span><span class="n">me</span><span class="p">[</span><span class="s1">&#39;st_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">_stid</span><span class="p">))]</span>
+        <span class="n">sj0</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[(</span><span class="o">~</span><span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ed_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">_edid</span><span class="p">))</span><span class="o">|</span><span class="p">(</span><span class="o">~</span><span class="n">sj</span><span class="p">[</span><span class="s1">&#39;st_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">_stid</span><span class="p">))]</span>
+        <span class="k">return</span> <span class="n">sj0</span><span class="p">,</span> <span class="n">me0</span></div>
+        
+<div class="viewcode-block" id="MEGraph2.connected"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph2.connected">[docs]</a>    <span class="k">def</span> <span class="nf">connected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eid</span><span class="p">,</span> <span class="n">exx</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="c1">#recursive version : reaches max limit with &#39;PR26_@myofiber_m53_1383&#39;</span>
+        <span class="k">if</span> <span class="n">depth</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;depth {0}: eid={1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span><span class="n">eid</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">exx</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">exx</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">exx</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_ex</span><span class="p">(</span><span class="n">eid</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">e</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exx</span><span class="p">:</span>
+                <span class="n">exx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">exx</span><span class="p">,</span> <span class="n">depth</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">exx</span></div>
+        
+<div class="viewcode-block" id="MEGraph2.allcomponents"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph2.allcomponents">[docs]</a>    <span class="k">def</span> <span class="nf">allcomponents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1"># ~45sec (sid1624)</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">me</span>
+        <span class="c1">#me[&#39;_visited&#39;] = False</span>
+        <span class="c1">#mei = me.set_index(&#39;_id&#39;)</span>
+        <span class="c1">#visited = mei[&#39;_visited&#39;]</span>
+        <span class="c1"># above method of recording visited node is &gt;x300 slower</span>
+        <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">genes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">eid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+            <span class="c1"># if i % 50000 == 0:</span>
+            <span class="c1">#     LOG.debug(&#39;{0}/{1}...&#39;.format(i,tot))</span>
+            <span class="c1">#if not visited.ix[eid]:</span>
+            <span class="k">if</span> <span class="n">eid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                <span class="n">exx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span>
+                <span class="n">genes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exx</span><span class="p">)</span>
+                <span class="c1">#visited.loc[exx] = True</span>
+                <span class="n">visited</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">exx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">genes</span></div>
+        
+<div class="viewcode-block" id="MEGraph2.ex_ex"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph2.ex_ex">[docs]</a>    <span class="k">def</span> <span class="nf">ex_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eid</span><span class="p">):</span>
+        <span class="c1"># return exons connected to eid</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_l_ex</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">ex_r_ex</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="MEGraph2.ex_l_ex"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph2.ex_l_ex">[docs]</a>    <span class="k">def</span> <span class="nf">ex_l_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eid</span><span class="p">):</span>
+        <span class="c1"># connected through donor (down-stream)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+        
+<div class="viewcode-block" id="MEGraph2.ex_r_ex"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph2.ex_r_ex">[docs]</a>    <span class="k">def</span> <span class="nf">ex_r_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eid</span><span class="p">):</span>
+        <span class="c1"># connected through acceptor (up-stream)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+        
+<div class="viewcode-block" id="MEGraph2.connected_nr"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph2.connected_nr">[docs]</a>    <span class="k">def</span> <span class="nf">connected_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eid</span><span class="p">):</span>
+        <span class="c1"># non recursive, slow? still not work for PR26 seems to be in infinite loop</span>
+        <span class="n">to_visit</span> <span class="o">=</span> <span class="p">[</span><span class="n">eid</span><span class="p">]</span>
+        <span class="n">exx</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">depth</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">while</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">to_visit</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">):</span>
+            <span class="n">depth</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">to_visit</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">depth</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">:</span>
+                <span class="n">flag</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">exx</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_ex</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">e</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exx</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">e</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_visit</span><span class="p">):</span>
+                    <span class="n">to_visit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;eid={1} last visit = {2}: depth {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span><span class="n">eid</span><span class="p">,</span><span class="n">c</span><span class="p">))</span> 
+        <span class="k">return</span> <span class="n">exx</span></div>
+        
+<div class="viewcode-block" id="MEGraph2.allcomponents_nr"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph2.allcomponents_nr">[docs]</a>    <span class="k">def</span> <span class="nf">allcomponents_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1"># ~44sec (sid1624)</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">me</span>
+        <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">genes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">eid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+            <span class="c1"># if i % 50000 == 0:</span>
+            <span class="c1">#     LOG.debug(&#39;{0}/{1}...&#39;.format(i,tot))</span>
+            <span class="k">if</span> <span class="n">eid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                <span class="n">exx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected_nr</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span>
+                <span class="n">genes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exx</span><span class="p">)</span>
+                <span class="n">visited</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">exx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">genes</span>    </div>
+        
+<div class="viewcode-block" id="MEGraph2.sj_leftex"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph2.sj_leftex">[docs]</a>    <span class="k">def</span> <span class="nf">sj_leftex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">st_id</span><span class="p">,</span><span class="n">flds</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">]):</span><span class="c1">#sjrec):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">st_id</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">left</span><span class="p">]</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()][</span><span class="n">flds</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>        </div>
+<div class="viewcode-block" id="MEGraph2.sj_rightex"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph2.sj_rightex">[docs]</a>    <span class="k">def</span> <span class="nf">sj_rightex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ed_id</span><span class="p">,</span><span class="n">flds</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">]):</span><span class="c1">#sjrec):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gr</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">ed_id</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">right</span><span class="p">]</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()][</span><span class="n">flds</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="MEGraph2.sj_ex"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph2.sj_ex">[docs]</a>    <span class="k">def</span> <span class="nf">sj_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sjrec</span><span class="p">,</span><span class="n">flds</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sj_leftex</span><span class="p">(</span><span class="n">sjrec</span><span class="p">[</span><span class="s1">&#39;st_id&#39;</span><span class="p">],</span><span class="n">flds</span><span class="p">)</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">sj_rightex</span><span class="p">(</span><span class="n">sjrec</span><span class="p">[</span><span class="s1">&#39;ed_id&#39;</span><span class="p">],</span><span class="n">flds</span><span class="p">)</span></div></div>
+            
+<span class="c1">## MEGraph version 3 (stranded: acceptor/donor based)</span>
+<div class="viewcode-block" id="MEGraph3"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph3">[docs]</a><span class="k">class</span> <span class="nc">MEGraph3</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; acceptor/donor version, has problem if there&#39;s unstranded data &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">maxcnt</span><span class="o">=</span><span class="mi">990</span><span class="p">):</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">set_info</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">me</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sj</span> <span class="o">=</span> <span class="n">sj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">me</span> <span class="o">=</span> <span class="n">me</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxcnt</span><span class="o">=</span><span class="n">maxcnt</span>
+        
+        <span class="c1"># prepare joined table</span>
+        <span class="n">metbl</span> <span class="o">=</span> <span class="n">me</span><span class="p">[[</span><span class="s1">&#39;a_id&#39;</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;d_id&#39;</span><span class="p">]]</span>
+        <span class="n">metbl_a</span> <span class="o">=</span> <span class="n">metbl</span><span class="p">[</span><span class="n">metbl</span><span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">]</span><span class="o">!=-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;d_id&#39;</span><span class="p">:</span><span class="s1">&#39;d_id_a&#39;</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span><span class="s1">&#39;e_id_a&#39;</span><span class="p">})</span>
+        <span class="n">metbl_d</span> <span class="o">=</span> <span class="n">metbl</span><span class="p">[</span><span class="n">metbl</span><span class="p">[</span><span class="s1">&#39;d_id&#39;</span><span class="p">]</span><span class="o">!=-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;a_id&#39;</span><span class="p">:</span><span class="s1">&#39;a_id_d&#39;</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span><span class="s1">&#39;e_id_d&#39;</span><span class="p">})</span>
+        <span class="n">sjtbl</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[[</span><span class="s1">&#39;d_id&#39;</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;a_id&#39;</span><span class="p">]]</span>
+        <span class="c1"># join on donor</span>
+        <span class="n">j1</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">metbl_d</span><span class="p">,</span> <span class="n">sjtbl</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;d_id&#39;</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">j2</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">j1</span><span class="p">,</span> <span class="n">metbl_a</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;a_id&#39;</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>              
+        <span class="c1"># remove dangling exons, junctions</span>
+        <span class="n">j2nd</span> <span class="o">=</span> <span class="n">j2</span><span class="p">[</span><span class="n">j2</span><span class="p">[</span><span class="s1">&#39;e_id_a&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">&amp;</span><span class="n">j2</span><span class="p">[</span><span class="s1">&#39;e_id_d&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+        <span class="c1"># groupby exon id</span>
+        <span class="n">j2nd</span><span class="p">[</span><span class="s1">&#39;e_id_d&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">j2nd</span><span class="p">[</span><span class="s1">&#39;e_id_d&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">j2nd</span><span class="p">[</span><span class="s1">&#39;e_id_a&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">j2nd</span><span class="p">[</span><span class="s1">&#39;e_id_a&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">j2nd</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;e_id_a&#39;</span><span class="p">)[</span><span class="s1">&#39;e_id_d&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="n">j2nd</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;e_id_d&#39;</span><span class="p">)[</span><span class="s1">&#39;e_id_a&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">j2</span> <span class="o">=</span> <span class="n">j2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">j2nd</span> <span class="o">=</span> <span class="n">j2nd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ga</span> <span class="o">=</span> <span class="n">j2</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;a_id&#39;</span><span class="p">)</span> <span class="c1"># groupby acceptor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gd</span> <span class="o">=</span> <span class="n">j2</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;d_id&#39;</span><span class="p">)</span> <span class="c1"># groupby donor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exons</span> <span class="o">=</span> <span class="n">me</span>
+        
+<div class="viewcode-block" id="MEGraph3.consistent"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph3.consistent">[docs]</a>    <span class="k">def</span> <span class="nf">consistent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># return consistent subset of me, sj (i.e. non-dangling)</span>
+        <span class="n">j2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">j2</span>
+        <span class="n">_dids</span> <span class="o">=</span> <span class="n">j2</span><span class="p">[</span><span class="n">j2</span><span class="p">[</span><span class="s1">&#39;e_id_a&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()][</span><span class="s1">&#39;d_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">_aids</span> <span class="o">=</span> <span class="n">j2</span><span class="p">[</span><span class="n">j2</span><span class="p">[</span><span class="s1">&#39;e_id_d&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()][</span><span class="s1">&#39;a_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">me0</span> <span class="o">=</span> <span class="n">me</span><span class="p">[(</span><span class="o">~</span><span class="n">me</span><span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">_aid</span><span class="p">))</span><span class="o">|</span><span class="p">(</span><span class="o">~</span><span class="n">me</span><span class="p">[</span><span class="s1">&#39;d_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">_did</span><span class="p">))]</span>
+        <span class="n">sj0</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[(</span><span class="o">~</span><span class="n">sj</span><span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">_aid</span><span class="p">))</span><span class="o">|</span><span class="p">(</span><span class="o">~</span><span class="n">sj</span><span class="p">[</span><span class="s1">&#39;d_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">_did</span><span class="p">))]</span>
+        <span class="k">return</span> <span class="n">sj0</span><span class="p">,</span> <span class="n">me0</span></div>
+        
+    <span class="k">def</span> <span class="nf">_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eid</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cnt</span> <span class="o">+=</span><span class="mi">1</span>
+        <span class="c1">#recursive version : reaches max limit with &#39;PR26_@myofiber_m53_1383&#39;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">depth</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pcnt</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pcnt</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">10</span><span class="p">)</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;{2} depth {0}: eid={1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span><span class="n">eid</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_curreid</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pcnt</span> <span class="o">+=</span><span class="mi">1</span>
+        <span class="c1">#if exx is None:</span>
+        <span class="c1">#    exx = set()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exx</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cnt</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">maxcnt</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;cnt {0} &gt; {2} aborting eid:{1}:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span><span class="n">eid</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">maxcnt</span><span class="p">))</span>
+            <span class="k">return</span> <span class="c1">#exx</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_ex</span><span class="p">(</span><span class="n">eid</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">e</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exx</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">depth</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> 
+<div class="viewcode-block" id="MEGraph3.connected_nr"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph3.connected_nr">[docs]</a>    <span class="k">def</span> <span class="nf">connected_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eid</span><span class="p">):</span>
+        <span class="c1"># non recursive, slow? still not work for PR26 seems to be in infinite loop</span>
+        <span class="n">to_visit</span> <span class="o">=</span> <span class="p">[</span><span class="n">eid</span><span class="p">]</span>
+        <span class="n">exx</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">depth</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">while</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">to_visit</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">):</span>
+            <span class="n">depth</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">to_visit</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">depth</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">:</span>
+                <span class="n">flag</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">exx</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_ex</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">e</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exx</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">e</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_visit</span><span class="p">):</span>
+                    <span class="n">to_visit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;eid={1} last visit = {2}: depth {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span><span class="n">eid</span><span class="p">,</span><span class="n">c</span><span class="p">))</span>         
+        <span class="k">return</span> <span class="n">exx</span></div>
+
+<div class="viewcode-block" id="MEGraph3.allcomponents"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph3.allcomponents">[docs]</a>    <span class="k">def</span> <span class="nf">allcomponents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1"># ~45sec (sid1624)</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">me</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visited</span> <span class="o">=</span> <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">genes</span> <span class="o">=</span> <span class="n">genes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">eid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+            <span class="c1"># if i % 5000 == 0:</span>
+            <span class="c1">#     LOG.debug(&#39;{0}/{1}...&#39;.format(i,tot))</span>
+            <span class="k">if</span> <span class="n">eid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pcnt</span><span class="o">=</span><span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cnt</span><span class="o">=</span><span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_exx</span><span class="o">=</span><span class="nb">set</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_curreid</span> <span class="o">=</span> <span class="n">eid</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span>
+                <span class="n">genes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_exx</span><span class="p">)</span>
+                <span class="n">visited</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_exx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">genes</span></div>
+
+<div class="viewcode-block" id="MEGraph3.allcomponents_nr"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph3.allcomponents_nr">[docs]</a>    <span class="k">def</span> <span class="nf">allcomponents_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1"># ~44sec (sid1624)</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">me</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visited</span> <span class="o">=</span><span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">genes</span> <span class="o">=</span> <span class="n">genes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">eid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+            <span class="c1"># if i % 50000 == 0:</span>
+            <span class="c1">#     LOG.debug(&#39;{0}/{1}...&#39;.format(i,tot))</span>
+            <span class="k">if</span> <span class="n">eid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                <span class="n">exx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected_nr</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span>
+                <span class="n">genes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exx</span><span class="p">)</span>
+                <span class="n">visited</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">exx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">genes</span>    </div>
+                
+<div class="viewcode-block" id="MEGraph3.connected"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph3.connected">[docs]</a>    <span class="k">def</span> <span class="nf">connected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eid</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pcnt</span><span class="o">=</span><span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cnt</span><span class="o">=</span><span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exx</span><span class="o">=</span><span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_curreid</span> <span class="o">=</span> <span class="n">eid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exx</span></div>
+        
+<div class="viewcode-block" id="MEGraph3.ex_ex"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph3.ex_ex">[docs]</a>    <span class="k">def</span> <span class="nf">ex_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eid</span><span class="p">):</span>
+        <span class="c1"># return exons connected to eid</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_d_ex</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">ex_a_ex</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="MEGraph3.ex_d_ex"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph3.ex_d_ex">[docs]</a>    <span class="k">def</span> <span class="nf">ex_d_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eid</span><span class="p">):</span>
+        <span class="c1"># connected through donor (down-stream)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+        
+<div class="viewcode-block" id="MEGraph3.ex_a_ex"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph3.ex_a_ex">[docs]</a>    <span class="k">def</span> <span class="nf">ex_a_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eid</span><span class="p">):</span>
+        <span class="c1"># connected through acceptor (up-stream)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+        
+
+<div class="viewcode-block" id="MEGraph3.sj_leftex"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph3.sj_leftex">[docs]</a>    <span class="k">def</span> <span class="nf">sj_leftex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">aid</span><span class="p">,</span><span class="n">did</span><span class="p">,</span><span class="n">strand</span><span class="p">):</span> <span class="c1">#sjrec):</span>
+        <span class="c1">#aid,did,strand = sjrec[[&#39;a_id&#39;,&#39;d_id&#39;,&#39;strand&#39;]]</span>
+        <span class="k">if</span> <span class="n">strand</span><span class="o">==</span><span class="s1">&#39;+&#39;</span><span class="p">:</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gd</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">did</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">left</span><span class="p">[</span><span class="s1">&#39;e_id_d&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">aid</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">left</span><span class="p">[</span><span class="s1">&#39;e_id_a&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span></div>
+        
+<div class="viewcode-block" id="MEGraph3.sj_rightex"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph3.sj_rightex">[docs]</a>    <span class="k">def</span> <span class="nf">sj_rightex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">aid</span><span class="p">,</span><span class="n">did</span><span class="p">,</span><span class="n">strand</span><span class="p">):</span> <span class="c1">#sjrec):</span>
+        <span class="c1">#aid,did,strand = sjrec[[&#39;a_id&#39;,&#39;d_id&#39;,&#39;strand&#39;]]</span>
+        <span class="k">if</span> <span class="n">strand</span><span class="o">==</span><span class="s1">&#39;+&#39;</span><span class="p">:</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">aid</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">right</span><span class="p">[</span><span class="s1">&#39;e_id_a&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gd</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">did</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">right</span><span class="p">[</span><span class="s1">&#39;e_id_d&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span></div></div>
+
+<span class="c1">## MEGraph version 4 (stranded, overlap of exon also counts as connection)</span>
+<div class="viewcode-block" id="MEGraph4"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph4">[docs]</a><span class="k">class</span> <span class="nc">MEGraph4</span><span class="p">(</span><span class="n">MEGraph3</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">filepre</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">maxcnt</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
+        <span class="n">MEGraph3</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">maxcnt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre</span> <span class="o">=</span> <span class="n">filepre</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">filepre</span><span class="o">+</span><span class="s1">&#39;ex1.txt.gz&#39;</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">filepre</span><span class="o">+</span><span class="s1">&#39;ex2.txt.gz&#39;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">filepre</span><span class="o">+</span><span class="s1">&#39;ov.txt.gz&#39;</span>
+        <span class="c1"># calculate exon overlap to self </span>
+        <span class="n">cols0</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">save_tsv_nidx_nhead</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="n">cols0</span><span class="p">],</span> <span class="n">a</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">save_tsv_nidx_nhead</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="n">cols0</span><span class="p">],</span> <span class="n">b</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">BT</span><span class="o">.</span><span class="n">bedtoolintersect</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">wao</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">cols1</span> <span class="o">=</span> <span class="n">cols0</span><span class="o">+</span><span class="p">[</span><span class="s1">&#39;b_&#39;</span><span class="o">+</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cols0</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="s1">&#39;ovl&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ov</span> <span class="o">=</span> <span class="n">ov</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">cols1</span><span class="p">)</span>
+        <span class="c1"># select same strand overlap to non-self</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ov1</span> <span class="o">=</span> <span class="n">ov1</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">!=</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b__id&#39;</span><span class="p">])</span><span class="o">&amp;</span><span class="p">(</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">ov</span><span class="p">[</span><span class="s1">&#39;b_strand&#39;</span><span class="p">])]</span>
+        <span class="c1"># make connected dictionary _id =&gt; [b__id&#39;s]</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">ov1</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;_id&#39;</span><span class="p">)[</span><span class="s1">&#39;b__id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;index&#39;</span> <span class="ow">in</span> <span class="n">tmp</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span>
+        <span class="c1">#LOG.debug(&#39;graph.MEGraph4.__init__: tmp.columns={0}, len(tmp)={1}&#39;.format(tmp.columns, len(tmp))) </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eoe</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;b__id&#39;</span><span class="p">]))</span>
+        <span class="c1"># cleanup</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MEGraph4.ex_ex"><a class="viewcode-back" href="../../modules.html#jgem.graph.MEGraph4.ex_ex">[docs]</a>    <span class="k">def</span> <span class="nf">ex_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eid</span><span class="p">):</span>
+        <span class="c1"># return exons connected to eid</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_d_ex</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">ex_a_ex</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">eoe</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">eid</span><span class="p">,[])</span></div></div>
+        
+<span class="k">def</span> <span class="nf">_worker2</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">c</span><span class="p">):</span>
+    <span class="n">mg</span> <span class="o">=</span> <span class="n">MEGraph2</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">)</span>
+    <span class="n">genes</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">allcomponents</span><span class="p">()</span>
+    <span class="c1">#LOG.debug(&quot;finished {0}...&quot;.format(c))</span>
+    <span class="k">return</span> <span class="n">genes</span>
+    
+<span class="k">def</span> <span class="nf">_worker3</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">c</span><span class="p">):</span>
+    <span class="n">mg</span> <span class="o">=</span> <span class="n">MEGraph3</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">)</span>
+    <span class="c1">#genes = mg.allcomponents()</span>
+    <span class="n">genes</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">allcomponents_nr</span><span class="p">()</span>
+    <span class="c1">#LOG.debug(&quot;finished {0}...&quot;.format(c))</span>
+    <span class="c1">#cPickle.dump(genes, open(&#39;genes-{0}.pic&#39;.format(c),&#39;w&#39;))</span>
+    <span class="k">return</span> <span class="n">genes</span>
+
+<span class="k">def</span> <span class="nf">_worker4</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">fp</span><span class="p">):</span>
+    <span class="n">fpc</span> <span class="o">=</span> <span class="n">fp</span><span class="o">+</span><span class="n">c</span><span class="o">+</span><span class="s1">&#39;.&#39;</span>
+    <span class="n">mg</span> <span class="o">=</span> <span class="n">MEGraph4</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">fpc</span><span class="p">)</span>
+    <span class="c1">#genes = mg.allcomponents()</span>
+    <span class="n">genes</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">allcomponents_nr</span><span class="p">()</span>
+    <span class="c1">#LOG.debug(&quot;finished {0}...&quot;.format(c))</span>
+    <span class="c1">#cPickle.dump(genes, open(&#39;genes-{0}.pic&#39;.format(c),&#39;w&#39;))</span>
+    <span class="k">return</span> <span class="n">genes</span>    
+        
+<div class="viewcode-block" id="worker"><a class="viewcode-back" href="../../modules.html#jgem.graph.worker">[docs]</a><span class="k">def</span> <span class="nf">worker</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">func</span><span class="p">,</span> <span class="n">arg</span> <span class="o">=</span> <span class="n">args</span>
+    <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">arg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="mcore_allcomponents"><a class="viewcode-back" href="../../modules.html#jgem.graph.mcore_allcomponents">[docs]</a><span class="k">def</span> <span class="nf">mcore_allcomponents</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">maxcnt</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">chroms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">filepre</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span> <span class="c1"># ~31sec (np=1)</span>
+    <span class="c1"># np number of processes</span>
+    <span class="c1"># spawn processes to process chrom-wise</span>
+    <span class="c1"># common id</span>
+    <span class="k">if</span> <span class="s1">&#39;_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">set_ids</span><span class="p">(</span><span class="n">sj</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">me</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">set_ids</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">version</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;st_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;st_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">me</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="n">UT</span><span class="o">.</span><span class="n">set_pos_info</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">me</span><span class="p">)</span> 
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;a_pos&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;a_pos&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">me</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="n">UT</span><span class="o">.</span><span class="n">set_ad_info</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">)</span> 
+    <span class="k">if</span> <span class="n">chroms</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">chroms</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">version</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">sj</span><span class="p">[</span><span class="n">sj</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">c</span><span class="p">],</span> <span class="n">me</span><span class="p">[</span><span class="n">me</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">c</span><span class="p">],</span> <span class="n">c</span><span class="p">,</span> <span class="n">filepre</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">sj</span><span class="p">[</span><span class="n">sj</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">c</span><span class="p">],</span> <span class="n">me</span><span class="p">[</span><span class="n">me</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">c</span><span class="p">],</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">rslts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">version</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+                <span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">c</span> <span class="o">=</span> <span class="n">d</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;connected component: processing {0}...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+                <span class="n">mg</span> <span class="o">=</span> <span class="n">MEGraph3</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">maxcnt</span><span class="o">=</span><span class="n">maxcnt</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">version</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span>
+                <span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">filepre</span> <span class="o">=</span> <span class="n">d</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;connected component: processing {0}...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+                <span class="n">mg</span> <span class="o">=</span> <span class="n">MEGraph4</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">filepre</span><span class="p">,</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">maxcnt</span><span class="o">=</span><span class="n">maxcnt</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">c</span> <span class="o">=</span> <span class="n">d</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;connected component: processing {0}...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+                <span class="n">mg</span> <span class="o">=</span> <span class="n">MEGraph2</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">allcomponents_nr</span><span class="p">()</span>
+            <span class="n">rslts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;finished {0}...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+            <span class="c1">#cPickle.dump(tmp, open(&#39;genes-{0}.pic&#39;.format(c),&#39;w&#39;))</span>
+        <span class="n">genes</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">rslts</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">y</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">np</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">version</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">repeat</span><span class="p">(</span><span class="n">_worker3</span><span class="p">),</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">version</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">repeat</span><span class="p">(</span><span class="n">_worker4</span><span class="p">),</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">repeat</span><span class="p">(</span><span class="n">_worker2</span><span class="p">),</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">genes</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">iadd</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">worker</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="c1">#p.join()</span>
+    <span class="k">return</span> <span class="n">genes</span></div>
+
+<div class="viewcode-block" id="mcore_allcomponents2"><a class="viewcode-back" href="../../modules.html#jgem.graph.mcore_allcomponents2">[docs]</a><span class="k">def</span> <span class="nf">mcore_allcomponents2</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">maxcnt</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">chroms</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mcore_allcomponents</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">maxcnt</span><span class="p">,</span> <span class="n">chroms</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="mcore_allcomponents3"><a class="viewcode-back" href="../../modules.html#jgem.graph.mcore_allcomponents3">[docs]</a><span class="k">def</span> <span class="nf">mcore_allcomponents3</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">maxcnt</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">chroms</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mcore_allcomponents</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">maxcnt</span><span class="p">,</span> <span class="n">chroms</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="mcore_allcomponents4"><a class="viewcode-back" href="../../modules.html#jgem.graph.mcore_allcomponents4">[docs]</a><span class="k">def</span> <span class="nf">mcore_allcomponents4</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">filepre</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">maxcnt</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">chroms</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mcore_allcomponents</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">maxcnt</span><span class="p">,</span> <span class="n">chroms</span><span class="p">,</span> <span class="n">filepre</span><span class="p">)</span></div>
+
+
+<span class="c1"># GENE FINDER ###############################################################</span>
+
+<div class="viewcode-block" id="find_genes3"><a class="viewcode-back" href="../../modules.html#jgem.graph.find_genes3">[docs]</a><span class="k">def</span> <span class="nf">find_genes3</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">ae</span><span class="p">,</span> <span class="n">cachename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">override</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">140</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Adds _gidx column to ae</span>
+<span class="sd">    Connection: by junctions</span>
+
+<span class="sd">    Returns genes [set([_id,..]), ...]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ae</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;setting ex _id...&#39;</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">set_ids</span><span class="p">(</span><span class="n">ae</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;setting sj _id...&#39;</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">set_ids</span><span class="p">(</span><span class="n">sj</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;cat&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ae</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">set_exon_category</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">ae</span><span class="p">)</span>
+
+    <span class="c1">### FIND GENES</span>
+    <span class="k">if</span> <span class="n">cachename</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cachename</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">override</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;loading cached genes (connected components)...&#39;</span><span class="p">)</span>
+        <span class="n">genes</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">cachename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;finding genes (connected components)...&#39;</span><span class="p">)</span>
+        <span class="n">_sttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">me</span><span class="p">,</span> <span class="n">se</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">mese</span><span class="p">(</span><span class="n">ae</span><span class="p">)</span>
+        <span class="n">genes</span> <span class="o">=</span> <span class="n">mcore_allcomponents3</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">)</span>
+        <span class="c1"># genes = [set([_id&#39;s]),...]</span>
+        <span class="c1"># SE genes</span>
+        <span class="n">genes</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">set</span><span class="p">([</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">se</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">cachename</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">genes</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">cachename</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39; time: {0:.3f}s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">_sttime</span><span class="p">))</span>
+    
+    <span class="c1">### WRITE EXONS W/ GENE number</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;assigning gidx...&#39;</span><span class="p">)</span>
+    <span class="n">_sttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="c1"># ae[&#39;_gidx&#39;] = 0</span>
+    <span class="c1"># ae.index = ae[&#39;_id&#39;]</span>
+    <span class="c1"># for i, ids in enumerate(genes):</span>
+    <span class="c1">#     ae.ix[ids, &#39;_gidx&#39;] = i+1</span>
+    <span class="n">i2g</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ids</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">genes</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+            <span class="n">i2g</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+    <span class="n">ae</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i2g</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ae</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]]</span>
+
+    <span class="c1">## set sj _gidx, use acceptor=&gt;_gidx map (exon a_id, sj a_id)</span>
+    <span class="n">a2g</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">ae</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">,</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]))</span>
+    <span class="n">d2g</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">ae</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;d_id&#39;</span><span class="p">,</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]))</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">a2g</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">d2g</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">sj</span><span class="p">,[</span><span class="s1">&#39;a_id&#39;</span><span class="p">,</span><span class="s1">&#39;d_id&#39;</span><span class="p">])]</span>
+
+    
+    <span class="c1"># This shouldn&#39;t happen</span>
+    <span class="n">nidx</span> <span class="o">=</span> <span class="n">ae</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span>
+    <span class="k">if</span> <span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nidx</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;###### WARNING!!!!!! exons with no gene assignment:{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nidx</span><span class="p">)))</span>
+        <span class="c1">#ae.loc[nidx, &#39;_gidx&#39;] = N.arange(len(ae),len(ae)+N.sum(nidx))        </span>
+        
+    <span class="k">return</span> <span class="n">genes</span></div>
+
+<div class="viewcode-block" id="find_genes4"><a class="viewcode-back" href="../../modules.html#jgem.graph.find_genes4">[docs]</a><span class="k">def</span> <span class="nf">find_genes4</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">ae</span><span class="p">,</span> <span class="n">filepre</span><span class="p">,</span> <span class="n">cachename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">override</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">separatese</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Adds _gidx column to ae</span>
+<span class="sd">    Connection: 1) by junctions, 2) by overlap in the same strand</span>
+
+<span class="sd">    Returns genes [set([_id,..]), ...]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ae</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;setting ex _id...&#39;</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">set_ids</span><span class="p">(</span><span class="n">ae</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sj</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;setting sj _id...&#39;</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">set_ids</span><span class="p">(</span><span class="n">sj</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;cat&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ae</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">set_exon_category</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">ae</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;a_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ae</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">set_ad_info</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">ae</span><span class="p">)</span>
+
+    <span class="c1">### FIND GENES</span>
+    <span class="k">if</span> <span class="n">cachename</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cachename</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">override</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;loading cached genes (connected components)...&#39;</span><span class="p">)</span>
+        <span class="n">genes</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">cachename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;finding genes (connected components)...&#39;</span><span class="p">)</span>
+        <span class="n">_sttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">separatese</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">,</span> <span class="n">se</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">mese</span><span class="p">(</span><span class="n">ae</span><span class="p">)</span>
+            <span class="n">genes</span> <span class="o">=</span> <span class="n">mcore_allcomponents4</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">filepre</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">)</span>
+            <span class="c1"># SE genes</span>
+            <span class="n">genes</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">set</span><span class="p">([</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">se</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">genes</span> <span class="o">=</span> <span class="n">mcore_allcomponents4</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">ae</span><span class="p">,</span> <span class="n">filepre</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">)</span>
+        <span class="c1"># version 4 graph: uses overlaps in addition to junctions to connect</span>
+        <span class="c1"># genes = [set([_id&#39;s]),...]</span>
+        <span class="k">if</span> <span class="n">cachename</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">genes</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">cachename</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39; time: {0:.3f}s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">_sttime</span><span class="p">))</span>
+    
+    <span class="c1">### WRITE EXONS W/ GENE number</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;assigning gidx...&#39;</span><span class="p">)</span>
+    <span class="n">_sttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">i2g</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># eid =&gt; _gidx</span>
+    <span class="n">i2gn</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># eidt =&gt; gname</span>
+    <span class="n">g2gn</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">i2s</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">ae</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">]))</span> <span class="c1"># eid =&gt; strand</span>
+    <span class="c1">#i2c = dict(UT.izipcols(ae, [&#39;_id&#39;,&#39;cat&#39;])) # eid =&gt; category</span>
+    <span class="n">s2n</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;+&#39;</span><span class="p">:</span><span class="s1">&#39;P&#39;</span><span class="p">,</span><span class="s1">&#39;-&#39;</span><span class="p">:</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">:</span><span class="s1">&#39;&#39;</span><span class="p">}</span>
+    <span class="n">c2n</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span><span class="s1">&#39;S&#39;</span><span class="p">,</span><span class="s1">&#39;i&#39;</span><span class="p">:</span><span class="s1">&#39;G&#39;</span><span class="p">,</span><span class="s1">&#39;5&#39;</span><span class="p">:</span><span class="s1">&#39;G&#39;</span><span class="p">,</span><span class="s1">&#39;3&#39;</span><span class="p">:</span><span class="s1">&#39;G&#39;</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ids</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">genes</span><span class="p">):</span>
+        <span class="n">gid</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+        <span class="n">strand</span> <span class="o">=</span> <span class="n">s2n</span><span class="p">[</span><span class="n">i2s</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">ids</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]]</span>
+        <span class="n">cat</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;G&#39;</span>
+        <span class="k">if</span> <span class="n">strand</span><span class="o">==</span><span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="c1"># negative strand</span>
+            <span class="n">gid</span> <span class="o">=</span> <span class="o">-</span><span class="n">gid</span>
+        <span class="n">gname</span> <span class="o">=</span> <span class="s1">&#39;{0}{1}{2}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">strand</span><span class="p">,</span><span class="n">cat</span><span class="p">,</span><span class="nb">abs</span><span class="p">(</span><span class="n">gid</span><span class="p">))</span>
+        <span class="n">g2gn</span><span class="p">[</span><span class="n">gid</span><span class="p">]</span> <span class="o">=</span> <span class="n">gname</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+            <span class="n">i2g</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">gid</span>
+            <span class="n">i2gn</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">gname</span>
+
+    <span class="n">ae</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i2g</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ae</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]]</span>
+    <span class="n">ae</span><span class="p">[</span><span class="s1">&#39;gname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i2gn</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ae</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]]</span>
+
+    <span class="c1">## set sj _gidx, use acceptor=&gt;_gidx map (exon a_id, sj a_id)</span>
+    <span class="n">a2g</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">ae</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;a_id&#39;</span><span class="p">,</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]))</span>
+    <span class="n">d2g</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">ae</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;d_id&#39;</span><span class="p">,</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]))</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">a2g</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">d2g</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="n">UT</span><span class="o">.</span><span class="n">izipcols</span><span class="p">(</span><span class="n">sj</span><span class="p">,[</span><span class="s1">&#39;a_id&#39;</span><span class="p">,</span><span class="s1">&#39;d_id&#39;</span><span class="p">])]</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;gname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">g2gn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]]</span>
+    
+    <span class="c1"># This shouldn&#39;t happen</span>
+    <span class="n">nidx</span> <span class="o">=</span> <span class="n">ae</span><span class="p">[</span><span class="s1">&#39;_gidx&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span>
+    <span class="k">if</span> <span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nidx</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;###### WARNING!!!!!! exons with no gene assignment:{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nidx</span><span class="p">)))</span>
+        <span class="c1">#ae.loc[nidx, &#39;_gidx&#39;] = N.arange(len(ae),len(ae)+N.sum(nidx))        </span>
+        
+    <span class="k">return</span> <span class="n">genes</span></div>
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Ken Sugino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
