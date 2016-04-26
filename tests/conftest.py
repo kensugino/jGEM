@@ -177,4 +177,8 @@ def testsampleinfo(datadir):
 	si['bwfile'] = datadir + '/' + si['bwfile']
 	return si
 
+@pytest.fixture(scope='session')
+def mergedsjexbase(datadir):
+	apre = os.path.join(datadir, 'assemblies', 'FevA2')
+	return apre
 

@@ -4,6 +4,13 @@ import pandas as PD
 
 from jgem import utils as UT
 from jgem import gtfgffbed as GGB
+import jgem.cy.bw as cybw
+
+def test_read_gtf_cy(g4gtfpath):
+	#gtf = GGB.read_gtf(g4gtfpath)
+	recs, cols = cybw.read_gtf_helper(g4gtfpath, GGB.DEFAULT_GTF_PARSE)
+	gtf = PD.DataFrame(recs, columns=cols)
+	assert len(gtf) == 112665
 
 
 def test_sjtab2sjbed(sampleinfo, datadir, outdir):
@@ -25,7 +32,7 @@ def test_sjtab2sjbed(sampleinfo, datadir, outdir):
 
 def test_read_gtf(g4gtfpath):
 	gtf = GGB.read_gtf(g4gtfpath)
-	assert len(gtf) == 50942
+	assert len(gtf) == 112665
 
 
 # def test_read_gff():
