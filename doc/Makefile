@@ -5,7 +5,7 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
-BUILDDIR      = ../gh-pages/html
+BUILDDIR      = ../gh-pages
 #BUILDDIR      = _build
 
 # User-friendly check for sphinx-build
