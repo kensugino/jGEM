@@ -119,7 +119,7 @@ class Collector(object):
         msj = self.sj()
         fn = self.fnobj
         msj['locus'] = UT.calc_locus_strand(msj)
-        for i, (s,sjfile) in enumerate(self.si[['name','sjfile']].values):
+        for i, (s,sjfile) in enumerate(self.si[['name','sjbed_path']].values):
             LOG.info('{1}/{2} processing {0}'.format(s,i,len(self.si)))
             sj = GGB.read_sj(sjfile)
             sj['locus'] = UT.calc_locus_strand(sj)
@@ -144,7 +144,7 @@ class Collector(object):
         ep = self.expath
         cp = self.cipath
         ids = mex['_id'].values
-        args = [(s, w, bw, dpre, ep, cp, ids, np) for s,bw in self.si[['name','bwfile']].values]
+        args = [(s, w, bw, dpre, ep, cp, ids, np) for s,bw in self.si[['name','bw_path']].values]
         for i,a in enumerate(args):
             LOG.info('{1}/{2} processing {0}'.format(a[0],i,len(args)))
             # path = fn.txtname2(a[0], a[1]) # register path
@@ -168,7 +168,7 @@ class Collector(object):
         dpre = fn.fname('')
         ep = self.expath
         cp = self.cipath
-        args = [(s, w, bw, dpre, ep, cp, ids, np) for s,bw in self.si[['name','bwfile']].values]
+        args = [(s, w, bw, dpre, ep, cp, ids, np) for s,bw in self.si[['name','bw_path']].values]
         for i,a in enumerate(args):
             LOG.info('{1}/{2} processing {0}'.format(a[0],i,len(args)))
             # path = fn.txtname2(a[0], a[1]) # register path
@@ -220,7 +220,7 @@ class Collector(object):
         dpre = fn.fname('')
         # make trimmed ex if not exists
         ep,cp = self.trimex(length)
-        args = [(s, w, bw, dpre, ep, cp, ids, np) for s,bw in self.si[['name','bwfile']].values]
+        args = [(s, w, bw, dpre, ep, cp, ids, np) for s,bw in self.si[['name','bw_path']].values]
         for i,a in enumerate(args):
             LOG.info('{1}/{2} processing {0}'.format(a[0],i,len(args)))
             # path = fn.txtname2(a[0], a[1]) # register path

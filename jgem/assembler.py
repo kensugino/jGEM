@@ -290,7 +290,7 @@ class SUBASE(object):
         self.info = ''
 
     def __call__(self, *args, **kwargs):
-        LOG.info('Executing {0} '.format(self.__class__.__name__)+'='*20)
+        LOG.info('{0} '.format(self.__class__.__name__)+'='*20)
         _sttime = time.time()
         rslt = self.call(*args, **kwargs)
         if self.info:

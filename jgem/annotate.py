@@ -60,9 +60,9 @@ class Comparator(object):
     def calc_overlaps(self):
         cref = self.cn_ref
         ctgt = self.cn_tgt
-        a = ctgt.fname('ex.bed.gz')
-        b = cref.fname('ex.bed.gz')
-        c = ctgt.fname2('ex.ovl.txt.gz', cref.code)
+        a = ctgt.fname('cptmp.ex.bed.gz')
+        b = cref.fname('cptmp.ex.bed.gz')
+        c = ctgt.fname2('cptmp.ex.ovl.txt.gz', cref.code)
         cols = ['chr','st','ed','cat','_id','_gidx','len','strand']
         self.ex_tgt = etgt = ctgt.model('ex') #UT.read_pandas(p1.ex)
         self.ex_ref = eref = cref.model('ex') #UT.read_pandas(p2.ex)
@@ -87,8 +87,8 @@ class Comparator(object):
         gtgt = _gbed(etgt)
         gref = _gbed(eref)
         gcols2 = gcols+['_gidx']
-        a2 = ctgt.fname('gene.bed.gz')
-        b2 = cref.fname('gene.bed.gz')
+        a2 = ctgt.fname('cptmp.gene.bed.gz')
+        b2 = cref.fname('cptmp.gene.bed.gz')
         c2 = ctgt.fname2('gene.ovl.txt.gz', cref.code)
         a2 = UT.write_pandas(gtgt[gcols2],a2,'')
         b2 = UT.write_pandas(gref[gcols2],b2,'')

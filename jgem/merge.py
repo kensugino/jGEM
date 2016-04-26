@@ -77,10 +77,10 @@ class MergeInputNames(FN.FileNamesBase):
         return [(n, '{0}.sj.txt.gz'.format(x)) for n,x in self.si[['name','sjexpre']].values]
 
     def sjpaths(self):
-        return self.si[['name','sjfile']].values # BED
+        return self.si[['name','sjbed_path']].values # BED
 
     def bwpaths(self):
-        return self.si[['name','bwfile']].values # BIGWIG
+        return self.si[['name','bw_path']].values # BIGWIG
 
     def sj0_bed(self):
         return self.bedname('sj0', category='output')
