@@ -57,8 +57,8 @@ class MergeInputNames(FN.FileNamesBase):
     SampleInfo Columns:
         name: sample name (unique)
         sjexpre: path prefix to SJ/EX files (sj.txt.gz, ex.txt.gz will be added)
-        bwfile: original bigwig coverage
-        sjfile: original junction bed file (converted from SJ.out.tab)
+        bw_path: original bigwig coverage
+        sjbed_path: original junction bed file (converted from SJ.out.tab)
 
     """
 

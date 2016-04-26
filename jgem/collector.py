@@ -61,6 +61,11 @@ class Collector(object):
         samplecode: identidier for the sample set
         outdir: output directory
 
+    SampleInfo DataFrame columns:
+        name: sample name
+        bw_path: bigwig path
+        sjbed_path: sjbed path
+
    	Methods:
 	    1. collect_gcov: gene coverages (row:genes, col:samples)
 	    2. collect_ecov: exon coverages (row:exons, col:samples)
