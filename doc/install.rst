@@ -2,29 +2,28 @@
 Installation
 ============
 
-jGEM is built with Python (http://www.python.org). Several 3rd party
+jGEM is built with `Python<http://www.python.org>`_. Several 3rd party
 python packages and non-python external tools are also required:
 
 -  Required Python packages
 
-   -  numpy (http://www.numpy.org)
-   -  scipy (http://www.scipy.org)
-   -  matplotlib (http://matplotlib.org)
-   -  pandas (http://pandas.pydata.org)
-   -  xlrd (http://www.python-excel.org/) if using Excel spreadsheet to
+   -  `numpy<http://www.numpy.org>`_
+   -  `scipy<http://www.scipy.org>`_
+   -  `matplotlib<http://matplotlib.org>`_
+   -  `pandas<http://pandas.pydata.org>`_
+   -  `xlrd<http://www.python-excel.org/>`_ if using Excel spreadsheet>to
       maintain sample info
 
 -  Required External Tools
 
-   -  bedtools (https://github.com/arq5x/bedtools2)
-   -  Kent's Lib wigToBigWig (http://hgdownload.cse.ucsc.edu/admin/exe/)
+   -  `bedtools<https://github.com/arq5x/bedtools2>`_
+   -  `Kent's Lib wigToBigWig<http://hgdownload.cse.ucsc.edu/admin/exe/>`_
 
 Python & Python packages
 ------------------------
 
 If you don't already have Python installed, I recommend to install
-Miniconda (http://conda.pydata.org/miniconda.html) or Anaconda
-(https://www.continuum.io/downloads)
+`Miniconda<http://conda.pydata.org/miniconda.html>`_ or `Anaconda<https://www.continuum.io/downloads>`_
 
 Once Miniconda (or Anaconda) is installed, you can use **conda** command
 to create a "virtual environment" for jGEM and to install required
@@ -64,13 +63,7 @@ Make sure you're in the jgem virtual environment:
 
     $ source activate jgemenv
 
-Then, install jGEM from PyPi:
-
-::
-
-    $ pip install jgem
-
-Or clone Git repository and install as a developmental package:
+Then clone Git repository and install as a developmental package. 
 
 ::
 
@@ -78,3 +71,8 @@ Or clone Git repository and install as a developmental package:
     $ cd jGEM
     $ python setup.py develop
 
+Or install jGEM from PyPi (test data is not included in PyPi version):
+
+::
+
+    $ pip install jgem
