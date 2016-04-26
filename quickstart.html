@@ -339,9 +339,9 @@ This can be calculated using
 </pre></div>
 </div>
 <div class="highlight-ipython3"><div class="highlight"><pre>
-<span></span><span class="c1"># first prepare destination (~ 2 min)</span>
+<span></span><span class="c1"># first prepare destination</span>
 <span class="n">si</span><span class="p">[</span><span class="s1">&#39;bw_path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASEDIR</span><span class="p">,</span> <span class="s2">&quot;bigwig/{0}.bw&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">si</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span>
-<span class="c1"># BED =&gt; BIGWIG</span>
+<span class="c1"># then make coverages BIGWIG from BED (~ 2 min)</span>
 <span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">UT</span>
 <span class="n">chromsizes</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">chromsizes</span><span class="p">(</span><span class="s1">&#39;mm10&#39;</span><span class="p">)</span> <span class="c1"># a file containing chromosome names and sizes</span>
 <span class="k">for</span> <span class="n">bedfile</span><span class="p">,</span> <span class="n">bwfile</span><span class="p">,</span> <span class="n">acov</span> <span class="ow">in</span> <span class="n">si</span><span class="p">[[</span><span class="s1">&#39;bed_path&#39;</span><span class="p">,</span><span class="s1">&#39;bw_path&#39;</span><span class="p">,</span><span class="s1">&#39;acov&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
@@ -443,7 +443,7 @@ This can be calculated using
 <li><strong>st</strong>: start position</li>
 <li><strong>ed</strong>: end position</li>
 <li><strong>name</strong>: junction name</li>
-<li><strong>ucnt</strong>: unique reads (normalized to 1M mapped reads)</li>
+<li><strong>ucnt</strong>: unique reads (normalized to average coverage)</li>
 <li><strong>strand</strong>: strand of junction</li>
 <li><strong>mcnt</strong>: non-unique (multimapping) reads (normalized)</li>
 </ul>
@@ -794,7 +794,7 @@ and <a class="reference external" href="modules.html#jgem.evalutate.EvalMatch">E
 <span class="n">ens</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># keep EvalNames objects</span>
 <span class="n">ems</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># keep EvalMatch object</span>
 <span class="c1"># Gencode.VM4</span>
-<span class="n">en_gen4</span> <span class="o">=</span> <span class="n">EV</span><span class="o">.</span><span class="n">EvalNames</span><span class="p">(</span><span class="s1">&#39;../tests/data/assemblies/gencode.vM4.chr1&#39;</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="s1">&#39;gen4&#39;</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="s1">&#39;../out/&#39;</span><span class="p">)</span>
+<span class="n">en_gen4</span> <span class="o">=</span> <span class="n">EV</span><span class="o">.</span><span class="n">EvalNames</span><span class="p">(</span><span class="s1">&#39;../tests/data/assemblies/gencode.vM4.chr1&#39;</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="s1">&#39;gen4&#39;</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="s1">&#39;../tests/out/&#39;</span><span class="p">)</span>
 <span class="c1"># assign sample code</span>
 <span class="n">si</span><span class="p">[</span><span class="s1">&#39;scode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">si</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span>
 <span class="c1"># For each sample</span>
@@ -925,9 +925,9 @@ That is, to match internal exons, they have to be exactly the same
 other side does not have to be. To match single exon, they just need to
 have some overlap.</p>
 <p>So, we have quite good detection of junctions. About 70% of internal
-exons are detected. 5&#8217;,3&#8217; exons are worse (~44-49%) but if allowed to
-match to other class of exons, then detection rate get close to internal
-exon. Single exon detection rates are worst and about 10%.</p>
+exons are detected. 5&#8217;,3&#8217; exons are worse (&lt; 50%) but if allowed to
+match to other class of exons, then detection rates get close to the
+internal exons. Single exon detection rates are bad and about 10%.</p>
 <p>We can visualize the detection percentages as follows.</p>
 <div class="nbinput container">
 <div class="highlight-none"><div class="highlight"><pre>

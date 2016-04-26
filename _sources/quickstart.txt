@@ -203,9 +203,9 @@
    },
    "outputs": [],
    "source": [
-    "# first prepare destination (~ 2 min)\n",
+    "# first prepare destination\n",
     "si['bw_path'] = [os.path.join(BASEDIR, \"bigwig/{0}.bw\".format(x)) for x in si['name']]\n",
-    "# BED => BIGWIG\n",
+    "# then make coverages BIGWIG from BED (~ 2 min)\n",
     "from jgem import utils as UT\n",
     "chromsizes = UT.chromsizes('mm10') # a file containing chromosome names and sizes\n",
     "for bedfile, bwfile, acov in si[['bed_path','bw_path','acov']].values:\n",
@@ -325,7 +325,7 @@
     "- **st**: start position\n",
     "- **ed**: end position\n",
     "- **name**: junction name\n",
-    "- **ucnt**: unique reads (normalized to 1M mapped reads)\n",
+    "- **ucnt**: unique reads (normalized to average coverage)\n",
     "- **strand**: strand of junction\n",
     "- **mcnt**: non-unique (multimapping) reads (normalized)\n"
    ]
@@ -813,7 +813,7 @@
     "ens = {} # keep EvalNames objects\n",
     "ems = {} # keep EvalMatch object\n",
     "# Gencode.VM4\n",
-    "en_gen4 = EV.EvalNames('../tests/data/assemblies/gencode.vM4.chr1', code='gen4', outdir='../out/')\n",
+    "en_gen4 = EV.EvalNames('../tests/data/assemblies/gencode.vM4.chr1', code='gen4', outdir='../tests/out/')\n",
     "# assign sample code\n",
     "si['scode'] = [x.split('_')[-1].split('.')[0] for x in si['name']]\n",
     "# For each sample\n",
@@ -851,7 +851,7 @@
     "\n",
     "Matching exons with junction boundary requires the boundaries to match. That is, to match internal exons, they have to be exactly the same (including strand). To match 5'exons, donor site has to the same but the other side does not have to be. To match single exon, they just need to have some overlap. \n",
     "\n",
-    "So, we have quite good detection of junctions. About 70% of internal exons are detected. 5',3' exons are worse (~44-49%) but if allowed to match to other class of exons, then detection rate get close to internal exon. Single exon detection rates are worst and about 10%.\n"
+    "So, we have quite good detection of junctions. About 70% of internal exons are detected. 5',3' exons are worse (< 50%) but if allowed to match to other class of exons, then detection rates get close to the internal exons. Single exon detection rates are bad and about 10%.\n"
    ]
   },
   {

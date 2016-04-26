@@ -1297,19 +1297,27 @@ using a cluster of computers. T</p>
 <li><strong>sampleinfo</strong> &#8211; dataframe containing sample info (required fileds= name, bwfile, sjfile)</li>
 <li><strong>samplecode</strong> &#8211; identidier for the sample set</li>
 <li><strong>outdir</strong> &#8211; output directory</li>
-<li><strong>Methods</strong> &#8211; <ol class="arabic">
-<li>collect_gcov: gene coverages (row:genes, col:samples)</li>
-<li>collect_ecov: exon coverages (row:exons, col:samples)</li>
-<li>collect_jcnt: junction counts (row:junctions, col:samples)</li>
-<li>collect_gcov1000 (using trimmed model)</li>
-</ol>
-</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <dl class="docutils">
+<dt>SampleInfo DataFrame columns:</dt>
+<dd><p class="first">name: sample name
+bw_path: bigwig path
+sjbed_path: sjbed path</p>
+<dl class="last docutils">
+<dt>Methods:</dt>
+<dd><ol class="first last arabic simple">
+<li>collect_gcov: gene coverages (row:genes, col:samples)</li>
+<li>collect_ecov: exon coverages (row:exons, col:samples)</li>
+<li>collect_jcnt: junction counts (row:junctions, col:samples)</li>
+<li>collect_gcov1000 (using trimmed model)</li>
+</ol>
+</dd>
+</dl>
+</dd>
 <dt>Outputs:</dt>
 <dd><p class="first">are written in files
 1. outdir/assemblycode.samplecode.gcov.txt.gz
@@ -1586,7 +1594,7 @@ and junction counts (sjfile).</p>
 </dl>
 <dl class="attribute">
 <dt id="jgem.evaluate.EvalMatch.abbr">
-<code class="descname">abbr</code><em class="property"> = {'i': 'internal exons', '3b': &quot;3' exons (b)&quot;, 'sb': 'single exons (b)', 'j': 'junctions', 's': 'single exons', '3': &quot;3' exons&quot;, '5': &quot;5' exons&quot;, '5b': &quot;5' exons (b)&quot;}</em><a class="headerlink" href="#jgem.evaluate.EvalMatch.abbr" title="Permalink to this definition">¶</a></dt>
+<code class="descname">abbr</code><em class="property"> = {'5b': &quot;5' exons (b)&quot;, '5': &quot;5' exons&quot;, 's': 'single exons', 'i': 'internal exons', 'sb': 'single exons (b)', '3': &quot;3' exons&quot;, '3b': &quot;3' exons (b)&quot;, 'j': 'junctions'}</em><a class="headerlink" href="#jgem.evaluate.EvalMatch.abbr" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2540,8 +2548,8 @@ Currently only filter with maxcov.</p>
 <dt>SampleInfo Columns:</dt>
 <dd>name: sample name (unique)
 sjexpre: path prefix to SJ/EX files (sj.txt.gz, ex.txt.gz will be added)
-bwfile: original bigwig coverage
-sjfile: original junction bed file (converted from SJ.out.tab)</dd>
+bw_path: original bigwig coverage
+sjbed_path: original junction bed file (converted from SJ.out.tab)</dd>
 </dl>
 <dl class="method">
 <dt id="jgem.merge.MergeInputNames.agg_bw">
