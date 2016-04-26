@@ -14,17 +14,26 @@ from unittest.mock import MagicMock, Mock
 #     def __getattr__(cls, name):
 #             return MagicMock()
 
-MOCK_MODULES = ['numpy','scipy','matplotlib','pandas','jgem.bxbbi.bigwig_file',
-                'matplotlib.pyplot','jgem.cy.bw','scipy.optimize']
-sys.modules.update((mod_name, MagicMock()) for mod_name in MOCK_MODULES)
-# Above does not work. Results in recursion error. 
+MOCK_MODULES = ['numpy',
+                'scipy',
+                'matplotlib',
+                'pandas',
+                'matplotlib.pyplot',
+                'jgem.cy',
+                'jgem.bxbbi.bigwig_file',
+                'scipy.optimize',
+                ]
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if not on_rtd:  # only import and set the theme if we're building docs locally
-    import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+    # import sphinx_rtd_theme
+    # html_theme = 'sphinx_rtd_theme'
+    # html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+    pass
+else:
+    sys.modules.update((mod_name, MagicMock()) for mod_name in MOCK_MODULES)
+    # Above does not work well. 
 
 
 # If extensions (or modules to document with autodoc) are in another directory,

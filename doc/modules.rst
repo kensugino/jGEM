@@ -1,99 +1,121 @@
 jGEM packages
 =============
 
+.. automodule:: jgem
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 Submodules
 ----------
 
-jgem.assembler module
----------------------
+assembler module
+----------------
 
 .. automodule:: jgem.assembler
     :members:
     :undoc-members:
     :show-inheritance:
 
-jgem.bedtools module
----------------------
+annotate module
+----------------
+
+.. automodule:: jgem.annotate
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+bedtools module
+----------------
 
 .. automodule:: jgem.bedtools
     :members:
     :undoc-members:
     :show-inheritance:
 
-jgem.bigwig module
-------------------
+bigwig module
+-------------
 
 .. automodule:: jgem.bigwig
     :members:
     :undoc-members:
     :show-inheritance:
 
-jgem.calccov module
--------------------
+calccov module
+--------------
 
 .. automodule:: jgem.calccov
     :members:
     :undoc-members:
     :show-inheritance:
 
-jgem.convert module
---------------------
+collector module
+----------------
+
+.. automodule:: jgem.collector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+convert module
+---------------
 
 .. automodule:: jgem.convert
     :members:
     :undoc-members:
     :show-inheritance:
 
-jgem.evaluate module
---------------------
+evaluate module
+---------------
 
 .. automodule:: jgem.evaluate
     :members:
     :undoc-members:
     :show-inheritance:
 
-jgem.filenames module
----------------------
+filenames module
+----------------
 
 .. automodule:: jgem.filenames
     :members:
     :undoc-members:
     :show-inheritance:
 
-jgem.graph module
------------------
+graph module
+------------
 
 .. automodule:: jgem.graph
     :members:
     :undoc-members:
     :show-inheritance:
 
-jgem.gtfgffbed module
----------------------
+gtfgffbed module
+----------------
 
 .. automodule:: jgem.gtfgffbed
     :members:
     :undoc-members:
     :show-inheritance:
 
-jgem.merge module
-------------------
+merge module
+-------------
 
 .. automodule:: jgem.merge
     :members:
     :undoc-members:
     :show-inheritance:
 
-jgem.trimex module
-------------------
+trimex module
+-------------
 
 .. automodule:: jgem.trimex
     :members:
     :undoc-members:
     :show-inheritance:
 
-jgem.utils module
------------------
+utils module
+------------
 
 .. automodule:: jgem.utils
     :members:
