@@ -46,14 +46,14 @@ def get_extension_modules():
     return extensions 
 
 setup(
-    name='jgem',
+    name='jGEM',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
     version='0.9.0',
 
-    description='jGEM ("j"unction and coverage based Gene and exon Extractor and Merger)',
+    description='Junction and coverage based Gene and exon Extractor and Merger for RNASeq',
     long_description=long_description,
 
     # The project's main homepage.
