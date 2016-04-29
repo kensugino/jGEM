@@ -26,6 +26,10 @@ MOCK_MODULES = ['numpy',
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
+import sphinx_bootstrap_theme
+html_theme = 'bootstrap'
+html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+
 if not on_rtd:  # only import and set the theme if we're building docs locally
     # import sphinx_rtd_theme
     # html_theme = 'sphinx_rtd_theme'
@@ -56,6 +60,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
+    #'sphinx.ext.autosummary',
     'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
 ]
@@ -323,3 +328,17 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+
+# include __init__ in the autodoc
+# http://stackoverflow.com/questions/5599254/how-to-use-sphinxs-autodoc-to-document-a-classs-init-self-method
+# def skip(app, what, name, obj, skip, options):
+#     if name == "__init__":
+#         return False
+#     return skip
+
+# def setup(app):
+#     app.connect("autodoc-skip-member", skip)
+# does not work
+autoclass_content = 'both'
+autosummary_generate = True
