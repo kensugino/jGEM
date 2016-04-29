@@ -174,7 +174,8 @@ div.nboutput > :first-child pre {
 div.nbinput > :first-child[class^=highlight],
 div.nboutput > :first-child[class^=highlight],
 div.nboutput > :first-child {
-    min-width: 11ex;
+    /*min-width: 11ex;*/
+    min-width:10ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -414,19 +415,19 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">            fnobj: MergeInputNames object</span>
 
 <span class="sd">        Other keywords arguments:</span>
-<span class="sd">            genome: UCSC genome name</span>
-<span class="sd">            np: number of CPU to use</span>
-<span class="sd">            covth: only use exons with coverage &gt; covth (default 0)</span>
-<span class="sd">            covdelta: exon coverage quantization delta</span>
-<span class="sd">            uth: unique reads threshold for junctions (default 0)</span>
-<span class="sd">            mth: non-unique reads threshold for junctions (default 5)</span>
-<span class="sd">            th_ratio: threshold for selecting junctions by overlapping ratio </span>
+<span class="sd">            * genome: UCSC genome name</span>
+<span class="sd">            * np: number of CPU to use</span>
+<span class="sd">            * covth: only use exons with coverage &gt; covth (default 0)</span>
+<span class="sd">            * covdelta: exon coverage quantization delta</span>
+<span class="sd">            * uth: unique reads threshold for junctions (default 0)</span>
+<span class="sd">            * mth: non-unique reads threshold for junctions (default 5)</span>
+<span class="sd">            * th_ratio: threshold for selecting junctions by overlapping ratio </span>
 <span class="sd">              (default 0.001, i.e. if a junction&#39;s read is less than 1/1000 of the sum of </span>
 <span class="sd">              all the reads of overlapping junctions then the junction is discarded)</span>
-<span class="sd">            th_detected: junctions need to be detected in more than this number of samples (default 2)</span>
+<span class="sd">            * th_detected: junctions need to be detected in more than this number of samples (default 2)</span>
 <span class="sd">              unless max junction reads across samples is larger than th_maxcnt2</span>
-<span class="sd">            th_maxcnt1: max junction reads across sample has to be larger than this (default 0.1)</span>
-<span class="sd">            th_maxcnt2: if max junction reads across samples is larger than this, ignore th_detected</span>
+<span class="sd">            * th_maxcnt1: max junction reads across sample has to be larger than this (default 0.1)</span>
+<span class="sd">            * th_maxcnt2: if max junction reads across samples is larger than this, ignore th_detected</span>
 <span class="sd">              (default 4)</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -456,9 +457,9 @@ div.nboutput  > :nth-child(2).stderr {
             <span class="n">bedpath</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">ex_bed</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="c1">#fn.fname(&#39;ex.{0}.bed.gz&#39;.format(k))</span>
             <span class="n">bwpath</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">ex_bw</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="c1">#fn.fname(&#39;ex.{0}.bw&#39;.format(k), category=&#39;output&#39;)</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;converting {0} to BIGWIG...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bedpath</span><span class="p">))</span>
-            <span class="n">totbp</span><span class="p">,</span><span class="n">covbp</span> <span class="o">=</span> <span class="n">BT</span><span class="o">.</span><span class="n">get_total_bp_bedfile</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="n">bed12</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-            <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">covbp</span><span class="p">)</span><span class="o">/</span><span class="n">totbp</span> <span class="c1"># normalize average coverage to 1.</span>
-            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;{0}:totbp={1},covbp={2},scale={3}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span><span class="n">totbp</span><span class="p">,</span><span class="n">covbp</span><span class="p">,</span><span class="n">scale</span><span class="p">))</span>
+            <span class="c1">#totbp,covbp = BT.get_total_bp_bedfile(bedpath, bed12=False)</span>
+            <span class="c1">#scale = float(covbp)/totbp # normalize average coverage to 1.</span>
+            <span class="c1">#LOG.info(&#39;{0}:totbp={1},covbp={2},scale={3}&#39;.format(bedpath,totbp,covbp,scale))</span>
             <span class="c1"># scale = 1e8/totbp # old normalization = 1e6/totaligned when readlen=100bp</span>
             <span class="c1"># ^==== TODO: Is normalizing to totaligned good? </span>
             <span class="c1"># If complexity (#genes) is bigger then per element cov is smaller. </span>
@@ -468,7 +469,11 @@ div.nboutput  > :nth-child(2).stderr {
             <span class="c1"># [Q] normalize chrom-wise? Mouse chr11,19,X seems higher than average</span>
             <span class="c1">#     in addition to the obvious low expressing chrY</span>
 
-            <span class="n">BT</span><span class="o">.</span><span class="n">bed2bw</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+            <span class="c1"># 2016-04-28: don&#39;t scale just reflect read depth all the way through</span>
+
+            <span class="c1">#BT.bed2bw(bedpath, self.chromsizes, bwpath, scale=scale)</span>
+            <span class="n">BT</span><span class="o">.</span><span class="n">bed2bw</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+
         <span class="c1"># delete temp files</span>
         <span class="n">fn</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">],</span><span class="n">protect</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">])</span></div>
 
@@ -483,12 +488,14 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="n">tgts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgts</span> <span class="c1"># [&#39;mep&#39;,&#39;men&#39;,&#39;se&#39;] #sep&#39;,&#39;sen&#39;]</span>
         <span class="n">th</span> <span class="o">=</span> <span class="n">pr</span><span class="p">[</span><span class="s1">&#39;covth&#39;</span><span class="p">]</span>
         <span class="n">delta</span> <span class="o">=</span> <span class="n">pr</span><span class="p">[</span><span class="s1">&#39;covdelta&#39;</span><span class="p">]</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">dstpre</span><span class="p">))</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[(</span><span class="n">expaths</span><span class="p">,</span> <span class="n">dstpre</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">th</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">tgts</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">]</span>
 
         <span class="n">rslts</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">process_mp</span><span class="p">(</span><span class="n">make_ex_bed_chr</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="n">doreduce</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
         <span class="c1"># concatenate</span>
         <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;concatenating chroms...&#39;</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">ex_bed</span><span class="p">(</span><span class="n">tgts</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tgts</span><span class="p">:</span>
             <span class="n">bf</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">ex_bed</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="c1">#fn.fname(&#39;ex.{0}.bed.gz&#39;.format(k))</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">bf</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
@@ -518,11 +525,12 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="n">scode</span> <span class="o">=</span> <span class="s1">&#39;sjbed.gz&#39;</span>
         <span class="n">asjpath</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="n">scode</span><span class="p">)</span> <span class="c1"># aggregated sj file</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[(</span><span class="n">sjpaths</span><span class="p">,</span> <span class="n">asjpath</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">uth</span><span class="p">,</span> <span class="n">mth</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">]</span>
-
+        <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">asjpath</span><span class="p">))</span>
         <span class="n">rslts</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">process_mp</span><span class="p">(</span><span class="n">make_sj_bed_chr</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">np</span><span class="p">,</span> <span class="n">doreduce</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
         <span class="c1"># concatenate</span>
         <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;merge sj: concatenating chroms...&#39;</span><span class="p">)</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">asjpath</span><span class="p">))</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">asjpath</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">:</span>
                 <span class="n">sf</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;{0}{1}.gz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scode</span><span class="p">,</span><span class="n">x</span><span class="p">))</span>
@@ -533,16 +541,18 @@ div.nboutput  > :nth-child(2).stderr {
 
         <span class="c1"># group same junctions</span>
         <span class="n">msj</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">asjpath</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span><span class="s1">&#39;src&#39;</span><span class="p">,</span><span class="s1">&#39;ucnt&#39;</span><span class="p">,</span><span class="s1">&#39;mcnt&#39;</span><span class="p">])</span>
-        <span class="c1"># average</span>
-        <span class="n">scale</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sjpaths</span><span class="p">))</span> 
-        <span class="n">msj</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale</span><span class="o">*</span><span class="n">msj</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span>
-        <span class="n">msj</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale</span><span class="o">*</span><span class="n">msj</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span>
+        <span class="c1"># average &lt;= 2016-04-28 don&#39;t average just aggregate</span>
+        <span class="c1"># scale = 1/float(len(sjpaths)) </span>
+        <span class="c1"># msj[&#39;ucnt&#39;] = scale*msj[&#39;ucnt&#39;]</span>
+        <span class="c1"># msj[&#39;mcnt&#39;] = scale*msj[&#39;mcnt&#39;]</span>
         <span class="c1"># unique junctions</span>
         <span class="n">msjg</span> <span class="o">=</span> <span class="n">msj</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">])[[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">,</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
         <span class="c1"># msjg[&#39;sc1&#39;] = msjg[&#39;ucnt&#39;] # for BED</span>
         <span class="c1"># msjg[&#39;tst&#39;] = msjg[&#39;mcnt&#39;] # for BED</span>
-        <span class="n">u</span> <span class="o">=</span> <span class="n">msjg</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="s1">&#39;{:.2}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">msjg</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="s1">&#39;{:.2}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+        <span class="c1"># u = msjg[&#39;ucnt&#39;].map(&#39;{:.2}&#39;.format)</span>
+        <span class="c1"># m = msjg[&#39;mcnt&#39;].map(&#39;{:.2}&#39;.format)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">msjg</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">msjg</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
         <span class="n">msjg</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">msjg</span><span class="p">))</span>
         <span class="n">msjg</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msjg</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;_u:&#39;</span><span class="o">+</span><span class="n">u</span><span class="o">+</span><span class="s1">&#39;_m:&#39;</span><span class="o">+</span><span class="n">m</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">SJCOLS</span> <span class="c1">#GGB.BEDCOLS[:7] # chr,st,ed,name,sc1,strand,tst</span>
@@ -666,8 +676,9 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="n">pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
         <span class="n">bwfiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fn</span><span class="o">.</span><span class="n">bwpaths</span><span class="p">()]</span> <span class="c1"># [(name,bwfile),...]</span>
         <span class="n">dstpath</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">agg_bw</span><span class="p">()</span>
-        <span class="n">scale</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">bwfiles</span><span class="p">)</span> <span class="c1"># average</span>
-        <span class="n">BW</span><span class="o">.</span><span class="n">merge_bigwigs_mp</span><span class="p">(</span><span class="n">bwfiles</span><span class="p">,</span> <span class="n">pr</span><span class="p">[</span><span class="s1">&#39;genome&#39;</span><span class="p">],</span> <span class="n">dstpath</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;np&#39;</span><span class="p">])</span></div></div>
+        <span class="c1"># scale = 1./len(bwfiles) # average</span>
+        <span class="c1"># BW.merge_bigwigs_mp(bwfiles, pr[&#39;genome&#39;], dstpath, scale=scale, np=pr[&#39;np&#39;])</span>
+        <span class="n">BW</span><span class="o">.</span><span class="n">merge_bigwigs_mp</span><span class="p">(</span><span class="n">bwfiles</span><span class="p">,</span> <span class="n">pr</span><span class="p">[</span><span class="s1">&#39;genome&#39;</span><span class="p">],</span> <span class="n">dstpath</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;np&#39;</span><span class="p">])</span></div></div>
 
 <div class="viewcode-block" id="make_ex_bed_chr"><a class="viewcode-back" href="../../modules.html#jgem.merge.make_ex_bed_chr">[docs]</a><span class="k">def</span> <span class="nf">make_ex_bed_chr</span><span class="p">(</span><span class="n">expaths</span><span class="p">,</span> <span class="n">dstpre</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">covth</span><span class="p">,</span> <span class="n">covdelta</span><span class="p">,</span> <span class="n">tgts</span><span class="p">):</span>
     <span class="n">withcov</span> <span class="o">=</span> <span class="bp">True</span>
@@ -797,8 +808,11 @@ div.nboutput  > :nth-child(2).stderr {
 <div class="viewcode-block" id="MergeAssemble.assemble_me1"><a class="viewcode-back" href="../../modules.html#jgem.merge.MergeAssemble.assemble_me1">[docs]</a>    <span class="k">def</span> <span class="nf">assemble_me1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;do assembly separately for each strand&quot;&quot;&quot;</span>
         <span class="n">asms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asms</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;#########  START +strand assembly ######################################&#39;</span><span class="p">)</span>
         <span class="n">asms</span><span class="p">[</span><span class="s1">&#39;mep&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;#########  START -strand assembly ######################################&#39;</span><span class="p">)</span>
         <span class="n">asms</span><span class="p">[</span><span class="s1">&#39;men&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>        
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;########################################################################&#39;</span><span class="p">)</span>
         <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;mep:{0}, men:{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">asms</span><span class="p">[</span><span class="s1">&#39;mep&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ae</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">asms</span><span class="p">[</span><span class="s1">&#39;men&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ae</span><span class="p">)))</span></div>
 
     <span class="k">def</span> <span class="nf">_remove_se_from_me</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

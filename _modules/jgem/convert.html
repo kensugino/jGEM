@@ -174,7 +174,8 @@ div.nboutput > :first-child pre {
 div.nbinput > :first-child[class^=highlight],
 div.nboutput > :first-child[class^=highlight],
 div.nboutput > :first-child {
-    min-width: 11ex;
+    /*min-width: 11ex;*/
+    min-width:10ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -559,6 +560,7 @@ div.nboutput  > :nth-child(2).stderr {
 <div class="viewcode-block" id="BEDWriter.write_iso"><a class="viewcode-back" href="../../modules.html#jgem.convert.BEDWriter.write_iso">[docs]</a>    <span class="k">def</span> <span class="nf">write_iso</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">maxisonum</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">fname</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
             <span class="n">fname</span> <span class="o">=</span> <span class="n">fname</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fobj</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_iso_all</span><span class="p">(</span><span class="n">maxisonum</span><span class="o">=</span><span class="n">maxisonum</span><span class="p">):</span>
                 <span class="n">fobj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="n">x</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>

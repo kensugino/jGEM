@@ -174,7 +174,8 @@ div.nboutput > :first-child pre {
 div.nbinput > :first-child[class^=highlight],
 div.nboutput > :first-child[class^=highlight],
 div.nboutput > :first-child {
-    min-width: 11ex;
+    /*min-width: 11ex;*/
+    min-width:10ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -287,13 +288,13 @@ div.nboutput  > :nth-child(2).stderr {
 
 <span class="c1"># SJ.out.tab to SJBED ###################################################################</span>
 
-<div class="viewcode-block" id="sjtab2sjbed"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.sjtab2sjbed">[docs]</a><span class="k">def</span> <span class="nf">sjtab2sjbed</span><span class="p">(</span><span class="n">sjtab</span><span class="p">,</span> <span class="n">sjbed</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+<div class="viewcode-block" id="sjtab2sjbed"><a class="viewcode-back" href="../../modules.html#jgem.gtfgffbed.sjtab2sjbed">[docs]</a><span class="k">def</span> <span class="nf">sjtab2sjbed</span><span class="p">(</span><span class="n">sjtab</span><span class="p">,</span> <span class="n">sjbed</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Generate splice junction input file from STAR SJ.out.tab</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        sjtab (str): path to SJ.out.tab file</span>
 <span class="sd">        sjbed (str): path to output bed</span>
-<span class="sd">        scale (float): scale (= 1/average_coverage = covbp/totbp)</span>
+<span class="sd">        scale (float): a number to multiply (default None, no change)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Pandas dataframe</span>
@@ -304,13 +305,17 @@ div.nboutput  > :nth-child(2).stderr {
                   <span class="n">sj</span><span class="p">[[</span><span class="s1">&#39;motif&#39;</span><span class="p">,</span><span class="s1">&#39;annotated&#39;</span><span class="p">,</span><span class="s1">&#39;ureads&#39;</span><span class="p">,</span><span class="s1">&#39;mreads&#39;</span><span class="p">,</span><span class="s1">&#39;maxoverhang&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
     <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;strand&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">SJTABSTRAND</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;strand2&#39;</span><span class="p">]]</span>
     <span class="c1">#scale = 1e6/float(aligned)</span>
-    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ureads&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">scale</span>
-    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;mreads&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">scale</span>
+    <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ureads&#39;</span><span class="p">]</span>
+        <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;mreads&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ureads&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">scale</span>
+        <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;mreads&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">scale</span>
     <span class="c1">#sj[&#39;jcnt&#39;] = [x or y for x, y in sj[[&#39;ucnt&#39;,&#39;mcnt&#39;]].values]</span>
     <span class="c1">#cols = [&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;,&#39;name&#39;,&#39;strand&#39;,&#39;ucnt&#39;,&#39;mcnt&#39;]#,&#39;jcnt&#39;]</span>
     <span class="c1">#UT.write_pandas(sj[cols], sjbed, &#39;&#39;)</span>
-    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;sc1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ureads&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">scale</span>
-    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;tst&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;mreads&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">scale</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;sc1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;ucnt&#39;</span><span class="p">]</span> <span class="c1">#sj[&#39;ureads&#39;]*scale</span>
+    <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;tst&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sj</span><span class="p">[</span><span class="s1">&#39;mcnt&#39;</span><span class="p">]</span> <span class="c1">#sj[&#39;mreads&#39;]*scale</span>
     <span class="c1">#cols = [&#39;chr&#39;,&#39;st&#39;,&#39;ed&#39;,&#39;name&#39;,&#39;sc1&#39;,&#39;strand&#39;,&#39;tst&#39;] </span>
     <span class="c1">#UT.write_pandas(sj[cols], sjbed, &#39;&#39;)</span>
     <span class="n">write_bed</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span> <span class="n">sjbed</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
@@ -578,6 +583,7 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">fname</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">fname</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
     <span class="n">df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_NONE</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">compress</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>

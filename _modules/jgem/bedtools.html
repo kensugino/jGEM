@@ -174,7 +174,8 @@ div.nboutput > :first-child pre {
 div.nbinput > :first-child[class^=highlight],
 div.nboutput > :first-child[class^=highlight],
 div.nboutput > :first-child {
-    min-width: 11ex;
+    /*min-width: 11ex;*/
+    min-width:10ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -278,6 +279,7 @@ div.nboutput  > :nth-child(2).stderr {
 
 <span class="c1"># decorators to separate logic</span>
 <div class="viewcode-block" id="compressQ"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.compressQ">[docs]</a><span class="k">def</span> <span class="nf">compressQ</span><span class="p">(</span><span class="n">outname</span><span class="p">,</span> <span class="n">noerr</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; decorator for checking file compression and error &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">deco</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
         <span class="n">argnames</span><span class="p">,</span> <span class="n">varargs</span><span class="p">,</span> <span class="n">keywords</span><span class="p">,</span> <span class="n">defaults</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getargspec</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="n">argnames</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">outname</span><span class="p">)</span>
@@ -293,6 +295,7 @@ div.nboutput  > :nth-child(2).stderr {
                 <span class="n">opath</span> <span class="o">=</span> <span class="n">opath</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">compress</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">opath</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">outname</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="n">outname</span><span class="p">]</span> <span class="o">=</span> <span class="n">opath</span>
             <span class="k">else</span><span class="p">:</span>
@@ -385,6 +388,7 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    Runs Kent&#39;s tool wigToBigWig.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;wigToBigWig&#39;</span><span class="p">,</span> <span class="n">wigpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">]</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">bwpath</span><span class="p">))</span>
     <span class="n">err</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">err</span></div>
 
@@ -414,6 +418,7 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="n">make_bw_from_bed</span><span class="p">(</span><span class="n">bedpath</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="n">bwpath</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="bed12_bed6"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.bed12_bed6">[docs]</a><span class="k">def</span> <span class="nf">bed12_bed6</span><span class="p">(</span><span class="n">bed</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; convert BED12 to BED6 uses cython helper &quot;&quot;&quot;</span>
     <span class="c1"># BED12 [&#39;chr&#39;, &#39;st&#39;, &#39;ed&#39;, &#39;name&#39;, &#39;sc1&#39;, &#39;strand&#39;, &#39;tst&#39;, &#39;ted&#39;, &#39;sc2&#39;, &#39;#exons&#39;, &#39;esizes&#39;, &#39;estarts&#39;]</span>
     <span class="c1"># BED6 [&#39;chr&#39;, &#39;st&#39;, &#39;ed&#39;, &#39;name&#39;, &#39;sc1&#39;, &#39;strand&#39;] flatten exons, collect unique</span>
     <span class="c1"># BED12 tid =&gt; BED6 name=tid+exon_number</span>
@@ -556,8 +561,10 @@ div.nboutput  > :nth-child(2).stderr {
             <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cname</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">outfile</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">ret</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
-            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;bederror&#39;</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ret</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;bederror return code:{0}, cmd:{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+        <span class="c1"># LOG.warning(msg)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">cname</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">_runbedtools3</span><span class="p">(</span><span class="n">which</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">bname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -570,7 +577,9 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cname</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">outfile</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">ret</span> <span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
-        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;bederror&#39;</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;bederror return code:{0}, cmd:{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+        <span class="c1"># LOG.warning(msg)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ret</span>
 
 <span class="k">def</span> <span class="nf">_bedtoolscatcherror</span><span class="p">(</span><span class="n">which</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">bname</span><span class="p">,</span> <span class="n">cname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -586,8 +595,6 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="n">aname</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">uncompresscopy</span><span class="p">(</span><span class="n">aname</span><span class="p">)</span>
         <span class="n">bname</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">uncompresscopy</span><span class="p">(</span><span class="n">bname</span><span class="p">)</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">_runbedtools3</span><span class="p">(</span><span class="n">which</span><span class="p">,</span><span class="n">aname</span><span class="p">,</span><span class="n">bname</span><span class="p">,</span><span class="n">cname</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">ret</span> <span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;bedtools error&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">cname</span><span class="p">)</span>
 
 <div class="viewcode-block" id="calc_ovlratio"><a class="viewcode-back" href="../../modules.html#jgem.bedtools.calc_ovlratio">[docs]</a><span class="k">def</span> <span class="nf">calc_ovlratio</span><span class="p">(</span><span class="n">aname</span><span class="p">,</span> <span class="n">bname</span><span class="p">,</span> <span class="n">tname</span><span class="p">,</span> <span class="n">nacol</span><span class="p">,</span> <span class="n">nbcol</span><span class="p">,</span> <span class="n">idcol</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">]):</span>

@@ -174,7 +174,8 @@ div.nboutput > :first-child pre {
 div.nbinput > :first-child[class^=highlight],
 div.nboutput > :first-child[class^=highlight],
 div.nboutput > :first-child {
-    min-width: 11ex;
+    /*min-width: 11ex;*/
+    min-width:10ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -259,9 +260,6 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># system imports</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
-<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">iadd</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="nb">reduce</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 <span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
@@ -313,9 +311,9 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        outdir: output directory</span>
 
 <span class="sd">    SampleInfo DataFrame columns:</span>
-<span class="sd">        name: sample name</span>
-<span class="sd">        bw_path: bigwig path</span>
-<span class="sd">        sjbed_path: sjbed path</span>
+<span class="sd">        - name: sample name</span>
+<span class="sd">        - bw_path: bigwig path</span>
+<span class="sd">        - sjbed_path: sjbed path</span>
 
 <span class="sd">   	Methods:</span>
 <span class="sd">	    1. collect_gcov: gene coverages (row:genes, col:samples)</span>
@@ -324,14 +322,14 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">	    4. collect_gcov1000 (using trimmed model)</span>
 
 <span class="sd">    Outputs:</span>
-<span class="sd">        are written in files</span>
-<span class="sd">        1. outdir/assemblycode.samplecode.gcov.txt.gz</span>
-<span class="sd">        1b. outdir/assemblycode.samplecode.ugcov.txt.gz</span>
-<span class="sd">        2. outdir/assemblycode.samplecode.ecov.txt.gz</span>
-<span class="sd">        2b. outdir/assemblycode.samplecode.uecov.txt.gz</span>
-<span class="sd">        3. outdir/assemblycode.samplecode.jcnt.txt.gz</span>
-<span class="sd">        4. outdir/assemblycode.samplecode.t1000gcov.txt.gz</span>
-<span class="sd">        4b. outdir/assemblycode.samplecode.ut1000gcov.txt.gz</span>
+<span class="sd">        are written in files:</span>
+<span class="sd">        * 1. outdir/assemblycode.samplecode.gcov.txt.gz</span>
+<span class="sd">        * 1b. outdir/assemblycode.samplecode.ugcov.txt.gz</span>
+<span class="sd">        * 2. outdir/assemblycode.samplecode.ecov.txt.gz</span>
+<span class="sd">        * 2b. outdir/assemblycode.samplecode.uecov.txt.gz</span>
+<span class="sd">        * 3. outdir/assemblycode.samplecode.jcnt.txt.gz</span>
+<span class="sd">        * 4. outdir/assemblycode.samplecode.t1000gcov.txt.gz</span>
+<span class="sd">        * 4b. outdir/assemblycode.samplecode.ut1000gcov.txt.gz</span>
 
 <span class="sd">        Individual sample gcov/ecov/gcov1000 should have filename</span>
 <span class="sd">        outdir/assemblycode.samplename.gcov.txt.gz etc.</span>

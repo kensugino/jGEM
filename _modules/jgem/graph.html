@@ -174,7 +174,8 @@ div.nboutput > :first-child pre {
 div.nbinput > :first-child[class^=highlight],
 div.nboutput > :first-child[class^=highlight],
 div.nboutput > :first-child {
-    min-width: 11ex;
+    /*min-width: 11ex;*/
+    min-width:10ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -750,6 +751,7 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="c1"># SE genes</span>
         <span class="n">genes</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">set</span><span class="p">([</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">se</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]]</span>
         <span class="k">if</span> <span class="n">cachename</span><span class="p">:</span>
+            <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cachename</span><span class="p">))</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">genes</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">cachename</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">))</span>
         <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39; time: {0:.3f}s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">_sttime</span><span class="p">))</span>
     
@@ -815,6 +817,7 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="c1"># version 4 graph: uses overlaps in addition to junctions to connect</span>
         <span class="c1"># genes = [set([_id&#39;s]),...]</span>
         <span class="k">if</span> <span class="n">cachename</span><span class="p">:</span>
+            <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cachename</span><span class="p">))</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">genes</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">cachename</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">))</span>
         <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39; time: {0:.3f}s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">_sttime</span><span class="p">))</span>
     

@@ -1,3 +1,9 @@
+dl.class, dl.function {
+  border-top: 2px solid grey;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
 /*
  * bootstrap-sphinx.css
  * ~~~~~~~~~~~~~~~~~~~~

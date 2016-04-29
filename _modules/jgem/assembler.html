@@ -174,7 +174,8 @@ div.nboutput > :first-child pre {
 div.nbinput > :first-child[class^=highlight],
 div.nboutput > :first-child[class^=highlight],
 div.nboutput > :first-child {
-    min-width: 11ex;
+    /*min-width: 11ex;*/
+    min-width:10ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -296,7 +297,7 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="n">checksjsupport</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="c1"># whether check splice junctions without read support (necessary when merging or binth&gt;0)</span>
     <span class="n">binth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="c1"># bigwig to bed threshold</span>
 
-    <span class="n">jie_binth</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="n">jie_binth</span><span class="o">=</span><span class="mi">320</span><span class="p">,</span> <span class="c1">#16,</span>
     <span class="n">jie_sjth</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>    
     <span class="n">jie_ratio</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="c1"># junctions in a exon ratio to surrounding junctions which define the exon</span>
 
@@ -319,36 +320,36 @@ div.nboutput  > :nth-child(2).stderr {
     
     <span class="n">iret_mpth</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span><span class="c1"># mapped% th for detecting intron retension</span>
     <span class="n">iret_covratio</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="c1"># min cov ratio between an iret and average of surrounding exons </span>
-    <span class="n">iret_covth</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="c1"># if intron cov smaller than this, then ignore</span>
+    <span class="n">iret_covth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="c1">#0.005, # if intron cov smaller than this, then ignore</span>
 
 
     <span class="n">findsecovth</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="c1"># whether to use adaptive secovth (pndr2)</span>
-    <span class="n">minsecovth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span><span class="c1"># minimum single exon coverage (normalized to million alignments)</span>
-    <span class="n">secovth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="c1"># default SE cov threshold if not using adaptive version (pndr1)</span>
+    <span class="n">minsecovth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="c1">#0.1,# minimum single exon coverage (normalized to million alignments)</span>
+    <span class="n">secovth</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="c1">#0.5, # default SE cov threshold if not using adaptive version (pndr1)</span>
     <span class="n">se_gap</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="c1">#50,# single exon gap fill</span>
     <span class="n">se_sizeth</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="c1"># single exon size th</span>
     <span class="n">se_sizeth2</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="c1"># for SELECTSEME</span>
-    <span class="n">se_binth</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">se_binth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="c1">#0.01,</span>
     <span class="c1"># adaptive threshold is calculated and bigger of this and calculated value is used</span>
     <span class="c1"># se_th99, FINDSE_secovth in stats is the calculated value</span>
     <span class="n">findsecovth_useref</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="c1"># whether to use ref for finding secov, if not use ME</span>
     <span class="n">savepndr1</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="c1"># whether to save pndr1 (no adaptive secovth) when doing pndr2</span>
     
     <span class="n">find53ir_covratio</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="c1"># cov ratio threshold for FIND53IR</span>
-    <span class="n">find53ir_covth</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span> <span class="c1"># cov threhold for FIND53IR</span>
+    <span class="n">find53ir_covth</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="c1">#0.03, # cov threhold for FIND53IR</span>
 
     <span class="n">remove_overlappingse</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="c1"># whether to remove SE overlapping to ME</span>
     <span class="n">remove_bad2exon</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="c1"># whether to perform bad 2 exon gene removal</span>
     <span class="n">me2exon_sjth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="c1"># 2exon genes with splice junction support less than this will be removed</span>
     <span class="n">me2exon_sizeth</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span><span class="c1"># 2exon genes terminal size th ~ 2 x read length</span>
-    <span class="n">me2exon_covth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="c1"># 2exon genes cov th</span>
+    <span class="n">me2exon_covth</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="c1">#0.5,# 2exon genes cov th</span>
     
     <span class="n">ed_window</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="c1"># edge detector smooth window (in bp)</span>
     <span class="n">ed_minth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="c1"># edge detector minth for smoothed derivative</span>
     <span class="n">ed_sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="c1"># edge detector sigma for threshold (larger of minth, sigma*std is used)</span>
     <span class="n">ed_covratio</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="c1"># edge detector if cov ratio to surrounds is &lt; covratio, discard</span>
     <span class="c1"># for abundant one covratio needs to be small to retrieve </span>
-    <span class="n">ed_covth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span><span class="c1"># edge detector abs cov threshold</span>
+    <span class="n">ed_covth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="c1">#0.1,# edge detector abs cov threshold</span>
     <span class="n">ed_smwinsize</span><span class="o">=</span><span class="mi">151</span><span class="p">,</span> <span class="c1"># smooth window for trimming</span>
     <span class="n">ed_minintsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="c1"># window for merging peaks</span>
     <span class="n">ed_aggratio</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="c1"># </span>
@@ -376,9 +377,9 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="n">gap3</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 
     <span class="n">findsecovth</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">minsecovth</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span>
-    <span class="n">secovth</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
-    <span class="n">se_binth</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+    <span class="c1">#minsecovth=0.03,</span>
+    <span class="c1">#secovth=0.05,</span>
+    <span class="c1">#se_binth=0.01,</span>
     <span class="n">se_gap</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="c1">#se_sizeth=10,</span>
 
@@ -387,14 +388,14 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="n">ed_mimath</span><span class="o">=</span><span class="mf">0.20</span><span class="p">,</span>
     <span class="n">ed_mimath2</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
     <span class="n">ed_sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-    <span class="n">ed_covth</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+    <span class="c1">#ed_covth=0.001,</span>
 
     <span class="n">iret_mpth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1">#0.9999,</span>
     <span class="n">iret_covratio</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-    <span class="n">iret_covth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1">#0.01,</span>
+    <span class="c1">#iret_covth=1, #0.01,</span>
 
     <span class="n">find53ir_covratio</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
-    <span class="n">find53ir_covth</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span>
+    <span class="c1">#find53ir_covth=0.03,</span>
 <span class="p">)</span>
 <span class="n">MPARAMS</span> <span class="o">=</span> <span class="n">PARAMS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="n">MPARAMS</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">MPARAMDIFF</span><span class="p">)</span>
@@ -414,9 +415,7 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">            fnobj: FileNames object</span>
 <span class="sd">            merging (bool): whether merging assembled models or not (default False)</span>
 <span class="sd">            saveintermediates (bool): whether to save intermediates (default True)</span>
-
-<span class="sd">        KeywordArgs:</span>
-<span class="sd">            to change any of the parameter values</span>
+<span class="sd">            kwargs: to change any of the parameter values</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span><span class="o">=</span><span class="n">fnobj</span>
@@ -447,7 +446,7 @@ div.nboutput  > :nth-child(2).stderr {
             <span class="c1"># always do consistency check if binth&gt;0 (since support may be reduced)</span>
             <span class="n">pr</span><span class="p">[</span><span class="s1">&#39;checksjsupport&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;checksjsupport&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">True</span>
         <span class="n">prdf</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pr</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">txtname</span><span class="p">(</span><span class="s1">&#39;assemble.params&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;assemble.params.txt&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
             <span class="n">prdf0</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prdf</span><span class="p">)</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">prdf0</span><span class="p">):</span>
@@ -471,11 +470,13 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">prdf</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;ih&#39;</span><span class="p">)</span></div>
             
 <div class="viewcode-block" id="Assembler.save_stats"><a class="viewcode-back" href="../../modules.html#jgem.assembler.Assembler.save_stats">[docs]</a>    <span class="k">def</span> <span class="nf">save_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Saves assemble related stats into (samplename).assemble.stats.txt. &quot;&quot;&quot;</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;assemble.stats.txt&#39;</span><span class="p">,</span><span class="n">category</span><span class="o">=</span><span class="s1">&#39;stats&#39;</span><span class="p">)</span>
         <span class="n">UT</span><span class="o">.</span><span class="n">write_pandas</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;ih&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Assembler.assemble"><a class="viewcode-back" href="../../modules.html#jgem.assembler.Assembler.assemble">[docs]</a>    <span class="k">def</span> <span class="nf">assemble</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Perform the assembly &quot;&quot;&quot;</span>
         <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span>
         <span class="n">pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
         <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span>
@@ -613,17 +614,17 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    Args:</span>
 <span class="sd">        sj: junction DataFrame</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">        sj: selected junctions dataframe</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :sj: selected junctions dataframe</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        selectsj_ratio: thredhold for the ratio, default:{selectsj_ratio}</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * selectsj_ratio: thredhold for the ratio, default:{selectsj_ratio}</span>
 
 <span class="sd">    Files:</span>
-<span class="sd">        selectsj.bed.gz</span>
-<span class="sd">        selectsj.inte.txt.gz</span>
+<span class="sd">        * selectsj.bed.gz</span>
+<span class="sd">        * selectsj.inte.txt.gz</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SELECTSJ.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.SELECTSJ.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">sj</span>
@@ -669,21 +670,21 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    Args:</span>
 <span class="sd">        sj: junction DataFrame</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">        sj: compatible junctions</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :sj: compatible junctions</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        binth: coverage threshold, default:{binth}, (for merging: {binth_m})</span>
-<span class="sd">        genome: genome version, default:{genome}</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * binth: coverage threshold, default:{binth}, (for merging: {binth_m})</span>
+<span class="sd">        * genome: genome version, default:{genome}</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        bw*.bed.gz</span>
-<span class="sd">        sjst.bed.gz</span>
-<span class="sd">        sjed.bed.gz</span>
-<span class="sd">        sjst.ovl.txt.gz</span>
-<span class="sd">        sjed.ovl.txt.gz</span>
+<span class="sd">        * bw*.bed.gz</span>
+<span class="sd">        * sjst.bed.gz</span>
+<span class="sd">        * sjed.bed.gz</span>
+<span class="sd">        * sjst.ovl.txt.gz</span>
+<span class="sd">        * sjed.ovl.txt.gz</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="CHECKSJSUPPORT.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.CHECKSJSUPPORT.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">sj</span>
@@ -723,20 +724,20 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    Args:</span>
 <span class="sd">        sj: junction DataFrame</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">        sj: junction dataframe without JIE</span>
-<span class="sd">        jie: junctions in exons</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :sj: junction dataframe without JIE</span>
+<span class="sd">        :jie: junctions in exons</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        jie_binth: coverage threshold,  default:{jie_binth}</span>
-<span class="sd">        jie_sjth: threshold for normalized read counts,  default:{genome}</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * jie_binth: coverage threshold,  default:{jie_binth}</span>
+<span class="sd">        * jie_sjth: threshold for normalized read counts,  default:{genome}</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        bw*.bed.gz</span>
-<span class="sd">        sjsupp.bed.gz</span>
-<span class="sd">        jie.bw.ovl.txt.gz</span>
+<span class="sd">        * bw*.bed.gz</span>
+<span class="sd">        * sjsupp.bed.gz</span>
+<span class="sd">        * jie.bw.ovl.txt.gz</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="REMOVEJIE.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.REMOVEJIE.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">sj</span>
@@ -746,6 +747,15 @@ div.nboutput  > :nth-child(2).stderr {
 
         <span class="c1"># covarage file</span>
         <span class="n">binfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bw2bed</span><span class="p">(</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;jie_binth&#39;</span><span class="p">])</span>
+        <span class="c1"># if nothing in binfile then skip</span>
+        <span class="n">jiebw</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_bed</span><span class="p">(</span><span class="n">binfile</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">jiebw</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">jie</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;nothing above jie_binth {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;jie_binth&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;REMOVEJIE.#sj&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sj</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;REMOVEJIE.#jie&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">return</span>            
+
         <span class="n">sjmp</span> <span class="o">=</span> <span class="n">BT</span><span class="o">.</span><span class="n">calc_ovlratio</span><span class="p">(</span>
             <span class="n">aname</span><span class="o">=</span><span class="n">sjfile</span><span class="p">,</span> 
             <span class="n">bname</span><span class="o">=</span><span class="n">binfile</span><span class="p">,</span> 
@@ -779,18 +789,18 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    Args:</span>
 <span class="sd">        sj: junction DataFrame</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">        me: exons dataframe</span>
-<span class="sd">        sj: compatible junctions</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :me: exons dataframe</span>
+<span class="sd">        :sj: compatible junctions</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        ureadth: threshold for junction unique counts, default:{ureadth} ({ureadth_m} for merging)</span>
-<span class="sd">        mreadth: threshold for non-unique junction counts, default:{mreadth} ({mreadth_m} for merging)</span>
-<span class="sd">        maxexonsize: maximum exon size, default:{maxexonsize}</span>
-<span class="sd">        edgesize: temporary edge exon size, default:{edgesize}</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * ureadth: threshold for junction unique counts, default:{ureadth} ({ureadth_m} for merging)</span>
+<span class="sd">        * mreadth: threshold for non-unique junction counts, default:{mreadth} ({mreadth_m} for merging)</span>
+<span class="sd">        * maxexonsize: maximum exon size, default:{maxexonsize}</span>
+<span class="sd">        * edgesize: temporary edge exon size, default:{edgesize}</span>
 
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SJ2EX.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.SJ2EX.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">sj</span>
@@ -952,14 +962,14 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    Args:</span>
 <span class="sd">        me: exon DataFrame</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">        me: exon dataframe with merged exons</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :me: exon dataframe with merged exons</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        sjex.bed.gz</span>
-<span class="sd">        sjex.inte.txt.gz</span>
+<span class="sd">        * sjex.bed.gz</span>
+<span class="sd">        * sjex.inte.txt.gz</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO:</span>
     <span class="c1">#     Currently only two overlapping exons are merged. Generalized to n.</span>
 
@@ -1000,41 +1010,41 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        sj: junction DataFrame</span>
 <span class="sd">        me: exon DataFrame</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">        sj: compatible junctions</span>
-<span class="sd">        me: exon dataframe with edge exons added</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :sj: compatible junctions</span>
+<span class="sd">        :me: exon dataframe with edge exons added</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        mpth: mapped% th for detecting gene boundary, default {mpth}</span>
-<span class="sd">        binth: bigwig to bed threshold, default {binth} (merging: {binth_m})</span>
-<span class="sd">        gap: fill this gap to distinguish gene boundary vs. exon (fill exon but not intergenic), default {gap} (merging: {gap_m})</span>
-<span class="sd">        edgesize: temporary edge exon size, default {edgesize}</span>
-<span class="sd">        maxexonsize: max exon size (Ttn has ~20kbp exon), default {maxexonsize}</span>
-<span class="sd">        cutlen: check candidate bounded exons larger than this for cutting, default {cutlen}</span>
-<span class="sd">        ed_sigma: edge detector sigma for threshold (larger of minth, sigma*std is used), </span>
-<span class="sd">            default {ed_sigma}  (merging: {ed_sigma_m})</span>
-<span class="sd">        ed_minth: edge detector minth for smoothed derivative, default {ed_minth} (merging: {ed_minth_m})</span>
-<span class="sd">        ed_covratio: edge detector if cov ratio to surrounds is &lt; covratio, discard, </span>
-<span class="sd">            default {ed_covratio} (merging: {ed_covratio_m})</span>
-<span class="sd">        ed_window: edge detector smooth window (in bp), default {ed_window}</span>
-<span class="sd">        ed_covth: edge detector abs cov threshold, default {ed_covth}  (merging: {ed_covth_m})</span>
-<span class="sd">        ed_smwinsize: smooth window for trimming default {ed_smwinsize}</span>
-<span class="sd">        ed_minintsize: window for merging peaks, default {ed_minintsize}</span>
-<span class="sd">        ed_aggratio: default {ed_aggratio} </span>
-<span class="sd">        ed_mimath: min-max ratio threshold for cut decision, default {ed_mimath} (merging: {ed_mimath_m})</span>
-<span class="sd">        ed_mimath2: default {ed_mimath2}  (merging: {ed_mimath2_m})</span>
-<span class="sd">        ed_triggerth: for rise detection (detect rise when &gt;= max*mimath*triggerth after &lt;max*mima), default {ed_triggerth}</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * mpth: mapped% th for detecting gene boundary, default {mpth}</span>
+<span class="sd">        * binth: bigwig to bed threshold, default {binth} (merging: {binth_m})</span>
+<span class="sd">        * gap: fill this gap to distinguish gene boundary vs. exon (fill exon but not intergenic), default {gap} (merging: {gap_m})</span>
+<span class="sd">        * edgesize: temporary edge exon size, default {edgesize}</span>
+<span class="sd">        * maxexonsize: max exon size (Ttn has ~20kbp exon), default {maxexonsize}</span>
+<span class="sd">        * cutlen: check candidate bounded exons larger than this for cutting, default {cutlen}</span>
+<span class="sd">        * ed_sigma: edge detector sigma for threshold (larger of minth, sigma*std is used), </span>
+<span class="sd">          default {ed_sigma}  (merging: {ed_sigma_m})</span>
+<span class="sd">        * ed_minth: edge detector minth for smoothed derivative, default {ed_minth} (merging: {ed_minth_m})</span>
+<span class="sd">        * ed_covratio: edge detector if cov ratio to surrounds is &lt; covratio, discard, </span>
+<span class="sd">          default {ed_covratio} (merging: {ed_covratio_m})</span>
+<span class="sd">        * ed_window: edge detector smooth window (in bp), default {ed_window}</span>
+<span class="sd">        * ed_covth: edge detector abs cov threshold, default {ed_covth}  (merging: {ed_covth_m})</span>
+<span class="sd">        * ed_smwinsize: smooth window for trimming default {ed_smwinsize}</span>
+<span class="sd">        * ed_minintsize: window for merging peaks, default {ed_minintsize}</span>
+<span class="sd">        * ed_aggratio: default {ed_aggratio} </span>
+<span class="sd">        * ed_mimath: min-max ratio threshold for cut decision, default {ed_mimath} (merging: {ed_mimath_m})</span>
+<span class="sd">        * ed_mimath2: default {ed_mimath2}  (merging: {ed_mimath2_m})</span>
+<span class="sd">        * ed_triggerth: for rise detection (detect rise when &gt;= max*mimath*triggerth after &lt;max*mima), default {ed_triggerth}</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        fe2.sjbb.bed.gz</span>
-<span class="sd">        fe2.sjbb-ovl.txt.gz</span>
-<span class="sd">        fe2.me1.ci.txt.gz</span>
-<span class="sd">        fe2.me2p.ci.txt.gz</span>
-<span class="sd">        fe2.me2n.ci.txt.gz</span>
-<span class="sd">        fe2.sj.txt.gz</span>
-<span class="sd">        fe2.me.txt.gz</span>
+<span class="sd">        * fe2.sjbb.bed.gz</span>
+<span class="sd">        * fe2.sjbb-ovl.txt.gz</span>
+<span class="sd">        * fe2.me1.ci.txt.gz</span>
+<span class="sd">        * fe2.me2p.ci.txt.gz</span>
+<span class="sd">        * fe2.me2n.ci.txt.gz</span>
+<span class="sd">        * fe2.sj.txt.gz</span>
+<span class="sd">        * fe2.me.txt.gz</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="FINDEDGES2.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.FINDEDGES2.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">sj</span>
@@ -1067,7 +1077,7 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="c1"># name1 contains list of ids</span>
         <span class="n">ci1</span> <span class="o">=</span> <span class="n">bbg</span><span class="p">[(</span><span class="n">bbg</span><span class="p">[</span><span class="s1">&#39;ovlratio&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;mpth&#39;</span><span class="p">])</span><span class="o">|</span><span class="p">(</span><span class="n">bbg</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;cutlen&#39;</span><span class="p">])]</span> <span class="c1"># ~ 16K</span>
         <span class="c1"># cut candidates</span>
-        <span class="n">eids1</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">iadd</span><span class="p">,</span> <span class="n">ci1</span><span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="c1"># exons being cut</span>
+        <span class="n">eids1</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">iadd</span><span class="p">,</span> <span class="n">ci1</span><span class="p">[</span><span class="s1">&#39;name1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="p">[])</span> <span class="c1"># exons being cut</span>
         <span class="n">eids0</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">me1</span><span class="p">[</span><span class="s1">&#39;_id2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">eids1</span><span class="p">)))</span>
         <span class="n">me1i</span> <span class="o">=</span> <span class="n">me1</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;_id2&#39;</span><span class="p">)</span> <span class="c1"># me1 (bounded) indexed</span>
         <span class="n">me1s</span> <span class="o">=</span> <span class="n">me1i</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">eids1</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span> <span class="c1"># cut targets</span>
@@ -1353,22 +1363,22 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    Args:</span>
 <span class="sd">        me: exon DataFrame</span>
 
-<span class="sd">    Output:</span>
-<span class="sd">        me: exon dataframe with edge exons added</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :me: exon dataframe with edge exons added</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        mpth: mapped% th for detecting gene boundary, default:{mpth} (merging: {mpth_m})</span>
-<span class="sd">        binth: default {binth} (merging: {binth_m})</span>
-<span class="sd">        gap: fill this gap to distinguish gene boundary vs. exon (fill exon but not intergenic)</span>
-<span class="sd">            default {gap} (merging: {gap_m})</span>
-<span class="sd">        edgesize: temporary edge exon size, default {edgesize}</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * mpth: mapped% th for detecting gene boundary, default:{mpth} (merging: {mpth_m})</span>
+<span class="sd">        * binth: default {binth} (merging: {binth_m})</span>
+<span class="sd">        * gap: fill this gap to distinguish gene boundary vs. exon (fill exon but not intergenic)</span>
+<span class="sd">          default {gap} (merging: {gap_m})</span>
+<span class="sd">        * edgesize: temporary edge exon size, default {edgesize}</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        fe.sjbb.bed.gz</span>
-<span class="sd">        fe.sjbb-ovl.txt.gz</span>
-<span class="sd">        fe.exons.bed.gz</span>
+<span class="sd">        * fe.sjbb.bed.gz</span>
+<span class="sd">        * fe.sjbb-ovl.txt.gz</span>
+<span class="sd">        * fe.exons.bed.gz</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="FINDEDGES.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.FINDEDGES.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sjexdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">me</span>
@@ -1427,18 +1437,18 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        sj: junction dataframe</span>
 <span class="sd">        me: exon dataframe</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">        sj: junction dataframe with strand fixed</span>
-<span class="sd">        me: exon dataframe with strand fixed</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :sj: junction dataframe with strand fixed</span>
+<span class="sd">        :me: exon dataframe with strand fixed</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        useallconnected (bool): whether to use all connected components or just direct neighbors</span>
-<span class="sd">            default {useallconnected}</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * useallconnected (bool): whether to use all connected components or just direct neighbors</span>
+<span class="sd">          default {useallconnected}</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        sj0.bed.gz</span>
+<span class="sd">        * sj0.bed.gz</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="FIXSTRAND.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.FIXSTRAND.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">sj</span>
@@ -1625,22 +1635,22 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    Args:</span>
 <span class="sd">        me: exon dataframe</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">        me: exon dataframe with edge exons fixed</span>
-<span class="sd">        edgefixer: this instance for reuse later</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :me: exon dataframe with edge exons fixed</span>
+<span class="sd">        :edgefixer: this instance for reuse later</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        gap3: for 3&#39; UTR extension, default {gap3} (merging: {gap3_m})</span>
-<span class="sd">        gap5: for 5&#39; UTR extension, default {gap5} (merging: {gap5_m})</span>
-<span class="sd">        covfactor: for gap filling: if coverage of the next interval is &lt; covfactor*current cov</span>
-<span class="sd">            default {covfactor}</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * gap3: for 3&#39; UTR extension, default {gap3} (merging: {gap3_m})</span>
+<span class="sd">        * gap5: for 5&#39; UTR extension, default {gap5} (merging: {gap5_m})</span>
+<span class="sd">        * covfactor: for gap filling: if coverage of the next interval is &lt; covfactor*current cov</span>
+<span class="sd">          default {covfactor}</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        fixed5pr.bed.gz</span>
-<span class="sd">        fixed3pr.bed.gz</span>
-<span class="sd">        edgefixer.me.bed.gz</span>
+<span class="sd">        * fixed5pr.bed.gz</span>
+<span class="sd">        * fixed3pr.bed.gz</span>
+<span class="sd">        * edgefixer.me.bed.gz</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># [TODO]</span>
     <span class="c1"># - how to distinguish gaps in real 3&#39;UTRs vs. gaps between genes or within exons?</span>
@@ -1872,31 +1882,31 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        sj: junction DataFrame</span>
 <span class="sd">        me: exon DataFrame</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">        me: exons with irets</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :me: exons with irets</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        iret_mpth: mapped% th for detecting intron retension,</span>
-<span class="sd">            default {iret_mpth} (merging: {iret_mpth_m})</span>
-<span class="sd">        iret_covth: if intron cov smaller than this, then ignore</span>
-<span class="sd">            default {iret_covth} (merging: {iret_covth_m})</span>
-<span class="sd">        iret_covratio: min cov ratio between an iret and average of surrounding exons </span>
-<span class="sd">            default {iret_covratio} (merging: {iret_covratio_m})</span>
-<span class="sd">        binth: default {binth} (merging: {binth_m})</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * iret_mpth: mapped% th for detecting intron retension,</span>
+<span class="sd">          default {iret_mpth} (merging: {iret_mpth_m})</span>
+<span class="sd">        * iret_covth: if intron cov smaller than this, then ignore</span>
+<span class="sd">          default {iret_covth} (merging: {iret_covth_m})</span>
+<span class="sd">        * iret_covratio: min cov ratio between an iret and average of surrounding exons </span>
+<span class="sd">          default {iret_covratio} (merging: {iret_covratio_m})</span>
+<span class="sd">        * binth: default {binth} (merging: {binth_m})</span>
 
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        irets.bed.gz</span>
-<span class="sd">        irets.exons.txt.gz</span>
-<span class="sd">        irets.me.cov.txt.gz</span>
-<span class="sd">        irets.me.bed.gz</span>
-<span class="sd">        irets.me.covci.txt.gz</span>
-<span class="sd">        irets.me.ci.txt.gz</span>
-<span class="sd">        sj.iret.sub.bed.gz</span>
-<span class="sd">        sj.iret.ci.txt.gz</span>
-<span class="sd">        sj.iret.covci.txt.gz</span>
+<span class="sd">        * irets.bed.gz</span>
+<span class="sd">        * irets.exons.txt.gz</span>
+<span class="sd">        * irets.me.cov.txt.gz</span>
+<span class="sd">        * irets.me.bed.gz</span>
+<span class="sd">        * irets.me.covci.txt.gz</span>
+<span class="sd">        * irets.me.ci.txt.gz</span>
+<span class="sd">        * sj.iret.sub.bed.gz</span>
+<span class="sd">        * sj.iret.ci.txt.gz</span>
+<span class="sd">        * sj.iret.covci.txt.gz</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="FINDIRETS.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.FINDIRETS.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sj</span> <span class="o">=</span> <span class="n">sj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">sj</span>
@@ -2076,29 +2086,29 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        edgefixer: EdgeFixer instance</span>
 <span class="sd">        secovth: se coverage threshold</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">        ae: all exons</span>
-<span class="sd">        se: single exons</span>
-<span class="sd">        me: multi-exons</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :ae: all exons</span>
+<span class="sd">        :se: single exons</span>
+<span class="sd">        :me: multi-exons</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        minsecovth: minimum single exon coverage (normalized to million alignments)</span>
-<span class="sd">            default {minsecovth} (merging: {minsecovth_m})</span>
-<span class="sd">        secovth: default SE cov threshold if not using adaptive version</span>
-<span class="sd">            default {secovth} (merging: {secovth_m})</span>
-<span class="sd">        se_gap: single exon gap fill, default {se_gap}</span>
-<span class="sd">        se_binth: coverage threshold for SE finding, default {se_binth} (merging: {se_binth_m})</span>
-<span class="sd">        se_sizeth: single exon size th, default {se_sizeth} (merging: {se_sizeth_m})</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * minsecovth: minimum single exon coverage (normalized to million alignments)</span>
+<span class="sd">          default {minsecovth} (merging: {minsecovth_m})</span>
+<span class="sd">        * secovth: default SE cov threshold if not using adaptive version</span>
+<span class="sd">          default {secovth} (merging: {secovth_m})</span>
+<span class="sd">        * se_gap: single exon gap fill, default {se_gap}</span>
+<span class="sd">        * se_binth: coverage threshold for SE finding, default {se_binth} (merging: {se_binth_m})</span>
+<span class="sd">        * se_sizeth: single exon size th, default {se_sizeth} (merging: {se_sizeth_m})</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        se.cov.tmp.txt.gz</span>
-<span class="sd">        se.cov.all.txt.gz</span>
-<span class="sd">        secov.txt.gz</span>
-<span class="sd">        se.bed.gz</span>
-<span class="sd">        exons.afterfindse.txt.gz</span>
-<span class="sd">        me.exons.bed.gz</span>
+<span class="sd">        * se.cov.tmp.txt.gz</span>
+<span class="sd">        * se.cov.all.txt.gz</span>
+<span class="sd">        * secov.txt.gz</span>
+<span class="sd">        * se.bed.gz</span>
+<span class="sd">        * exons.afterfindse.txt.gz</span>
+<span class="sd">        * me.exons.bed.gz</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     
 <div class="viewcode-block" id="FINDSE.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.FINDSE.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -2287,31 +2297,31 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    Args:</span>
 <span class="sd">        me: exon DataFrame</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">        ae: exons with 5&#39;,3&#39; cuts, irets, and single exons.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :ae: exons with 5&#39;,3&#39; cuts, irets, and single exons.</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        minsecovth: minimum single exon coverage (normalized to million alignments)</span>
-<span class="sd">            default {minsecovth} (merging: {minsecovth_m})</span>
-<span class="sd">        secovth: default SE cov threshold if not using adaptive version</span>
-<span class="sd">            default {secovth} (merging: {secovth_m})</span>
-<span class="sd">        se_gap: single exon gap fill, default {se_gap}</span>
-<span class="sd">        se_binth: coverage threshold for SE finding, default {se_binth} (merging: {se_binth_m})</span>
-<span class="sd">        se_sizeth: single exon size th, default {se_sizeth} (merging: {se_sizeth_m})</span>
-<span class="sd">        find53ir_covratio: cov ratio threshold for FIND53IR, </span>
-<span class="sd">            default {find53ir_covratio}, (merging: {find53ir_covratio_m})</span>
-<span class="sd">        find53ir_covth: cov threshold for FIND53IR</span>
-<span class="sd">            default {find53ir_covth}, (mergin: {find53ir_covth_m})</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * minsecovth: minimum single exon coverage (normalized to million alignments)</span>
+<span class="sd">          default {minsecovth} (merging: {minsecovth_m})</span>
+<span class="sd">        * secovth: default SE cov threshold if not using adaptive version</span>
+<span class="sd">          default {secovth} (merging: {secovth_m})</span>
+<span class="sd">        * se_gap: single exon gap fill, default {se_gap}</span>
+<span class="sd">        * se_binth: coverage threshold for SE finding, default {se_binth} (merging: {se_binth_m})</span>
+<span class="sd">        * se_sizeth: single exon size th, default {se_sizeth} (merging: {se_sizeth_m})</span>
+<span class="sd">        * find53ir_covratio: cov ratio threshold for FIND53IR, </span>
+<span class="sd">          default {find53ir_covratio}, (merging: {find53ir_covratio_m})</span>
+<span class="sd">        * find53ir_covth: cov threshold for FIND53IR</span>
+<span class="sd">          default {find53ir_covth}, (mergin: {find53ir_covth_m})</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        se.cov.tmp.txt.gz</span>
-<span class="sd">        se.cov.all.txt.gz</span>
-<span class="sd">        me.exons.bed.gz</span>
-<span class="sd">        bw*.bed.gz</span>
-<span class="sd">        gap-sub-me.bed.gz</span>
-<span class="sd">        assemble.exons0.txt.gz</span>
-<span class="sd">        assemble.exons0.bed.gz</span>
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">        * se.cov.tmp.txt.gz</span>
+<span class="sd">        * se.cov.all.txt.gz</span>
+<span class="sd">        * me.exons.bed.gz</span>
+<span class="sd">        * bw*.bed.gz</span>
+<span class="sd">        * gap-sub-me.bed.gz</span>
+<span class="sd">        * assemble.exons0.txt.gz</span>
+<span class="sd">        * assemble.exons0.bed.gz</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="FIND53IR.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.FIND53IR.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">me</span>
@@ -2556,31 +2566,31 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    Args:</span>
 <span class="sd">        me: exon DataFrame</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">        secovth: threshold</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :secovth: threshold</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        findsecovth_useref: whether to use ref for finding secov, if not use ME</span>
-<span class="sd">            default {findsecovth_useref}</span>
-<span class="sd">        minsecovth: minimum single exon coverage (normalized to million alignments)</span>
-<span class="sd">            default {minsecovth} (merging: {minsecovth_m})</span>
-<span class="sd">        se_gap: single exon gap fill, default {se_gap}</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * findsecovth_useref: whether to use ref for finding secov, if not use ME</span>
+<span class="sd">          default {findsecovth_useref}</span>
+<span class="sd">        * minsecovth: minimum single exon coverage (normalized to million alignments)</span>
+<span class="sd">          default {minsecovth} (merging: {minsecovth_m})</span>
+<span class="sd">        * se_gap: single exon gap fill, default {se_gap}</span>
 
 <span class="sd">    Files:</span>
-<span class="sd">        findsecovth.params.txt.gz</span>
-<span class="sd">        findsecovth.pdf</span>
+<span class="sd">        * findsecovth.params.txt.gz</span>
+<span class="sd">        * findsecovth.pdf</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        findsecovth.refex.covci.txt.gz</span>
-<span class="sd">        findsecovth.refex.cov.txt.gz</span>
-<span class="sd">        se.cov.all.txt.gz</span>
-<span class="sd">        irets.me.cov.txt.gz</span>
-<span class="sd">        me.covci.txt.gz</span>
-<span class="sd">        me.ci.txt.gz</span>
-<span class="sd">        findsecovth.gap-sub-me.bed.gz</span>
+<span class="sd">        * findsecovth.refex.covci.txt.gz</span>
+<span class="sd">        * findsecovth.refex.cov.txt.gz</span>
+<span class="sd">        * se.cov.all.txt.gz</span>
+<span class="sd">        * irets.me.cov.txt.gz</span>
+<span class="sd">        * me.covci.txt.gz</span>
+<span class="sd">        * me.ci.txt.gz</span>
+<span class="sd">        * findsecovth.gap-sub-me.bed.gz</span>
 
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">bins</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.7</span><span class="p">,</span><span class="mf">0.05</span><span class="p">)</span>
     
@@ -2609,7 +2619,8 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="n">st</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># gamma, a1</span>
         <span class="c1"># residue, th99 for (ref, me, se)</span>
-        <span class="n">attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span><span class="s1">&#39;a1&#39;</span><span class="p">,</span><span class="s1">&#39;ref_res&#39;</span><span class="p">,</span><span class="s1">&#39;ref_th99&#39;</span><span class="p">,</span><span class="s1">&#39;me_res&#39;</span><span class="p">,</span><span class="s1">&#39;me_th99&#39;</span><span class="p">,</span><span class="s1">&#39;se_res&#39;</span><span class="p">,</span><span class="s1">&#39;se_th99&#39;</span><span class="p">]</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span><span class="s1">&#39;a1&#39;</span><span class="p">,</span><span class="s1">&#39;ref_res&#39;</span><span class="p">,</span><span class="s1">&#39;ref_th99bn&#39;</span><span class="p">,</span><span class="s1">&#39;me_res&#39;</span><span class="p">,</span><span class="s1">&#39;me_th99bn&#39;</span><span class="p">,</span><span class="s1">&#39;se_res&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ref_nf&#39;</span><span class="p">,</span><span class="s1">&#39;me_nf&#39;</span><span class="p">,</span><span class="s1">&#39;se_nf&#39;</span><span class="p">,</span><span class="s1">&#39;se_th99&#39;</span><span class="p">]</span>
         <span class="n">pr</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
             <span class="n">st</span><span class="p">[</span><span class="s1">&#39;FINDSECOVTH.&#39;</span><span class="o">+</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">pr</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
@@ -2623,9 +2634,12 @@ div.nboutput  > :nth-child(2).stderr {
 
         <span class="n">excovname</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">txtname</span><span class="p">(</span><span class="s1">&#39;findsecovth.refex.cov&#39;</span><span class="p">)</span>
         <span class="k">if</span>  <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">excovname</span><span class="p">):</span>
+            <span class="n">rsj</span><span class="p">,</span><span class="n">rex</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">refsjex</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rsj</span> <span class="o">=</span> <span class="n">rsj</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rex</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="n">excovname</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">rsj</span><span class="p">,</span><span class="n">rex</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">refsjex</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rsj</span> <span class="o">=</span> <span class="n">rsj</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rex</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">calc_cov_ovl_mp</span><span class="p">(</span>
                 <span class="n">srcname</span><span class="o">=</span><span class="n">rex</span><span class="p">,</span> 
                 <span class="n">bwname</span><span class="o">=</span><span class="n">fn</span><span class="o">.</span><span class="n">bwfile</span><span class="p">,</span> 
@@ -2683,7 +2697,7 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="n">secov</span> <span class="o">=</span> <span class="n">CC</span><span class="o">.</span><span class="n">calc_cov_mp</span><span class="p">(</span><span class="n">bed</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">bwname</span><span class="o">=</span><span class="n">fn</span><span class="o">.</span><span class="n">bwfile</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="n">fname</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;np&#39;</span><span class="p">])</span>
         <span class="c1">#os.unlink(cname)</span>
     
-    <span class="k">def</span> <span class="nf">_fit_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">refcov</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">a1</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_fit_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">refcov</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">a1</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">nf</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
         <span class="c1"># find best gamma for gen4</span>
         <span class="n">width</span> <span class="o">=</span> <span class="p">(</span><span class="mi">9</span><span class="o">-</span><span class="n">N</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">gamma</span><span class="p">))</span><span class="o">/</span><span class="mf">100.</span>
         <span class="n">bins</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">gamma</span><span class="p">),</span><span class="mi">9</span><span class="p">,</span><span class="n">width</span><span class="p">)</span>
@@ -2737,7 +2751,8 @@ div.nboutput  > :nth-child(2).stderr {
             <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;log2(count+1)&#39;</span><span class="p">)</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="s1">&#39;res={:.1f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="s1">&#39;slope={:.2f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a1</span><span class="p">))</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="s1">&#39;covth={:.1f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">th99</span><span class="p">))</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="s1">&#39;ncovth={:.1f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">th99</span><span class="p">))</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="s1">&#39;covth={:.1f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">th99</span><span class="o">*</span><span class="n">nf</span><span class="p">))</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">17</span><span class="p">])</span>
             
             <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="n">th99</span>
@@ -2746,9 +2761,9 @@ div.nboutput  > :nth-child(2).stderr {
     
 <div class="viewcode-block" id="FINDSECOVTH.find_gamma_slope"><a class="viewcode-back" href="../../modules.html#jgem.assembler.FINDSECOVTH.find_gamma_slope">[docs]</a>    <span class="k">def</span> <span class="nf">find_gamma_slope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">gammas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bins</span>
-        <span class="n">refcov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_refcov</span><span class="p">()</span>
+        <span class="n">refcov</span><span class="p">,</span> <span class="n">ref_nf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_refcov</span><span class="p">()</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span><span class="s1">&#39;a1&#39;</span><span class="p">,</span><span class="s1">&#39;a0&#39;</span><span class="p">,</span><span class="s1">&#39;res&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">refcovfits</span> <span class="o">=</span> <span class="n">fits</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_fit_hist</span><span class="p">(</span><span class="n">refcov</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gammas</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refcovfits</span> <span class="o">=</span> <span class="n">fits</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_fit_hist</span><span class="p">(</span><span class="n">refcov</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">nf</span><span class="o">=</span><span class="n">ref_nf</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gammas</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
         <span class="n">fits</span><span class="p">[</span><span class="s1">&#39;-gamma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">fits</span><span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">]</span>
         <span class="n">gamma</span><span class="p">,</span><span class="n">a1</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;res&#39;</span><span class="p">,</span><span class="s1">&#39;-gamma&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][[</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span><span class="s1">&#39;a1&#39;</span><span class="p">]]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span>
@@ -2767,7 +2782,10 @@ div.nboutput  > :nth-child(2).stderr {
                 <span class="n">UT</span><span class="o">.</span><span class="n">set_exon_category</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">ex</span><span class="p">)</span>
             <span class="n">refcov</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;s&#39;</span><span class="p">][</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
         <span class="n">refcov</span> <span class="o">=</span> <span class="n">refcov</span><span class="p">[</span><span class="n">refcov</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># only use expressed </span>
-        <span class="k">return</span> <span class="n">refcov</span>
+        <span class="c1"># normalize 1e4 factor is to match to 100bp readlen normalized to 1M reads</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_nf</span> <span class="o">=</span> <span class="n">ref_nf</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">refcov</span><span class="p">)</span><span class="o">/</span><span class="mf">1e4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refcov</span> <span class="o">=</span> <span class="n">refcov</span> <span class="o">=</span> <span class="n">refcov</span><span class="o">/</span><span class="n">ref_nf</span>
+        <span class="k">return</span> <span class="n">refcov</span><span class="p">,</span> <span class="n">ref_nf</span>
 
 <div class="viewcode-block" id="FINDSECOVTH.find_secovth"><a class="viewcode-back" href="../../modules.html#jgem.assembler.FINDSECOVTH.find_secovth">[docs]</a>    <span class="k">def</span> <span class="nf">find_secovth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnobj</span>
@@ -2780,6 +2798,7 @@ div.nboutput  > :nth-child(2).stderr {
         
         <span class="c1"># use gamma, slope to find secovth</span>
         <span class="n">fig</span><span class="p">,</span> <span class="n">axr</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+        <span class="c1"># fig, axr = P.subplots(2,3,figsize=(9,6))</span>
         <span class="n">P</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span><span class="n">top</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">sname</span><span class="p">)</span>
         <span class="c1"># panel1 refcov fits</span>
@@ -2796,24 +2815,47 @@ div.nboutput  > :nth-child(2).stderr {
         
         <span class="c1"># panel2 refcov optimum</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">axr</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">refcov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_refcov</span><span class="p">()</span>
+        <span class="n">refcov</span><span class="p">,</span> <span class="n">ref_nf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_refcov</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">pr</span><span class="p">[</span><span class="s1">&#39;findsecovth_useref&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">fn</span><span class="o">.</span><span class="n">refgtf</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;all ref&#39;</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;ref ME &amp; SE&#39;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;sample multi exons&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ref_res</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_th99</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_hist</span><span class="p">(</span><span class="n">refcov</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;sample ME&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_res</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_th99bn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_hist</span><span class="p">(</span><span class="n">refcov</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">nf</span><span class="o">=</span><span class="n">ref_nf</span><span class="p">)</span>
+        
+        <span class="c1"># refcov SE</span>
+        <span class="c1"># if pr[&#39;findsecovth_useref&#39;] and fn.refgtf.exists():</span>
+        <span class="c1">#     rsj,rex = self.rsj, self.rex</span>
+        <span class="c1">#     if &#39;cat&#39; not in rex.columns:</span>
+        <span class="c1">#         UT.set_exon_category(rsj,rex)</span>
+        <span class="c1">#     rse = rex[rex[&#39;cat&#39;]==&#39;s&#39;]</span>
+        <span class="c1">#     rse = rse[rse[&#39;cov&#39;]&gt;0][&#39;cov&#39;].values</span>
+        <span class="c1">#     rse_nf = N.sum(rse)/1e4</span>
+        <span class="c1">#     self.rse = rse = rse/rse_nf</span>
+        <span class="c1">#     ax = axr[0][2]</span>
+        <span class="c1">#     tmp = self._fit_hist(rse, gamma, a1, ax=ax, title=&#39;ref SE&#39;, nf=rse_nf)</span>
+
         <span class="c1"># panel3 me fits</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">axr</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="c1">#ex = self.ex</span>
-        <span class="c1">#me = ex[ex[&#39;cat&#39;]!=&#39;s&#39;]</span>
-        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex</span>
+        <span class="k">if</span> <span class="s1">&#39;cat&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ex</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">sj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">sj</span>
+            <span class="n">UT</span><span class="o">.</span><span class="n">set_exon_category</span><span class="p">(</span><span class="n">sj</span><span class="p">,</span><span class="n">ex</span><span class="p">)</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="n">ex</span><span class="p">[</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;s&#39;</span><span class="p">]</span>
         <span class="n">me</span> <span class="o">=</span> <span class="n">me</span><span class="p">[</span><span class="n">me</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">me_res</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">me_th99</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_hist</span><span class="p">(</span><span class="n">me</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;pndr ME&#39;</span><span class="p">)</span>
+        <span class="c1"># normalize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">me_nf</span> <span class="o">=</span> <span class="n">me_nf</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">me</span><span class="p">)</span><span class="o">/</span><span class="mf">1e4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">me</span> <span class="o">=</span> <span class="n">me</span> <span class="o">=</span> <span class="n">me</span><span class="o">/</span><span class="n">me_nf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">me_res</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">me_th99bn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_hist</span><span class="p">(</span><span class="n">me</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;ME&#39;</span><span class="p">,</span> <span class="n">nf</span><span class="o">=</span><span class="n">me_nf</span><span class="p">)</span>
+        
         <span class="c1"># panel4 seall</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">axr</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">secov</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">read_txt</span><span class="p">(</span><span class="s1">&#39;se.cov.all&#39;</span><span class="p">)</span>
         <span class="n">secov</span> <span class="o">=</span> <span class="n">secov</span><span class="p">[</span><span class="n">secov</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;cov&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">se_res</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">se_th99</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_hist</span><span class="p">(</span><span class="n">secov</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;pndr SE candidates&#39;</span><span class="p">)</span>
+        <span class="c1"># normalize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">se_nf</span> <span class="o">=</span> <span class="n">se_nf</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">secov</span><span class="p">)</span><span class="o">/</span><span class="mf">1e4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secov</span> <span class="o">=</span> <span class="n">secov</span> <span class="o">=</span> <span class="n">secov</span><span class="o">/</span><span class="n">se_nf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">se_res</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">se_th99bn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_hist</span><span class="p">(</span><span class="n">secov</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;SE candidates&#39;</span><span class="p">,</span> <span class="n">nf</span><span class="o">=</span><span class="n">se_nf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">se_th99</span> <span class="o">=</span> <span class="n">se_nf</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">se_th99bn</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;findsecovth.pdf&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
@@ -2828,29 +2870,29 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        sj: junction dataframe</span>
 <span class="sd">        ae: exon (all exon = single+multi exons) dataframe</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">        sj: junction dataframe without spurious junctions</span>
-<span class="sd">        ae: exon dataframe without spurious exons</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :sj: junction dataframe without spurious junctions</span>
+<span class="sd">        :ae: exon dataframe without spurious exons</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        se_sizeth2: remove SE with length smaller than this, default {se_sizeth2}</span>
-<span class="sd">        np: number of CPU to use, default {np}</span>
-<span class="sd">        me2exon_sjth: 2exon genes with splice junction support less than this will be removed</span>
-<span class="sd">            default {me2exon_sjth}</span>
-<span class="sd">        me2exon_sizeth: 2exon genes terminal size th ~ 2 x read length, default {me2exon_sizeth}</span>
-<span class="sd">        me2exon_covth: 2exon genes cov th, default {me2exon_covth} </span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * se_sizeth2: remove SE with length smaller than this, default {se_sizeth2}</span>
+<span class="sd">        * np: number of CPU to use, default {np}</span>
+<span class="sd">        * me2exon_sjth: 2exon genes with splice junction support less than this will be removed</span>
+<span class="sd">          default {me2exon_sjth}</span>
+<span class="sd">        * me2exon_sizeth: 2exon genes terminal size th ~ 2 x read length, default {me2exon_sizeth}</span>
+<span class="sd">        * me2exon_covth: 2exon genes cov th, default {me2exon_covth} </span>
 
 
 <span class="sd">    Files:</span>
-<span class="sd">        sj.txt.gz</span>
-<span class="sd">        ex.txt.gz</span>
+<span class="sd">        * sj.txt.gz</span>
+<span class="sd">        * ex.txt.gz</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        selectseme.rm.se.bed.gz</span>
-<span class="sd">        selectseme.rm.me.bed.gz</span>
-<span class="sd">        selectseme.rm.ovl.txt.gz</span>
+<span class="sd">        * selectseme.rm.se.bed.gz</span>
+<span class="sd">        * selectseme.rm.me.bed.gz</span>
+<span class="sd">        * selectseme.rm.ovl.txt.gz</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     
 <div class="viewcode-block" id="SELECTSEME.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.SELECTSEME.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">sj</span>
@@ -2991,14 +3033,14 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        sj: junction dataframe</span>
 <span class="sd">        ae: exon (all exon = single+multi exons) dataframe</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        np: number of CPU to use, default {np}</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * np: number of CPU to use, default {np}</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        genegraph-*</span>
-<span class="sd">        genes.cache.pic</span>
+<span class="sd">        * genegraph-*</span>
+<span class="sd">        * genes.cache.pic</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># look at cov and detect sharp drop/rise</span>
     
@@ -3136,11 +3178,11 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        add column (cov) to ae dataframe</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        cov.txt.gz</span>
-<span class="sd">        cov.bed.gz</span>
-<span class="sd">        assemble.cov.txt.gz</span>
-<span class="sd">        assemble.exons0.covci.txt.gz</span>
-<span class="sd">        assemble.exons0.ci.txt.gz</span>
+<span class="sd">        * cov.txt.gz</span>
+<span class="sd">        * cov.bed.gz</span>
+<span class="sd">        * assemble.cov.txt.gz</span>
+<span class="sd">        * assemble.exons0.covci.txt.gz</span>
+<span class="sd">        * assemble.exons0.ci.txt.gz</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="CALCCOV.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.CALCCOV.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -3187,14 +3229,14 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        sj: junction dataframe</span>
 <span class="sd">        ae: exon (all exon = single+multi exons) dataframe</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        np: number of CPU to use, default {np}</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * np: number of CPU to use, default {np}</span>
 
 <span class="sd">    TempFiles:</span>
-<span class="sd">        genegraph-*</span>
-<span class="sd">        genes.cache.pic</span>
+<span class="sd">        * genegraph-*</span>
+<span class="sd">        * genes.cache.pic</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="FINDGENES.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.FINDGENES.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">sj</span>
@@ -3209,8 +3251,11 @@ div.nboutput  > :nth-child(2).stderr {
             <span class="n">cachename</span><span class="o">=</span><span class="n">fn</span><span class="o">.</span><span class="n">fname</span><span class="p">(</span><span class="s1">&#39;genes.cache.pic&#39;</span><span class="p">),</span> 
             <span class="n">np</span><span class="o">=</span><span class="n">pr</span><span class="p">[</span><span class="s1">&#39;np&#39;</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;#genes:{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">genes</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;FINDGENES.#genes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">genes</span><span class="p">)</span>
+        <span class="n">numme</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">genes</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">numse</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">genes</span><span class="p">)</span> <span class="o">-</span> <span class="n">numme</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;#genes:ME{0}, SE(before selection){1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">numme</span><span class="p">,</span> <span class="n">numse</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;FINDGENES.#me_genes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numme</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;FINDGENES.#se_genes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numse</span>
         <span class="c1">#return genes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">genes</span> <span class="o">=</span> <span class="n">genes</span></div></div>
 
@@ -3221,17 +3266,17 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        sj: junction dataframe</span>
 <span class="sd">        ae: exon dataframe</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        findsecovth (bool): whether secovth is found from data</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * findsecovth (bool): whether secovth is found from data</span>
 
 <span class="sd">    Files:</span>
-<span class="sd">        sj.txt.gz</span>
-<span class="sd">        ex.txt.gz</span>
-<span class="sd">        ci.txt.gz</span>
-<span class="sd">        sj.bed.gz</span>
-<span class="sd">        ex.bed.gz</span>
+<span class="sd">        * sj.txt.gz</span>
+<span class="sd">        * ex.txt.gz</span>
+<span class="sd">        * ci.txt.gz</span>
+<span class="sd">        * sj.bed.gz</span>
+<span class="sd">        * ex.bed.gz</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="WRITESJEX.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.WRITESJEX.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">sj</span>
@@ -3261,18 +3306,18 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        sj: junction dataframe</span>
 <span class="sd">        ae: exon dataframe</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        writeiso (bool): whether to write isoforms or not, default {writeiso}</span>
-<span class="sd">        maxisonum (int):; number of maximum isoforms to write, default {maxisonum}</span>
-<span class="sd">        writegtf (bool): whether to write GTF file, default {writegtf}</span>
+<span class="sd">    Related Parameters:</span>
+<span class="sd">        * writeiso (bool): whether to write isoforms or not, default {writeiso}</span>
+<span class="sd">        * maxisonum (int):; number of maximum isoforms to write, default {maxisonum}</span>
+<span class="sd">        * writegtf (bool): whether to write GTF file, default {writegtf}</span>
 
 <span class="sd">    Files:</span>
-<span class="sd">        genes.bed.gz</span>
-<span class="sd">        genes.iso*.bed.gz</span>
-<span class="sd">        genes.gtf.gz</span>
-<span class="sd">        genes.iso*.gtf.gz</span>
+<span class="sd">        * genes.bed.gz</span>
+<span class="sd">        * genes.iso*.bed.gz</span>
+<span class="sd">        * genes.gtf.gz</span>
+<span class="sd">        * genes.iso*.gtf.gz</span>
 
-<span class="sd">    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="WRITEGENES.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.WRITEGENES.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asm</span><span class="o">.</span><span class="n">sj</span>
@@ -3305,8 +3350,8 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        sj: junction dataframe</span>
 <span class="sd">        ae: exon dataframe</span>
 
-<span class="sd">    Output:</span>
-<span class="sd">        sj: modify assembler sj</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        :sj: modify assembler sj</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="CONSISTENTSJ.call"><a class="viewcode-back" href="../../modules.html#jgem.assembler.CONSISTENTSJ.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -3951,6 +3996,8 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="k">return</span> <span class="n">fig</span></div></div>
 
 
+<span class="k">for</span> <span class="n">klass</span> <span class="ow">in</span> <span class="n">SUBASE</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">():</span>
+    <span class="n">klass</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">klass</span><span class="o">.</span><span class="n">__doc__</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">PARAMSDOC</span><span class="p">)</span>
 </pre></div>
 
     </div>

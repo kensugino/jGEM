@@ -174,7 +174,8 @@ div.nboutput > :first-child pre {
 div.nbinput > :first-child[class^=highlight],
 div.nboutput > :first-child[class^=highlight],
 div.nboutput > :first-child {
-    min-width: 11ex;
+    /*min-width: 11ex;*/
+    min-width:10ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -399,6 +400,7 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="n">lines</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">srcfile</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">srcfile</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">dstfile</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">dstfile</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span><span class="p">:</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">dstfile</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -586,7 +588,8 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="n">fname2</span> <span class="o">=</span> <span class="n">fname</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname2</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">fname2</span>
-    <span class="n">tmp</span> <span class="o">=</span> <span class="n">fname2</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">fname</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">fname2</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span><span class="o">+</span><span class="n">ext</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fobj</span><span class="p">:</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;gunzip&#39;</span><span class="p">,</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">fobj</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ret</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>

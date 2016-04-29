@@ -174,7 +174,8 @@ div.nboutput > :first-child pre {
 div.nbinput > :first-child[class^=highlight],
 div.nboutput > :first-child[class^=highlight],
 div.nboutput > :first-child {
-    min-width: 11ex;
+    /*min-width: 11ex;*/
+    min-width:10ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -341,6 +342,7 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="n">scale</span> <span class="o">=</span> <span class="mf">1000000.</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">aligned</span><span class="p">)</span>
     <span class="c1"># convert_to_wig</span>
     <span class="n">tpath</span> <span class="o">=</span> <span class="n">bpath</span> <span class="o">+</span><span class="s1">&#39;.wig&#39;</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">tpath</span><span class="p">))</span>
     <span class="n">tfobj</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">tpath</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="n">cmd1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;genomeCoverageBed&#39;</span><span class="p">,</span> <span class="s1">&#39;-split&#39;</span><span class="p">,</span> <span class="s1">&#39;-bg&#39;</span><span class="p">,</span> <span class="s1">&#39;-ibam&#39;</span><span class="p">,</span> <span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="n">chromsizes</span><span class="p">,</span> <span class="s1">&#39;-scale&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">scale</span><span class="p">)]</span>
     <span class="n">p1</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd1</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">tfobj</span><span class="p">)</span>
@@ -427,18 +429,20 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    Returns:</span>
 <span class="sd">        path to generated BED file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bedbase</span> <span class="o">=</span> <span class="n">bedfile</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="k">if</span> <span class="n">bedfile</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">==</span><span class="s1">&#39;.gz&#39;</span> <span class="k">else</span> <span class="n">bedfile</span>
     <span class="c1">#bedfile = &#39;{0}.binary{1:g}.bed&#39;.format(bwfile[:-3], th)</span>
-    <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">notstale</span><span class="p">(</span><span class="n">bwfile</span><span class="p">,</span> <span class="n">bedfile</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">bedfile</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span>
+    <span class="k">if</span> <span class="n">UT</span><span class="o">.</span><span class="n">notstale</span><span class="p">(</span><span class="n">bwfile</span><span class="p">,</span> <span class="n">bedbase</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">bedbase</span><span class="o">+</span><span class="s1">&#39;.gz&#39;</span>
     <span class="c1"># make sure bwfile exists</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">bwfile</span><span class="p">)</span> <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;BigWig file {0} does not exist.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bwfile</span><span class="p">))</span>
     <span class="n">processor</span> <span class="o">=</span> <span class="n">apply_threshold</span><span class="p">(</span><span class="n">bwfile</span><span class="p">,</span><span class="n">th</span><span class="p">,</span> <span class="n">chroms</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">bedfile</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">bedfile</span><span class="p">))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">bedbase</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">%s</span><span class="se">\t</span><span class="si">%i</span><span class="se">\t</span><span class="si">%i</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">processor</span><span class="p">]))</span>
     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">bedfile</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">UT</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">bedbase</span><span class="p">)</span></div>
 
 <span class="c1">### Merge BigWigs ##########################################################</span>
 
@@ -497,6 +501,7 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="n">dic</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rslts</span><span class="p">)</span>
     <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;concatenating chromosomes...&#39;</span><span class="p">)</span>
     <span class="n">wigpath</span> <span class="o">=</span> <span class="n">dstpath</span><span class="o">+</span><span class="s1">&#39;.wig&#39;</span>
+    <span class="n">UT</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">wigpath</span><span class="p">))</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">wigpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">c</span><span class="p">],</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>

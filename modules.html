@@ -202,7 +202,8 @@ div.nboutput > :first-child pre {
 div.nbinput > :first-child[class^=highlight],
 div.nboutput > :first-child[class^=highlight],
 div.nboutput > :first-child {
-    min-width: 11ex;
+    /*min-width: 11ex;*/
+    min-width:10ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -285,10 +286,25 @@ div.nboutput  > :nth-child(2).stderr {
 <dt id="jgem.assembler.Assembler">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">Assembler</code><span class="sig-paren">(</span><em>fnobj</em>, <em>merging=False</em>, <em>saveintermediates=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#Assembler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.Assembler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fnobj</strong> &#8211; FileNames object</li>
+<li><strong>merging</strong> (<em>bool</em>) &#8211; whether merging assembled models or not (default False)</li>
+<li><strong>saveintermediates</strong> (<em>bool</em>) &#8211; whether to save intermediates (default True)</li>
+<li><strong>kwargs</strong> &#8211; to change any of the parameter values</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="jgem.assembler.Assembler.assemble">
 <code class="descname">assemble</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#Assembler.assemble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.Assembler.assemble" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Perform the assembly</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="jgem.assembler.Assembler.check_params">
@@ -299,7 +315,8 @@ div.nboutput  > :nth-child(2).stderr {
 <dl class="method">
 <dt id="jgem.assembler.Assembler.save_stats">
 <code class="descname">save_stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#Assembler.save_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.Assembler.save_stats" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Saves assemble related stats into (samplename).assemble.stats.txt.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -320,11 +337,14 @@ div.nboutput  > :nth-child(2).stderr {
 <dt>SideEffects:</dt>
 <dd>add column (cov) to ae dataframe</dd>
 <dt>TempFiles:</dt>
-<dd>cov.txt.gz
-cov.bed.gz
-assemble.cov.txt.gz
-assemble.exons0.covci.txt.gz
-assemble.exons0.ci.txt.gz</dd>
+<dd><ul class="first last simple">
+<li>cov.txt.gz</li>
+<li>cov.bed.gz</li>
+<li>assemble.cov.txt.gz</li>
+<li>assemble.exons0.covci.txt.gz</li>
+<li>assemble.exons0.ci.txt.gz</li>
+</ul>
+</dd>
 </dl>
 <dl class="method">
 <dt id="jgem.assembler.CALCCOV.call">
@@ -337,6 +357,34 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.CHECKSJSUPPORT">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">CHECKSJSUPPORT</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#CHECKSJSUPPORT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.CHECKSJSUPPORT" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Check junction edges have &gt;0 coverages. Remove junctions without support.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sj</strong> &#8211; junction DataFrame</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">sj: compatible junctions</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>binth: coverage threshold, default:0, (for merging: 0)</li>
+<li>genome: genome version, default:mm10</li>
+</ul>
+</dd>
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>bw*.bed.gz</li>
+<li>sjst.bed.gz</li>
+<li>sjed.bed.gz</li>
+<li>sjst.ovl.txt.gz</li>
+<li>sjed.ovl.txt.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.CHECKSJSUPPORT.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#CHECKSJSUPPORT.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.CHECKSJSUPPORT.call" title="Permalink to this definition">¶</a></dt>
@@ -353,18 +401,17 @@ assemble.exons0.ci.txt.gz</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>sj</strong> &#8211; junction dataframe</li>
 <li><strong>ae</strong> &#8211; exon dataframe</li>
 </ul>
 </td>
 </tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sj: modify assembler sj</p>
+</td>
+</tr>
 </tbody>
 </table>
-<dl class="docutils">
-<dt>Output:</dt>
-<dd>sj: modify assembler sj</dd>
-</dl>
 <dl class="method">
 <dt id="jgem.assembler.CONSISTENTSJ.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#CONSISTENTSJ.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.CONSISTENTSJ.call" title="Permalink to this definition">¶</a></dt>
@@ -376,6 +423,35 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.EDGEFIXER">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">EDGEFIXER</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#EDGEFIXER"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.EDGEFIXER" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Fix edge exons by extending.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>me</strong> &#8211; exon dataframe</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">me: exon dataframe with edge exons fixed
+:edgefixer: this instance for reuse later</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>gap3: for 3&#8217; UTR extension, default 50 (merging: 1)</li>
+<li>gap5: for 5&#8217; UTR extension, default 50 (merging: 1)</li>
+<li>covfactor: for gap filling: if coverage of the next interval is &lt; covfactor*current cov
+default 0.1</li>
+</ul>
+</dd>
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>fixed5pr.bed.gz</li>
+<li>fixed3pr.bed.gz</li>
+<li>edgefixer.me.bed.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.EDGEFIXER.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#EDGEFIXER.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.EDGEFIXER.call" title="Permalink to this definition">¶</a></dt>
@@ -407,6 +483,33 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.EdgeDetector">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">EdgeDetector</code><span class="sig-paren">(</span><em>bwname</em>, <em>sigmath=3</em>, <em>minth=0.5</em>, <em>delta=15</em>, <em>covratio=0.1</em>, <em>winsize=15</em>, <em>covth=0.005</em>, <em>smwinsize=151</em>, <em>minintsize=10</em>, <em>mimath=0.15</em>, <em>triggerth=2</em>, <em>mimath2=None</em>, <em>mincutlen=50</em>, <em>aggregateratio=0.1</em>, <em>verbose=False</em>, <em>gap=0</em>, <em>gapth=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#EdgeDetector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.EdgeDetector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>bwname</strong> (<em>str</em>) &#8211; path to coverage bigwig file</li>
+<li><strong>sigmath</strong> (<em>float</em>) &#8211; sigma threshold (default 3)</li>
+<li><strong>minth</strong> (<em>float</em>) &#8211; (default 0.5)</li>
+<li><strong>delta</strong> (<em>int</em>) &#8211; (default 15)</li>
+<li><strong>covratio</strong> (<em>float</em>) &#8211; (default 0.1)</li>
+<li><strong>winsize</strong> (<em>int</em>) &#8211; (default 15)</li>
+<li><strong>covth</strong> (<em>float</em>) &#8211; (default 0.005)</li>
+<li><strong>smwinsize</strong> (<em>int</em>) &#8211; (default 151)</li>
+<li><strong>minintsize</strong> (<em>int</em>) &#8211; (default 10)</li>
+<li><strong>mimath</strong> (<em>float</em>) &#8211; min, max threshold (default 0.15)</li>
+<li><strong>triggerth</strong> (<em>float</em>) &#8211; (default 2)</li>
+<li><strong>mimath2</strong> (<em>float</em>) &#8211; (default None)</li>
+<li><strong>mincutlen</strong> (<em>int</em>) &#8211; (default 50)</li>
+<li><strong>aggregateratio</strong> (<em>float</em>) &#8211; (default 0.1)</li>
+<li><strong>verbose</strong> (<em>bool</em>) &#8211; (default False)</li>
+<li><strong>gap</strong> (<em>int</em>) &#8211; (default 0)</li>
+<li><strong>gapth</strong> (<em>float</em>) &#8211; (default 0.)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="jgem.assembler.EdgeDetector.calc_stats">
 <code class="descname">calc_stats</code><span class="sig-paren">(</span><em>chrom</em>, <em>st</em>, <em>ed</em>, <em>v=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#EdgeDetector.calc_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.EdgeDetector.calc_stats" title="Permalink to this definition">¶</a></dt>
@@ -503,6 +606,45 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.FIND53IR">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">FIND53IR</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FIND53IR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FIND53IR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Find 5&#8217;,3&#8217; exon (cut), intron retentions and single exons.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>me</strong> &#8211; exon DataFrame</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">ae: exons with 5&#8217;,3&#8217; cuts, irets, and single exons.</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>minsecovth: minimum single exon coverage (normalized to million alignments)
+default 2 (merging: 2)</li>
+<li>secovth: default SE cov threshold if not using adaptive version
+default 10 (merging: 10)</li>
+<li>se_gap: single exon gap fill, default 170</li>
+<li>se_binth: coverage threshold for SE finding, default 0.2 (merging: 0.2)</li>
+<li>se_sizeth: single exon size th, default 50 (merging: 50)</li>
+<li>find53ir_covratio: cov ratio threshold for FIND53IR,
+default 0.2, (merging: 0.15)</li>
+<li>find53ir_covth: cov threshold for FIND53IR
+default 0.6, (mergin: 0.6)</li>
+</ul>
+</dd>
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>se.cov.tmp.txt.gz</li>
+<li>se.cov.all.txt.gz</li>
+<li>me.exons.bed.gz</li>
+<li>bw*.bed.gz</li>
+<li>gap-sub-me.bed.gz</li>
+<li>assemble.exons0.txt.gz</li>
+<li>assemble.exons0.bed.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.FIND53IR.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FIND53IR.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FIND53IR.call" title="Permalink to this definition">¶</a></dt>
@@ -524,6 +666,35 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.FINDEDGES">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">FINDEDGES</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FINDEDGES"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FINDEDGES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Find edge exons. (Add * to the name when cut.)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>me</strong> &#8211; exon DataFrame</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">me: exon dataframe with edge exons added</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>mpth: mapped% th for detecting gene boundary, default:0.95 (merging: 0.9999)</li>
+<li>binth: default 0 (merging: 0)</li>
+<li>gap: fill this gap to distinguish gene boundary vs. exon (fill exon but not intergenic)
+default 50 (merging: 0)</li>
+<li>edgesize: temporary edge exon size, default 100</li>
+</ul>
+</dd>
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>fe.sjbb.bed.gz</li>
+<li>fe.sjbb-ovl.txt.gz</li>
+<li>fe.exons.bed.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.FINDEDGES.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FINDEDGES.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FINDEDGES.call" title="Permalink to this definition">¶</a></dt>
@@ -535,6 +706,59 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.FINDEDGES2">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">FINDEDGES2</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FINDEDGES2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FINDEDGES2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Find edges</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sj</strong> &#8211; junction DataFrame</li>
+<li><strong>me</strong> &#8211; exon DataFrame</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sj: compatible junctions
+:me: exon dataframe with edge exons added</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>mpth: mapped% th for detecting gene boundary, default 0.95</li>
+<li>binth: bigwig to bed threshold, default 0 (merging: 0)</li>
+<li>gap: fill this gap to distinguish gene boundary vs. exon (fill exon but not intergenic), default 50 (merging: 0)</li>
+<li>edgesize: temporary edge exon size, default 100</li>
+<li>maxexonsize: max exon size (Ttn has ~20kbp exon), default 35000</li>
+<li>cutlen: check candidate bounded exons larger than this for cutting, default 350</li>
+<li>ed_sigma: edge detector sigma for threshold (larger of minth, sigma*std is used),
+default 3  (merging: 5)</li>
+<li>ed_minth: edge detector minth for smoothed derivative, default 0.5 (merging: 0.05)</li>
+<li>ed_covratio: edge detector if cov ratio to surrounds is &lt; covratio, discard,
+default 0.001 (merging: 0.05)</li>
+<li>ed_window: edge detector smooth window (in bp), default 15</li>
+<li>ed_covth: edge detector abs cov threshold, default 2  (merging: 2)</li>
+<li>ed_smwinsize: smooth window for trimming default 151</li>
+<li>ed_minintsize: window for merging peaks, default 10</li>
+<li>ed_aggratio: default 0.1</li>
+<li>ed_mimath: min-max ratio threshold for cut decision, default 0.15 (merging: 0.2)</li>
+<li>ed_mimath2: default 0.3  (merging: 0.75)</li>
+<li>ed_triggerth: for rise detection (detect rise when &gt;= max*mimath*triggerth after &lt;max*mima), default 2</li>
+</ul>
+</dd>
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>fe2.sjbb.bed.gz</li>
+<li>fe2.sjbb-ovl.txt.gz</li>
+<li>fe2.me1.ci.txt.gz</li>
+<li>fe2.me2p.ci.txt.gz</li>
+<li>fe2.me2n.ci.txt.gz</li>
+<li>fe2.sj.txt.gz</li>
+<li>fe2.me.txt.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.FINDEDGES2.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FINDEDGES2.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FINDEDGES2.call" title="Permalink to this definition">¶</a></dt>
@@ -551,6 +775,32 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.FINDGENES">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">FINDGENES</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FINDGENES"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FINDGENES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Find genes (connected components).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sj</strong> &#8211; junction dataframe</li>
+<li><strong>ae</strong> &#8211; exon (all exon = single+multi exons) dataframe</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>np: number of CPU to use, default 1</li>
+</ul>
+</dd>
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>genegraph-*</li>
+<li>genes.cache.pic</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.FINDGENES.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FINDGENES.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FINDGENES.call" title="Permalink to this definition">¶</a></dt>
@@ -562,6 +812,48 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.FINDIRETS">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">FINDIRETS</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FINDIRETS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FINDIRETS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Find intron retentions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sj</strong> &#8211; junction DataFrame</li>
+<li><strong>me</strong> &#8211; exon DataFrame</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">me: exons with irets</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>iret_mpth: mapped% th for detecting intron retension,
+default 0.98 (merging: 1)</li>
+<li>iret_covth: if intron cov smaller than this, then ignore
+default 0.1 (merging: 0.1)</li>
+<li>iret_covratio: min cov ratio between an iret and average of surrounding exons
+default 0.01 (merging: 0.1)</li>
+<li>binth: default 0 (merging: 0)</li>
+</ul>
+</dd>
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>irets.bed.gz</li>
+<li>irets.exons.txt.gz</li>
+<li>irets.me.cov.txt.gz</li>
+<li>irets.me.bed.gz</li>
+<li>irets.me.covci.txt.gz</li>
+<li>irets.me.ci.txt.gz</li>
+<li>sj.iret.sub.bed.gz</li>
+<li>sj.iret.ci.txt.gz</li>
+<li>sj.iret.covci.txt.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.FINDIRETS.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FINDIRETS.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FINDIRETS.call" title="Permalink to this definition">¶</a></dt>
@@ -583,6 +875,48 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.FINDSE">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">FINDSE</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FINDSE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FINDSE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Find single exons.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>me</strong> &#8211; exon DataFrame</li>
+<li><strong>edgefixer</strong> &#8211; EdgeFixer instance</li>
+<li><strong>secovth</strong> &#8211; se coverage threshold</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">ae: all exons
+:se: single exons
+:me: multi-exons</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>minsecovth: minimum single exon coverage (normalized to million alignments)
+default 2 (merging: 2)</li>
+<li>secovth: default SE cov threshold if not using adaptive version
+default 10 (merging: 10)</li>
+<li>se_gap: single exon gap fill, default 170</li>
+<li>se_binth: coverage threshold for SE finding, default 0.2 (merging: 0.2)</li>
+<li>se_sizeth: single exon size th, default 50 (merging: 50)</li>
+</ul>
+</dd>
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>se.cov.tmp.txt.gz</li>
+<li>se.cov.all.txt.gz</li>
+<li>secov.txt.gz</li>
+<li>se.bed.gz</li>
+<li>exons.afterfindse.txt.gz</li>
+<li>me.exons.bed.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.FINDSE.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FINDSE.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FINDSE.call" title="Permalink to this definition">¶</a></dt>
@@ -599,6 +933,45 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.FINDSECOVTH">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">FINDSECOVTH</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FINDSECOVTH"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FINDSECOVTH" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Find single exon coverage threshold (secovth).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>me</strong> &#8211; exon DataFrame</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">secovth: threshold</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>findsecovth_useref: whether to use ref for finding secov, if not use ME
+default True</li>
+<li>minsecovth: minimum single exon coverage (normalized to million alignments)
+default 2 (merging: 2)</li>
+<li>se_gap: single exon gap fill, default 170</li>
+</ul>
+</dd>
+<dt>Files:</dt>
+<dd><ul class="first last simple">
+<li>findsecovth.params.txt.gz</li>
+<li>findsecovth.pdf</li>
+</ul>
+</dd>
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>findsecovth.refex.covci.txt.gz</li>
+<li>findsecovth.refex.cov.txt.gz</li>
+<li>se.cov.all.txt.gz</li>
+<li>irets.me.cov.txt.gz</li>
+<li>me.covci.txt.gz</li>
+<li>me.ci.txt.gz</li>
+<li>findsecovth.gap-sub-me.bed.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="attribute">
 <dt id="jgem.assembler.FINDSECOVTH.bins">
 <code class="descname">bins</code><em class="property"> = array([ 0.5 ,  0.55,  0.6 ,  0.65,  0.7 ,  0.75,  0.8 ,  0.85,  0.9 ,         0.95,  1.  ,  1.05,  1.1 ,  1.15,  1.2 ,  1.25,  1.3 ,  1.35,         1.4 ,  1.45,  1.5 ,  1.55,  1.6 ,  1.65])</em><a class="headerlink" href="#jgem.assembler.FINDSECOVTH.bins" title="Permalink to this definition">¶</a></dt>
@@ -640,6 +1013,32 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.FIXEDGES2">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">FIXEDGES2</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FIXEDGES2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FIXEDGES2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Find genes (connected components).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sj</strong> &#8211; junction dataframe</li>
+<li><strong>ae</strong> &#8211; exon (all exon = single+multi exons) dataframe</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>np: number of CPU to use, default 1</li>
+</ul>
+</dd>
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>genegraph-*</li>
+<li>genes.cache.pic</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.FIXEDGES2.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FIXEDGES2.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FIXEDGES2.call" title="Permalink to this definition">¶</a></dt>
@@ -656,6 +1055,36 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.FIXSTRAND">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">FIXSTRAND</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FIXSTRAND"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FIXSTRAND" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Assign strand to unstranded elements using information from connected components.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sj</strong> &#8211; junction dataframe</li>
+<li><strong>me</strong> &#8211; exon dataframe</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sj: junction dataframe with strand fixed
+:me: exon dataframe with strand fixed</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>useallconnected (bool): whether to use all connected components or just direct neighbors
+default True</li>
+</ul>
+</dd>
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>sj0.bed.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.FIXSTRAND.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#FIXSTRAND.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.FIXSTRAND.call" title="Permalink to this definition">¶</a></dt>
@@ -667,6 +1096,25 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.MERGEEXONS">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">MERGEEXONS</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#MERGEEXONS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.MERGEEXONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Merge overlapping exons.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>me</strong> &#8211; exon DataFrame</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">me: exon dataframe with merged exons</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>sjex.bed.gz</li>
+<li>sjex.inte.txt.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.MERGEEXONS.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#MERGEEXONS.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.MERGEEXONS.call" title="Permalink to this definition">¶</a></dt>
@@ -678,6 +1126,34 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.REMOVEJIE">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">REMOVEJIE</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#REMOVEJIE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.REMOVEJIE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Remove Junctions In Exons. Often times exons with high coverage contain
+noise junctions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sj</strong> &#8211; junction DataFrame</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">sj: junction dataframe without JIE
+:jie: junctions in exons</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>jie_binth: coverage threshold,  default:320</li>
+<li>jie_sjth: threshold for normalized read counts,  default:mm10</li>
+</ul>
+</dd>
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>bw*.bed.gz</li>
+<li>sjsupp.bed.gz</li>
+<li>jie.bw.ovl.txt.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.REMOVEJIE.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#REMOVEJIE.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.REMOVEJIE.call" title="Permalink to this definition">¶</a></dt>
@@ -689,6 +1165,48 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.SELECTSEME">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">SELECTSEME</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#SELECTSEME"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.SELECTSEME" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Remove noise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sj</strong> &#8211; junction dataframe</li>
+<li><strong>ae</strong> &#8211; exon (all exon = single+multi exons) dataframe</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sj: junction dataframe without spurious junctions
+:ae: exon dataframe without spurious exons</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>se_sizeth2: remove SE with length smaller than this, default 200</li>
+<li>np: number of CPU to use, default 1</li>
+<li>me2exon_sjth: 2exon genes with splice junction support less than this will be removed
+default 2</li>
+<li>me2exon_sizeth: 2exon genes terminal size th ~ 2 x read length, default 200</li>
+<li>me2exon_covth: 2exon genes cov th, default 10</li>
+</ul>
+</dd>
+<dt>Files:</dt>
+<dd><ul class="first last simple">
+<li>sj.txt.gz</li>
+<li>ex.txt.gz</li>
+</ul>
+</dd>
+<dt>TempFiles:</dt>
+<dd><ul class="first last simple">
+<li>selectseme.rm.se.bed.gz</li>
+<li>selectseme.rm.me.bed.gz</li>
+<li>selectseme.rm.ovl.txt.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.SELECTSEME.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#SELECTSEME.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.SELECTSEME.call" title="Permalink to this definition">¶</a></dt>
@@ -700,6 +1218,32 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.SELECTSJ">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">SELECTSJ</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#SELECTSJ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.SELECTSJ" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Select splice junction based on ratio of junction counts within overlapping junctions.
+Use ratio of unique counts and ratio of total counts (to incorporate cases where there are
+only non-unique counts).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sj</strong> &#8211; junction DataFrame</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">sj: selected junctions dataframe</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>selectsj_ratio: thredhold for the ratio, default:0.001</li>
+</ul>
+</dd>
+<dt>Files:</dt>
+<dd><ul class="first last simple">
+<li>selectsj.bed.gz</li>
+<li>selectsj.inte.txt.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.SELECTSJ.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#SELECTSJ.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.SELECTSJ.call" title="Permalink to this definition">¶</a></dt>
@@ -739,6 +1283,28 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.SJ2EX">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">SJ2EX</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#SJ2EX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.SJ2EX" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Find candidate exons from junctions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sj</strong> &#8211; junction DataFrame</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">me: exons dataframe
+:sj: compatible junctions</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>ureadth: threshold for junction unique counts, default:0 (0 for merging)</li>
+<li>mreadth: threshold for non-unique junction counts, default:0 (0 for merging)</li>
+<li>maxexonsize: maximum exon size, default:35000</li>
+<li>edgesize: temporary edge exon size, default:100</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.SJ2EX.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#SJ2EX.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.SJ2EX.call" title="Permalink to this definition">¶</a></dt>
@@ -782,6 +1348,36 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.WRITEGENES">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">WRITEGENES</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#WRITEGENES"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.WRITEGENES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Write genes (and isoform) BED (and GTF) files for viewing on browsers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sj</strong> &#8211; junction dataframe</li>
+<li><strong>ae</strong> &#8211; exon dataframe</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>writeiso (bool): whether to write isoforms or not, default False</li>
+<li>maxisonum (int):; number of maximum isoforms to write, default 10</li>
+<li>writegtf (bool): whether to write GTF file, default False</li>
+</ul>
+</dd>
+<dt>Files:</dt>
+<dd><ul class="first last simple">
+<li>genes.bed.gz</li>
+<li>genes.iso*.bed.gz</li>
+<li>genes.gtf.gz</li>
+<li>genes.iso*.gtf.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.WRITEGENES.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#WRITEGENES.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.WRITEGENES.call" title="Permalink to this definition">¶</a></dt>
@@ -793,6 +1389,35 @@ assemble.exons0.ci.txt.gz</dd>
 <dt id="jgem.assembler.WRITESJEX">
 <em class="property">class </em><code class="descclassname">jgem.assembler.</code><code class="descname">WRITESJEX</code><span class="sig-paren">(</span><em>asm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#WRITESJEX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.WRITESJEX" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#jgem.assembler.SUBASE" title="jgem.assembler.SUBASE"><code class="xref py py-class docutils literal"><span class="pre">jgem.assembler.SUBASE</span></code></a></p>
+<p>Write sj, ex and ci files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sj</strong> &#8211; junction dataframe</li>
+<li><strong>ae</strong> &#8211; exon dataframe</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Related Parameters:</dt>
+<dd><ul class="first last simple">
+<li>findsecovth (bool): whether secovth is found from data</li>
+</ul>
+</dd>
+<dt>Files:</dt>
+<dd><ul class="first last simple">
+<li>sj.txt.gz</li>
+<li>ex.txt.gz</li>
+<li>ci.txt.gz</li>
+<li>sj.bed.gz</li>
+<li>ex.bed.gz</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.assembler.WRITESJEX.call">
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#WRITESJEX.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.WRITESJEX.call" title="Permalink to this definition">¶</a></dt>
@@ -825,14 +1450,36 @@ assemble.exons0.ci.txt.gz</dd>
 <code class="descclassname">jgem.assembler.</code><code class="descname">fixedges_m</code><span class="sig-paren">(</span><em>ci</em>, <em>me</em>, <em>bwname</em>, <em>pr</em>, <em>chrom</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/assembler.html#fixedges_m"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.assembler.fixedges_m" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="attribute">
+<dt id="jgem.assembler.klass">
+<code class="descclassname">jgem.assembler.</code><code class="descname">klass</code><a class="headerlink" href="#jgem.assembler.klass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">FIXEDGES2</span></code></p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-jgem.annotate">
 <span id="annotate-module"></span><h2>annotate module<a class="headerlink" href="#module-jgem.annotate" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-compare"></span><dl class="class">
 <dt id="jgem.annotate.Comparator">
-<em class="property">class </em><code class="descclassname">jgem.annotate.</code><code class="descname">Comparator</code><span class="sig-paren">(</span><em>cn_ref</em>, <em>cn_tgt</em>, <em>outdir</em>, <em>gnamecol='gene_name'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/annotate.html#Comparator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.annotate.Comparator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">jgem.annotate.</code><code class="descname">Comparator</code><span class="sig-paren">(</span><em>cn_ref</em>, <em>cn_tgt</em>, <em>gnamecol='gene_name'</em>, <em>gidxcol='gene_id'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/annotate.html#Comparator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.annotate.Comparator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Compare to reference and annotate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cn_ref</strong> &#8211; Reference ComparatorNames object</li>
+<li><strong>cn_tgt</strong> &#8211; Target ComparatorNames object</li>
+<li><strong>gnamecol</strong> &#8211; name of the column containing gene names (gene_name for Gencode, symbol for RefSeq)
+(default gene_name)</li>
+<li><strong>gidxcol</strong> &#8211; name of the column containing gene id (gene_id for Gencode,
+_gidx if using connected components as genes)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="jgem.annotate.Comparator.annotate">
 <code class="descname">annotate</code><span class="sig-paren">(</span><em>overwrite=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/annotate.html#Comparator.annotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.annotate.Comparator.annotate" title="Permalink to this definition">¶</a></dt>
@@ -890,7 +1537,7 @@ Assign code (ex_as_ovl_(refcode)) to exon-wise and then gene-wise (gene_as_ovl_(
 <dl class="attribute">
 <dt id="compare.ComparatorNames.sjexbase">
 <code class="descname">sjexbase</code><a class="headerlink" href="#compare.ComparatorNames.sjexbase" title="Permalink to this definition">¶</a></dt>
-<dd><p>path prefix to junction, exon files (<a href="#id1"><span class="problematic" id="id2">*</span></a>.sj.txt.gz and <a href="#id3"><span class="problematic" id="id4">*</span></a>.ex.txt.gz)</p>
+<dd><p>path prefix to junction, exon files (*.sj.txt.gz and *.ex.txt.gz)</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -940,7 +1587,8 @@ Assign code (ex_as_ovl_(refcode)) to exon-wise and then gene-wise (gene_as_ovl_(
 <dl class="function">
 <dt id="jgem.bedtools.bed12_bed6">
 <code class="descclassname">jgem.bedtools.</code><code class="descname">bed12_bed6</code><span class="sig-paren">(</span><em>bed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/bedtools.html#bed12_bed6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.bedtools.bed12_bed6" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>convert BED12 to BED6 uses cython helper</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="jgem.bedtools.bed2bw">
@@ -1010,7 +1658,8 @@ Will check existence of result file (tname) and uses it if newer than input file
 <dl class="function">
 <dt id="jgem.bedtools.compressQ">
 <code class="descclassname">jgem.bedtools.</code><code class="descname">compressQ</code><span class="sig-paren">(</span><em>outname</em>, <em>noerr=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/bedtools.html#compressQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.bedtools.compressQ" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>decorator for checking file compression and error</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="jgem.bedtools.fillgap">
@@ -1407,9 +2056,11 @@ using a cluster of computers. T</p>
 </table>
 <dl class="docutils">
 <dt>SampleInfo DataFrame columns:</dt>
-<dd><p class="first">name: sample name
-bw_path: bigwig path
-sjbed_path: sjbed path</p>
+<dd><ul class="first simple">
+<li>name: sample name</li>
+<li>bw_path: bigwig path</li>
+<li>sjbed_path: sjbed path</li>
+</ul>
 <dl class="last docutils">
 <dt>Methods:</dt>
 <dd><ol class="first last arabic simple">
@@ -1422,14 +2073,14 @@ sjbed_path: sjbed path</p>
 </dl>
 </dd>
 <dt>Outputs:</dt>
-<dd><p class="first">are written in files
-1. outdir/assemblycode.samplecode.gcov.txt.gz
-1b. outdir/assemblycode.samplecode.ugcov.txt.gz
-2. outdir/assemblycode.samplecode.ecov.txt.gz
-2b. outdir/assemblycode.samplecode.uecov.txt.gz
-3. outdir/assemblycode.samplecode.jcnt.txt.gz
-4. outdir/assemblycode.samplecode.t1000gcov.txt.gz
-4b. outdir/assemblycode.samplecode.ut1000gcov.txt.gz</p>
+<dd><p class="first">are written in files:
+* 1. outdir/assemblycode.samplecode.gcov.txt.gz
+* 1b. outdir/assemblycode.samplecode.ugcov.txt.gz
+* 2. outdir/assemblycode.samplecode.ecov.txt.gz
+* 2b. outdir/assemblycode.samplecode.uecov.txt.gz
+* 3. outdir/assemblycode.samplecode.jcnt.txt.gz
+* 4. outdir/assemblycode.samplecode.t1000gcov.txt.gz
+* 4b. outdir/assemblycode.samplecode.ut1000gcov.txt.gz</p>
 <p class="last">Individual sample gcov/ecov/gcov1000 should have filename
 outdir/assemblycode.samplename.gcov.txt.gz etc.
 If these files are generated by separate cluster computation,
@@ -1695,9 +2346,25 @@ and junction counts (sjfile).</p>
 </div>
 </dd>
 </dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>en1</strong> &#8211; EvalNames object, reference</li>
+<li><strong>en2</strong> &#8211; EvalNames object, sensitivity of this model against en1 is calculated</li>
+<li><strong>bigwig</strong> &#8211; path to normalized bigwig coverage file</li>
+<li><strong>sjfile</strong> &#8211; path to normalized junction counts file</li>
+<li><strong>datacode</strong> &#8211; code indicating data (bigwig &amp; sjfile)</li>
+<li><strong>binsize</strong> (<em>int</em>) &#8211; for sensitivity plot (default 1000)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="jgem.evaluate.EvalMatch.abbr">
-<code class="descname">abbr</code><em class="property"> = {'s': 'single exons', '3b': &quot;3' exons (b)&quot;, '3': &quot;3' exons&quot;, '5b': &quot;5' exons (b)&quot;, 'sb': 'single exons (b)', 'i': 'internal exons', 'j': 'junctions', '5': &quot;5' exons&quot;}</em><a class="headerlink" href="#jgem.evaluate.EvalMatch.abbr" title="Permalink to this definition">¶</a></dt>
+<code class="descname">abbr</code><em class="property"> = {'3b': &quot;3' exons (b)&quot;, '5': &quot;5' exons&quot;, '3': &quot;3' exons&quot;, 'sb': 'single exons (b)', 'i': 'internal exons', 'j': 'junctions', 's': 'single exons', '5b': &quot;5' exons (b)&quot;}</em><a class="headerlink" href="#jgem.evaluate.EvalMatch.abbr" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1755,7 +2422,7 @@ and junction counts (sjfile).</p>
 
 <dl class="method">
 <dt id="jgem.evaluate.EvalMatch.plot_completeness">
-<code class="descname">plot_completeness</code><span class="sig-paren">(</span><em>axr=None, tgts=['glc', 'ecc', 'jcc'], pw='dft', disp='both', title=None, **kw</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/evaluate.html#EvalMatch.plot_completeness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.evaluate.EvalMatch.plot_completeness" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plot_completeness</code><span class="sig-paren">(</span><em>axr=None, tgts=['glc', 'ecc', 'jcc'], pw='dft', disp='both', title=None, xlim=[0, 10], xlimjcc=[0, 40], **kw</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/evaluate.html#EvalMatch.plot_completeness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.evaluate.EvalMatch.plot_completeness" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1804,7 +2471,7 @@ and junction counts (sjfile).</p>
 <dl class="attribute">
 <dt id="evaluate.EvalNames.sjexbase">
 <code class="descname">sjexbase</code><a class="headerlink" href="#evaluate.EvalNames.sjexbase" title="Permalink to this definition">¶</a></dt>
-<dd><p>path prefix to junction, exon files (<a href="#id5"><span class="problematic" id="id6">*</span></a>.sj.txt.gz and <a href="#id7"><span class="problematic" id="id8">*</span></a>.ex.txt.gz)</p>
+<dd><p>path prefix to junction, exon files (*.sj.txt.gz and *.ex.txt.gz)</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1910,6 +2577,22 @@ writes to outdir/(code).(code2).(which).txt.gz.</p>
 - output directory (outdir)
 - reference (refgtf) if using it for finding SE (single exon) coverage threshold</p>
 <p>All filenames have <strong>outdir+sname</strong> as prefix.</p>
+<p>Handles filenames.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sname</strong> (<em>str</em>) &#8211; sample name</li>
+<li><strong>bwfile</strong> (<em>str</em>) &#8211; path to normalized coverage bigwig file</li>
+<li><strong>sjfile</strong> (<em>str</em>) &#8211; path to junction file</li>
+<li><strong>outdir</strong> (<em>str</em>) &#8211; path to output directory</li>
+<li><strong>refgtf</strong> (<em>str</em>) &#8211; (optional) path to reference GTF</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="jgem.filenames.FileNames.bedname2">
 <code class="descname">bedname2</code><span class="sig-paren">(</span><em>suf</em>, <em>th</em>, <em>cat='temp'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/filenames.html#FileNames.bedname2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.filenames.FileNames.bedname2" title="Permalink to this definition">¶</a></dt>
@@ -1949,6 +2632,14 @@ writes to outdir/(code).(code2).(which).txt.gz.</p>
 <p>Base calss for handling tons of (temporary) filenames.
 * All filenames have a common prefix.
 * Each filename belong to a category.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>prefix</strong> (<em>str</em>) &#8211; path prefix</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="jgem.filenames.FileNamesBase.bedname">
 <code class="descname">bedname</code><span class="sig-paren">(</span><em>suffix</em>, <em>category='temp'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/filenames.html#FileNamesBase.bedname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.filenames.FileNamesBase.bedname" title="Permalink to this definition">¶</a></dt>
@@ -2413,7 +3104,7 @@ Connection: 1) by junctions, 2) by overlap in the same strand</p>
 
 <dl class="function">
 <dt id="jgem.gtfgffbed.sjtab2sjbed">
-<code class="descclassname">jgem.gtfgffbed.</code><code class="descname">sjtab2sjbed</code><span class="sig-paren">(</span><em>sjtab</em>, <em>sjbed</em>, <em>scale</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/gtfgffbed.html#sjtab2sjbed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.gtfgffbed.sjtab2sjbed" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">jgem.gtfgffbed.</code><code class="descname">sjtab2sjbed</code><span class="sig-paren">(</span><em>sjtab</em>, <em>sjbed</em>, <em>scale=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/gtfgffbed.html#sjtab2sjbed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.gtfgffbed.sjtab2sjbed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate splice junction input file from STAR SJ.out.tab</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2422,7 +3113,7 @@ Connection: 1) by junctions, 2) by overlap in the same strand</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>sjtab</strong> (<em>str</em>) &#8211; path to SJ.out.tab file</li>
 <li><strong>sjbed</strong> (<em>str</em>) &#8211; path to output bed</li>
-<li><strong>scale</strong> (<em>float</em>) &#8211; scale (= 1/average_coverage = covbp/totbp)</li>
+<li><strong>scale</strong> (<em>float</em>) &#8211; a number to multiply (default None, no change)</li>
 </ul>
 </td>
 </tr>
@@ -2521,6 +3212,22 @@ Connection: 1) by junctions, 2) by overlap in the same strand</p>
 <li>calculate coverage based on averaged bigwig</li>
 <li>calculate junction coverage based on aggregated junctions</li>
 </ol>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fni</strong> &#8211; MergeInputNames object</li>
+<li><strong>fna</strong> &#8211; MergeAssemblyNames object</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Keywords:</dt>
+<dd>can be used to modify assembly parameters</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.merge.MergeAssemble.assemble">
 <code class="descname">assemble</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/merge.html#MergeAssemble.assemble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.merge.MergeAssemble.assemble" title="Permalink to this definition">¶</a></dt>
@@ -2738,6 +3445,34 @@ Multiple bigwig file are for exons in each strand and for single exons.</p>
 </ol>
 <p>(Note: at 1. bigwigs are from exon model outputs from each assembly, at 4. bigwig is just an
 average of all original bigiwigs which were inputs to each assembly.)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fnobj</strong> &#8211; MergeInputNames object</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Other keywords arguments:</dt>
+<dd><ul class="first last simple">
+<li>genome: UCSC genome name</li>
+<li>np: number of CPU to use</li>
+<li>covth: only use exons with coverage &gt; covth (default 0)</li>
+<li>covdelta: exon coverage quantization delta</li>
+<li>uth: unique reads threshold for junctions (default 0)</li>
+<li>mth: non-unique reads threshold for junctions (default 5)</li>
+<li>th_ratio: threshold for selecting junctions by overlapping ratio
+(default 0.001, i.e. if a junction&#8217;s read is less than 1/1000 of the sum of
+all the reads of overlapping junctions then the junction is discarded)</li>
+<li>th_detected: junctions need to be detected in more than this number of samples (default 2)
+unless max junction reads across samples is larger than th_maxcnt2</li>
+<li>th_maxcnt1: max junction reads across sample has to be larger than this (default 0.1)</li>
+<li>th_maxcnt2: if max junction reads across samples is larger than this, ignore th_detected
+(default 4)</li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="jgem.merge.MergeInputs.aggregate_bigwigs">
 <code class="descname">aggregate_bigwigs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jgem/merge.html#MergeInputs.aggregate_bigwigs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#jgem.merge.MergeInputs.aggregate_bigwigs" title="Permalink to this definition">¶</a></dt>
