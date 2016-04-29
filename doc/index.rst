@@ -12,7 +12,7 @@ Contents:
    :maxdepth: 4
 
    install.rst
-   quickstart.ipynb
+   tutorial.ipynb
 
    modules.rst
 
