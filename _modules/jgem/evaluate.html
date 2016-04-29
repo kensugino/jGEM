@@ -68,7 +68,7 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">jGEM packages</a></li>
 </ul>
 </ul>
@@ -822,7 +822,7 @@ div.nboutput  > :nth-child(2).stderr {
                 <span class="c1">#avgx,avgy = UT.calc_binned(x,y,num=binsize)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="n">which</span><span class="p">]</span>
-                <span class="n">maxx</span><span class="p">,</span><span class="n">avgy</span> <span class="o">=</span> <span class="n">st</span><span class="p">[</span><span class="s1">&#39;maxx&#39;</span><span class="p">],</span><span class="n">st</span><span class="p">[</span><span class="s1">&#39;avgy&#39;</span><span class="p">]</span>
+                <span class="n">maxx</span><span class="p">,</span><span class="n">avgy</span> <span class="o">=</span> <span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">st</span><span class="p">[</span><span class="s1">&#39;maxx&#39;</span><span class="p">]),</span><span class="n">N</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">st</span><span class="p">[</span><span class="s1">&#39;avgy&#39;</span><span class="p">])</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">maxx</span><span class="p">,</span><span class="n">scale</span><span class="o">*</span><span class="n">avgy</span><span class="p">,</span> <span class="n">ca</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;t&#39;</span> <span class="ow">in</span> <span class="n">pw</span><span class="p">:</span> <span class="c1"># threshold</span>
             <span class="k">if</span> <span class="n">which</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>

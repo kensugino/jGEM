@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tutorial &mdash; jGEM 0.9.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-3.3.4/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-3.3.4/css/bootstrap-theme.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.9.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="jGEM 0.9.0 documentation" href="index.html" />
+    <link rel="next" title="jGEM packages" href="modules.html" />
+    <link rel="prev" title="Installation" href="install.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          jGEM</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.9.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">jGEM packages</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Tutorial</a><ul>
+<li><a class="reference internal" href="#Sample-Info">Sample Info</a></li>
+<li><a class="reference internal" href="#Preparing-Inputs-to-the-assembler">Preparing Inputs to the assembler</a><ul>
+<li><a class="reference internal" href="#SJBED-file-format">SJBED file format</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Assembling-individual-samples">Assembling individual samples</a></li>
+<li><a class="reference internal" href="#Evaluation-of-individual-assemblies">Evaluation of individual assemblies</a></li>
+<li><a class="reference internal" href="#Preparing-for-merge">Preparing for merge</a></li>
+<li><a class="reference internal" href="#Merging">Merging</a></li>
+<li><a class="reference internal" href="#Annotating-assembly">Annotating assembly</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="install.html" title="Previous Chapter: Installation"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Installation</span>
+    </a>
+  </li>
+  <li>
+    <a href="modules.html" title="Next Chapter: jGEM packages"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">jGEM packages &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/tutorial.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class^=highlight] pre {
+    line-height: unset;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    /*min-width: 11ex;*/
+    min-width:10ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<div class="section" id="Tutorial">
+<h1>Tutorial<a class="headerlink" href="#Tutorial" title="Permalink to this headline">¶</a></h1>
+<p>We will do the assembly and merging using the example data in the
+doc/tutorial_data directory in the following order:</p>
+<ol class="arabic simple">
+<li>Preparing sample info spreadsheet</li>
+<li>Preparing inputs</li>
+<li>Assembling individual samples</li>
+<li>Evalulation of individual assemblies</li>
+<li>Preparing for merge</li>
+<li>Merging</li>
+<li>Evaluation of the merged assembly</li>
+<li>Annotating merged assembly</li>
+</ol>
+<p>The example data is the chromosome 1 portion of the RNASeq data from the
+neurons in superior central nucleus raphe, medial part (CSm) and dosal
+nucleus raphe (DR) in Fev-Cre mouse line which labels serotoninergic
+neurons. (Fev-Cre is also called ePet-Cre.)</p>
+<p>First we will change the logging level for jupyter notebook and enable
+inline matplotlib figure:</p>
+<div class="nbinput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[1]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># This is to change logging level of jupyter notebook</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="nb">reload</span> <span class="c1"># for python 3</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="nb">reload</span><span class="p">(</span><span class="n">logging</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="n">datefmt</span><span class="o">=</span><span class="s1">&#39;%I:%M:%S&#39;</span><span class="p">)</span>
+
+<span class="c1"># This is to show matplotlib output in the notebook</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">matplotlib.pylab</span> <span class="kn">as</span> <span class="nn">P</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Sample-Info">
+<h2>Sample Info<a class="headerlink" href="#Sample-Info" title="Permalink to this headline">¶</a></h2>
+<p>For this tutorial, we will use the Excel file <strong>sampleinfo.xlsx</strong> in the
+tests/data directory. Following fields are required:</p>
+<ul class="simple">
+<li><strong>name</strong>: unique sample name</li>
+<li><strong>mapbed</strong>: name (or path) of BED file containing mapped reads</li>
+<li><strong>sjtab</strong>: name (or path) of STAR SJ.out.tab output file</li>
+</ul>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[2]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">PD</span>
+
+<span class="n">si</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;tutorial_data/sampleinfo.xlsx&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">si</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;mapbed&#39;</span><span class="p">,</span><span class="s1">&#39;sjtab&#39;</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+                    name                             mapbed  \
+0   Fev_DR_m70_1623.chr1   Fev_DR_m70_1623_star.chr1.bed.gz
+1  Fev_CSm_m70_1624.chr1  Fev_CSm_m70_1624_star.chr1.bed.gz
+2   Fev_DR_m71_1625.chr1   Fev_DR_m71_1625_star.chr1.bed.gz
+3  Fev_CSm_m71_1626.chr1  Fev_CSm_m71_1626_star.chr1.bed.gz
+
+                              sjtab
+0   Fev_DR_m70_1623.chr1.SJ.out.tab
+1  Fev_CSm_m70_1624.chr1.SJ.out.tab
+2   Fev_DR_m71_1625.chr1.SJ.out.tab
+3  Fev_CSm_m71_1626.chr1.SJ.out.tab
+</pre></div></div>
+</div>
+<p>The read mapping output from STAR is a BAM file. We convert the BAM file
+to BED file. You can do this using <strong>bedtools bamtobed</strong> command, or
+using the wrapper
+<a class="reference external" href="modules.html#jgem.bedtools.bam2bed">jgem.bedtools.bam2bed</a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">bedtools</span> <span class="k">as</span> <span class="n">BT</span>
+<span class="n">BT</span><span class="o">.</span><span class="n">bam2bed</span><span class="p">(</span><span class="n">bam_path</span><span class="p">,</span><span class="n">bed_path</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>STAR also creates a file named SJ.out.tab which contains junction
+information.</p>
+<p>First, we&#8217;ll create columns containing actual paths of these files in
+the sampleinfo dataframe.</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[3]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">BASEDIR</span> <span class="o">=</span> <span class="s1">&#39;./tutorial_data&#39;</span>
+<span class="n">si</span><span class="p">[</span><span class="s1">&#39;bed_path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASEDIR</span><span class="p">,</span> <span class="s2">&quot;BED&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">si</span><span class="p">[</span><span class="s1">&#39;mapbed&#39;</span><span class="p">]]</span>
+<span class="n">si</span><span class="p">[</span><span class="s1">&#39;sjtab_path&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASEDIR</span><span class="p">,</span> <span class="s2">&quot;SJ&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">si</span><span class="p">[</span><span class="s1">&#39;sjtab&#39;</span><span class="p">]]</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">si</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;bed_path&#39;</span><span class="p">,</span><span class="s1">&#39;sjtab_path&#39;</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+                    name                                           bed_path  \
+0   Fev_DR_m70_1623.chr1  ./tutorial_data/BED/Fev_DR_m70_1623_star.chr1....
+1  Fev_CSm_m70_1624.chr1  ./tutorial_data/BED/Fev_CSm_m70_1624_star.chr1...
+2   Fev_DR_m71_1625.chr1  ./tutorial_data/BED/Fev_DR_m71_1625_star.chr1....
+3  Fev_CSm_m71_1626.chr1  ./tutorial_data/BED/Fev_CSm_m71_1626_star.chr1...
+
+                                          sjtab_path
+0  ./tutorial_data/SJ/Fev_DR_m70_1623.chr1.SJ.out...
+1  ./tutorial_data/SJ/Fev_CSm_m70_1624.chr1.SJ.ou...
+2  ./tutorial_data/SJ/Fev_DR_m71_1625.chr1.SJ.out...
+3  ./tutorial_data/SJ/Fev_CSm_m71_1626.chr1.SJ.ou...
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Preparing-Inputs-to-the-assembler">
+<h2>Preparing Inputs to the assembler<a class="headerlink" href="#Preparing-Inputs-to-the-assembler" title="Permalink to this headline">¶</a></h2>
+<p>We need a BIGWIG file containing normalized coverages and an
+appropriately formatted BED file containing junction information for the
+inputs to the assembler.</p>
+<p>To normalize coverage, we use average coverage which is the number of
+the total mapped base pairs divided by the number of covered base pairs.
+This can be calculated using
+<a class="reference external" href="modules.html#jgem.bedtools.get_total_bp_bedfile">jgem.bedtools.get_total_bp_bedfile</a>:</p>
+<p>Now normalized BIGWIG coverage files can be generated using
+<a class="reference external" href="modules.html#jgem.bedtools.bed2bw">jgem.bedtools.bed2bw</a> function:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[4]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="o">%%</span><span class="k">time</span>
+# first prepare destination
+OUTDIR = &#39;./tutorial_out&#39;
+si[&#39;bw_path&#39;] = [os.path.join(OUTDIR, &quot;bigwig/{0}.bw&quot;.format(x)) for x in si[&#39;name&#39;]]
+# then make coverages BIGWIG from BED (~ 2 min)
+from jgem import utils as UT
+from jgem import bedtools as BT
+chromsizes = UT.chromsizes(&#39;mm10&#39;) # a file containing chromosome names and sizes
+for bedfile, bwfile in si[[&#39;bed_path&#39;,&#39;bw_path&#39;]].values:
+    BT.bed2bw(bedfile, chromsizes, bwfile)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+CPU times: user 138 ms, sys: 85 ms, total: 223 ms
+Wall time: 1min 50s
+</pre></div></div>
+</div>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[5]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">ls</span> <span class="o">./</span><span class="n">tutorial_out</span><span class="o">/</span><span class="n">bigwig</span><span class="o">/*</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+./tutorial_out/bigwig/Fev_CSm_m70_1624.chr1.bw
+./tutorial_out/bigwig/Fev_CSm_m71_1626.chr1.bw
+./tutorial_out/bigwig/Fev_DR_m70_1623.chr1.bw
+./tutorial_out/bigwig/Fev_DR_m71_1625.chr1.bw
+</pre></div></div>
+</div>
+<p>To generate junction files from SJ.out.tab, use function
+<a class="reference external" href="modules.html#jgem.gtfgffbed.sjtab2sjbed">jgem.gtfgffbed.sjtab2sjbed</a>:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[6]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="o">%%</span><span class="k">time</span>
+# sjbed destination
+si[&#39;sjbed_path&#39;] = [os.path.join(OUTDIR, &quot;sjbed/{0}.sj.bed.gz&quot;.format(x)) for x in si[&#39;name&#39;]]
+# SJ.out.tab =&gt; sjbed
+from jgem import gtfgffbed as GGB
+for sjtab, sjbed in si[[&#39;sjtab_path&#39;,&#39;sjbed_path&#39;]].values:
+    GGB.sjtab2sjbed(sjtab,sjbed)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+CPU times: user 265 ms, sys: 33.3 ms, total: 299 ms
+Wall time: 407 ms
+</pre></div></div>
+</div>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[9]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">ls</span> <span class="o">./</span><span class="n">tutorial_out</span><span class="o">/</span><span class="n">sjbed</span><span class="o">/*</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+./tutorial_out/sjbed/Fev_CSm_m70_1624.chr1.sj.bed.gz
+./tutorial_out/sjbed/Fev_CSm_m71_1626.chr1.sj.bed.gz
+./tutorial_out/sjbed/Fev_DR_m70_1623.chr1.sj.bed.gz
+./tutorial_out/sjbed/Fev_DR_m71_1625.chr1.sj.bed.gz
+</pre></div></div>
+</div>
+<p>Let&#8217;s check the content of generated SJBED file.</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[10]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">sj</span> <span class="o">=</span> <span class="n">GGB</span><span class="o">.</span><span class="n">read_sj</span><span class="p">(</span><span class="n">sjbed</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sj</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+    chr       st       ed                 name  ucnt strand  mcnt
+0  chr1  3121707  3142317   CT/AC-k0-u4-m0-o46     4      -     0
+1  chr1  3207318  3213438  CT/AC-k0-u10-m0-o47    10      -     0
+2  chr1  3271573  3302745   GT/AG-k0-u0-m1-o37     0      +     1
+3  chr1  3421902  3670551  CT/AC-k1-u20-m0-o43    20      -     0
+4  chr1  3660890  3670551   CT/AC-k0-u2-m0-o41     2      -     0
+</pre></div></div>
+</div>
+<div class="section" id="SJBED-file-format">
+<h3>SJBED file format<a class="headerlink" href="#SJBED-file-format" title="Permalink to this headline">¶</a></h3>
+<p>As shown above, the tab separated junction file should contain:</p>
+<ul class="simple">
+<li><strong>chr</strong>: chromosome name</li>
+<li><strong>st</strong>: start position</li>
+<li><strong>ed</strong>: end position</li>
+<li><strong>name</strong>: junction name</li>
+<li><strong>ucnt</strong>: unique reads</li>
+<li><strong>strand</strong>: strand of junction</li>
+<li><strong>mcnt</strong>: non-unique (multimapping) reads</li>
+</ul>
+</div>
+</div>
+<div class="section" id="Assembling-individual-samples">
+<h2>Assembling individual samples<a class="headerlink" href="#Assembling-individual-samples" title="Permalink to this headline">¶</a></h2>
+<p>Use <a class="reference external" href="modules.html#jgem.filenames.FileNames">FileNames class</a> to
+specify inputs (bigwig file and sjbed file) and output directory, then
+use <a class="reference external" href="modules.html#jgem.assembler.Assembler">Assembler class</a> to do
+the assembly.</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[11]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># assemble 4 samples takes about ~10 min</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">filenames</span> <span class="k">as</span> <span class="n">FN</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">assembler</span> <span class="k">as</span> <span class="n">AS</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">bwfile</span><span class="p">,</span><span class="n">sjfile</span> <span class="ow">in</span> <span class="n">si</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;bw_path&#39;</span><span class="p">,</span><span class="s1">&#39;sjbed_path&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">FN</span><span class="o">.</span><span class="n">FileNames</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bwfile</span><span class="p">,</span> <span class="n">sjfile</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="n">OUTDIR</span><span class="o">+</span><span class="s1">&#39;/assemblies&#39;</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">AS</span><span class="o">.</span><span class="n">Assembler</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span><span class="n">saveintermediates</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="stderr container">
+<div class="highlight"><pre>
+INFO:SELECTSJ ====================
+INFO: #sj:7660=&gt;7649
+INFO: time: 0.377s
+INFO:REMOVEJIE ====================
+INFO: #sj:7649=&gt;7640, jie 9
+INFO: time: 1.770s
+INFO:SJ2EX ====================
+INFO:#sj:7640=&gt;7640 after ureadth, mreadth
+INFO: #ex:8127, #sj:7640
+INFO: time: 0.106s
+INFO:MERGEEXONS ====================
+INFO: #ex:8205
+INFO: time: 0.190s
+INFO:FINDEDGES ====================
+INFO: time: 1.893s
+INFO:FIXSTRAND ====================
+INFO: time: 0.378s
+INFO:EDGEFIXER ====================
+INFO: time: 13.653s
+INFO:FINDIRETS ====================
+INFO:#irets candidates:171
+INFO:169 irets found
+INFO: time: 5.094s
+INFO:FINDSECOVTH ====================
+INFO: SECOVTH=9.509753345884835
+INFO: time: 5.202s
+INFO:FINDSE ====================
+INFO:#candidate SE:8041
+INFO:  processing 8041 SE candidates
+INFO:#candidate SE after _fix_se_ext:7957
+INFO:write exons ...=&gt; assemble.exons0.txt.gz
+INFO: time: 43.701s
+INFO:CALCCOV ====================
+INFO: time: 3.339s
+INFO:SETINFO ====================
+INFO: time: 0.383s
+INFO:FINDGENES ====================
+INFO:finding genes (connected components)...
+INFO: time: 1.996s
+INFO:assigning gidx...
+INFO: #genes:ME1224, SE(before selection)7085
+INFO: time: 2.053s
+INFO:SELECTSEME ====================
+INFO:ex(9660) sj(7640) ==&gt; ex(9054) sj(7640)
+INFO:se(612) =&gt; se(558) 54 removed
+INFO: time: 0.639s
+INFO:FIXEDGES2 ====================
+INFO: #ae:11058
+INFO: time: 10.655s
+INFO:CONSISTENTSJ ====================
+INFO:  #sj 7640 =&gt; 7336
+INFO: time: 0.010s
+INFO:WRITESJEX ====================
+INFO: time: 0.825s
+INFO:WRITEGENES ====================
+INFO: writing bed12 genes...
+INFO: time: 4.735s
+INFO:SELECTSJ ====================
+INFO: #sj:8150=&gt;8131
+INFO: time: 0.393s
+INFO:REMOVEJIE ====================
+INFO: #sj:8131=&gt;8122, jie 9
+INFO: time: 2.038s
+INFO:SJ2EX ====================
+INFO:#sj:8122=&gt;8122 after ureadth, mreadth
+INFO: #ex:8613, #sj:8122
+INFO: time: 0.099s
+INFO:MERGEEXONS ====================
+INFO: #ex:8731
+INFO: time: 0.187s
+INFO:FINDEDGES ====================
+INFO: time: 2.037s
+INFO:FIXSTRAND ====================
+INFO: time: 0.322s
+INFO:EDGEFIXER ====================
+INFO: time: 15.335s
+INFO:FINDIRETS ====================
+INFO:#irets candidates:243
+INFO:251 irets found
+INFO: time: 6.101s
+INFO:FINDSECOVTH ====================
+INFO: SECOVTH=8.349099685381518
+INFO: time: 5.535s
+INFO:FINDSE ====================
+INFO:#candidate SE:8664
+INFO:  processing 8664 SE candidates
+INFO:#candidate SE after _fix_se_ext:8572
+INFO:write exons ...=&gt; assemble.exons0.txt.gz
+INFO: time: 47.983s
+INFO:CALCCOV ====================
+INFO: time: 3.476s
+INFO:SETINFO ====================
+INFO: time: 0.409s
+INFO:FINDGENES ====================
+INFO:finding genes (connected components)...
+INFO: time: 2.210s
+INFO:assigning gidx...
+INFO: #genes:ME1225, SE(before selection)7561
+INFO: time: 2.271s
+INFO:SELECTSEME ====================
+INFO:ex(10297) sj(8122) ==&gt; ex(9665) sj(8122)
+INFO:se(606) =&gt; se(554) 52 removed
+INFO: time: 0.698s
+INFO:FIXEDGES2 ====================
+INFO: #ae:11862
+INFO: time: 11.774s
+INFO:CONSISTENTSJ ====================
+INFO:  #sj 8122 =&gt; 7806
+INFO: time: 0.012s
+INFO:WRITESJEX ====================
+INFO: time: 0.846s
+INFO:WRITEGENES ====================
+INFO: writing bed12 genes...
+INFO: time: 4.573s
+INFO:SELECTSJ ====================
+INFO: #sj:8445=&gt;8430
+INFO: time: 0.394s
+INFO:REMOVEJIE ====================
+INFO: #sj:8430=&gt;8420, jie 10
+INFO: time: 2.116s
+INFO:SJ2EX ====================
+INFO:#sj:8420=&gt;8420 after ureadth, mreadth
+INFO: #ex:8923, #sj:8420
+INFO: time: 0.103s
+INFO:MERGEEXONS ====================
+INFO: #ex:9017
+INFO: time: 0.197s
+INFO:FINDEDGES ====================
+INFO: time: 2.338s
+INFO:FIXSTRAND ====================
+INFO: time: 0.323s
+INFO:EDGEFIXER ====================
+INFO: time: 17.622s
+INFO:FINDIRETS ====================
+INFO:#irets candidates:313
+INFO:348 irets found
+INFO: time: 6.668s
+INFO:FINDSECOVTH ====================
+INFO: SECOVTH=6.952539775166711
+INFO: time: 6.002s
+INFO:FINDSE ====================
+INFO:#candidate SE:9688
+INFO:  processing 9688 SE candidates
+INFO:#candidate SE after _fix_se_ext:9608
+INFO:write exons ...=&gt; assemble.exons0.txt.gz
+INFO: time: 58.027s
+INFO:CALCCOV ====================
+INFO: time: 3.735s
+INFO:SETINFO ====================
+INFO: time: 0.434s
+INFO:FINDGENES ====================
+INFO:finding genes (connected components)...
+INFO: time: 2.339s
+INFO:assigning gidx...
+INFO: #genes:ME1321, SE(before selection)8381
+INFO: time: 2.411s
+INFO:SELECTSEME ====================
+INFO:ex(10990) sj(8420) ==&gt; ex(10234) sj(8420)
+INFO:se(663) =&gt; se(593) 70 removed
+INFO: time: 0.733s
+INFO:FIXEDGES2 ====================
+INFO: #ae:12707
+INFO: time: 12.741s
+INFO:CONSISTENTSJ ====================
+INFO:  #sj 8420 =&gt; 8041
+INFO: time: 0.013s
+INFO:WRITESJEX ====================
+INFO: time: 0.933s
+INFO:WRITEGENES ====================
+INFO: writing bed12 genes...
+INFO: time: 4.784s
+INFO:SELECTSJ ====================
+INFO: #sj:8009=&gt;7999
+INFO: time: 0.393s
+INFO:REMOVEJIE ====================
+INFO: #sj:7999=&gt;7995, jie 4
+INFO: time: 2.087s
+INFO:SJ2EX ====================
+INFO:#sj:7995=&gt;7995 after ureadth, mreadth
+INFO: #ex:8502, #sj:7995
+INFO: time: 0.110s
+INFO:MERGEEXONS ====================
+INFO: #ex:8587
+INFO: time: 0.203s
+INFO:FINDEDGES ====================
+INFO: time: 2.097s
+INFO:FIXSTRAND ====================
+INFO: time: 0.295s
+INFO:EDGEFIXER ====================
+INFO: time: 15.671s
+INFO:FINDIRETS ====================
+INFO:#irets candidates:208
+INFO:207 irets found
+INFO: time: 5.964s
+INFO:FINDSECOVTH ====================
+INFO: SECOVTH=9.592454664480613
+INFO: time: 5.897s
+INFO:FINDSE ====================
+INFO:#candidate SE:9940
+INFO:  processing 9940 SE candidates
+INFO:#candidate SE after _fix_se_ext:9829
+INFO:write exons ...=&gt; assemble.exons0.txt.gz
+INFO: time: 57.179s
+INFO:CALCCOV ====================
+INFO: time: 3.855s
+INFO:SETINFO ====================
+INFO: time: 0.459s
+INFO:FINDGENES ====================
+INFO:finding genes (connected components)...
+INFO: time: 2.380s
+INFO:assigning gidx...
+INFO: #genes:ME1284, SE(before selection)8716
+INFO: time: 2.446s
+INFO:SELECTSEME ====================
+INFO:ex(10330) sj(7995) ==&gt; ex(9662) sj(7995)
+INFO:se(651) =&gt; se(603) 48 removed
+INFO: time: 0.753s
+INFO:FIXEDGES2 ====================
+INFO: #ae:12016
+INFO: time: 12.666s
+INFO:CONSISTENTSJ ====================
+INFO:  #sj 7995 =&gt; 7661
+INFO: time: 0.011s
+INFO:WRITESJEX ====================
+INFO: time: 0.889s
+INFO:WRITEGENES ====================
+INFO: writing bed12 genes...
+INFO: time: 5.182s
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_20_1.png" src="_images/tutorial_20_1.png" />
+</div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_20_2.png" src="_images/tutorial_20_2.png" />
+</div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_20_3.png" src="_images/tutorial_20_3.png" />
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_20_4.png" src="_images/tutorial_20_4.png" />
+</div>
+</div>
+<p>Generated figures visualize the process of finding coverage threshold
+for single exons. (See ...)</p>
+<p>In the output directory, several files are generated:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[13]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">ls</span> <span class="o">./</span><span class="n">tutorial_out</span><span class="o">/</span><span class="n">assemblies</span><span class="o">/</span><span class="n">Fev_DR_m70_1623</span><span class="o">*</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+./tutorial_out/assemblies/Fev_DR_m70_1623.chr1.assemble.params.txt
+./tutorial_out/assemblies/Fev_DR_m70_1623.chr1.assemble.stats.txt
+./tutorial_out/assemblies/Fev_DR_m70_1623.chr1.ci.txt.gz
+./tutorial_out/assemblies/Fev_DR_m70_1623.chr1.ex.bed.gz
+./tutorial_out/assemblies/Fev_DR_m70_1623.chr1.ex.txt.gz
+./tutorial_out/assemblies/Fev_DR_m70_1623.chr1.findsecovth.params.txt
+./tutorial_out/assemblies/Fev_DR_m70_1623.chr1.findsecovth.pdf
+./tutorial_out/assemblies/Fev_DR_m70_1623.chr1.genes.bed.gz
+./tutorial_out/assemblies/Fev_DR_m70_1623.chr1.selectsj.sj2.txt.gz
+./tutorial_out/assemblies/Fev_DR_m70_1623.chr1.sj.bed.gz
+./tutorial_out/assemblies/Fev_DR_m70_1623.chr1.sj.txt.gz
+</pre></div></div>
+</div>
+<p>Main outputs are files with .ex.txt.gz, .sj.txt.gz suffixes. These
+contain exons and junctions in tab separated format. BED files are also
+generated for viewing elements (genes,exons,junctions) with browsers
+like IGV (<a class="reference external" href="https://www.broadinstitute.org/igv/">https://www.broadinstitute.org/igv/</a>). The screenshot below is
+a segment of chromosome 1 showing genes.bed files from the 4 samples.</p>
+<div class="figure">
+<img alt="" src="_images/GD1YM1XSXBVB8NOM2KDWF3FB0H5DE3OW.png" />
+</div>
+<p>Other files (assemble.params.txt.gz, assemble.stats.txt.gz,
+findsecovth.params.txt.gz, findsecovth.pdf) contain parameters and
+statistics of the assembly.</p>
+</div>
+<div class="section" id="Evaluation-of-individual-assemblies">
+<h2>Evaluation of individual assemblies<a class="headerlink" href="#Evaluation-of-individual-assemblies" title="Permalink to this headline">¶</a></h2>
+<p>We will evaluate the assemblies against <a class="reference external" href="http://www.gencodegenes.org/mouse_releases/4.html">Gencode.VM4
+annotation</a>. For
+this, we use <a class="reference external" href="modules.html#jgem.evalutate.EvalNames">EvalNames class</a>
+and <a class="reference external" href="modules.html#jgem.evalutate.EvalMatch">EvalMatch class</a>.</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[16]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Evaluate against Gencode.VM4 (~1 min)</span>
+<span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">evaluate</span> <span class="k">as</span> <span class="n">EV</span>
+<span class="n">ens</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># keep EvalNames objects</span>
+<span class="n">ems</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># keep EvalMatch object</span>
+<span class="c1"># Gencode.VM4</span>
+<span class="n">en_gen4</span> <span class="o">=</span> <span class="n">EV</span><span class="o">.</span><span class="n">EvalNames</span><span class="p">(</span><span class="s1">&#39;./tutorial_data/REF/gencode.vM4.chr1&#39;</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="s1">&#39;gen4&#39;</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="n">OUTDIR</span><span class="o">+</span><span class="s1">&#39;/eval&#39;</span><span class="p">)</span>
+<span class="c1"># assign sample code</span>
+<span class="n">si</span><span class="p">[</span><span class="s1">&#39;scode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">si</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span>
+<span class="c1"># For each sample</span>
+<span class="k">for</span> <span class="n">scode</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bwfile</span><span class="p">,</span> <span class="n">sjfile</span> <span class="ow">in</span> <span class="n">si</span><span class="p">[[</span><span class="s1">&#39;scode&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;bw_path&#39;</span><span class="p">,</span><span class="s1">&#39;sjbed_path&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;process {0}...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+    <span class="n">sjexbase</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">OUTDIR</span><span class="p">,</span><span class="s1">&#39;assemblies&#39;</span><span class="p">,</span><span class="n">name</span><span class="p">)</span> <span class="c1"># prefix to .ex.txt.gz and .sj.txt.gz files</span>
+    <span class="n">assemblycode</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">scode</span><span class="p">)</span> <span class="c1"># assembly identifier</span>
+    <span class="n">datacode</span> <span class="o">=</span> <span class="s1">&#39;d&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">scode</span><span class="p">)</span> <span class="c1"># data identifier</span>
+    <span class="n">ens</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">EV</span><span class="o">.</span><span class="n">EvalNames</span><span class="p">(</span><span class="n">sjexbase</span><span class="p">,</span>  <span class="n">code</span><span class="o">=</span><span class="n">assemblycode</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="n">OUTDIR</span><span class="o">+</span><span class="s1">&#39;/eval&#39;</span><span class="p">)</span>
+    <span class="n">ems</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">EV</span><span class="o">.</span><span class="n">EvalMatch</span><span class="p">(</span><span class="n">en_gen4</span><span class="p">,</span> <span class="n">ens</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">bwfile</span><span class="p">,</span> <span class="n">sjfile</span><span class="p">,</span> <span class="n">datacode</span><span class="o">=</span><span class="n">datacode</span><span class="p">,</span> <span class="n">binsize</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">ems</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">calculate</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+process Fev_DR_m70_1623.chr1...
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="stderr container">
+<div class="highlight"><pre>
+INFO:[i] detected1:7824,        matched:5585,   (detected2:5815),       ratio:0.71,     (ratio2:0.96)
+INFO:[5] detected1:2346,        matched:1146,   (detected2:1964),       ratio:0.49,     (ratio2:0.58)
+INFO:[3] detected1:2643,        matched:1166,   (detected2:2066),       ratio:0.44,     (ratio2:0.56)
+INFO:[s] detected1:915, matched:102,    (detected2:558),        ratio:0.11,     (ratio2:0.18)
+INFO:[j] detected1:6892,        matched:6722,   (detected2:7329),       ratio:0.98,     (ratio2:0.92)
+INFO:[5b] detected1:2346,       matched:1610,   (detected2:10403),      ratio:0.69,     (ratio2:0.15)
+INFO:[3b] detected1:2643,       matched:1757,   (detected2:10403),      ratio:0.66,     (ratio2:0.17)
+INFO:[sb] detected1:915,        matched:270,    (detected2:10403),      ratio:0.30,     (ratio2:0.03)
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+process Fev_CSm_m70_1624.chr1...
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="stderr container">
+<div class="highlight"><pre>
+INFO:[i] detected1:7947,        matched:5859,   (detected2:6173),       ratio:0.74,     (ratio2:0.95)
+INFO:[5] detected1:2423,        matched:1189,   (detected2:2036),       ratio:0.49,     (ratio2:0.58)
+INFO:[3] detected1:2727,        matched:1237,   (detected2:2251),       ratio:0.45,     (ratio2:0.55)
+INFO:[s] detected1:953, matched:115,    (detected2:551),        ratio:0.12,     (ratio2:0.21)
+INFO:[j] detected1:7153,        matched:6998,   (detected2:7799),       ratio:0.98,     (ratio2:0.90)
+INFO:[5b] detected1:2423,       matched:1671,   (detected2:11011),      ratio:0.69,     (ratio2:0.15)
+INFO:[3b] detected1:2727,       matched:1871,   (detected2:11011),      ratio:0.69,     (ratio2:0.17)
+INFO:[sb] detected1:953,        matched:294,    (detected2:11011),      ratio:0.31,     (ratio2:0.03)
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+process Fev_DR_m71_1625.chr1...
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="stderr container">
+<div class="highlight"><pre>
+INFO:[i] detected1:8242,        matched:5950,   (detected2:6343),       ratio:0.72,     (ratio2:0.94)
+INFO:[5] detected1:2524,        matched:1201,   (detected2:2234),       ratio:0.48,     (ratio2:0.54)
+INFO:[3] detected1:2846,        matched:1304,   (detected2:2529),       ratio:0.46,     (ratio2:0.52)
+INFO:[s] detected1:993, matched:107,    (detected2:588),        ratio:0.11,     (ratio2:0.18)
+INFO:[j] detected1:7336,        matched:7149,   (detected2:8035),       ratio:0.97,     (ratio2:0.89)
+INFO:[5b] detected1:2524,       matched:1707,   (detected2:11694),      ratio:0.68,     (ratio2:0.15)
+INFO:[3b] detected1:2846,       matched:1942,   (detected2:11694),      ratio:0.68,     (ratio2:0.17)
+INFO:[sb] detected1:993,        matched:294,    (detected2:11694),      ratio:0.30,     (ratio2:0.03)
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+process Fev_CSm_m71_1626.chr1...
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="stderr container">
+<div class="highlight"><pre>
+INFO:[i] detected1:8034,        matched:5726,   (detected2:6025),       ratio:0.71,     (ratio2:0.95)
+INFO:[5] detected1:2492,        matched:1258,   (detected2:2185),       ratio:0.50,     (ratio2:0.58)
+INFO:[3] detected1:2737,        matched:1245,   (detected2:2386),       ratio:0.45,     (ratio2:0.52)
+INFO:[s] detected1:974, matched:100,    (detected2:602),        ratio:0.10,     (ratio2:0.17)
+INFO:[j] detected1:7085,        matched:6909,   (detected2:7653),       ratio:0.98,     (ratio2:0.90)
+INFO:[5b] detected1:2492,       matched:1754,   (detected2:11198),      ratio:0.70,     (ratio2:0.16)
+INFO:[3b] detected1:2737,       matched:1867,   (detected2:11198),      ratio:0.68,     (ratio2:0.17)
+INFO:[sb] detected1:974,        matched:273,    (detected2:11198),      ratio:0.28,     (ratio2:0.02)
+</pre></div></div>
+</div>
+<p>INFO outputs are as follows:</p>
+<ul class="simple">
+<li>detected1: counts of gencode exons/junctions with positive coverage</li>
+<li>matched: number of matched exons/junctions</li>
+<li>detected2: counts of elements in the assembly</li>
+<li>ratio: matched/detected1</li>
+<li>ratio2: matched/detected2</li>
+</ul>
+<p>These are assesed within different exon classes:</p>
+<ul class="simple">
+<li><strong>i</strong>: internal exon (exons bounded by splice junctions)</li>
+<li><strong>5</strong>: 5&#8217;exons</li>
+<li><strong>3</strong>: 3&#8217;exons</li>
+<li><strong>s</strong>: single exons</li>
+<li><strong>j</strong>: junctions</li>
+</ul>
+<p>Classes with <strong>b</strong>, (<strong>5b</strong>,<strong>3b</strong>,<strong>sb</strong>) allow matching to
+different classes of exons.</p>
+<p>Matching exons with junction boundary requires the boundaries to match.
+That is, to match internal exons, they have to be exactly the same
+(including strand). To match 5&#8217;exons, donor site has to the same but the
+other side does not have to be. To match single exon, they just need to
+have some overlap.</p>
+<p>So, we have quite good detection of junctions. About 70% of internal
+exons are detected. 5&#8217;,3&#8217; exons are worse (&lt; 50%) but if allowed to
+match to other class of exons, then detection rates get close to the
+internal exons. Single exon detection rates are bad and about 10%.</p>
+<p>We can visualize the detection percentages as follows.</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[17]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># EvalMatch.get_detection_percentages returns a dataframe containing detection percentages</span>
+<span class="n">dp</span> <span class="o">=</span> <span class="n">PD</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">n</span><span class="p">:</span><span class="n">ems</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">get_detection_percentages</span><span class="p">()</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">ems</span><span class="p">})</span>
+<span class="n">tgt</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">,</span><span class="s1">&#39;5&#39;</span><span class="p">,</span><span class="s1">&#39;3&#39;</span><span class="p">,</span><span class="s1">&#39;s&#39;</span><span class="p">,</span><span class="s1">&#39;j&#39;</span><span class="p">]</span>
+<span class="n">dp1</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">ix</span><span class="p">[[(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">etected 1&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tgt</span><span class="p">]][</span><span class="n">si</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+<span class="n">dp1</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">tgt</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">dp1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;detection %&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;exons/junctions&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>Out[17]:
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>&lt;matplotlib.legend.Legend at 0x120bf8048&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_32_1.png" src="_images/tutorial_32_1.png" />
+</div>
+</div>
+<p>We can also plot the detection sensitivity against coverages. We expect
+the detection rate is better at the bigger coverage.</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[18]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ro-&#39;</span><span class="p">,</span><span class="s1">&#39;go-&#39;</span><span class="p">,</span><span class="s1">&#39;bo-&#39;</span><span class="p">,</span><span class="s1">&#39;mo-&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ems</span><span class="p">):</span>
+    <span class="n">em</span> <span class="o">=</span> <span class="n">ems</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">axr</span> <span class="o">=</span> <span class="n">em</span><span class="o">.</span><span class="n">plot_sensitivity</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">axr</span> <span class="o">=</span> <span class="n">em</span><span class="o">.</span><span class="n">plot_sensitivity</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">axr</span><span class="o">=</span><span class="n">axr</span><span class="p">,</span> <span class="n">ypos</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_34_0.png" src="_images/tutorial_34_0.png" />
+</div>
+</div>
+<p>These plots show percent of detected exons calculated in bins sorted by
+coverage (binsize 100). Numbers in inset indicate normalized area under
+the curve (AUC, which ranges from 0 to 1). Dashed lines in 5&#8217;,3&#8217; and
+single exon panels correspond to 5b, 3b, sb category.</p>
+<p>How about the precision of the match? We can assess this by length ratio
+of matched exons:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[19]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ems</span><span class="p">:</span>
+    <span class="n">ems</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">plot_ratio</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_37_0.png" src="_images/tutorial_37_0.png" />
+</div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_37_1.png" src="_images/tutorial_37_1.png" />
+</div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_37_2.png" src="_images/tutorial_37_2.png" />
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_37_3.png" src="_images/tutorial_37_3.png" />
+</div>
+</div>
+<p>Averages shown inside are geometric averages. Overall length tends to be
+a bit longer. (Matching of internal exons and junctions always produce
+ratio of 1, so they are not shown.)</p>
+<p>For some genes, we see partial or disconnected reconstruction of the
+structure. An example is shown below:</p>
+<div class="figure">
+<img alt="" src="_images/XLYS4AQF3MKU4PDJ17VOM2LBW63I566O.png" />
+</div>
+<p>These incomplete reconstructions are due to missing junctions or
+insufficient exon coverages.</p>
+<p>To evaluate the <em>completeness</em> of the reconstruction, we calculate three
+measures. One is the ratio of gene length. We call this GLC (gene length
+completenesss). The second measure is the ratio of exon counts (ECC,
+exon count completeness), and the third is the ratio of junction counts
+(JCC, junction count completeness).</p>
+<p>We can visualize these measures by
+<a class="reference external" href="modules.html#jgem.evaluate.EvalMatch.plot_completeness">plot_completeness</a>
+method.</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[24]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">axr</span> <span class="o">=</span> <span class="n">ems</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">plot_completeness</span><span class="p">(</span><span class="n">pw</span><span class="o">=</span><span class="s1">&#39;fdat&#39;</span><span class="p">,</span> <span class="n">ca</span><span class="o">=</span><span class="s1">&#39;g.-&#39;</span><span class="p">,</span> <span class="n">cf</span><span class="o">=</span><span class="s1">&#39;r-&#39;</span><span class="p">,</span>  <span class="n">cd</span><span class="o">=</span><span class="s1">&#39;b.&#39;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">15</span><span class="p">],</span> <span class="n">xlimjcc</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">40</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_42_0.png" src="_images/tutorial_42_0.png" />
+</div>
+</div>
+<p>Blue dots are genes, green dots are binned averages, red lines are
+sigmoid function fit to blue dots and red dashes are 99% position of the
+sigmoidal fit.</p>
+<p>As expected, genes with low coverages tends to have incomplete
+reconstructions.</p>
+<p>Below, we&#8217;ll plot binned averages of completeness measures for all 4
+samples.</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[25]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ro-&#39;</span><span class="p">,</span><span class="s1">&#39;go-&#39;</span><span class="p">,</span><span class="s1">&#39;bo-&#39;</span><span class="p">,</span><span class="s1">&#39;mo-&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ems</span><span class="p">):</span>
+    <span class="n">em</span> <span class="o">=</span> <span class="n">ems</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">axr</span> <span class="o">=</span> <span class="n">em</span><span class="o">.</span><span class="n">plot_completeness</span><span class="p">(</span><span class="n">pw</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">ca</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">axr</span> <span class="o">=</span> <span class="n">em</span><span class="o">.</span><span class="n">plot_completeness</span><span class="p">(</span><span class="n">pw</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">ca</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">15</span><span class="p">),</span><span class="n">xlimjcc</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">40</span><span class="p">),</span> <span class="n">axr</span><span class="o">=</span><span class="n">axr</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+<span class="n">P</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>Out[25]:
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>&lt;matplotlib.legend.Legend at 0x125b360f0&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_44_1.png" src="_images/tutorial_44_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Preparing-for-merge">
+<h2>Preparing for merge<a class="headerlink" href="#Preparing-for-merge" title="Permalink to this headline">¶</a></h2>
+<p>Since individual cell types express only subsets of the genes, merging
+assembies is necessary to obtain a more complete picture of the
+transcriptomes. Moreover, merging should also improve the sensitivity
+and the completeness of the reconstruction.</p>
+<p>For merging, we will repeat the assembly process but uses aggregated
+junctions and coverage bigwigs generated from all exons from all
+assemblies. We need to prepare these two kinds of files first. For this,
+we use <a class="reference external" href="modules.html#jgem.merge.MergeInputs">MergeInputs class</a>.</p>
+<div class="nbinput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[26]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">merge</span> <span class="k">as</span> <span class="n">MG</span>
+<span class="n">fni</span> <span class="o">=</span> <span class="n">MG</span><span class="o">.</span><span class="n">MergeInputNames</span><span class="p">(</span><span class="n">sampleinfo</span><span class="o">=</span><span class="n">si</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="s1">&#39;FevMI&#39;</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="n">OUTDIR</span><span class="o">+</span><span class="s1">&#39;/merge&#39;</span><span class="p">)</span>
+<span class="n">mi</span> <span class="o">=</span> <span class="n">MG</span><span class="o">.</span><span class="n">MergeInputs</span><span class="p">(</span><span class="n">fnobj</span><span class="o">=</span><span class="n">fni</span><span class="p">,</span> <span class="n">genome</span><span class="o">=</span><span class="s1">&#39;mm10&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">th_detected</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">th_maxcnt1</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We need to assign <strong>sjexpre</strong> column to the sampleinfo:</p>
+<div class="nbinput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[27]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># prefix to *.ex.txt.gz and *.sj.txt.gz files</span>
+<span class="n">si</span><span class="p">[</span><span class="s1">&#39;sjexpre&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">OUTDIR</span><span class="p">,</span> <span class="s1">&#39;assemblies&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">si</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<p>To create bigwigs:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[28]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="o">%%</span><span class="k">time</span>
+mi.make_ex_bigwigs()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+CPU times: user 22 ms, sys: 49.5 ms, total: 71.5 ms
+Wall time: 54.4 s
+</pre></div></div>
+</div>
+<p>To make aggreagated junction files:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[29]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="o">%%</span><span class="k">time</span>
+mi.make_sj_bed()
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="stderr container">
+<div class="highlight"><pre>
+INFO:selectsj: in 11398
+INFO:selectsj: 104 smaller than th_ratio(0.001)
+INFO:selectsj: 0 smaller than th_detected(0)
+INFO:selectsj: 0 smaller than th_maxcnt1(0)
+INFO:selectsj: 9236 larger than th_maxcnt2(1)
+INFO:#selected SJ:11294&lt;=11398
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+CPU times: user 924 ms, sys: 133 ms, total: 1.06 s
+Wall time: 3.11 s
+</pre></div></div>
+</div>
+<p>To make average bigwig coverage file (average of original individual
+bigwig coverages, different from bigwigs generated above by
+make_ex_bigwigs(), which are based on assembled exons):</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[30]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="o">%%</span><span class="k">time</span>
+mi.aggregate_bigwigs()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+CPU times: user 116 ms, sys: 147 ms, total: 263 ms
+Wall time: 30.1 s
+</pre></div></div>
+</div>
+<p>Output files are:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[31]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">ls</span> <span class="o">./</span><span class="n">tutorial_out</span><span class="o">/</span><span class="n">merge</span><span class="o">/*</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+./tutorial_out/merge/FevMI.allsample.bw
+./tutorial_out/merge/FevMI.allsj.stats.txt.gz
+./tutorial_out/merge/FevMI.allsj.txt.gz
+./tutorial_out/merge/FevMI.ex.men.bw
+./tutorial_out/merge/FevMI.ex.mep.bw
+./tutorial_out/merge/FevMI.ex.se.bw
+./tutorial_out/merge/FevMI.sj.n.bed.gz
+./tutorial_out/merge/FevMI.sj.p.bed.gz
+./tutorial_out/merge/FevMI.sj0.bed.gz
+./tutorial_out/merge/FevMI.sj2.txt.gz
+</pre></div></div>
+</div>
+<p>Bigwigs generated from assembly exons are separated into multi-exon
+positive strand, negative strand and single exons:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">.</span><span class="n">ex</span><span class="o">.</span><span class="n">mep</span><span class="o">.</span><span class="n">bw</span>
+<span class="o">.</span><span class="n">ex</span><span class="o">.</span><span class="n">men</span><span class="o">.</span><span class="n">bw</span>
+<span class="o">.</span><span class="n">ex</span><span class="o">.</span><span class="n">se</span><span class="o">.</span><span class="n">bw</span>
+</pre></div>
+</div>
+<p>Similarly junctions are also separated into two strands:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">.</span><span class="n">sj</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">bed</span><span class="o">.</span><span class="n">gz</span>
+<span class="o">.</span><span class="n">sj</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">bed</span><span class="o">.</span><span class="n">gz</span>
+</pre></div>
+</div>
+<p>Averaged bigwig is:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">.</span><span class="n">allsample</span><span class="o">.</span><span class="n">bw</span><span class="p">:</span>
+</pre></div>
+</div>
+<p>Other files contain stats.</p>
+</div>
+<div class="section" id="Merging">
+<h2>Merging<a class="headerlink" href="#Merging" title="Permalink to this headline">¶</a></h2>
+<p>Once we have inputs prepared, we use <a class="reference external" href="modules.html#jgem.merge.MergeAssemble">MergeAssemble
+class</a> to do the merging.</p>
+<div class="nbinput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[32]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">fna</span> <span class="o">=</span> <span class="n">MG</span><span class="o">.</span><span class="n">MergeAssemblyNames</span><span class="p">(</span><span class="s1">&#39;FevMA&#39;</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="n">OUTDIR</span><span class="o">+</span><span class="s1">&#39;/merge&#39;</span><span class="p">)</span>
+<span class="n">ma</span> <span class="o">=</span> <span class="n">MG</span><span class="o">.</span><span class="n">MergeAssemble</span><span class="p">(</span><span class="n">fni</span><span class="p">,</span><span class="n">fna</span><span class="p">,</span><span class="n">np</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">saveintermediates</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[34]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="nb">reload</span><span class="p">(</span><span class="n">AS</span><span class="p">)</span>
+<span class="nb">reload</span><span class="p">(</span><span class="n">MG</span><span class="p">)</span>
+<span class="n">ma</span><span class="o">.</span><span class="n">__class__</span> <span class="o">=</span> <span class="n">MG</span><span class="o">.</span><span class="n">MergeAssemble</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[35]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">ma</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="stderr container">
+<div class="highlight"><pre>
+INFO:#########  START +strand assembly ######################################
+INFO:CHECKSJSUPPORT ====================
+INFO: #sj: 5348=&gt;4900
+INFO: time: 0.763s
+INFO:REMOVEJIE ====================
+INFO: #sj:4900=&gt;4840, jie 60
+INFO: time: 0.289s
+INFO:SJ2EX ====================
+INFO:#sj:4840=&gt;4840 after ureadth, mreadth
+INFO: #ex:4922, #sj:4840
+INFO: time: 0.069s
+INFO:MERGEEXONS ====================
+INFO: #ex:5751
+INFO: time: 0.229s
+INFO:FINDEDGES2 ====================
+INFO: time: 14.115s
+INFO:FIXSTRAND ====================
+INFO: time: 0.139s
+INFO:FINDIRETS ====================
+INFO:#irets candidates:245
+INFO:253 irets found
+INFO: time: 2.437s
+INFO:FIND53IR ====================
+INFO:  calculating SECOV...
+INFO:write exons ...=&gt; assemble.exons0.txt.gz
+INFO: time: 1.855s
+INFO:CALCCOV ====================
+INFO: time: 0.664s
+INFO:SETINFO ====================
+INFO: time: 0.218s
+INFO:FINDGENES ====================
+INFO:finding genes (connected components)...
+INFO: time: 1.375s
+INFO:assigning gidx...
+INFO: #genes:ME570, SE(before selection)10
+INFO: time: 1.428s
+INFO:SELECTSEME ====================
+INFO:ex(5991) sj(4825) ==&gt; ex(5959) sj(4825)
+INFO:se(9) =&gt; se(9) 0 removed
+INFO: time: 0.456s
+INFO:CONSISTENTSJ ====================
+INFO:  #sj 4825 =&gt; 4809
+INFO: time: 0.008s
+INFO:WRITESJEX ====================
+INFO: time: 0.530s
+INFO:WRITEGENES ====================
+INFO: writing bed12 genes...
+INFO: time: 2.257s
+INFO:#########  START -strand assembly ######################################
+INFO:CHECKSJSUPPORT ====================
+INFO: #sj: 5961=&gt;5576
+INFO: time: 0.652s
+INFO:REMOVEJIE ====================
+INFO: #sj:5576=&gt;5548, jie 28
+INFO: time: 0.645s
+INFO:SJ2EX ====================
+INFO:#sj:5548=&gt;5548 after ureadth, mreadth
+INFO: #ex:5540, #sj:5548
+INFO: time: 0.089s
+INFO:MERGEEXONS ====================
+INFO: #ex:6473
+INFO: time: 0.416s
+INFO:FINDEDGES2 ====================
+INFO: time: 15.394s
+INFO:FIXSTRAND ====================
+INFO: time: 0.139s
+INFO:FINDIRETS ====================
+INFO:#irets candidates:341
+INFO:350 irets found
+INFO: time: 3.310s
+INFO:FIND53IR ====================
+INFO:  calculating SECOV...
+INFO:write exons ...=&gt; assemble.exons0.txt.gz
+INFO: time: 2.428s
+INFO:CALCCOV ====================
+INFO: time: 0.715s
+INFO:SETINFO ====================
+INFO: time: 0.230s
+INFO:FINDGENES ====================
+INFO:finding genes (connected components)...
+INFO: time: 1.959s
+INFO:assigning gidx...
+INFO: #genes:ME560, SE(before selection)12
+INFO: time: 1.993s
+INFO:SELECTSEME ====================
+INFO:ex(6743) sj(5531) ==&gt; ex(6711) sj(5531)
+INFO:se(10) =&gt; se(10) 0 removed
+INFO: time: 0.633s
+INFO:CONSISTENTSJ ====================
+INFO:  #sj 5531 =&gt; 5515
+INFO: time: 0.008s
+INFO:WRITESJEX ====================
+INFO: time: 0.629s
+INFO:WRITEGENES ====================
+INFO: writing bed12 genes...
+INFO: time: 2.120s
+INFO:########################################################################
+INFO:mep:5968, men:6721
+INFO:n0:1098, np:554, nn:544, np+nn:1098
+</pre></div></div>
+</div>
+<p>Output files are:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[37]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">ls</span> <span class="o">./</span><span class="n">tutorial_out</span><span class="o">/</span><span class="n">merge</span><span class="o">/</span><span class="n">FevMA</span><span class="o">*</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+./tutorial_out/merge/FevMA.ci.txt.gz
+./tutorial_out/merge/FevMA.ex.bed.gz
+./tutorial_out/merge/FevMA.ex.txt.gz
+./tutorial_out/merge/FevMA.genes.bed.gz
+./tutorial_out/merge/FevMA.genes.txt.gz
+./tutorial_out/merge/FevMA.men.assemble.stats.txt
+./tutorial_out/merge/FevMA.mep.assemble.stats.txt
+./tutorial_out/merge/FevMA.se.bed.gz
+./tutorial_out/merge/FevMA.sj.bed.gz
+./tutorial_out/merge/FevMA.sj.txt.gz
+</pre></div></div>
+</div>
+<p>Looking at .genes.bed file with IGV, we find previously incomplete
+reconstructions are now merged into one complete structure:</p>
+<div class="figure">
+<img alt="" src="_images/HF0TPO3FMEPGDMG1TQW3Y34I8QIUYB42.png" />
+</div>
+<p>To evaluate the merging quantitatively, we use EvalMatch class as
+before:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[38]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">ems2</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># keep EvalMatch object</span>
+<span class="n">en_m</span> <span class="o">=</span> <span class="n">EV</span><span class="o">.</span><span class="n">EvalNames</span><span class="p">(</span><span class="s1">&#39;./tutorial_out/merge/FevMA&#39;</span><span class="p">,</span>  <span class="n">code</span><span class="o">=</span><span class="s1">&#39;FevMA&#39;</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="s1">&#39;./tutorial_out/eval/&#39;</span><span class="p">)</span>
+<span class="c1"># for each sample data generate EvalMatch between the merged assembly and the gencode4</span>
+<span class="k">for</span> <span class="n">scode</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bwfile</span><span class="p">,</span> <span class="n">sjfile</span> <span class="ow">in</span> <span class="n">si</span><span class="p">[[</span><span class="s1">&#39;scode&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;bw_path&#39;</span><span class="p">,</span><span class="s1">&#39;sjbed_path&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;process {0}...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+    <span class="n">datacode</span> <span class="o">=</span> <span class="s1">&#39;d&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">scode</span><span class="p">)</span>
+    <span class="n">ems2</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">EV</span><span class="o">.</span><span class="n">EvalMatch</span><span class="p">(</span><span class="n">en_gen4</span><span class="p">,</span> <span class="n">en_m</span><span class="p">,</span> <span class="n">bwfile</span><span class="p">,</span> <span class="n">sjfile</span><span class="p">,</span> <span class="n">datacode</span><span class="o">=</span><span class="n">datacode</span><span class="p">,</span> <span class="n">binsize</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">ems2</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">calculate</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+process Fev_DR_m70_1623.chr1...
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="stderr container">
+<div class="highlight"><pre>
+INFO:[i] detected1:7824,        matched:6354,   (detected2:7018),       ratio:0.81,     (ratio2:0.91)
+INFO:[5] detected1:2346,        matched:1257,   (detected2:1475),       ratio:0.54,     (ratio2:0.85)
+INFO:[3] detected1:2643,        matched:1312,   (detected2:1729),       ratio:0.50,     (ratio2:0.76)
+INFO:[s] detected1:915, matched:148,    (detected2:1117),       ratio:0.16,     (ratio2:0.13)
+INFO:[j] detected1:6892,        matched:6812,   (detected2:7396),       ratio:0.99,     (ratio2:0.92)
+INFO:[5b] detected1:2346,       matched:1785,   (detected2:11339),      ratio:0.76,     (ratio2:0.16)
+INFO:[3b] detected1:2643,       matched:2005,   (detected2:11339),      ratio:0.76,     (ratio2:0.18)
+INFO:[sb] detected1:915,        matched:325,    (detected2:11339),      ratio:0.36,     (ratio2:0.03)
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+process Fev_CSm_m70_1624.chr1...
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="stderr container">
+<div class="highlight"><pre>
+INFO:[i] detected1:7947,        matched:6432,   (detected2:7149),       ratio:0.81,     (ratio2:0.90)
+INFO:[5] detected1:2423,        matched:1278,   (detected2:1566),       ratio:0.53,     (ratio2:0.82)
+INFO:[3] detected1:2727,        matched:1337,   (detected2:1786),       ratio:0.49,     (ratio2:0.75)
+INFO:[s] detected1:953, matched:152,    (detected2:1203),       ratio:0.16,     (ratio2:0.13)
+INFO:[j] detected1:7153,        matched:7069,   (detected2:7838),       ratio:0.99,     (ratio2:0.90)
+INFO:[5b] detected1:2423,       matched:1820,   (detected2:11704),      ratio:0.75,     (ratio2:0.16)
+INFO:[3b] detected1:2727,       matched:2055,   (detected2:11704),      ratio:0.75,     (ratio2:0.18)
+INFO:[sb] detected1:953,        matched:340,    (detected2:11704),      ratio:0.36,     (ratio2:0.03)
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+process Fev_DR_m71_1625.chr1...
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="stderr container">
+<div class="highlight"><pre>
+INFO:[i] detected1:8242,        matched:6526,   (detected2:7262),       ratio:0.79,     (ratio2:0.90)
+INFO:[5] detected1:2524,        matched:1294,   (detected2:1643),       ratio:0.51,     (ratio2:0.79)
+INFO:[3] detected1:2846,        matched:1377,   (detected2:1869),       ratio:0.48,     (ratio2:0.74)
+INFO:[s] detected1:993, matched:154,    (detected2:1285),       ratio:0.16,     (ratio2:0.12)
+INFO:[j] detected1:7336,        matched:7222,   (detected2:8087),       ratio:0.98,     (ratio2:0.89)
+INFO:[5b] detected1:2524,       matched:1870,   (detected2:12059),      ratio:0.74,     (ratio2:0.16)
+INFO:[3b] detected1:2846,       matched:2122,   (detected2:12059),      ratio:0.75,     (ratio2:0.18)
+INFO:[sb] detected1:993,        matched:337,    (detected2:12059),      ratio:0.34,     (ratio2:0.03)
+</pre></div></div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+process Fev_CSm_m71_1626.chr1...
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="stderr container">
+<div class="highlight"><pre>
+INFO:[i] detected1:8034,        matched:6405,   (detected2:7120),       ratio:0.80,     (ratio2:0.90)
+INFO:[5] detected1:2492,        matched:1336,   (detected2:1562),       ratio:0.54,     (ratio2:0.86)
+INFO:[3] detected1:2737,        matched:1348,   (detected2:1788),       ratio:0.49,     (ratio2:0.75)
+INFO:[s] detected1:974, matched:149,    (detected2:1236),       ratio:0.15,     (ratio2:0.12)
+INFO:[j] detected1:7085,        matched:6984,   (detected2:7705),       ratio:0.99,     (ratio2:0.91)
+INFO:[5b] detected1:2492,       matched:1892,   (detected2:11706),      ratio:0.76,     (ratio2:0.16)
+INFO:[3b] detected1:2737,       matched:2072,   (detected2:11706),      ratio:0.76,     (ratio2:0.18)
+INFO:[sb] detected1:974,        matched:329,    (detected2:11706),      ratio:0.34,     (ratio2:0.03)
+</pre></div></div>
+</div>
+<p>To visualize detection percentage:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[39]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">ems2</span><span class="p">:</span>
+    <span class="n">dp</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="s1">&#39;_merged&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ems2</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">get_detection_percentages</span><span class="p">()</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span>
+<span class="n">tgt</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">,</span><span class="s1">&#39;5&#39;</span><span class="p">,</span><span class="s1">&#39;3&#39;</span><span class="p">,</span><span class="s1">&#39;s&#39;</span><span class="p">,</span><span class="s1">&#39;j&#39;</span><span class="p">]</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">si</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span><span class="o">+</span><span class="p">[</span><span class="n">x</span><span class="o">+</span><span class="s1">&#39;_merged&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">si</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span>
+<span class="n">dp1</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">ix</span><span class="p">[[(</span><span class="n">x</span><span class="p">,</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">etected 1&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tgt</span><span class="p">]][</span><span class="n">cols</span><span class="p">]</span>
+<span class="n">dp1</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">tgt</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">dp1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;detection %&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;exons/junctions&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>Out[39]:
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>&lt;matplotlib.legend.Legend at 0x123a485f8&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_69_1.png" src="_images/tutorial_69_1.png" />
+</div>
+</div>
+<p>So we have much better detection of internal exons (~10% improvement)
+and slight improvements in the detection of 5&#8217;exons, 3&#8217;exons and
+junctions.</p>
+<p>We can also see the improvements in the gene structure reconstruction in
+the changes in GLC,ECC,JCC:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[40]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ems</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">axr</span> <span class="o">=</span> <span class="n">ems</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">plot_completeness</span><span class="p">(</span><span class="n">pw</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">ca</span><span class="o">=</span><span class="s1">&#39;bo-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">axr</span> <span class="o">=</span> <span class="n">ems2</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">plot_completeness</span><span class="p">(</span><span class="n">pw</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">ca</span><span class="o">=</span><span class="s1">&#39;ro-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;_merged&#39;</span><span class="p">,</span> <span class="n">axr</span><span class="o">=</span><span class="n">axr</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">axr</span> <span class="o">=</span> <span class="n">ems</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">plot_completeness</span><span class="p">(</span><span class="n">pw</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">ca</span><span class="o">=</span><span class="s1">&#39;bo-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">axr</span><span class="o">=</span><span class="n">axr</span><span class="p">)</span>
+        <span class="n">axr</span> <span class="o">=</span> <span class="n">ems2</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">plot_completeness</span><span class="p">(</span><span class="n">pw</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">ca</span><span class="o">=</span><span class="s1">&#39;ro-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;_merged&#39;</span><span class="p">,</span> <span class="n">axr</span><span class="o">=</span><span class="n">axr</span><span class="p">,</span>
+                                          <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">15</span><span class="p">),</span> <span class="n">xlimjcc</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">40</span><span class="p">))</span>
+
+<span class="n">P</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>Out[40]:
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>&lt;matplotlib.legend.Legend at 0x132374e48&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="_images/tutorial_72_1.png" src="_images/tutorial_72_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Annotating-assembly">
+<h2>Annotating assembly<a class="headerlink" href="#Annotating-assembly" title="Permalink to this headline">¶</a></h2>
+<p>Once we have an assembly, we want to know which gene model corresponds
+to which known gene. We do this using <a class="reference external" href="modules.html#jgem.annotate.Comparator">Comparator
+class</a>.</p>
+<div class="nbinput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[41]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">jgem</span> <span class="kn">import</span> <span class="n">annotate</span> <span class="k">as</span> <span class="n">AN</span>
+<span class="n">g4sjexpre</span> <span class="o">=</span> <span class="s1">&#39;./tutorial_data/REF/gencode.vM4.chr1&#39;</span>
+<span class="n">mergepre</span> <span class="o">=</span> <span class="s1">&#39;./tutorial_out/merge/FevMA&#39;</span>
+<span class="n">outdir</span> <span class="o">=</span> <span class="s1">&#39;./tutorial_out/annotate&#39;</span>
+<span class="n">cref</span> <span class="o">=</span> <span class="n">AN</span><span class="o">.</span><span class="n">ComparatorNames</span><span class="p">(</span><span class="n">g4sjexpre</span><span class="p">,</span> <span class="s1">&#39;gen4&#39;</span><span class="p">,</span> <span class="n">outdir</span><span class="p">)</span>
+<span class="n">ctgt</span> <span class="o">=</span> <span class="n">AN</span><span class="o">.</span><span class="n">ComparatorNames</span><span class="p">(</span><span class="n">mergepre</span><span class="p">,</span> <span class="s1">&#39;FevMA&#39;</span><span class="p">,</span> <span class="n">outdir</span><span class="p">)</span>
+<span class="n">cp</span> <span class="o">=</span> <span class="n">AN</span><span class="o">.</span><span class="n">Comparator</span><span class="p">(</span><span class="n">cref</span><span class="p">,</span> <span class="n">ctgt</span><span class="p">,</span> <span class="n">gnamecol</span><span class="o">=</span><span class="s1">&#39;gene_name&#39;</span><span class="p">,</span> <span class="n">gidxcol</span><span class="o">=</span><span class="s1">&#39;gene_id&#39;</span><span class="p">)</span>
+<span class="n">cp</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>When overwrite is True, it overwrites the original sj,ex files. If
+False, it creats files in the output direcotry:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[42]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">ls</span> <span class="o">./</span><span class="n">tutorial_out</span><span class="o">/</span><span class="n">annotate</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+FevMA.gen4.ex.txt.gz  FevMA.gen4.sj.txt.gz
+</pre></div></div>
+</div>
+<p>Let&#8217;s check the contents of the exon file:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[43]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">ex</span> <span class="o">=</span> <span class="n">UT</span><span class="o">.</span><span class="n">read_pandas</span><span class="p">(</span><span class="s1">&#39;./tutorial_out/annotate/FevMA.gen4.ex.txt.gz&#39;</span><span class="p">)</span>
+<span class="n">ex</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>Out[43]:
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>Index([&#39;chr&#39;, &#39;st&#39;, &#39;ed&#39;, &#39;name&#39;, &#39;sc1&#39;, &#39;strand&#39;, &#39;_id&#39;, &#39;_gidx&#39;, &#39;gname&#39;,
+       &#39;cat&#39;, &#39;ptyp&#39;, &#39;cov&#39;, &#39;len&#39;, &#39;a_id&#39;, &#39;d_id&#39;, &#39;a_degree&#39;, &#39;d_degree&#39;,
+       &#39;a_pos&#39;, &#39;d_pos&#39;, &#39;tlen&#39;, &#39;glen&#39;, &#39;ecov&#39;, &#39;gcov&#39;, &#39;eknown_gen4&#39;,
+       &#39;etcode_gen4&#39;, &#39;intergenic_gen4&#39;, &#39;ex_as_ovl_gen4&#39;, &#39;gene_as_ovl_gen4&#39;,
+       &#39;gknown_gen4&#39;, &#39;gtcode_gen4&#39;, &#39;gen4_gidxs&#39;, &#39;gen4_gidx0&#39;, &#39;gen4_syms&#39;,
+       &#39;gen4_sym0&#39;],
+      dtype=&#39;object&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In[44]:
+</pre></div>
+</div>
+<div class="highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">acols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chr&#39;</span><span class="p">,</span><span class="s1">&#39;st&#39;</span><span class="p">,</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span><span class="s1">&#39;strand&#39;</span><span class="p">,</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span><span class="s1">&#39;gname&#39;</span><span class="p">,</span><span class="s1">&#39;eknown_gen4&#39;</span><span class="p">,</span><span class="s1">&#39;etcode_gen4&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;intergenic_gen4&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_as_ovl_gen4&#39;</span><span class="p">,</span> <span class="s1">&#39;gene_as_ovl_gen4&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;gknown_gen4&#39;</span><span class="p">,</span> <span class="s1">&#39;gtcode_gen4&#39;</span><span class="p">,</span><span class="s1">&#39;gen4_sym0&#39;</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ex</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)[</span><span class="n">acols</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+    chr       st       ed strand cat   gname eknown_gen4 etcode_gen4  \
+0  chr1  3121337  3121706      -   3     NG1           u        u.me
+1  chr1  3142317  3142551      -   5     NG1           u        u.me
+2  chr1  3199728  3207317      -   3     NG2           k        k.me
+3  chr1  3206729  3207317      -   3     NG2           k        k.me
+4  chr1  3213438  3215204      -   5     NG2           k        k.me
+5  chr1  3213438  3216968      -   i     NG2           k        k.me
+6  chr1  3216888  3216968      -   3     NG2           k        k.me
+7  chr1  3266288  3266602      .   s  S50000           u        u.se
+8  chr1  3284679  3285150      .   s  S50001           u        u.se
+9  chr1  3322953  3323492      .   s  S50002           u        u.se
+
+  intergenic_gen4 ex_as_ovl_gen4 gene_as_ovl_gen4 gknown_gen4 gtcode_gen4  \
+0               y              n                n           u        u.me
+1               y              n                n           u        u.me
+2               n              n                n           k        k.me
+3               n              n                n           k        k.me
+4               n              n                n           k        k.me
+5               n              n                n           k        k.me
+6               n              n                n           k        k.me
+7               n              n                n           u        u.se
+8               n              n                n           u        u.se
+9               n              n                n           u        u.se
+
+  gen4_sym0
+0       NaN
+1       NaN
+2      Xkr4
+3      Xkr4
+4      Xkr4
+5      Xkr4
+6      Xkr4
+7       NaN
+8       NaN
+9       NaN
+</pre></div></div>
+</div>
+<p>Columns are:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cat</span><span class="p">:</span> <span class="n">exon</span> <span class="n">category</span> <span class="p">(</span><span class="n">internal</span><span class="p">,</span> <span class="mi">5</span><span class="s1">&#39;,3&#39;</span><span class="p">,</span><span class="n">single</span><span class="p">)</span>
+<span class="n">gname</span><span class="p">:</span> <span class="n">assembly</span> <span class="n">gene</span> <span class="n">name</span>
+<span class="n">eknown_gen4</span><span class="p">:</span> <span class="n">exon</span> <span class="n">known</span> <span class="n">against</span> <span class="n">gen4</span> <span class="p">(</span><span class="n">k</span> <span class="ow">or</span> <span class="n">u</span><span class="p">)</span>
+<span class="n">etcode_gen4</span><span class="p">:</span> <span class="n">exon</span> <span class="n">code</span> <span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">me</span><span class="p">:</span> <span class="n">known</span> <span class="n">multi</span><span class="o">-</span><span class="n">exon</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">se</span><span class="p">:</span><span class="n">unknown</span> <span class="n">single</span> <span class="n">exon</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span><span class="p">)</span>
+<span class="n">intergenic_gen4</span><span class="p">:</span> <span class="n">whether</span> <span class="n">the</span> <span class="n">gene</span> <span class="ow">is</span> <span class="n">intergenic</span>
+<span class="n">ex_as_ovl_gen4</span><span class="p">:</span> <span class="n">exon</span> <span class="n">overlaps</span> <span class="k">with</span> <span class="n">gen4</span> <span class="n">exon</span> <span class="ow">in</span> <span class="n">antisense</span> <span class="n">direction</span>
+<span class="n">gene_as_ovl_gen4</span><span class="p">:</span> <span class="n">gene</span> <span class="n">overlaps</span> <span class="k">with</span> <span class="n">gen4</span> <span class="n">gene</span> <span class="ow">in</span> <span class="n">antisense</span> <span class="n">direction</span>
+<span class="n">gtcode_gen4</span><span class="p">:</span> <span class="n">similar</span> <span class="n">to</span> <span class="n">etcode_gen4</span>
+<span class="n">gen4_sym0</span><span class="p">:</span> <span class="n">Gencode</span><span class="o">.</span><span class="n">vM4</span> <span class="n">gene</span> <span class="n">symbol</span> <span class="p">(</span><span class="mi">0</span> <span class="n">indicates</span> <span class="n">closest</span> <span class="n">one</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016, Ken Sugino.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
