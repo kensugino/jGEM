@@ -45,7 +45,7 @@ PARAMS = dict(
     checksjsupport=False, # whether check splice junctions without read support (necessary when merging or binth>0)
     binth=0, # bigwig to bed threshold
 
-    jie_binth=16,
+    jie_binth=320, #16,
     jie_sjth=100,    
     jie_ratio=0.01, # junctions in a exon ratio to surrounding junctions which define the exon
 
@@ -68,36 +68,36 @@ PARAMS = dict(
     
     iret_mpth=0.98,# mapped% th for detecting intron retension
     iret_covratio=0.01, # min cov ratio between an iret and average of surrounding exons 
-    iret_covth=0.005, # if intron cov smaller than this, then ignore
+    iret_covth=0.1, #0.005, # if intron cov smaller than this, then ignore
 
 
     findsecovth=True, # whether to use adaptive secovth (pndr2)
-    minsecovth=0.1,# minimum single exon coverage (normalized to million alignments)
-    secovth=0.5, # default SE cov threshold if not using adaptive version (pndr1)
+    minsecovth=2, #0.1,# minimum single exon coverage (normalized to million alignments)
+    secovth=10, #0.5, # default SE cov threshold if not using adaptive version (pndr1)
     se_gap=170, #50,# single exon gap fill
     se_sizeth=50,# single exon size th
     se_sizeth2=200, # for SELECTSEME
-    se_binth=0.01,
+    se_binth=0.2, #0.01,
     # adaptive threshold is calculated and bigger of this and calculated value is used
     # se_th99, FINDSE_secovth in stats is the calculated value
     findsecovth_useref=True, # whether to use ref for finding secov, if not use ME
     savepndr1=True, # whether to save pndr1 (no adaptive secovth) when doing pndr2
     
     find53ir_covratio=0.2, # cov ratio threshold for FIND53IR
-    find53ir_covth=0.03, # cov threhold for FIND53IR
+    find53ir_covth=0.6, #0.03, # cov threhold for FIND53IR
 
     remove_overlappingse=True,# whether to remove SE overlapping to ME
     remove_bad2exon=True,# whether to perform bad 2 exon gene removal
     me2exon_sjth=2, # 2exon genes with splice junction support less than this will be removed
     me2exon_sizeth=200,# 2exon genes terminal size th ~ 2 x read length
-    me2exon_covth=0.5,# 2exon genes cov th
+    me2exon_covth=10, #0.5,# 2exon genes cov th
     
     ed_window=15, # edge detector smooth window (in bp)
     ed_minth=0.5, # edge detector minth for smoothed derivative
     ed_sigma=3, # edge detector sigma for threshold (larger of minth, sigma*std is used)
     ed_covratio=0.001, # edge detector if cov ratio to surrounds is < covratio, discard
     # for abundant one covratio needs to be small to retrieve 
-    ed_covth=0.1,# edge detector abs cov threshold
+    ed_covth=2, #0.1,# edge detector abs cov threshold
     ed_smwinsize=151, # smooth window for trimming
     ed_minintsize=10, # window for merging peaks
     ed_aggratio=0.1, # 
@@ -125,9 +125,9 @@ MPARAMDIFF = dict(
     gap3=1,
 
     findsecovth=False,
-    minsecovth=0.03,
-    secovth=0.05,
-    se_binth=0.01,
+    #minsecovth=0.03,
+    #secovth=0.05,
+    #se_binth=0.01,
     se_gap=0,
     #se_sizeth=10,
 
@@ -136,14 +136,14 @@ MPARAMDIFF = dict(
     ed_mimath=0.20,
     ed_mimath2=0.75,
     ed_sigma=5,
-    ed_covth=0.001,
+    #ed_covth=0.001,
 
     iret_mpth=1, #0.9999,
     iret_covratio=0.1,
-    iret_covth=1, #0.01,
+    #iret_covth=1, #0.01,
 
     find53ir_covratio=0.15,
-    find53ir_covth=0.03,
+    #find53ir_covth=0.03,
 )
 MPARAMS = PARAMS.copy()
 MPARAMS.update(MPARAMDIFF)
@@ -163,9 +163,7 @@ class Assembler(object):
             fnobj: FileNames object
             merging (bool): whether merging assembled models or not (default False)
             saveintermediates (bool): whether to save intermediates (default True)
-
-        KeywordArgs:
-            to change any of the parameter values
+            kwargs: to change any of the parameter values
 
         """
         self.fnobj=fnobj
@@ -196,7 +194,7 @@ class Assembler(object):
             # always do consistency check if binth>0 (since support may be reduced)
             pr['checksjsupport'] = self.params['checksjsupport']=True
         prdf = PD.DataFrame(pr,index=['value']).T
-        fname = fn.txtname('assemble.params', category='output')
+        fname = fn.fname('assemble.params.txt', category='output')
         if os.path.exists(fname):
             prdf0 = UT.read_pandas(fname,index_col=[0])
             if len(prdf)==len(prdf0):
@@ -220,11 +218,13 @@ class Assembler(object):
         UT.write_pandas(prdf, fname, 'ih')
             
     def save_stats(self):
+        """ Saves assemble related stats into (samplename).assemble.stats.txt. """
         df = PD.DataFrame(self.stats, index=['value']).T
         fname = self.fnobj.fname('assemble.stats.txt',category='stats')
         UT.write_pandas(df, fname, 'ih')
 
     def assemble(self):
+        """ Perform the assembly """
         fn = self.fnobj
         pr = self.params
         st = self.stats
@@ -362,17 +362,17 @@ class SELECTSJ(SUBASE):
     Args:
         sj: junction DataFrame
 
-    Outputs:
-        sj: selected junctions dataframe
+    Returns:
+        :sj: selected junctions dataframe
 
-    Parameters:
-        selectsj_ratio: thredhold for the ratio, default:{selectsj_ratio}
+    Related Parameters:
+        * selectsj_ratio: thredhold for the ratio, default:{selectsj_ratio}
 
     Files:
-        selectsj.bed.gz
-        selectsj.inte.txt.gz
+        * selectsj.bed.gz
+        * selectsj.inte.txt.gz
 
-    """.format(**PARAMSDOC)
+    """
 
     def call(self):
         sj = self.asm.sj
@@ -418,21 +418,21 @@ class CHECKSJSUPPORT(SUBASE):
     Args:
         sj: junction DataFrame
 
-    Outputs:
-        sj: compatible junctions
+    Returns:
+        :sj: compatible junctions
 
-    Parameters:
-        binth: coverage threshold, default:{binth}, (for merging: {binth_m})
-        genome: genome version, default:{genome}
+    Related Parameters:
+        * binth: coverage threshold, default:{binth}, (for merging: {binth_m})
+        * genome: genome version, default:{genome}
 
     TempFiles:
-        bw*.bed.gz
-        sjst.bed.gz
-        sjed.bed.gz
-        sjst.ovl.txt.gz
-        sjed.ovl.txt.gz
+        * bw*.bed.gz
+        * sjst.bed.gz
+        * sjed.bed.gz
+        * sjst.ovl.txt.gz
+        * sjed.ovl.txt.gz
 
-    """.format(**PARAMSDOC)
+    """
 
     def call(self):
         sj = self.asm.sj
@@ -472,20 +472,20 @@ class REMOVEJIE(SUBASE):
     Args:
         sj: junction DataFrame
 
-    Outputs:
-        sj: junction dataframe without JIE
-        jie: junctions in exons
+    Returns:
+        :sj: junction dataframe without JIE
+        :jie: junctions in exons
 
-    Parameters:
-        jie_binth: coverage threshold,  default:{jie_binth}
-        jie_sjth: threshold for normalized read counts,  default:{genome}
+    Related Parameters:
+        * jie_binth: coverage threshold,  default:{jie_binth}
+        * jie_sjth: threshold for normalized read counts,  default:{genome}
 
     TempFiles:
-        bw*.bed.gz
-        sjsupp.bed.gz
-        jie.bw.ovl.txt.gz
+        * bw*.bed.gz
+        * sjsupp.bed.gz
+        * jie.bw.ovl.txt.gz
 
-    """.format(**PARAMSDOC)
+    """
 
     def call(self):
         sj = self.asm.sj
@@ -495,6 +495,15 @@ class REMOVEJIE(SUBASE):
 
         # covarage file
         binfile = self.bw2bed(pr['jie_binth'])
+        # if nothing in binfile then skip
+        jiebw = GGB.read_bed(binfile)
+        if len(jiebw)==0:
+            self.asm.jie = None
+            self.info = 'nothing above jie_binth {0}'.format(pr['jie_binth'])
+            self.stats['REMOVEJIE.#sj'] = len(sj)
+            self.stats['REMOVEJIE.#jie'] = 0
+            return            
+
         sjmp = BT.calc_ovlratio(
             aname=sjfile, 
             bname=binfile, 
@@ -528,18 +537,18 @@ class SJ2EX(SUBASE):
     Args:
         sj: junction DataFrame
 
-    Outputs:
-        me: exons dataframe
-        sj: compatible junctions
+    Returns:
+        :me: exons dataframe
+        :sj: compatible junctions
 
-    Parameters:
-        ureadth: threshold for junction unique counts, default:{ureadth} ({ureadth_m} for merging)
-        mreadth: threshold for non-unique junction counts, default:{mreadth} ({mreadth_m} for merging)
-        maxexonsize: maximum exon size, default:{maxexonsize}
-        edgesize: temporary edge exon size, default:{edgesize}
+    Related Parameters:
+        * ureadth: threshold for junction unique counts, default:{ureadth} ({ureadth_m} for merging)
+        * mreadth: threshold for non-unique junction counts, default:{mreadth} ({mreadth_m} for merging)
+        * maxexonsize: maximum exon size, default:{maxexonsize}
+        * edgesize: temporary edge exon size, default:{edgesize}
 
 
-    """.format(**PARAMSDOC)
+    """
 
     def call(self):
         sj = self.asm.sj
@@ -701,14 +710,14 @@ class MERGEEXONS(SUBASE):
     Args:
         me: exon DataFrame
 
-    Outputs:
-        me: exon dataframe with merged exons
+    Returns:
+        :me: exon dataframe with merged exons
 
     TempFiles:
-        sjex.bed.gz
-        sjex.inte.txt.gz
+        * sjex.bed.gz
+        * sjex.inte.txt.gz
 
-    """.format(**PARAMSDOC)
+    """
     # TODO:
     #     Currently only two overlapping exons are merged. Generalized to n.
 
@@ -749,41 +758,41 @@ class FINDEDGES2(SUBASE):
         sj: junction DataFrame
         me: exon DataFrame
 
-    Outputs:
-        sj: compatible junctions
-        me: exon dataframe with edge exons added
+    Returns:
+        :sj: compatible junctions
+        :me: exon dataframe with edge exons added
 
-    Parameters:
-        mpth: mapped% th for detecting gene boundary, default {mpth}
-        binth: bigwig to bed threshold, default {binth} (merging: {binth_m})
-        gap: fill this gap to distinguish gene boundary vs. exon (fill exon but not intergenic), default {gap} (merging: {gap_m})
-        edgesize: temporary edge exon size, default {edgesize}
-        maxexonsize: max exon size (Ttn has ~20kbp exon), default {maxexonsize}
-        cutlen: check candidate bounded exons larger than this for cutting, default {cutlen}
-        ed_sigma: edge detector sigma for threshold (larger of minth, sigma*std is used), 
-            default {ed_sigma}  (merging: {ed_sigma_m})
-        ed_minth: edge detector minth for smoothed derivative, default {ed_minth} (merging: {ed_minth_m})
-        ed_covratio: edge detector if cov ratio to surrounds is < covratio, discard, 
-            default {ed_covratio} (merging: {ed_covratio_m})
-        ed_window: edge detector smooth window (in bp), default {ed_window}
-        ed_covth: edge detector abs cov threshold, default {ed_covth}  (merging: {ed_covth_m})
-        ed_smwinsize: smooth window for trimming default {ed_smwinsize}
-        ed_minintsize: window for merging peaks, default {ed_minintsize}
-        ed_aggratio: default {ed_aggratio} 
-        ed_mimath: min-max ratio threshold for cut decision, default {ed_mimath} (merging: {ed_mimath_m})
-        ed_mimath2: default {ed_mimath2}  (merging: {ed_mimath2_m})
-        ed_triggerth: for rise detection (detect rise when >= max*mimath*triggerth after <max*mima), default {ed_triggerth}
+    Related Parameters:
+        * mpth: mapped% th for detecting gene boundary, default {mpth}
+        * binth: bigwig to bed threshold, default {binth} (merging: {binth_m})
+        * gap: fill this gap to distinguish gene boundary vs. exon (fill exon but not intergenic), default {gap} (merging: {gap_m})
+        * edgesize: temporary edge exon size, default {edgesize}
+        * maxexonsize: max exon size (Ttn has ~20kbp exon), default {maxexonsize}
+        * cutlen: check candidate bounded exons larger than this for cutting, default {cutlen}
+        * ed_sigma: edge detector sigma for threshold (larger of minth, sigma*std is used), 
+          default {ed_sigma}  (merging: {ed_sigma_m})
+        * ed_minth: edge detector minth for smoothed derivative, default {ed_minth} (merging: {ed_minth_m})
+        * ed_covratio: edge detector if cov ratio to surrounds is < covratio, discard, 
+          default {ed_covratio} (merging: {ed_covratio_m})
+        * ed_window: edge detector smooth window (in bp), default {ed_window}
+        * ed_covth: edge detector abs cov threshold, default {ed_covth}  (merging: {ed_covth_m})
+        * ed_smwinsize: smooth window for trimming default {ed_smwinsize}
+        * ed_minintsize: window for merging peaks, default {ed_minintsize}
+        * ed_aggratio: default {ed_aggratio} 
+        * ed_mimath: min-max ratio threshold for cut decision, default {ed_mimath} (merging: {ed_mimath_m})
+        * ed_mimath2: default {ed_mimath2}  (merging: {ed_mimath2_m})
+        * ed_triggerth: for rise detection (detect rise when >= max*mimath*triggerth after <max*mima), default {ed_triggerth}
 
     TempFiles:
-        fe2.sjbb.bed.gz
-        fe2.sjbb-ovl.txt.gz
-        fe2.me1.ci.txt.gz
-        fe2.me2p.ci.txt.gz
-        fe2.me2n.ci.txt.gz
-        fe2.sj.txt.gz
-        fe2.me.txt.gz
+        * fe2.sjbb.bed.gz
+        * fe2.sjbb-ovl.txt.gz
+        * fe2.me1.ci.txt.gz
+        * fe2.me2p.ci.txt.gz
+        * fe2.me2n.ci.txt.gz
+        * fe2.sj.txt.gz
+        * fe2.me.txt.gz
 
-    """.format(**PARAMSDOC)
+    """
 
     def call(self):
         sj = self.asm.sj
@@ -816,7 +825,7 @@ class FINDEDGES2(SUBASE):
         # name1 contains list of ids
         ci1 = bbg[(bbg['ovlratio']<pr['mpth'])|(bbg['len']>=pr['cutlen'])] # ~ 16K
         # cut candidates
-        eids1 = reduce(iadd, ci1['name1'].values) # exons being cut
+        eids1 = reduce(iadd, ci1['name1'].values, []) # exons being cut
         eids0 = sorted(set(me1['_id2'].values).difference(set(eids1)))
         me1i = me1.set_index('_id2') # me1 (bounded) indexed
         me1s = me1i.ix[eids1].reset_index() # cut targets
@@ -1102,22 +1111,22 @@ class FINDEDGES(SUBASE):
     Args:
         me: exon DataFrame
 
-    Output:
-        me: exon dataframe with edge exons added
+    Returns:
+        :me: exon dataframe with edge exons added
 
-    Parameters:
-        mpth: mapped% th for detecting gene boundary, default:{mpth} (merging: {mpth_m})
-        binth: default {binth} (merging: {binth_m})
-        gap: fill this gap to distinguish gene boundary vs. exon (fill exon but not intergenic)
-            default {gap} (merging: {gap_m})
-        edgesize: temporary edge exon size, default {edgesize}
+    Related Parameters:
+        * mpth: mapped% th for detecting gene boundary, default:{mpth} (merging: {mpth_m})
+        * binth: default {binth} (merging: {binth_m})
+        * gap: fill this gap to distinguish gene boundary vs. exon (fill exon but not intergenic)
+          default {gap} (merging: {gap_m})
+        * edgesize: temporary edge exon size, default {edgesize}
 
     TempFiles:
-        fe.sjbb.bed.gz
-        fe.sjbb-ovl.txt.gz
-        fe.exons.bed.gz
+        * fe.sjbb.bed.gz
+        * fe.sjbb-ovl.txt.gz
+        * fe.exons.bed.gz
 
-    """.format(**PARAMSDOC)
+    """
 
     def call(self):
         sjexdf = self.asm.me
@@ -1176,18 +1185,18 @@ class FIXSTRAND(SUBASE):
         sj: junction dataframe
         me: exon dataframe
 
-    Outputs:
-        sj: junction dataframe with strand fixed
-        me: exon dataframe with strand fixed
+    Returns:
+        :sj: junction dataframe with strand fixed
+        :me: exon dataframe with strand fixed
 
-    Parameters:
-        useallconnected (bool): whether to use all connected components or just direct neighbors
-            default {useallconnected}
+    Related Parameters:
+        * useallconnected (bool): whether to use all connected components or just direct neighbors
+          default {useallconnected}
 
     TempFiles:
-        sj0.bed.gz
+        * sj0.bed.gz
 
-    """.format(**PARAMSDOC)
+    """
 
     def call(self):
         sj = self.asm.sj
@@ -1374,22 +1383,22 @@ class EDGEFIXER(SUBASE):
     Args:
         me: exon dataframe
 
-    Outputs:
-        me: exon dataframe with edge exons fixed
-        edgefixer: this instance for reuse later
+    Returns:
+        :me: exon dataframe with edge exons fixed
+        :edgefixer: this instance for reuse later
 
-    Parameters:
-        gap3: for 3' UTR extension, default {gap3} (merging: {gap3_m})
-        gap5: for 5' UTR extension, default {gap5} (merging: {gap5_m})
-        covfactor: for gap filling: if coverage of the next interval is < covfactor*current cov
-            default {covfactor}
+    Related Parameters:
+        * gap3: for 3' UTR extension, default {gap3} (merging: {gap3_m})
+        * gap5: for 5' UTR extension, default {gap5} (merging: {gap5_m})
+        * covfactor: for gap filling: if coverage of the next interval is < covfactor*current cov
+          default {covfactor}
 
     TempFiles:
-        fixed5pr.bed.gz
-        fixed3pr.bed.gz
-        edgefixer.me.bed.gz
+        * fixed5pr.bed.gz
+        * fixed3pr.bed.gz
+        * edgefixer.me.bed.gz
 
-    """.format(**PARAMSDOC)
+    """
 
     # [TODO]
     # - how to distinguish gaps in real 3'UTRs vs. gaps between genes or within exons?
@@ -1621,31 +1630,31 @@ class FINDIRETS(SUBASE):
         sj: junction DataFrame
         me: exon DataFrame
 
-    Outputs:
-        me: exons with irets
+    Returns:
+        :me: exons with irets
 
-    Parameters:
-        iret_mpth: mapped% th for detecting intron retension,
-            default {iret_mpth} (merging: {iret_mpth_m})
-        iret_covth: if intron cov smaller than this, then ignore
-            default {iret_covth} (merging: {iret_covth_m})
-        iret_covratio: min cov ratio between an iret and average of surrounding exons 
-            default {iret_covratio} (merging: {iret_covratio_m})
-        binth: default {binth} (merging: {binth_m})
+    Related Parameters:
+        * iret_mpth: mapped% th for detecting intron retension,
+          default {iret_mpth} (merging: {iret_mpth_m})
+        * iret_covth: if intron cov smaller than this, then ignore
+          default {iret_covth} (merging: {iret_covth_m})
+        * iret_covratio: min cov ratio between an iret and average of surrounding exons 
+          default {iret_covratio} (merging: {iret_covratio_m})
+        * binth: default {binth} (merging: {binth_m})
 
 
     TempFiles:
-        irets.bed.gz
-        irets.exons.txt.gz
-        irets.me.cov.txt.gz
-        irets.me.bed.gz
-        irets.me.covci.txt.gz
-        irets.me.ci.txt.gz
-        sj.iret.sub.bed.gz
-        sj.iret.ci.txt.gz
-        sj.iret.covci.txt.gz
+        * irets.bed.gz
+        * irets.exons.txt.gz
+        * irets.me.cov.txt.gz
+        * irets.me.bed.gz
+        * irets.me.covci.txt.gz
+        * irets.me.ci.txt.gz
+        * sj.iret.sub.bed.gz
+        * sj.iret.ci.txt.gz
+        * sj.iret.covci.txt.gz
 
-    """.format(**PARAMSDOC)
+    """
 
     def call(self):
         self.sj = sj = self.asm.sj
@@ -1825,29 +1834,29 @@ class FINDSE(SUBASE):
         edgefixer: EdgeFixer instance
         secovth: se coverage threshold
 
-    Outputs:
-        ae: all exons
-        se: single exons
-        me: multi-exons
+    Returns:
+        :ae: all exons
+        :se: single exons
+        :me: multi-exons
 
-    Parameters:
-        minsecovth: minimum single exon coverage (normalized to million alignments)
-            default {minsecovth} (merging: {minsecovth_m})
-        secovth: default SE cov threshold if not using adaptive version
-            default {secovth} (merging: {secovth_m})
-        se_gap: single exon gap fill, default {se_gap}
-        se_binth: coverage threshold for SE finding, default {se_binth} (merging: {se_binth_m})
-        se_sizeth: single exon size th, default {se_sizeth} (merging: {se_sizeth_m})
+    Related Parameters:
+        * minsecovth: minimum single exon coverage (normalized to million alignments)
+          default {minsecovth} (merging: {minsecovth_m})
+        * secovth: default SE cov threshold if not using adaptive version
+          default {secovth} (merging: {secovth_m})
+        * se_gap: single exon gap fill, default {se_gap}
+        * se_binth: coverage threshold for SE finding, default {se_binth} (merging: {se_binth_m})
+        * se_sizeth: single exon size th, default {se_sizeth} (merging: {se_sizeth_m})
 
     TempFiles:
-        se.cov.tmp.txt.gz
-        se.cov.all.txt.gz
-        secov.txt.gz
-        se.bed.gz
-        exons.afterfindse.txt.gz
-        me.exons.bed.gz
+        * se.cov.tmp.txt.gz
+        * se.cov.all.txt.gz
+        * secov.txt.gz
+        * se.bed.gz
+        * exons.afterfindse.txt.gz
+        * me.exons.bed.gz
 
-    """.format(**PARAMSDOC)
+    """
 
     
     def call(self):
@@ -2036,31 +2045,31 @@ class FIND53IR(SUBASE):
     Args:
         me: exon DataFrame
 
-    Outputs:
-        ae: exons with 5',3' cuts, irets, and single exons.
+    Returns:
+        :ae: exons with 5',3' cuts, irets, and single exons.
 
-    Parameters:
-        minsecovth: minimum single exon coverage (normalized to million alignments)
-            default {minsecovth} (merging: {minsecovth_m})
-        secovth: default SE cov threshold if not using adaptive version
-            default {secovth} (merging: {secovth_m})
-        se_gap: single exon gap fill, default {se_gap}
-        se_binth: coverage threshold for SE finding, default {se_binth} (merging: {se_binth_m})
-        se_sizeth: single exon size th, default {se_sizeth} (merging: {se_sizeth_m})
-        find53ir_covratio: cov ratio threshold for FIND53IR, 
-            default {find53ir_covratio}, (merging: {find53ir_covratio_m})
-        find53ir_covth: cov threshold for FIND53IR
-            default {find53ir_covth}, (mergin: {find53ir_covth_m})
+    Related Parameters:
+        * minsecovth: minimum single exon coverage (normalized to million alignments)
+          default {minsecovth} (merging: {minsecovth_m})
+        * secovth: default SE cov threshold if not using adaptive version
+          default {secovth} (merging: {secovth_m})
+        * se_gap: single exon gap fill, default {se_gap}
+        * se_binth: coverage threshold for SE finding, default {se_binth} (merging: {se_binth_m})
+        * se_sizeth: single exon size th, default {se_sizeth} (merging: {se_sizeth_m})
+        * find53ir_covratio: cov ratio threshold for FIND53IR, 
+          default {find53ir_covratio}, (merging: {find53ir_covratio_m})
+        * find53ir_covth: cov threshold for FIND53IR
+          default {find53ir_covth}, (mergin: {find53ir_covth_m})
 
     TempFiles:
-        se.cov.tmp.txt.gz
-        se.cov.all.txt.gz
-        me.exons.bed.gz
-        bw*.bed.gz
-        gap-sub-me.bed.gz
-        assemble.exons0.txt.gz
-        assemble.exons0.bed.gz
-    """.format(**PARAMSDOC)
+        * se.cov.tmp.txt.gz
+        * se.cov.all.txt.gz
+        * me.exons.bed.gz
+        * bw*.bed.gz
+        * gap-sub-me.bed.gz
+        * assemble.exons0.txt.gz
+        * assemble.exons0.bed.gz
+    """
 
     def call(self):
         me = self.asm.me
@@ -2305,31 +2314,31 @@ class FINDSECOVTH(SUBASE):
     Args:
         me: exon DataFrame
 
-    Outputs:
-        secovth: threshold
+    Returns:
+        :secovth: threshold
 
-    Parameters:
-        findsecovth_useref: whether to use ref for finding secov, if not use ME
-            default {findsecovth_useref}
-        minsecovth: minimum single exon coverage (normalized to million alignments)
-            default {minsecovth} (merging: {minsecovth_m})
-        se_gap: single exon gap fill, default {se_gap}
+    Related Parameters:
+        * findsecovth_useref: whether to use ref for finding secov, if not use ME
+          default {findsecovth_useref}
+        * minsecovth: minimum single exon coverage (normalized to million alignments)
+          default {minsecovth} (merging: {minsecovth_m})
+        * se_gap: single exon gap fill, default {se_gap}
 
     Files:
-        findsecovth.params.txt.gz
-        findsecovth.pdf
+        * findsecovth.params.txt.gz
+        * findsecovth.pdf
 
     TempFiles:
-        findsecovth.refex.covci.txt.gz
-        findsecovth.refex.cov.txt.gz
-        se.cov.all.txt.gz
-        irets.me.cov.txt.gz
-        me.covci.txt.gz
-        me.ci.txt.gz
-        findsecovth.gap-sub-me.bed.gz
+        * findsecovth.refex.covci.txt.gz
+        * findsecovth.refex.cov.txt.gz
+        * se.cov.all.txt.gz
+        * irets.me.cov.txt.gz
+        * me.covci.txt.gz
+        * me.ci.txt.gz
+        * findsecovth.gap-sub-me.bed.gz
 
 
-    """.format(**PARAMSDOC)
+    """
 
     bins = N.arange(0.5,1.7,0.05)
     
@@ -2358,7 +2367,8 @@ class FINDSECOVTH(SUBASE):
         st = {}
         # gamma, a1
         # residue, th99 for (ref, me, se)
-        attrs = ['gamma','a1','ref_res','ref_th99','me_res','me_th99','se_res','se_th99']
+        attrs = ['gamma','a1','ref_res','ref_th99bn','me_res','me_th99bn','se_res',
+                'ref_nf','me_nf','se_nf','se_th99']
         pr = dict([(x, getattr(self, x)) for x in attrs])
         for a in attrs:
             st['FINDSECOVTH.'+a] = pr[a]
@@ -2372,9 +2382,12 @@ class FINDSECOVTH(SUBASE):
 
         excovname = fn.txtname('findsecovth.refex.cov')
         if  os.path.exists(excovname):
+            rsj,rex = fn.refsjex()
+            self.rsj = rsj
             self.rex = UT.read_pandas(excovname)
         else:
             rsj,rex = fn.refsjex()
+            self.rsj = rsj
             self.rex = CC.calc_cov_ovl_mp(
                 srcname=rex, 
                 bwname=fn.bwfile, 
@@ -2432,7 +2445,7 @@ class FINDSECOVTH(SUBASE):
         secov = CC.calc_cov_mp(bed=df, bwname=fn.bwfile, fname=fname, np=pr['np'])
         #os.unlink(cname)
     
-    def _fit_hist(self, refcov, gamma, a1=None, ax=None, title=''):
+    def _fit_hist(self, refcov, gamma, a1=None, ax=None, title='', nf=1.):
         # find best gamma for gen4
         width = (9-N.log2(gamma))/100.
         bins = N.arange(N.log2(gamma),9,width)
@@ -2486,7 +2499,8 @@ class FINDSECOVTH(SUBASE):
             ax.set_ylabel('log2(count+1)')
             ax.text(4,14,'res={:.1f}'.format(res))
             ax.text(4,12,'slope={:.2f}'.format(a1))
-            ax.text(4,10,'covth={:.1f}'.format(th99))
+            ax.text(4,10,'ncovth={:.1f}'.format(th99))
+            ax.text(4,8,'covth={:.1f}'.format(th99*nf))
             ax.set_ylim([0,17])
             
             return res, th99
@@ -2495,9 +2509,9 @@ class FINDSECOVTH(SUBASE):
     
     def find_gamma_slope(self):
         gammas = self.bins
-        refcov = self._get_refcov()
+        refcov, ref_nf = self._get_refcov()
         cols = ['gamma','a1','a0','res']
-        self.refcovfits = fits = PD.DataFrame([self._fit_hist(refcov, x) for x in gammas], columns=cols)
+        self.refcovfits = fits = PD.DataFrame([self._fit_hist(refcov, x, nf=ref_nf) for x in gammas], columns=cols)
         fits['-gamma'] = -fits['gamma']
         gamma,a1 = fits.sort_values(['res','-gamma']).iloc[0][['gamma','a1']]
         self.gamma=gamma
@@ -2516,7 +2530,10 @@ class FINDSECOVTH(SUBASE):
                 UT.set_exon_category(sj,ex)
             refcov = ex[ex['cat']!='s']['cov'].values
         refcov = refcov[refcov>0] # only use expressed 
-        return refcov
+        # normalize 1e4 factor is to match to 100bp readlen normalized to 1M reads
+        self.ref_nf = ref_nf = N.sum(refcov)/1e4
+        self.refcov = refcov = refcov/ref_nf
+        return refcov, ref_nf
 
     def find_secovth(self):
         fn = self.fnobj
@@ -2529,6 +2546,7 @@ class FINDSECOVTH(SUBASE):
         
         # use gamma, slope to find secovth
         fig, axr = P.subplots(2,2,figsize=(6,6))
+        # fig, axr = P.subplots(2,3,figsize=(9,6))
         P.subplots_adjust(wspace=0.4,hspace=0.4,top=0.9)
         fig.suptitle(fn.sname)
         # panel1 refcov fits
@@ -2545,24 +2563,47 @@ class FINDSECOVTH(SUBASE):
         
         # panel2 refcov optimum
         ax = axr[0][1]
-        refcov = self._get_refcov()
+        refcov, ref_nf = self._get_refcov()
         if pr['findsecovth_useref'] and fn.refgtf.exists():
-            title = 'all ref'
+            title = 'ref ME & SE'
         else:
-            title = 'sample multi exons'
-        self.ref_res,self.ref_th99 = self._fit_hist(refcov, gamma, a1, ax=ax, title=title)
+            title = 'sample ME'
+        self.ref_res,self.ref_th99bn = self._fit_hist(refcov, gamma, a1, ax=ax, title=title, nf=ref_nf)
+        
+        # refcov SE
+        # if pr['findsecovth_useref'] and fn.refgtf.exists():
+        #     rsj,rex = self.rsj, self.rex
+        #     if 'cat' not in rex.columns:
+        #         UT.set_exon_category(rsj,rex)
+        #     rse = rex[rex['cat']=='s']
+        #     rse = rse[rse['cov']>0]['cov'].values
+        #     rse_nf = N.sum(rse)/1e4
+        #     self.rse = rse = rse/rse_nf
+        #     ax = axr[0][2]
+        #     tmp = self._fit_hist(rse, gamma, a1, ax=ax, title='ref SE', nf=rse_nf)
+
         # panel3 me fits
         ax = axr[1][0]
-        #ex = self.ex
-        #me = ex[ex['cat']!='s']
-        me = self.ex
+        ex = self.ex
+        if 'cat' not in ex.columns:
+            sj = self.asm.sj
+            UT.set_exon_category(sj,ex)
+        me = ex[ex['cat']!='s']
         me = me[me['cov']>0]['cov'].values
-        self.me_res,self.me_th99 = self._fit_hist(me, gamma, a1, ax=ax,title='pndr ME')
+        # normalize
+        self.me_nf = me_nf = N.sum(me)/1e4
+        self.me = me = me/me_nf
+        self.me_res,self.me_th99bn = self._fit_hist(me, gamma, a1, ax=ax,title='ME', nf=me_nf)
+        
         # panel4 seall
         ax = axr[1][1]
         secov = fn.read_txt('se.cov.all')
         secov = secov[secov['cov']>0]['cov'].values
-        self.se_res,self.se_th99 = self._fit_hist(secov, gamma, a1, ax=ax,title='pndr SE candidates')
+        # normalize
+        self.se_nf = se_nf = N.sum(secov)/1e4
+        self.secov = secov = secov/se_nf
+        self.se_res,self.se_th99bn = self._fit_hist(secov, gamma, a1, ax=ax,title='SE candidates', nf=se_nf)
+        self.se_th99 = se_nf*self.se_th99bn
         fname = fn.fname('findsecovth.pdf', category='output')
         try:
             fig.savefig(fname)
@@ -2577,29 +2618,29 @@ class SELECTSEME(SUBASE):
         sj: junction dataframe
         ae: exon (all exon = single+multi exons) dataframe
 
-    Outputs:
-        sj: junction dataframe without spurious junctions
-        ae: exon dataframe without spurious exons
+    Returns:
+        :sj: junction dataframe without spurious junctions
+        :ae: exon dataframe without spurious exons
 
-    Parameters:
-        se_sizeth2: remove SE with length smaller than this, default {se_sizeth2}
-        np: number of CPU to use, default {np}
-        me2exon_sjth: 2exon genes with splice junction support less than this will be removed
-            default {me2exon_sjth}
-        me2exon_sizeth: 2exon genes terminal size th ~ 2 x read length, default {me2exon_sizeth}
-        me2exon_covth: 2exon genes cov th, default {me2exon_covth} 
+    Related Parameters:
+        * se_sizeth2: remove SE with length smaller than this, default {se_sizeth2}
+        * np: number of CPU to use, default {np}
+        * me2exon_sjth: 2exon genes with splice junction support less than this will be removed
+          default {me2exon_sjth}
+        * me2exon_sizeth: 2exon genes terminal size th ~ 2 x read length, default {me2exon_sizeth}
+        * me2exon_covth: 2exon genes cov th, default {me2exon_covth} 
 
 
     Files:
-        sj.txt.gz
-        ex.txt.gz
+        * sj.txt.gz
+        * ex.txt.gz
 
     TempFiles:
-        selectseme.rm.se.bed.gz
-        selectseme.rm.me.bed.gz
-        selectseme.rm.ovl.txt.gz
+        * selectseme.rm.se.bed.gz
+        * selectseme.rm.me.bed.gz
+        * selectseme.rm.ovl.txt.gz
 
-    """.format(**PARAMSDOC)
+    """
     
     def call(self):
         sj = self.asm.sj
@@ -2740,14 +2781,14 @@ class FIXEDGES2(SUBASE):
         sj: junction dataframe
         ae: exon (all exon = single+multi exons) dataframe
 
-    Parameters:
-        np: number of CPU to use, default {np}
+    Related Parameters:
+        * np: number of CPU to use, default {np}
 
     TempFiles:
-        genegraph-*
-        genes.cache.pic
+        * genegraph-*
+        * genes.cache.pic
 
-    """.format(**PARAMSDOC)
+    """
 
     # look at cov and detect sharp drop/rise
     
@@ -2885,11 +2926,11 @@ class CALCCOV(SUBASE):
         add column (cov) to ae dataframe
 
     TempFiles:
-        cov.txt.gz
-        cov.bed.gz
-        assemble.cov.txt.gz
-        assemble.exons0.covci.txt.gz
-        assemble.exons0.ci.txt.gz
+        * cov.txt.gz
+        * cov.bed.gz
+        * assemble.cov.txt.gz
+        * assemble.exons0.covci.txt.gz
+        * assemble.exons0.ci.txt.gz
     """
 
     def call(self):
@@ -2936,14 +2977,14 @@ class FINDGENES(SUBASE):
         sj: junction dataframe
         ae: exon (all exon = single+multi exons) dataframe
 
-    Parameters:
-        np: number of CPU to use, default {np}
+    Related Parameters:
+        * np: number of CPU to use, default {np}
 
     TempFiles:
-        genegraph-*
-        genes.cache.pic
+        * genegraph-*
+        * genes.cache.pic
 
-    """.format(**PARAMSDOC)
+    """
 
     def call(self):
         sj = self.asm.sj
@@ -2958,8 +2999,11 @@ class FINDGENES(SUBASE):
             cachename=fn.fname('genes.cache.pic'), 
             np=pr['np']
         )
-        self.info = '#genes:{0}'.format(len(genes))
-        self.stats['FINDGENES.#genes'] = len(genes)
+        numme = len([v for v in genes if len(v)>1])
+        numse = len(genes) - numme
+        self.info = '#genes:ME{0}, SE(before selection){1}'.format(numme, numse)
+        self.stats['FINDGENES.#me_genes'] = numme
+        self.stats['FINDGENES.#se_genes'] = numse
         #return genes
         self.asm.genes = genes
 
@@ -2970,17 +3014,17 @@ class WRITESJEX(SUBASE):
         sj: junction dataframe
         ae: exon dataframe
 
-    Parameters:
-        findsecovth (bool): whether secovth is found from data
+    Related Parameters:
+        * findsecovth (bool): whether secovth is found from data
 
     Files:
-        sj.txt.gz
-        ex.txt.gz
-        ci.txt.gz
-        sj.bed.gz
-        ex.bed.gz
+        * sj.txt.gz
+        * ex.txt.gz
+        * ci.txt.gz
+        * sj.bed.gz
+        * ex.bed.gz
 
-    """.format(**PARAMSDOC)
+    """
 
     def call(self):
         sj = self.asm.sj
@@ -3010,18 +3054,18 @@ class WRITEGENES(SUBASE):
         sj: junction dataframe
         ae: exon dataframe
 
-    Parameters:
-        writeiso (bool): whether to write isoforms or not, default {writeiso}
-        maxisonum (int):; number of maximum isoforms to write, default {maxisonum}
-        writegtf (bool): whether to write GTF file, default {writegtf}
+    Related Parameters:
+        * writeiso (bool): whether to write isoforms or not, default {writeiso}
+        * maxisonum (int):; number of maximum isoforms to write, default {maxisonum}
+        * writegtf (bool): whether to write GTF file, default {writegtf}
 
     Files:
-        genes.bed.gz
-        genes.iso*.bed.gz
-        genes.gtf.gz
-        genes.iso*.gtf.gz
+        * genes.bed.gz
+        * genes.iso*.bed.gz
+        * genes.gtf.gz
+        * genes.iso*.gtf.gz
 
-    """.format(**PARAMSDOC)
+    """
 
     def call(self):
         sj = self.asm.sj
@@ -3054,8 +3098,8 @@ class CONSISTENTSJ(SUBASE):
         sj: junction dataframe
         ae: exon dataframe
 
-    Output:
-        sj: modify assembler sj
+    Returns:
+        :sj: modify assembler sj
 
     """
     def call(self):
@@ -3700,3 +3744,5 @@ class EdgeDetector(object):
         return fig
 
 
+for klass in SUBASE.__subclasses__():
+    klass.__doc__ = klass.__doc__.format(**PARAMSDOC)

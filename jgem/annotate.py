@@ -28,7 +28,7 @@ class ComparatorNames(EV.EvalNames):
     """Filename manager for evaluation process. Same as EvalNames
 
     Attributes:
-        sjexbase: path prefix to junction, exon files (*.sj.txt.gz and *.ex.txt.gz)
+        sjexbase: path prefix to junction, exon files (\*.sj.txt.gz and \*.ex.txt.gz)
         code: assembly identifier
         outdir: output directory
 
@@ -43,18 +43,21 @@ class Comparator(object):
     """ Compare to reference and annotate. 
 
     """
-    def __init__(self, cn_ref, cn_tgt, outdir, gnamecol='gene_name'):
+    def __init__(self, cn_ref, cn_tgt, gnamecol='gene_name', gidxcol='gene_id'):
         """
         Args:
             cn_ref: Reference ComparatorNames object
             cn_tgt: Target ComparatorNames object
-            outdir: output directory
             gnamecol: name of the column containing gene names (gene_name for Gencode, symbol for RefSeq)
              (default gene_name)
+            gidxcol: name of the column containing gene id (gene_id for Gencode, 
+             _gidx if using connected components as genes)
+
         """
         self.cn_ref = cn_ref
         self.cn_tgt = cn_tgt
         self.refgnamecol = gnamecol
+        self.refgidxcol = gidxcol
         self.calc_overlaps()
 
     def calc_overlaps(self):
@@ -66,6 +69,9 @@ class Comparator(object):
         cols = ['chr','st','ed','cat','_id','_gidx','len','strand']
         self.ex_tgt = etgt = ctgt.model('ex') #UT.read_pandas(p1.ex)
         self.ex_ref = eref = cref.model('ex') #UT.read_pandas(p2.ex)
+        
+        eref['_gidx'] = eref[self.refgidxcol]
+
         if 'len' not in etgt.columns:
             etgt['len'] = etgt['ed']-etgt['st']
         if 'len' not in eref.columns:
@@ -176,20 +182,23 @@ class Comparator(object):
         ex.loc[(~idxgk)&(~idxse),gtfld] = 'u.me'
 
         # ref_gidxs, ref_gidx0
-        eogg = eog.groupby('_gidx')['b__gidx'] # overlapping ref gene _gidx's
-        g2cnt = {k:Counter(list(v)) for k,v in eogg}
-        g2gi = {k:','.join(map(str,v.keys())) for k,v in g2cnt.items()} # all of ovl _gidx
-        g2gi0 = {k:v.most_common()[0][0] for k,v in g2cnt.items()} # most common _gidx
+        self.eogg = eogg = eog.groupby('_gidx')['b__gidx'] # overlapping ref gene _gidx's
+        self.g2cnt = g2cnt = {k:Counter(list(v)) for k,v in eogg}
+        self.g2gi = g2gi = {k:','.join(map(str,v.keys())) for k,v in g2cnt.items()} # all of ovl _gidx
+        self.g2gi0 = g2gi0 = {k:v.most_common()[0][0] for k,v in g2cnt.items()} # most common _gidx
         ex[rcode+'_gidxs'] = [g2gi.get(x, N.nan) for x in ex['_gidx']]
         ex[rcode+'_gidx0'] = [g2gi0.get(x, N.nan) for x in ex['_gidx']]
 
         # ref_symbols, ref_symbol0
         sfld = self.refgnamecol
-        self.e2g = e2g = self.ex_ref.groupby('_gidx')[sfld].apply(lambda x: list(set(x))).reset_index()
-        self.g2s = g2s = UT.df2dict(e2g, '_gidx', sfld) # gidx => list of syms
+        # self.e2g = e2g = self.ex_ref.groupby('_gidx')[sfld].apply(lambda x: list(set(x))).reset_index()
+        # self.g2s = g2s = UT.df2dict(e2g, '_gidx', sfld) # gidx => list of syms
+        self.g2s = g2s = self.ex_ref.groupby('_gidx')[sfld].apply(lambda x: list(set(x)))
+        # self.g2s = g2s = UT.df2dict(e2g, '_gidx', sfld) # gidx => list of syms
         # convert _gidx => sym
-        g2gs = {k:','.join(set(reduce(iadd,[g2s[int(z)] for z in v.keys()]))) for k,v in g2cnt.items()}
-        g2gs0 = {k:','.join(g2s[int(v.most_common()[0][0])]) for k,v in g2cnt.items()}
+        self.g2gs = g2gs = {k:','.join(set(reduce(iadd,[g2s[z] for z in v.keys()],[]))) for k,v in g2cnt.items()}
+        self.g2gs0 = g2gs0 = {k:','.join(g2s[v.most_common()[0][0]]) for k,v in g2cnt.items()}
+        #g2gs0 = {k:g2s[int(g2gi0[k])] for k,v in g2cnt.items()}
         ex[rcode+'_syms'] = [g2gs.get(x, N.nan) for x in ex['_gidx']]
         ex[rcode+'_sym0'] = [g2gs0.get(x,N.nan) for x in ex['_gidx']]
         

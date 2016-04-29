@@ -148,6 +148,7 @@ def remove_ercc(srcfile, dstfile):
         lines = gzip.open(srcfile).readlines()
     else:
         lines = open(srcfile).readlines()
+    UT.makedirs(os.path.dirname(dstfile))
     if dstfile[:-3]=='.gz':
         t = gzip.open(dstfile,'w')
     else:
@@ -335,7 +336,8 @@ def uncompresscopy(fname):
     fname2 = fname[:-3]
     if os.path.exists(fname2):
         return fname2
-    tmp = fname2+str(uuid.uuid4())
+    ext = '.'+fname[:-3].split('.')[-1]
+    tmp = fname2+'.'+str(uuid.uuid4())+ext
     with open(tmp,'w') as fobj:
         ret = subprocess.call(['gunzip','-c', fname], stdout=fobj)
         if ret!=0:

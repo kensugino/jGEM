@@ -163,19 +163,19 @@ class MergeInputs(object):
             fnobj: MergeInputNames object
 
         Other keywords arguments:
-            genome: UCSC genome name
-            np: number of CPU to use
-            covth: only use exons with coverage > covth (default 0)
-            covdelta: exon coverage quantization delta
-            uth: unique reads threshold for junctions (default 0)
-            mth: non-unique reads threshold for junctions (default 5)
-            th_ratio: threshold for selecting junctions by overlapping ratio 
+            * genome: UCSC genome name
+            * np: number of CPU to use
+            * covth: only use exons with coverage > covth (default 0)
+            * covdelta: exon coverage quantization delta
+            * uth: unique reads threshold for junctions (default 0)
+            * mth: non-unique reads threshold for junctions (default 5)
+            * th_ratio: threshold for selecting junctions by overlapping ratio 
               (default 0.001, i.e. if a junction's read is less than 1/1000 of the sum of 
               all the reads of overlapping junctions then the junction is discarded)
-            th_detected: junctions need to be detected in more than this number of samples (default 2)
+            * th_detected: junctions need to be detected in more than this number of samples (default 2)
               unless max junction reads across samples is larger than th_maxcnt2
-            th_maxcnt1: max junction reads across sample has to be larger than this (default 0.1)
-            th_maxcnt2: if max junction reads across samples is larger than this, ignore th_detected
+            * th_maxcnt1: max junction reads across sample has to be larger than this (default 0.1)
+            * th_maxcnt2: if max junction reads across samples is larger than this, ignore th_detected
               (default 4)
 
         """
@@ -205,9 +205,9 @@ class MergeInputs(object):
             bedpath = fn.ex_bed(k) #fn.fname('ex.{0}.bed.gz'.format(k))
             bwpath = fn.ex_bw(k) #fn.fname('ex.{0}.bw'.format(k), category='output')
             LOG.debug('converting {0} to BIGWIG...'.format(bedpath))
-            totbp,covbp = BT.get_total_bp_bedfile(bedpath, bed12=False)
-            scale = float(covbp)/totbp # normalize average coverage to 1.
-            LOG.info('{0}:totbp={1},covbp={2},scale={3}'.format(bedpath,totbp,covbp,scale))
+            #totbp,covbp = BT.get_total_bp_bedfile(bedpath, bed12=False)
+            #scale = float(covbp)/totbp # normalize average coverage to 1.
+            #LOG.info('{0}:totbp={1},covbp={2},scale={3}'.format(bedpath,totbp,covbp,scale))
             # scale = 1e8/totbp # old normalization = 1e6/totaligned when readlen=100bp
             # ^==== TODO: Is normalizing to totaligned good? 
             # If complexity (#genes) is bigger then per element cov is smaller. 
@@ -217,7 +217,11 @@ class MergeInputs(object):
             # [Q] normalize chrom-wise? Mouse chr11,19,X seems higher than average
             #     in addition to the obvious low expressing chrY
 
-            BT.bed2bw(bedpath, self.chromsizes, bwpath, scale=scale)
+            # 2016-04-28: don't scale just reflect read depth all the way through
+
+            #BT.bed2bw(bedpath, self.chromsizes, bwpath, scale=scale)
+            BT.bed2bw(bedpath, self.chromsizes, bwpath, scale=None)
+
         # delete temp files
         fn.delete(delete=['temp'],protect=['output'])
 
@@ -232,12 +236,14 @@ class MergeInputs(object):
         tgts = self.tgts # ['mep','men','se'] #sep','sen']
         th = pr['covth']
         delta = pr['covdelta']
+        UT.makedirs(os.path.dirname(dstpre))
         args = [(expaths, dstpre, x, th, delta, tgts) for x in chroms]
 
         rslts = UT.process_mp(make_ex_bed_chr, args, np, doreduce=False)
 
         # concatenate
         LOG.debug('concatenating chroms...')
+        UT.makedirs(os.path.dirname(fn.ex_bed(tgts[0])))
         for k in tgts:
             bf = fn.ex_bed(k) #fn.fname('ex.{0}.bed.gz'.format(k))
             with open(bf,'wb') as dst:
@@ -267,11 +273,12 @@ class MergeInputs(object):
         scode = 'sjbed.gz'
         asjpath = fn.fname(scode) # aggregated sj file
         args = [(sjpaths, asjpath, x, uth, mth) for x in chroms]
-
+        UT.makedirs(os.path.dirname(asjpath))
         rslts = UT.process_mp(make_sj_bed_chr, args, np, doreduce=False)
 
         # concatenate
         LOG.debug('merge sj: concatenating chroms...')
+        UT.makedirs(os.path.dirname(asjpath))
         with open(asjpath,'wb') as dst:
             for x in chroms:
                 sf = fn.fname('{0}{1}.gz'.format(scode,x))
@@ -282,16 +289,18 @@ class MergeInputs(object):
 
         # group same junctions
         msj = UT.read_pandas(asjpath, names=['chr','st','ed','strand','src','ucnt','mcnt'])
-        # average
-        scale = 1/float(len(sjpaths)) 
-        msj['ucnt'] = scale*msj['ucnt']
-        msj['mcnt'] = scale*msj['mcnt']
+        # average <= 2016-04-28 don't average just aggregate
+        # scale = 1/float(len(sjpaths)) 
+        # msj['ucnt'] = scale*msj['ucnt']
+        # msj['mcnt'] = scale*msj['mcnt']
         # unique junctions
         msjg = msj.groupby(['chr','st','ed','strand'])[['ucnt','mcnt']].sum().reset_index()
         # msjg['sc1'] = msjg['ucnt'] # for BED
         # msjg['tst'] = msjg['mcnt'] # for BED
-        u = msjg['ucnt'].map('{:.2}'.format)
-        m = msjg['mcnt'].map('{:.2}'.format)
+        # u = msjg['ucnt'].map('{:.2}'.format)
+        # m = msjg['mcnt'].map('{:.2}'.format)
+        u = msjg['ucnt'].astype(str)
+        m = msjg['mcnt'].astype(str)
         msjg['_id'] = N.arange(len(msjg))
         msjg['name'] = msjg['_id'].astype(str)+'_u:'+u+'_m:'+m
         cols = GGB.SJCOLS #GGB.BEDCOLS[:7] # chr,st,ed,name,sc1,strand,tst
@@ -415,8 +424,9 @@ class MergeInputs(object):
         pr = self.params
         bwfiles = [x[1] for x in fn.bwpaths()] # [(name,bwfile),...]
         dstpath = fn.agg_bw()
-        scale = 1./len(bwfiles) # average
-        BW.merge_bigwigs_mp(bwfiles, pr['genome'], dstpath, scale=scale, np=pr['np'])
+        # scale = 1./len(bwfiles) # average
+        # BW.merge_bigwigs_mp(bwfiles, pr['genome'], dstpath, scale=scale, np=pr['np'])
+        BW.merge_bigwigs_mp(bwfiles, pr['genome'], dstpath, scale=None, np=pr['np'])
 
 def make_ex_bed_chr(expaths, dstpre, chrom, covth, covdelta, tgts):
     withcov = True
@@ -546,8 +556,11 @@ class MergeAssemble(object):
     def assemble_me1(self):
         """do assembly separately for each strand"""
         asms = self.asms
+        LOG.info('#########  START +strand assembly ######################################')
         asms['mep'].assemble()
+        LOG.info('#########  START -strand assembly ######################################')
         asms['men'].assemble()        
+        LOG.info('########################################################################')
         LOG.info('mep:{0}, men:{1}'.format(len(asms['mep'].ae),len(asms['men'].ae)))
 
     def _remove_se_from_me(self):

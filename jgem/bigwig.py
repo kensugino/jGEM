@@ -90,6 +90,7 @@ def bam2bw(fpath, chromsizes, bpath, aligned=None):
     scale = 1000000./float(aligned)
     # convert_to_wig
     tpath = bpath +'.wig'
+    UT.makedirs(os.path.dirname(tpath))
     tfobj = open(tpath,'w')
     cmd1 = ['genomeCoverageBed', '-split', '-bg', '-ibam', fpath, '-g', chromsizes, '-scale', str(scale)]
     p1 = subprocess.Popen(cmd1, stdout=tfobj)
@@ -176,18 +177,20 @@ def bw2bed(bwfile, bedfile, chroms, th):
     Returns:
         path to generated BED file
     """
+    bedbase = bedfile[:-3] if bedfile[-3:]=='.gz' else bedfile
     #bedfile = '{0}.binary{1:g}.bed'.format(bwfile[:-3], th)
-    if UT.notstale(bwfile, bedfile+'.gz'):
-        return bedfile+'.gz'
+    if UT.notstale(bwfile, bedbase+'.gz'):
+        return bedbase+'.gz'
     # make sure bwfile exists
     if not ( os.path.exists(bwfile) ):
         raise RuntimeError('BigWig file {0} does not exist.'.format(bwfile))
     processor = apply_threshold(bwfile,th, chroms)
-    out = open(bedfile,'w')
+    UT.makedirs(os.path.dirname(bedfile))
+    out = open(bedbase,'w')
     out.write(''.join(['%s\t%i\t%i\n' % x for x in processor]))
     out.write('\n')
     out.close()
-    return UT.compress(bedfile)
+    return UT.compress(bedbase)
 
 ### Merge BigWigs ##########################################################
 
@@ -246,6 +249,7 @@ def merge_bigwigs_mp(bwfiles, genome, dstpath, scale=None, np=7):
     dic = dict(rslts)
     LOG.debug('concatenating chromosomes...')
     wigpath = dstpath+'.wig'
+    UT.makedirs(os.path.dirname(wigpath))
     with open(wigpath, 'w') as dst:
         for c in chroms:
             with open(dic[c],'r') as src:

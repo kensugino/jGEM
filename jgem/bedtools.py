@@ -27,6 +27,7 @@ import inspect
 
 # decorators to separate logic
 def compressQ(outname, noerr=0):
+    """ decorator for checking file compression and error """
     def deco(func):
         argnames, varargs, keywords, defaults = inspect.getargspec(func)
         pos = argnames.index(outname)
@@ -42,6 +43,7 @@ def compressQ(outname, noerr=0):
                 opath = opath[:-3]
             else:
                 compress = False
+            UT.makedirs(os.path.dirname(opath))
             if outname in kwargs:
                 kwargs[outname] = opath
             else:
@@ -134,6 +136,7 @@ def wig2bw(wigpath, chromsizes, bwpath):
     Runs Kent's tool wigToBigWig.
     """
     cmd = ['wigToBigWig', wigpath, chromsizes, bwpath]
+    UT.makedirs(os.path.dirname(bwpath))
     err = subprocess.call(cmd)
     return err
 
@@ -163,6 +166,7 @@ def make_bw_from_bam(bampath, chromsizes, bedpath, bwpath):
     make_bw_from_bed(bedpath, chromsizes, bwpath)
     
 def bed12_bed6(bed):
+    """ convert BED12 to BED6 uses cython helper """
     # BED12 ['chr', 'st', 'ed', 'name', 'sc1', 'strand', 'tst', 'ted', 'sc2', '#exons', 'esizes', 'estarts']
     # BED6 ['chr', 'st', 'ed', 'name', 'sc1', 'strand'] flatten exons, collect unique
     # BED12 tid => BED6 name=tid+exon_number
@@ -305,8 +309,10 @@ def _runbedtools2(which, aname, cname, **kwargs):
             cmd += ['-'+k, str(v)]
     with open(cname, "w") as outfile:
         ret = subprocess.call(cmd, stdout=outfile)
-        if ret!=0:
-            LOG.warning('bederror', ret, cmd)
+    if ret!=0:
+        msg = 'bederror return code:{0}, cmd:{1}'.format(ret, cmd)
+        # LOG.warning(msg)
+        raise RuntimeError(msg)
     return UT.compress(cname)
 
 def _runbedtools3(which, aname, bname, cname, **kwargs):
@@ -319,7 +325,9 @@ def _runbedtools3(which, aname, bname, cname, **kwargs):
     with open(cname, "w") as outfile:
         ret = subprocess.call(cmd, stdout=outfile)
     if ret !=0:
-        LOG.warning('bederror', ret, cmd)
+        msg = 'bederror return code:{0}, cmd:{1}'.format(ret, cmd)
+        # LOG.warning(msg)
+        raise RuntimeError(msg)
     return ret
 
 def _bedtoolscatcherror(which, aname, bname, cname, **kwargs):
@@ -335,8 +343,6 @@ def _bedtoolscatcherror(which, aname, bname, cname, **kwargs):
         aname = UT.uncompresscopy(aname)
         bname = UT.uncompresscopy(bname)
         ret = _runbedtools3(which,aname,bname,cname,**kwargs)
-        if ret !=0:
-            raise RuntimeError('bedtools error')
     return UT.compress(cname)
 
 def calc_ovlratio(aname, bname, tname, nacol, nbcol, idcol=['chr','st','ed']):

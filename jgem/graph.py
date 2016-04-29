@@ -499,6 +499,7 @@ def find_genes3(sj, ae, cachename=None, np=1, override=False, depth=140):
         # SE genes
         genes += [set([x]) for x in se['_id']]
         if cachename:
+            UT.makedirs(os.path.dirname(cachename))
             pickle.dump(genes, open(cachename,'wb'))
         LOG.debug(' time: {0:.3f}s'.format(time.time()-_sttime))
     
@@ -564,6 +565,7 @@ def find_genes4(sj, ae, filepre, cachename=None, np=1, override=False, depth=500
         # version 4 graph: uses overlaps in addition to junctions to connect
         # genes = [set([_id's]),...]
         if cachename:
+            UT.makedirs(os.path.dirname(cachename))
             pickle.dump(genes, open(cachename,'wb'))
         LOG.info(' time: {0:.3f}s'.format(time.time()-_sttime))
     

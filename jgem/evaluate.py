@@ -35,7 +35,7 @@ class EvalNames(FN.FileNamesBase):
     """Filename manager for evaluation process.
 
     Attributes:
-        sjexbase: path prefix to junction, exon files (*.sj.txt.gz and *.ex.txt.gz)
+        sjexbase: path prefix to junction, exon files (\*.sj.txt.gz and \*.ex.txt.gz)
         code: assembly identifier
         outdir: output directory
 
@@ -189,6 +189,7 @@ class EvalMatch(object):
         #   auc, detected1, ..., sigmoid,...,maxx,avgx,avgy,...
         # ==> pickle or json
         fname1 = self.en2.fname2('stats.json',self.en1.code,category='output')
+        UT.makedirs(os.path.dirname(fname1))
         with open(fname1,'w') as fp:
             json.dump(self.stats, fp)
         # [i,5,5b,3,3b,s,sb,j] cov(x),ratio(y) => in a dataframe
@@ -197,7 +198,7 @@ class EvalMatch(object):
         fname2 = self.en2.fname2('ratios.txt.gz',self.en1.code,category='output')
         for k, v in self.ratios.items():
             v['kind'] = k
-        df = PD.concat(*self.ratios.values(), ignore_index=True)
+        df = PD.concat(self.ratios.values(), ignore_index=True)
         UT.write_pandas(df, fname2, 'h')
 
     def load(self):
@@ -449,15 +450,16 @@ class EvalMatch(object):
             auc4,maxx4,avgy4,x4,y4 = self._calc_binned(x2,y4,self.binsize)
 
             self.ratios[which] = PD.DataFrame({'x':x, 'y':y, 'name':ns})
-            self.stats[which] = {'detected1':pop,
-                                 'matched':hit,
-                                 'detected2':pop2,
-                                 'p1':float(hit)/pop,
-                                 'p2':float(hit)/pop2,
-                                 'auc':auc4,
-                                 'maxx':maxx4,
-                                 'avgy':avgy4,
-                                 'xth':xth}
+            self.stats[which] = {'detected1':pop, # int
+                                 'matched':hit, # int
+                                 'detected2':pop2, # int 
+                                 'p1':float(hit)/pop, # float
+                                 'p2':float(hit)/pop2, # float
+                                 'auc':auc4, # float
+                                 'maxx':list(maxx4), # list
+                                 'avgy':list(avgy4), # list
+                                 'xth':xth, # float
+                                 }
 
     # Not implemented yet:
     # (4. ELC: exon length completeness = max(ratio of exon length covered by overlapping target gene))
@@ -489,8 +491,12 @@ class EvalMatch(object):
         x,y = glc['x'].values,glc['y'].values
         x2,y2,xth = UT.fit_sigmoid(x,y,xlim,0.99)
         auc,maxx,avgy,x,y = self._calc_binned(x,y,self.binsize)
-        self.stats['glc'] = {'p1':N.sum(glc['b_glen']>0)/float(len(glc)),
-                             'auc':auc,'maxx':maxx,'avgy':avgy,'xth':xth}
+        self.stats['glc'] = {'p1':N.sum(glc['b_glen']>0)/float(len(glc)), # float ratio detected
+                             'auc':auc, # float
+                             'maxx':list(maxx), # list
+                             'avgy':list(avgy), # list
+                             'xth':xth, # float
+                             }
         
 
         # ECC
@@ -507,7 +513,10 @@ class EvalMatch(object):
         x2,y2,xth = UT.fit_sigmoid(x,y,xlim,0.99)
         auc,maxx,avgy,x,y = self._calc_binned(x,y,self.binsize)
         self.stats['ecc'] = {'p1':N.sum(ecc['b_#exons']>0)/float(len(ecc)),
-                             'auc':auc,'maxx':maxx,'avgy':avgy,'xth':xth}
+                             'auc':auc,
+                             'maxx':list(maxx),
+                             'avgy':list(avgy),
+                             'xth':xth}
                              
         # JCC
         s1 = self.s1
@@ -526,7 +535,10 @@ class EvalMatch(object):
         x2,y2,xth = UT.fit_sigmoid(x,y,xlim,0.99)
         auc,maxx,avgy,x,y = self._calc_binned(x,y,self.binsize)
         self.stats['jcc'] = {'p1':N.sum(jcc['b_jc']>0)/float(len(jcc)),
-                             'auc':auc,'maxx':maxx,'avgy':avgy,'xth':xth}
+                             'auc':auc,
+                             'maxx':list(maxx),
+                             'avgy':list(avgy),
+                             'xth':xth}
 
     def _plot(self, x, y, ax, ca='go-', cf='r.-', cd='b.',pw='dfat',
         binsize=25,xlim=(0,7),yth=0.99,scale=100,label='', which=None):
@@ -563,8 +575,9 @@ class EvalMatch(object):
         if 't' in pw: # threshold
             if which is not None:
                 xth = self.stats[which]['xth']
-            ax.plot([xth,xth],[0,scale],cf+'-')
-            ax.text(xth, 10, '{0:.2f}'.format(xth))
+            if xth < xlim[1]:
+                ax.plot([xth,xth],[0,scale],cf+'-')
+                ax.text(xth, 10, '{0:.2f}'.format(xth))
         ax.set_xlim([-0.5,xlim[1]])
         ax.set_ylim([-5,105])
 
@@ -598,9 +611,9 @@ class EvalMatch(object):
 
         def _plot_one(ax, which, label, color, ypos=0, xpos=0):
             s = self.stats[which]
-            x = N.concatenate([s['maxx'],[0]])
-            y = N.concatenate([100*s['avgy'],[0]])
-            # ax.plot(s['maxx'],100*s['avgy'],color+'.-',ms=5, label=label)
+            x = N.concatenate([N.array(s['maxx']),[0]])
+            y = N.concatenate([100*N.array(s['avgy']),[0]])
+            # ax.plot(s['maxx'],100*N.array(s['avgy']),color+'.-',ms=5, label=label)
             ax.plot(x,y,color,ms=5, label=label)
             ma = N.ceil(N.max(s['maxx']))+0.5
             ax.set_xlim([-0.5,ma])
@@ -652,7 +665,7 @@ class EvalMatch(object):
             ax = axr[i]
             #pop,hit,dif,auc,maxx,avgy,x,y = self.stats[w]
             st = self.stats[w]
-            auc,maxx,avgy= st['auc'],st['maxx'],st['avgy']
+            auc,maxx,avgy= st['auc'],N.array(st['maxx']),N.array(st['avgy'])
             xy = self.ratios[w]
             x = xy['x'].values
             y = xy['y'].values
@@ -675,12 +688,13 @@ class EvalMatch(object):
             fig.suptitle('{1}/{0}'.format(p1c,p2c))
         return axr
         
-    def plot_completeness(self, axr=None, tgts=['glc','ecc','jcc'], pw='dft', disp='both', title=None, **kw):
+    def plot_completeness(self, axr=None, tgts=['glc','ecc','jcc'], pw='dft', disp='both', 
+                        title=None, xlim=[0,10], xlimjcc=[0,40], **kw):
         st = self.stats
         p1c = st['code1'] # gen4
         p2c = st['code2']
         if axr is None:
-            fig,axr = P.subplots(1,len(tgts),figsize=(3*len(tgts),3),sharex=True,sharey=True)
+            fig,axr = P.subplots(1,len(tgts),figsize=(3*len(tgts),3),sharex=False,sharey=True)
             P.subplots_adjust(wspace=0.07,hspace=0.15,top=0.85)
         else:
             fig = None
@@ -689,11 +703,15 @@ class EvalMatch(object):
             d = self.ratios[w]
             x = d['x'].values
             y = d['y'].values
-            self._plot(x,y,ax,pw=pw,scale=100, which=w,**kw)
+            if w=='jcc':
+                xl = xlimjcc
+            else:
+                xl = xlim
+            self._plot(x,y,ax,pw=pw,scale=100, which=w,xlim=xl,**kw)
             if disp!='png':
                 if i==0:
                     ax.set_ylabel('% covered')
-                if i==1:
+                if (fig is not None and i==1):
                     ax.set_xlabel('log2({0}.{1}_gcov+1)'.format(p1c, self.datacode))
                 ax.set_title(w.upper())
             else:

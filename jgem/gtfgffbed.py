@@ -36,13 +36,13 @@ DEFAULT_GTF_PARSE = ['gene_id','transcript_id','exon_number','gene_name','cov','
 
 # SJ.out.tab to SJBED ###################################################################
 
-def sjtab2sjbed(sjtab, sjbed, scale):
+def sjtab2sjbed(sjtab, sjbed, scale=None):
     """Generate splice junction input file from STAR SJ.out.tab
 
     Args:
         sjtab (str): path to SJ.out.tab file
         sjbed (str): path to output bed
-        scale (float): scale (= 1/average_coverage = covbp/totbp)
+        scale (float): a number to multiply (default None, no change)
 
     Returns:
         Pandas dataframe
@@ -53,13 +53,17 @@ def sjtab2sjbed(sjtab, sjbed, scale):
                   sj[['motif','annotated','ureads','mreads','maxoverhang']].values]
     sj['strand'] = [SJTABSTRAND[x] for x in sj['strand2']]
     #scale = 1e6/float(aligned)
-    sj['ucnt'] = sj['ureads']*scale
-    sj['mcnt'] = sj['mreads']*scale
+    if scale is None:
+        sj['ucnt'] = sj['ureads']
+        sj['mcnt'] = sj['mreads']
+    else:
+        sj['ucnt'] = sj['ureads']*scale
+        sj['mcnt'] = sj['mreads']*scale
     #sj['jcnt'] = [x or y for x, y in sj[['ucnt','mcnt']].values]
     #cols = ['chr','st','ed','name','strand','ucnt','mcnt']#,'jcnt']
     #UT.write_pandas(sj[cols], sjbed, '')
-    sj['sc1'] = sj['ureads']*scale
-    sj['tst'] = sj['mreads']*scale
+    sj['sc1'] = sj['ucnt'] #sj['ureads']*scale
+    sj['tst'] = sj['mcnt'] #sj['mreads']*scale
     #cols = ['chr','st','ed','name','sc1','strand','tst'] 
     #UT.write_pandas(sj[cols], sjbed, '')
     write_bed(sj, sjbed, ncols=7)
@@ -327,6 +331,7 @@ def write_ggb(df, fname, cols, compress=True):
         df['ed'] = df['ed'].astype(int)
     if fname[-3:]=='.gz':
         fname = fname[:-3]
+    UT.makedirs(os.path.dirname(fname))
     df[cols].to_csv(fname, index=False, header=False, sep='\t', quoting=csv.QUOTE_NONE)
     if compress:
         return UT.compress(fname)

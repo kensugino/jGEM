@@ -11,6 +11,20 @@ import numpy as N
 cimport numpy as N
 import gzip
 import codecs
+import os
+import errno
+
+def makedirs2(path):
+    """Make all the directories along the path, calls os.makedirs but 
+    intercept irrelevant exceptions
+    """
+    dirpath = os.path.dirname(path)
+    try:
+        os.makedirs(dirpath)
+    except OSError as err:
+        if err.errno != errno.EEXIST or not os.path.isdir(dirpath):
+            raise
+
 
 ctypedef N.float32_t F32_t
 ctypedef N.float64_t F64_t
@@ -41,7 +55,7 @@ cpdef list union_intervals(ADTYPE_t[I32_t,ndim=2] a):
 
 @cython.boundscheck(False) # turns off bounds-checking for entire function
 @cython.wraparound(False) # turns off negative indexing checking
-cpdef get_total_bp_bed12file_helper(str bed12path):
+cpdef get_total_bp_bed12file_helper( bed12path):
     """ Returns total mapped base pairs (totbp) and covered base pairs (covbp).
     The ratio totbp/covbp gives average coverage. Process without reading entire data
     into the RAM.
@@ -93,7 +107,7 @@ cpdef get_total_bp_bed12file_helper(str bed12path):
 
 @cython.boundscheck(False) # turns off bounds-checking for entire function
 @cython.wraparound(False) # turns off negative indexing checking
-cpdef get_total_bp_bedfile_helper(str bedpath):
+cpdef get_total_bp_bedfile_helper( bedpath):
     """ Returns total mapped base pairs (totbp) and covered base pairs (covbp).
     The ratio totbp/covbp gives average coverage. Process without reading entire data
     into the RAM. Process non BED12 file.
@@ -143,7 +157,7 @@ cpdef get_total_bp_bedfile_helper(str bedpath):
 
 @cython.boundscheck(False) # turns off bounds-checking for entire function
 @cython.wraparound(False) # turns off negative indexing checking
-cpdef get_total_bp_bedfile_helper_check_uniq(str bedpath):
+cpdef get_total_bp_bedfile_helper_check_uniq( bedpath):
     """ Returns total mapped base pairs (totbp) and covered base pairs (covbp).
     The ratio totbp/covbp gives average coverage. Process without reading entire data
     into the RAM. Process non BED12 file.
@@ -224,11 +238,12 @@ cpdef list flatten_bed8(ADTYPE_t bed8):
 
 @cython.boundscheck(False) # turns off bounds-checking for entire function
 @cython.wraparound(False) # turns off negative indexing checking
-cpdef str array2wiggle_chr(N.ndarray[F32_t] a, str chrom, str dstpath):
+cpdef str array2wiggle_chr(N.ndarray[F32_t] a,  chrom,  dstpath):
     #cdef unicode txt
     cdef int i,j,st
     cdef F32_t c
 
+    makedirs2(dstpath)
     fobj = open(dstpath,'w')
     i = 0
     cdef Py_ssize_t n = len(a)
@@ -252,11 +267,12 @@ cpdef str array2wiggle_chr(N.ndarray[F32_t] a, str chrom, str dstpath):
 
 @cython.boundscheck(False) # turns off bounds-checking for entire function
 @cython.wraparound(False) # turns off negative indexing checking
-cpdef str array2wiggle_chr64(N.ndarray[F64_t] a, str chrom, str dstpath):
+cpdef str array2wiggle_chr64(N.ndarray[F64_t] a,  chrom,  dstpath):
     #cdef unicode txt
     cdef int i,j,st
     cdef F64_t c
 
+    makedirs2(dstpath)
     fobj = open(dstpath,'w')
     i = 0
     cdef Py_ssize_t n = len(a)
@@ -281,7 +297,7 @@ cpdef str array2wiggle_chr64(N.ndarray[F64_t] a, str chrom, str dstpath):
 
 @cython.boundscheck(False) # turns off bounds-checking for entire function
 @cython.wraparound(False) # turns off negative indexing checking
-cpdef read_gtf_helper(str gtfpath, list parseattrs, str comment='#'):
+cpdef read_gtf_helper( gtfpath, list parseattrs,  comment='#'):
     """ Returns total mapped base pairs (totbp) and covered base pairs (covbp).
     The ratio totbp/covbp gives average coverage. Process without reading entire data
     into the RAM.

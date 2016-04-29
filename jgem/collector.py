@@ -8,9 +8,6 @@
 """
 # system imports
 import os
-from collections import Counter
-from operator import iadd
-from functools import reduce
 import logging
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
@@ -62,9 +59,9 @@ class Collector(object):
         outdir: output directory
 
     SampleInfo DataFrame columns:
-        name: sample name
-        bw_path: bigwig path
-        sjbed_path: sjbed path
+        - name: sample name
+        - bw_path: bigwig path
+        - sjbed_path: sjbed path
 
    	Methods:
 	    1. collect_gcov: gene coverages (row:genes, col:samples)
@@ -73,14 +70,14 @@ class Collector(object):
 	    4. collect_gcov1000 (using trimmed model)
 
     Outputs:
-        are written in files
-        1. outdir/assemblycode.samplecode.gcov.txt.gz
-        1b. outdir/assemblycode.samplecode.ugcov.txt.gz
-        2. outdir/assemblycode.samplecode.ecov.txt.gz
-        2b. outdir/assemblycode.samplecode.uecov.txt.gz
-        3. outdir/assemblycode.samplecode.jcnt.txt.gz
-        4. outdir/assemblycode.samplecode.t1000gcov.txt.gz
-        4b. outdir/assemblycode.samplecode.ut1000gcov.txt.gz
+        are written in files:
+        * 1. outdir/assemblycode.samplecode.gcov.txt.gz
+        * 1b. outdir/assemblycode.samplecode.ugcov.txt.gz
+        * 2. outdir/assemblycode.samplecode.ecov.txt.gz
+        * 2b. outdir/assemblycode.samplecode.uecov.txt.gz
+        * 3. outdir/assemblycode.samplecode.jcnt.txt.gz
+        * 4. outdir/assemblycode.samplecode.t1000gcov.txt.gz
+        * 4b. outdir/assemblycode.samplecode.ut1000gcov.txt.gz
 
         Individual sample gcov/ecov/gcov1000 should have filename
         outdir/assemblycode.samplename.gcov.txt.gz etc.

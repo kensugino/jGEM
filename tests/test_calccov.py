@@ -48,7 +48,7 @@ def test_calc_ecov(g4sjexprefix, bigwig, outdir):
 	assert ecov.ix[117]['chr'] == 'chr1'
 	assert ecov.ix[117]['st'] == 4857813 
 	assert ecov.ix[117]['ed'] == 4857976 
-	assert ecov.ix[117]['ecov'] == 3.0008723189128688
+	assert ecov.ix[117]['ecov'] == 110.69325153374233 #3.0008723189128688
 
 # def test_calc_gcov():
 # 	pass

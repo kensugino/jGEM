@@ -308,6 +308,7 @@ class BEDWriter(object):
     def write_iso(self, fname, maxisonum):
         if fname[-3:]=='.gz':
             fname = fname[:-3]
+        UT.makedirs(os.path.dirname(fname))
         with open(fname,'w') as fobj:
             for x in self.gen_iso_all(maxisonum=maxisonum):
                 fobj.write('\t'.join(map(str,x))+'\n')
