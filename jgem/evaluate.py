@@ -570,7 +570,7 @@ class EvalMatch(object):
                 #avgx,avgy = UT.calc_binned(x,y,num=binsize)
             else:
                 st = self.stats[which]
-                maxx,avgy = st['maxx'],st['avgy']
+                maxx,avgy = N.array(st['maxx']),N.array(st['avgy'])
             ax.plot(maxx,scale*avgy, ca, label=label)
         if 't' in pw: # threshold
             if which is not None:
