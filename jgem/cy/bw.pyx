@@ -238,7 +238,7 @@ cpdef list flatten_bed8(ADTYPE_t bed8):
 
 @cython.boundscheck(False) # turns off bounds-checking for entire function
 @cython.wraparound(False) # turns off negative indexing checking
-cpdef unicode array2wiggle_chr(N.ndarray[F32_t] a,  chrom,  dstpath):
+cpdef array2wiggle_chr(N.ndarray[F32_t] a,  chrom,  dstpath):
     #cdef unicode txt
     cdef int i,j,st
     cdef F32_t c
@@ -257,17 +257,17 @@ cpdef unicode array2wiggle_chr(N.ndarray[F32_t] a,  chrom,  dstpath):
             continue
         else:
             if c!=0:
-                fobj.write(u'{0}\t{1}\t{2}\t{3}\n'.format(chrom,st,i,c))
+                fobj.write('{0}\t{1}\t{2}\t{3}\n'.format(chrom,st,i,c))
             st = i
             c = a[st]
     if c!=0:
-        fobj.write(u'{0}\t{1}\t{2}\t{3}\n'.format(chrom,st,i,c))
+        fobj.write('{0}\t{1}\t{2}\t{3}\n'.format(chrom,st,i,c))
     fobj.close()
     return dstpath
 
 @cython.boundscheck(False) # turns off bounds-checking for entire function
 @cython.wraparound(False) # turns off negative indexing checking
-cpdef unicode array2wiggle_chr64(N.ndarray[F64_t] a,  chrom,  dstpath):
+cpdef array2wiggle_chr64(N.ndarray[F64_t] a,  chrom,  dstpath):
     #cdef unicode txt
     cdef int i,j,st
     cdef F64_t c
@@ -319,7 +319,7 @@ cpdef read_gtf_helper( gtfpath, list parseattrs,  comment='#'):
     cdef int st0, ed0
     cdef dict dic
     cdef list cols0 = GTFCOLS+parseattrs
-    cdef list e = ['']*len(parseattrs)
+    cdef list e = [u'']*len(parseattrs)
 
     if gtfpath[len(gtfpath)-3:len(gtfpath)]=='.gz':
         gfp = gzip.open(gtfpath,'r')
@@ -333,19 +333,19 @@ cpdef read_gtf_helper( gtfpath, list parseattrs,  comment='#'):
         if len(line)>0 and line[0]!=comment:
             break
     # process the first line
-    r = line.strip().split('\t')
+    r = line.strip().split(u'\t')
     if len(r)==9:
         chrom,src,typ,st,ed,sc1,strand,sc2,extra = r
-        dic = dict([(l[0],l[1][1:-1]) for l in [y.split() for y in extra.split(';')] if len(l)>1])
-        recs.append(r+[dic.get(x,'') for x in parseattrs])
+        dic = dict([(l[0],l[1][1:len(l[1])-1]) for l in [y.split() for y in extra.split(u';')] if len(l)>1])
+        recs.append(r+[dic.get(x,u'') for x in parseattrs])
     else:
         recs.append(r)        
     for line in fp: # process the rest
-        r = line.strip().split('\t')
+        r = line.strip().split(u'\t')
         if len(r)==9:
             chrom,src,typ,st,ed,sc1,strand,sc2,extra = r
-            dic = dict([(l[0],l[1][1:-1]) for l in [y.split() for y in extra.split(';')] if len(l)>1])
-            recs.append(r+[dic.get(x,'') for x in parseattrs])
+            dic = dict([(l[0],l[1][1:len(l[1])-1]) for l in [y.split() for y in extra.split(u';')] if len(l)>1])
+            recs.append(r+[dic.get(x,u'') for x in parseattrs])
         else:
             recs.append(r)
     gfp.close()

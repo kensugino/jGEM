@@ -2766,12 +2766,15 @@ class SELECTSEME(SUBASE):
         b = UT.write_pandas(me[cols], fn.bedname('selectseme.rm.me'), fm='')
         c = BT.bedtoolintersect(a,b,fn.txtname('selectseme.rm.ovl'),wao=True) # get original entry
         cdf = BT.read_ovl(c, GGB.BEDCOLS[:6])
-        cdfg = cdf.groupby('sc1') # sc1 <= _id
-        ovl = cdfg['ovl'].sum()
-        siz = cdfg.size()
-        nonovl_se = ovl[(ovl==0)|(siz>1)].index.values 
-        # remove overlapping to only one ME exon ~((ovl>0)&(siz==1))
-        se2 = se.set_index('_id').ix[nonovl_se].reset_index()
+        if len(cdf)>0:
+            cdfg = cdf.groupby('sc1') # sc1 <= _id
+            ovl = cdfg['ovl'].sum()
+            siz = cdfg.size()
+            nonovl_se = ovl[(ovl==0)|(siz>1)].index.values 
+            # remove overlapping to only one ME exon ~((ovl>0)&(siz==1))
+            se2 = se.set_index('_id').ix[nonovl_se].reset_index()
+        else: # no overlap
+            se2 = se
         ex2 = PD.concat([me,se2], ignore_index=True)
         LOG.info('se({0}) => se({1}) {2} removed'.format(len(se),len(se2),len(se)-len(se2)))
         st['SELECTSEME.#removed_se'] = len(se)-len(se2)

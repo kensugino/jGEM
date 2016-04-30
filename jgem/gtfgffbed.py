@@ -22,17 +22,17 @@ from jgem import utils as UT
 import jgem.cy.bw as cybw
 
 
-GTFCOLS = ['chr','src','typ','st','ed','sc1','strand','sc2','extra']
-GFFCOLS = ['chr','src','typ','st','ed','sc1','strand','sc2','attr']
-BEDCOLS = ['chr', 'st', 'ed', 'name', 'sc1', 'strand', 'tst', 'ted', 'sc2', '#exons', 'esizes', 'estarts']
+GTFCOLS = [u'chr',u'src',u'typ',u'st',u'ed',u'sc1',u'strand',u'sc2',u'extra']
+GFFCOLS = [u'chr',u'src',u'typ',u'st',u'ed',u'sc1',u'strand',u'sc2',u'attr']
+BEDCOLS = [u'chr', u'st', u'ed', u'name', u'sc1', u'strand', u'tst', u'ted', u'sc2', u'#exons', u'esizes', u'estarts']
 
-SJCOLS = ['chr', 'st', 'ed', 'name', 'ucnt', 'strand', 'mcnt']
+SJCOLS = [u'chr', u'st', u'ed', u'name', u'ucnt', u'strand', u'mcnt']
 
-SJTABCOLS = ['chr','st','ed','strand2','motif','annotated','ureads','mreads','maxoverhang']
+SJTABCOLS = [u'chr',u'st',u'ed',u'strand2',u'motif',u'annotated',u'ureads',u'mreads',u'maxoverhang']
 SJTABMOTIF = {0:'non-canonical',1:'GT/AG',2:'CT/AC',3:'GC/AG',4:'CT/GC',5:'AT/AC',6:'GT/AT'}
 SJTABSTRAND = {1:'+',2:'-',0:'.'}
 
-DEFAULT_GTF_PARSE = ['gene_id','transcript_id','exon_number','gene_name','cov','FPKM']
+DEFAULT_GTF_PARSE = [u'gene_id',u'transcript_id',u'exon_number',u'gene_name',u'cov',u'FPKM']
 
 # SJ.out.tab to SJBED ###################################################################
 
