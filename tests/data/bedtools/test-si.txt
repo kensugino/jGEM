@@ -1,0 +1,5 @@
+sample_id	name	sjexpre	bwfile	sjbed
+1	sample1	assemblies/s1	bedtools/test.bw	SJ/test1.sj.bed.gz
+2	sample2	assemblies/s2	bedtools/test.bw	SJ/test2.sj.bed.gz
+3	sample3	assemblies/s3	bedtools/test.bw	SJ/test3.sj.bed.gz
+4	sample4	assemblies/s4	bedtools/test.bw	SJ/test4.sj.bed.gz
