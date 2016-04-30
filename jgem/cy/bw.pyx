@@ -218,14 +218,14 @@ cpdef get_total_bp_bedfile_helper_check_uniq( bedpath):
 cpdef list flatten_bed8(ADTYPE_t bed8):
     cdef list rslt, x1
     cdef int i
-    cdef str siz,sta,y,z
+    cdef unicode siz,sta,y,z
     cdef Py_ssize_t n = len(bed8)
     rslt = []
     for i in range(n):
         x = bed8[i]
-        siz = str(x[6])
-        sta = str(x[7])
-        if siz[len(siz)-1]==',':
+        siz = unicode(x[6])
+        sta = unicode(x[7])
+        if siz[len(siz)-1]==u',':
             siz = siz[:len(siz)-1]
             sta = sta[:len(siz)-1]
         for y,z in zip(siz.split(','),sta.split(',')):
@@ -238,7 +238,7 @@ cpdef list flatten_bed8(ADTYPE_t bed8):
 
 @cython.boundscheck(False) # turns off bounds-checking for entire function
 @cython.wraparound(False) # turns off negative indexing checking
-cpdef str array2wiggle_chr(N.ndarray[F32_t] a,  chrom,  dstpath):
+cpdef unicode array2wiggle_chr(N.ndarray[F32_t] a,  chrom,  dstpath):
     #cdef unicode txt
     cdef int i,j,st
     cdef F32_t c
@@ -267,7 +267,7 @@ cpdef str array2wiggle_chr(N.ndarray[F32_t] a,  chrom,  dstpath):
 
 @cython.boundscheck(False) # turns off bounds-checking for entire function
 @cython.wraparound(False) # turns off negative indexing checking
-cpdef str array2wiggle_chr64(N.ndarray[F64_t] a,  chrom,  dstpath):
+cpdef unicode array2wiggle_chr64(N.ndarray[F64_t] a,  chrom,  dstpath):
     #cdef unicode txt
     cdef int i,j,st
     cdef F64_t c
@@ -312,7 +312,7 @@ cpdef read_gtf_helper( gtfpath, list parseattrs,  comment='#'):
         cols: column names
 
     """
-    cdef str line,chrom,src,typ,st,ed,sc1,strand,sc2,extra,x,y
+    cdef unicode line,chrom,src,typ,st,ed,sc1,strand,sc2,extra,x,y
     cdef list l,r
     cdef list GTFCOLS = ['chr','src','typ','st','ed','sc1','strand','sc2','extra']
     cdef list recs = []
