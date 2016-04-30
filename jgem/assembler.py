@@ -73,7 +73,7 @@ PARAMS = dict(
 
     findsecovth=True, # whether to use adaptive secovth (pndr2)
     minsecovth=2, #0.1,# minimum single exon coverage (normalized to million alignments)
-    secovth=10, #0.5, # default SE cov threshold if not using adaptive version (pndr1)
+    secovth=8, #0.5, # default SE cov threshold if not using adaptive version (pndr1)
     se_gap=170, #50,# single exon gap fill
     se_sizeth=50,# single exon size th
     se_sizeth2=200, # for SELECTSEME
@@ -124,26 +124,26 @@ MPARAMDIFF = dict(
     gap5=1,
     gap3=1,
 
-    findsecovth=False,
-    #minsecovth=0.03,
-    #secovth=0.05,
-    #se_binth=0.01,
+    # findsecovth=False, # 2016-04-30 turn it on
+    minsecovth=5,
+    # secovth=0.05,
+    # se_binth=0.01,
     se_gap=0,
-    #se_sizeth=10,
+    # se_sizeth=10,
 
     ed_covratio=0.05,
     ed_minth=0.05,
     ed_mimath=0.20,
     ed_mimath2=0.75,
     ed_sigma=5,
-    #ed_covth=0.001,
+    # ed_covth=0.001,
 
     iret_mpth=1, #0.9999,
     iret_covratio=0.1,
-    #iret_covth=1, #0.01,
+    # iret_covth=1, #0.01,
 
     find53ir_covratio=0.15,
-    #find53ir_covth=0.03,
+    # find53ir_covth=0.03,
 )
 MPARAMS = PARAMS.copy()
 MPARAMS.update(MPARAMDIFF)
@@ -247,6 +247,7 @@ class Assembler(object):
             # FIND53IR only deals with exons with length > SE sizeth = 50bp)
             # gap smaller than this will be missed if we skip FINDIRETS
             FINDIRETS(self)()
+            FINDSECOVTH(self)()
             FIND53IR(self)()
         else:
             FINDEDGES(self)()
@@ -2344,7 +2345,11 @@ class FINDSECOVTH(SUBASE):
 
     """
 
-    bins = N.arange(0.5,1.7,0.05)
+    bins = N.arange(0.4,1.8,0.05)
+    """ gamma values to search """
+
+    fitrange = (6,9)
+    """ x range to fit a line (fitmax,resmax)"""
     
     def call(self):
         ex = self.asm.me
@@ -2451,28 +2456,53 @@ class FINDSECOVTH(SUBASE):
     
     def _fit_hist(self, refcov, gamma, a1=None, ax=None, title='', nf=1.):
         # find best gamma for gen4
-        width = (9-N.log2(gamma))/100.
-        bins = N.arange(N.log2(gamma),9,width)
+        fma,xma = self.fitrange
+        fmi = N.log2(gamma)
+        nbins = float(max(min(100, len(refcov)/50), 50))
+        width = (xma-fmi)/nbins
+        bins = N.arange(fmi,xma,width)
         tot = float(len(refcov))
         v = N.log2(refcov+gamma)
         h,b = N.histogram(v, bins=bins)
         x = b[1:]
         y = N.log2(h+1) # logscale
-        st,ed = 0,60 # range of fit
+        # st,ed = 0,60 # range of fit
+        st = 0 
+        ed = int(nbins*(float(fma-fmi)/(xma-fmi)))
+        xf = x[0:ed]
+        yo = y[0:ed]
         if a1 is None:
             x3 = x[st:ed]
             y3 = y[st:ed]
             a1,a0 = N.polyfit(x3,y3,1)
         else:
-            st = 15 # throw away initial 14 points
-            x3 = x[st:ed]
-            y3 = y[st:ed]
-            a0 = N.mean(y3-a1*x3)
-        xf = x[0:ed]
-        yo = y[0:ed]
+            LOG.info('ed={0} x[ed]={1}'.format(ed, x[ed]))
+            # st = 15 # throw away initial 14 points
+            # x3 = x[st:ed]
+            # y3 = y[st:ed]
+            # a0 = N.mean(y3-a1*x3) # directly calculate intercept
+            # change st and calculate ave_res take a0 for min ave_res
+            use = int(nbins*0.4) if nbins < 50 else 20
+            sts = range(st,ed-use)
+            mres = []
+            a0s = []
+            for sttmp in sts:
+                x3 = x[sttmp:ed]
+                y3 = y[sttmp:ed]
+                a0tmp = N.mean(y3-a1*x3)
+                yftmp = a0tmp+a1*x3
+                a0s.append(a0tmp)
+                mres.append(N.mean((y3-yftmp)**2))
+            min_res = N.min(mres)
+            min_idx = mres.index(min_res)
+            a0 = a0s[min_idx]
+            min_st = sts[min_idx]
+            LOG.info('FINDSECOV: SE fit a0={0}, st={1}, x[st]={2}'.format(a0,min_st,x[min_st]))
+
         yf = a0+a1*xf
         res = N.sum((yo-yf)**2)
         
+        # [TODO] separate drawing and threshold calculation
         if ax is not None: # also calculate th99
             idx = slice(0,40)
             cp = N.sum(2**yf[idx]-gamma)   # condition positive
@@ -2508,7 +2538,7 @@ class FINDSECOVTH(SUBASE):
             ax.set_ylim([0,17])
             
             return res, th99
-        
+        # [TODO] return types are different (confusing) => separate into two methods
         return gamma,a1,a0,res
     
     def find_gamma_slope(self):
@@ -2608,7 +2638,7 @@ class FINDSECOVTH(SUBASE):
         self.secov = secov = secov/se_nf
         self.se_res,self.se_th99bn = self._fit_hist(secov, gamma, a1, ax=ax,title='SE candidates', nf=se_nf)
         self.se_th99 = se_nf*self.se_th99bn
-        fname = fn.fname('findsecovth.pdf', category='output')
+        fname = fn.fname('findsecovth.pdf', category='stats')
         try:
             fig.savefig(fname)
         except:
@@ -3747,6 +3777,8 @@ class EdgeDetector(object):
                 P.text(x1+1,ylim[1]*0.45,'{0:.4f}'.format(cov))
         return fig
 
-
-for klass in SUBASE.__subclasses__():
-    klass.__doc__ = klass.__doc__.format(**PARAMSDOC)
+try: # only Python3
+    for klass in SUBASE.__subclasses__():
+        klass.__doc__ = klass.__doc__.format(**PARAMSDOC)
+except:
+    pass
