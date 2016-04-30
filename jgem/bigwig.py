@@ -63,7 +63,7 @@ def cnt_bam(fpath):
     else:
         cmd = ['samtools', 'flagstat', fpath]
         out = subprocess.check_output(cmd)
-        open(cache,'w').write(out)
+        open(cache,'wb').write(out)
     firstline = out.split('\n')[0].split()
     return int(firstline[0])+int(firstline[2])
 
@@ -91,7 +91,7 @@ def bam2bw(fpath, chromsizes, bpath, aligned=None):
     # convert_to_wig
     tpath = bpath +'.wig'
     UT.makedirs(os.path.dirname(tpath))
-    tfobj = open(tpath,'w')
+    tfobj = open(tpath,'wb')
     cmd1 = ['genomeCoverageBed', '-split', '-bg', '-ibam', fpath, '-g', chromsizes, '-scale', str(scale)]
     p1 = subprocess.Popen(cmd1, stdout=tfobj)
     p1.wait()
@@ -250,9 +250,9 @@ def merge_bigwigs_mp(bwfiles, genome, dstpath, scale=None, np=7):
     LOG.debug('concatenating chromosomes...')
     wigpath = dstpath+'.wig'
     UT.makedirs(os.path.dirname(wigpath))
-    with open(wigpath, 'w') as dst:
+    with open(wigpath, 'wb') as dst:
         for c in chroms:
-            with open(dic[c],'r') as src:
+            with open(dic[c],'rb') as src:
                 shutil.copyfileobj(src, dst)
 
     LOG.debug('converting wiggle to bigwig')

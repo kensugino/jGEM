@@ -135,7 +135,7 @@ cpdef get_total_bp_bedfile_helper( bedpath):
         #reader = codecs.getreader("utf-8")
         #fp = reader( gfp )
     else:
-        fp = open(bedpath,'r')
+        fp = open(bedpath,'r') # don't need to be 'rb' ?
         #gfp = fp
     for line in fp:#.readlines():
         chrom,st,ed = line.split(b'\t')[:3]

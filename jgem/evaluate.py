@@ -124,6 +124,8 @@ class EvalNames(FN.FileNamesBase):
         return None
 
 WSDEFAULT = ['i',('5','5b'),('3','3b'),('s','sb'),'j']
+WSDEFAULT1 = ['i','5','3','s','j']
+WSDEFAULT2 = ['i','5','5b','3','3b','s','sb','j']
 
 class EvalMatch(object):
     """Compare two models against a genome coverage (bigwig) 
@@ -168,7 +170,7 @@ class EvalMatch(object):
         self.ratios = {} # holds dataframes of cov(x) and ratio(y)
         self.binsize = binsize
 
-    def calculate(self, np=1):
+    def calculate(self, np=1, saveintermediates=True):
         """Calculate necessary data.
 
         1. for en1 and en2 calculate ecov,gcov,jcnt (prep_sjex)
@@ -182,6 +184,9 @@ class EvalMatch(object):
         self.find_match()
         self.calc_stats()
         self.calc_completeness()
+        if not saveintermediates:
+            self.en1.delete(['temp'],['output','read'])
+            self.en2.delete(['temp'],['output','read'])
 
     def save(self):
         # [i,5,5b,3,3b,s,sb,j,glc,ecc,jcc]
@@ -650,7 +655,7 @@ class EvalMatch(object):
             fig.suptitle('{1}/{0}'.format(p1c,p2c))
         return axr
 
-    def plot_ratio(self,axr=None,plotxlabel=True,label='',disp='both'):
+    def plot_ratio(self,axr=None,plotxlabel=True,label='',disp='both', ylim=(0.01,1000)):
         """Plot length ratios of best matching exons """
         st = self.stats
         p1c = st['code1'] # gen4
@@ -673,6 +678,7 @@ class EvalMatch(object):
                 ax.plot(x,y,'.',ms=3, alpha=0.3)
             #ax.plot(maxx,avgy,'ro-',ms=3,alpha=0.3)
             ax.set_yscale('log')
+            ax.set_ylim(ylim)
             if disp!='png':
                 if i==0:
                     ax.set_ylabel('{1}_len/{0}_len+1'.format(p1c,p2c))

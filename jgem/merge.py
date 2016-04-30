@@ -550,8 +550,8 @@ class MergeAssemble(object):
         if not self.saveintermediates:
             self.fna.delete(delete=[],protect=['output'])
             # also delete outputs of mep, men assemblies
-            self.asms['mep'].fnobj.delete(['output'])
-            self.asms['men'].fnobj.delete(['output'])
+            self.asms['mep'].fnobj.delete(['output'],['stats'])
+            self.asms['men'].fnobj.delete(['output'],['stats'])
 
     def assemble_me1(self):
         """do assembly separately for each strand"""

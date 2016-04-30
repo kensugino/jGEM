@@ -82,7 +82,7 @@ def bam2bed(bampath, bedpath):
     cmd1 = ['bedtools','bamtobed','-i', bampath, '-split','-bed12']
     awkscript = 'BEGIN{OFS="\t";c=1;}{if(d[$4]){$4=d[$4];}else{d[$4]=c;$4=c;c++;} n=split($11,a,","); n=split($12,b,","); for(i=1;i<=n;i++){st=$2+b[i]; print $1,st,st+a[i],$4,$5,$6,NR}}'
     cmd2 = ['awk',awkscript]
-    with open(bedpath, 'w') as fp:
+    with open(bedpath, 'wb') as fp:
         p1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE)
         p2 = subprocess.Popen(cmd2, stdin=p1.stdout, stdout=fp)
         err = p2.communicate()[1]
@@ -100,7 +100,7 @@ def bam2bed12(bampath, bedpath):
     cmd1 = ['bedtools','bamtobed','-i', bampath, '-split', '-bed12']
     awkscript = 'BEGIN{OFS="\t";c=1;}{if(a[$4]){$4=a[$4];}else{a[$4]=c;$4=c;c++;}; $7=NR; print $0;}'
     cmd2 = ['awk',awkscript]
-    with open(bedpath, 'w') as fp:
+    with open(bedpath, 'wb') as fp:
         p1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE)
         p2 = subprocess.Popen(cmd2, stdin=p1.stdout, stdout=fp)
         err = p2.communicate()[1]
@@ -113,7 +113,7 @@ def bed2wig(bedpath, chromsizes, wigpath, scale=None):
         cmd1 = ['bedtools','genomecov','-bg', '-split', '-i', bedpath, '-g', chromsizes]
     else:
         cmd1 = ['bedtools','genomecov','-bg', '-split', '-i', bedpath, '-g', chromsizes, '-scale', str(scale)]
-    with open(wigpath,'w') as fp:
+    with open(wigpath,'wb') as fp:
         p1 = subprocess.Popen(cmd1, stdout=fp)
         err = p1.wait()
     return err
@@ -125,7 +125,7 @@ def bam2wig(bampath, chromsizes, wigpath, scale=None):
         cmd1 = ['bedtools', 'genomecov', '-split', '-bg', '-ibam', bampath, '-g', chromsizes]
     else:
         cmd1 = ['bedtools', 'genomecov', '-split', '-bg', '-ibam', bampath, '-g', chromsizes, '-scale', str(scale)]
-    with open(wigpath,'w') as fp:
+    with open(wigpath,'wb') as fp:
         p1 = subprocess.Popen(cmd1, stdout=fp)
         err = p1.wait()
     return err
@@ -194,7 +194,7 @@ def bed12_bed6(bed):
 def bed12ToBed6(bed12path, bed6path):
     """ uses bedtools bed12ToBed6 """
     cmd = ['bed12ToBed6', '-i', bed12path]
-    with open(bed6path, 'w') as fp:
+    with open(bed6path, 'wb') as fp:
         p1 = subprocess.Popen(cmd, stdout=fp)
         err = p1.wait()
     return err
@@ -307,11 +307,13 @@ def _runbedtools2(which, aname, cname, **kwargs):
             cmd += ['-'+k]
         else:
             cmd += ['-'+k, str(v)]
-    with open(cname, "w") as outfile:
+    with open(cname, "wb") as outfile:
         ret = subprocess.call(cmd, stdout=outfile)
     if ret!=0:
         msg = 'bederror return code:{0}, cmd:{1}'.format(ret, cmd)
-        # LOG.warning(msg)
+        LOG.warning(msg)
+        # delete output
+        os.unlink(cname)
         raise RuntimeError(msg)
     return UT.compress(cname)
 
@@ -322,11 +324,13 @@ def _runbedtools3(which, aname, bname, cname, **kwargs):
             cmd += ['-'+k]
         else:
             cmd += ['-'+k, str(v)]
-    with open(cname, "w") as outfile:
+    with open(cname, "wb") as outfile:
         ret = subprocess.call(cmd, stdout=outfile)
     if ret !=0:
         msg = 'bederror return code:{0}, cmd:{1}'.format(ret, cmd)
-        # LOG.warning(msg)
+        LOG.warning(msg)
+        # delete output
+        os.unlink(cname)
         raise RuntimeError(msg)
     return ret
 
@@ -338,11 +342,18 @@ def _bedtoolscatcherror(which, aname, bname, cname, **kwargs):
         
     if cname.endswith('.gz'):
         cname = cname[:-3]
-    ret = _runbedtools3(which,aname,bname,cname,**kwargs)
-    if ret !=0: # try uncompressed 
-        aname = UT.uncompresscopy(aname)
-        bname = UT.uncompresscopy(bname)
+    try:
         ret = _runbedtools3(which,aname,bname,cname,**kwargs)
+    except RuntimeError:
+        LOG.warning('bedtool error: repeating on uncompressed a:{0},b:{1},c:{2}'.format(aname,bname,cname))
+        print('bedtool error: repeating on uncompressed a:{0},b:{1},c:{2}'.format(aname,bname,cname))
+        aname2 = UT.uncompresscopy(aname)
+        bname2 = UT.uncompresscopy(bname)
+        ret = _runbedtools3(which,aname2,bname2,cname,**kwargs)
+        if aname2 != aname:
+            os.unlink(aname2)
+        if bname2 != bname:
+            os.unlink(bname2)
     return UT.compress(cname)
 
 def calc_ovlratio(aname, bname, tname, nacol, nbcol, idcol=['chr','st','ed']):

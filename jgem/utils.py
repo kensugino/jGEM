@@ -338,7 +338,7 @@ def uncompresscopy(fname):
         return fname2
     ext = '.'+fname[:-3].split('.')[-1]
     tmp = fname2+'.'+str(uuid.uuid4())+ext
-    with open(tmp,'w') as fobj:
+    with open(tmp,'wb') as fobj:
         ret = subprocess.call(['gunzip','-c', fname], stdout=fobj)
         if ret!=0:
             LOG.warning('Error uncompressing file {0}'.format(fname))
