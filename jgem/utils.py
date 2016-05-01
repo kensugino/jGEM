@@ -270,7 +270,7 @@ def check_int_nan(d, when=['chr','st','ed'], icols=['st','ed']):
         idx = idx |d[c].isnull()
     nannum = N.sum(idx)
     notint = any([d.dtypes[c] != int for c in icols])
-    if nanum>0 or notint:
+    if nannum>0 or notint:
         d = d[~idx].copy()
         if nannum>0:
             LOG.warning('{0} NaN in chr/st/ed, discarding'.format(N.sum(idx)))
