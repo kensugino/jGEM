@@ -166,7 +166,7 @@ class GTF2SJEX(object):
         # if 'cov' in gtf.iloc[0]['extra']:
         #     gtf['cov'] = GGB.get_gtf_attr_col(gtf, 'cov')
         # convert gtf to sjex
-        sj, ex = gtf2exonsj(gtf)
+        sj, ex = gtf2exonsj(gtf, np=np)
         # save
         UT.write_pandas(sj, sjpath, 'h')
         UT.write_pandas(ex, expath, 'h')
