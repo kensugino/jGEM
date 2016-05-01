@@ -34,12 +34,12 @@ def gtf2exonsj(gtf, np=1, graphpre=None):
         sj, ex: Pandas.DataFrames for splice junctions and exons
 
     """
-    exons = gtf[gtf['typ']=='exon'].copy()
-    if len(exons)==0: # edge case
+    if len(gtf)==0: # edge case
         cols = GGB.BEDCOLS[:6]+['locus','_id','cat']
         sj = UT.make_empty_df(cols)
         ex = UT.make_empty_df(cols)
         return sj,ex
+    exons = gtf[gtf['typ']=='exon'].copy()
     # find junctions
     def _igen():
         for k, g in exons.groupby('transcript_id'):
