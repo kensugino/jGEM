@@ -707,7 +707,7 @@ class EvalMatch(object):
         return axr
         
     def plot_completeness(self, axr=None, tgts=['glc','ecc','jcc'], pw='dft', disp='both', 
-                        title=None, xlim=[0,10], xlimjcc=[0,40], alpha=0.1, **kw):
+                        title=None, xlim=[0,15], alpha=0.1, **kw):
         st = self.stats
         p1c = st['code1'] # gen4
         p2c = st['code2']
@@ -721,11 +721,7 @@ class EvalMatch(object):
             d = self.ratios[w]
             x = d['x'].values
             y = d['y'].values
-            if w=='jcc':
-                xl = xlimjcc
-            else:
-                xl = xlim
-            self._plot(x,y,ax,pw=pw,scale=100, which=w,xlim=xl,**kw)
+            self._plot(x,y,ax,pw=pw,scale=100, which=w,xlim=xlim,**kw)
             if disp!='png':
                 if i==0:
                     ax.set_ylabel('% covered')
