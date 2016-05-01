@@ -2454,6 +2454,27 @@ class FINDSECOVTH(SUBASE):
         secov = CC.calc_cov_mp(bed=df, bwname=fn.bwfile, fname=fname, np=pr['np'])
         #os.unlink(cname)
     
+    def _calc_th99(self, yo,yf,gamma,i0=0,i1=40):
+        idx = slice(i0,i1)
+        cp = N.sum(2**yf[idx]-gamma)   # condition positive
+        cn = N.sum(2**yo[idx]-gamma)-cp # condition negative
+        if cn<0:
+            cn = 0
+        fn = N.cumsum(2**yf[idx]-gamma) # false negative (condition positive but < th)
+        tp = cp - fn # true positive (condition positive and >= th)
+        tn = N.cumsum(2**yo[idx]-gamma) - fn  # true negative
+        tn[tn<0]=0
+        fp = cn - tn
+        fp[fp<0]=0
+        tpr = tp/cp
+        fpr = fp/cn
+        fpr[N.isnan(fpr)]=0
+        tf = tpr-fpr
+        tmp = N.nonzero(fpr<=0.01)[0]
+        th99x = xf[N.min(tmp)]
+        th99 = 2**th99x - gamma
+        return th99x,th99
+
     def _fit_hist(self, refcov, gamma, a1=None, ax=None, title='', nf=1.):
         # find best gamma for gen4
         fma,xma = self.fitrange
@@ -2502,26 +2523,8 @@ class FINDSECOVTH(SUBASE):
         yf = a0+a1*xf
         res = N.sum((yo-yf)**2)
         
-        # [TODO] separate drawing and threshold calculation
         if ax is not None: # also calculate th99
-            idx = slice(0,40)
-            cp = N.sum(2**yf[idx]-gamma)   # condition positive
-            cn = N.sum(2**yo[idx]-gamma)-cp # condition negative
-            if cn<0:
-                cn = 0
-            fn = N.cumsum(2**yf[idx]-gamma) # false negative (condition positive but < th)
-            tp = cp - fn # true positive (condition positive and >= th)
-            tn = N.cumsum(2**yo[idx]-gamma) - fn  # true negative
-            tn[tn<0]=0
-            fp = cn - tn
-            fp[fp<0]=0
-            tpr = tp/cp
-            fpr = fp/cn
-            fpr[N.isnan(fpr)]=0
-            tf = tpr-fpr
-            tmp = N.nonzero(fpr<=0.01)[0]
-            th99x = xf[N.min(tmp)]
-            th99 = 2**th99x - gamma
+            th99x,th99 = self._calc_th99(yo,yf,gamma,0,40)
 
             ax.plot(x,y,'o',ms=3)
             ax.plot(x,a0+a1*x,'m-',lw=1)
@@ -2531,10 +2534,11 @@ class FINDSECOVTH(SUBASE):
             ax.set_title(title)
             ax.set_xlabel('log2(cov+gamma)')
             ax.set_ylabel('log2(count+1)')
-            ax.text(4,14,'res={:.1f}'.format(res))
-            ax.text(4,12,'slope={:.2f}'.format(a1))
-            ax.text(4,10,'ncovth={:.1f}'.format(th99))
-            ax.text(4,8,'covth={:.1f}'.format(th99*nf))
+            ax.text(4,15,'res={:.1f}'.format(res))
+            ax.text(4,13.5,'slope={:.2f}'.format(a1))
+            ax.text(4,12,'ncovth={:.1f}'.format(th99))
+            ax.text(4,10.5,'covth={:.1f}'.format(th99*nf))
+            ax.text(4,9,'nf={:.1f}'.format(tnf))
             ax.set_ylim([0,17])
             
             return res, th99
@@ -2584,6 +2588,11 @@ class FINDSECOVTH(SUBASE):
     def find_secovth(self):
         fn = self.fnobj
         pr = self.params
+
+        if pr['findsecovth_useref'] and fn.refgtf.exists():
+            useref = True
+        else:
+            useref = False
         
         # find gamma, slope from reference coverage histogram
         gamma, a1 = self.find_gamma_slope()
@@ -2604,16 +2613,14 @@ class FINDSECOVTH(SUBASE):
         ypos=ylim[0]+0.9*(ylim[1]-ylim[0])
         ax.text(1,ypos, 'min at {0:.2f}'.format(gamma))
         ax.set_xlabel('gamma')
-        ax.set_ylabel('gen4 cov residual')
+        ylabel = 'REF cov residual' if useref else 'sample ME cov residual'
+        ax.set_ylabel(ylabel)
         ax.set_title('finding gamma and slope')
         
         # panel2 refcov optimum
         ax = axr[0][1]
         refcov, ref_nf = self._get_refcov()
-        if pr['findsecovth_useref'] and fn.refgtf.exists():
-            title = 'ref ME & SE'
-        else:
-            title = 'sample ME'
+        title = 'ref ME & SE' if useref else 'sample ME'
         self.ref_res,self.ref_th99bn = self._fit_hist(refcov, gamma, a1, ax=ax, title=title, nf=ref_nf)
         
         # refcov SE
