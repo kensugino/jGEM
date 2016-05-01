@@ -315,12 +315,12 @@ class EvalMatch(object):
         ocols = cols + ['b_'+x for x in cols] + ['ovl']
         self.ov = ov = UT.read_pandas(c, names=ocols) # overlaps of exons
         
-        idxchr = ov['chr']==ov['b_chr'] 
-        idxstrand = ov['strand']==ov['b_strand']
+        idxchr = ov['chr']==ov['b_chr'] # str vs. str
+        idxstrand = ov['strand']==ov['b_strand'] # str vs. str
         idxp = (ov['strand']=='+')&idxstrand
         idxn = (ov['strand']=='-')&idxstrand
-        idxst = ov['st']==ov['b_st']
-        idxed = ov['ed']==ov['b_ed']
+        idxst = ov['st']==ov['b_st'] # b_st column mixed? type?
+        idxed = ov['ed']==ov['b_ed'] # b_ed column mixed? type?
         idxcat = ov['cat']==ov['b_cat']
         idxcov = ov[ecovname]>0 # exons with reads
         LOG.debug('='*10 + 'calculating match between {0} and {1}'.format(en1.code, en2.code))
@@ -378,7 +378,7 @@ class EvalMatch(object):
         jhitname = self.colname2('jhit', self.en2.code)
 
         def _findclosest(e, which):
-            e['dlen'] = N.abs(e['len']-e['b_len'].astype(int))
+            e['dlen'] = N.abs(e['len']-e['b_len'].astype(float))
             e['ratio'] = e['b_len'].astype(float)/e['len']
             e = e.sort_values(['_id','dlen'],ascending=True)
             f = e.groupby('_id',sort=False).first().reset_index()
