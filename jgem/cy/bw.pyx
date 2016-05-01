@@ -329,9 +329,13 @@ cpdef read_gtf_helper( gtfpath, list parseattrs,  comment='#'):
         fp = codecs.open(gtfpath,encoding='utf-8')
         gfp = fp
 
+    line = None
     for line in fp: # skip initial comments
         if len(line)>0 and line[0]!=comment:
             break
+
+    if line is None: # empty file
+        return [], cols0
     # process the first line
     r = line.strip().split(u'\t')
     if len(r)==9:
