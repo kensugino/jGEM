@@ -279,6 +279,15 @@ def read_bed(fpath):
     #     d['min.exon.size'] = d['esizes'].apply(lambda x: N.min(list(map(int, x[:-1].split(',')))))
     #     d['max.exon.size'] = d['esizes'].apply(lambda x: N.max(list(map(int, x[:-1].split(',')))))
     #     d['length'] = d['ed']-d['st']
+    # make sure st,ed are integers
+    # discard entries with NaN in (chr,st,ed)
+
+    idx = (d['chr'].isnull())|(d['st'].isnull())|(d['ed'].isnull())
+    if N.sum(idx)>0:
+        LOG.warning('{1} NaN in chr/st/ed in file {0}, discarding'.format(fpath, N.sum(idx)))
+        d = d[~idx].copy()
+    d['st'] = d['st'].astype(int)
+    d['ed'] = d['ed'].astype(int)
     return d
 
 def write_gff(df, fname, compress=True):

@@ -355,8 +355,10 @@ class MEGraph4(MEGraph3):
         c = filepre+'ov.txt.gz'
         # calculate exon overlap to self 
         cols0 = ['chr','st','ed','strand','_id']
-        a = UT.save_tsv_nidx_nhead(me[cols0], a)
-        b = UT.save_tsv_nidx_nhead(me[cols0], b)
+        # single cell data contains float in st,ed in ex ??? 
+        me = UT.check_int_nan(me)
+        a = UT.write_pandas(me[cols0], a, '')
+        b = UT.write_pandas(me[cols0], b, '')
         c = BT.bedtoolintersect(a,b,c,wao=True)
         cols1 = cols0+['b_'+x for x in cols0]+['ovl']
         self.ov = ov = UT.read_pandas(c, names=cols1)

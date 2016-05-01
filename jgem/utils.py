@@ -253,6 +253,27 @@ def save_tsv(df, path, gzip=True, **kwargs):
         return compress(path)
     return path
 
+def check_integer(df, cols):
+    if any([df.dtypes.get(x,int)!=int for x in cols]):
+        LOG.warning('col not integer: copy and converting')
+        df = df.copy()
+        for x in cols:
+            df[x] = df[x].astype(int)
+    return df
+
+def check_int_nan(d):
+    idx = (d['chr'].isnull())|(d['st'].isnull())|(d['ed'].isnull())
+    if (N.sum(idx)>0) or (d.dtypes['st'] != int) or (d.dtypes['ed'] != int):
+        d = d[~idx].copy()
+        if N.sum(idx)>0:
+            LOG.warning('{1} NaN in chr/st/ed in file {0}, discarding'.format(fpath, N.sum(idx)))
+        else:
+            LOG.warning('st,ed not integer in file {0}'.format(fpath)
+        d['st'] = d['st'].astype(int)
+        d['ed'] = d['ed'].astype(int)
+    return d
+
+
 def write_pandas(df, path, fm='h', **kwargs):
     """Write gzip compressed tab separated file.
 
