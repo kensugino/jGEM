@@ -72,8 +72,8 @@ PARAMS = dict(
 
 
     findsecovth=True, # whether to use adaptive secovth (pndr2)
-    minsecovth=2, #0.1,# minimum single exon coverage (normalized to million alignments)
-    secovth=8, #0.5, # default SE cov threshold if not using adaptive version (pndr1)
+    minsecovth=5, #0.1,# minimum single exon coverage (normalized to million alignments)
+    secovth=10, #0.5, # default SE cov threshold if not using adaptive version (pndr1)
     se_gap=170, #50,# single exon gap fill
     se_sizeth=50,# single exon size th
     se_sizeth2=200, # for SELECTSEME
@@ -2454,7 +2454,7 @@ class FINDSECOVTH(SUBASE):
         secov = CC.calc_cov_mp(bed=df, bwname=fn.bwfile, fname=fname, np=pr['np'])
         #os.unlink(cname)
     
-    def _calc_th99(self, yo,yf,gamma,i0=0,i1=40):
+    def _calc_th99(self, xf,yo,yf,gamma,i0=0,i1=40):
         idx = slice(i0,i1)
         cp = N.sum(2**yf[idx]-gamma)   # condition positive
         cn = N.sum(2**yo[idx]-gamma)-cp # condition negative
@@ -2524,7 +2524,7 @@ class FINDSECOVTH(SUBASE):
         res = N.sum((yo-yf)**2)
         
         if ax is not None: # also calculate th99
-            th99x,th99 = self._calc_th99(yo,yf,gamma,0,40)
+            th99x,th99 = self._calc_th99(xf,yo,yf,gamma,0,40)
 
             ax.plot(x,y,'o',ms=3)
             ax.plot(x,a0+a1*x,'m-',lw=1)
