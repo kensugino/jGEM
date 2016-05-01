@@ -14,6 +14,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
 import shutil
+import json
 
 import pandas as PD
 import numpy as N
@@ -187,12 +188,21 @@ class MergeInputs(object):
         self.chroms = UT.chroms(genome)
         self.tgts =  ['mep','men','se'] #'sep','sen']
 
+
+    def save_params(self):
+        """ Saves merge parameters with filename outdir/mergecode.params.json """
+        fname1 = self.fnobj.fname('params.json',category='output')
+        UT.makedirs(os.path.dirname(fname1))
+        with open(fname1,'w') as fp:
+            json.dump(self.params, fp)
+
     def prepare(self):
         """ Prepare merged bigwig coverage files, merged junction files and aggregated bigwig file (average cov)."""
         self.make_ex_bigwigs()
         self.make_sj_bed()
         self.aggregate_bigwigs()
         fn.delete(delete=['temp'],protect=['output'])
+        self.save_params()
 
     def make_ex_bigwigs(self):
         """Make 5 bigwig files from assembly exon outputs by treating each exon as reads weighted by coverage. """
