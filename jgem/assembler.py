@@ -1735,7 +1735,17 @@ class FINDIRETS(SUBASE):
         cname = fn.bedname('findirets.sj.sub')
         if override or (not os.path.exists(cname)):
             cname = BT.bedtoolsubtract(sjname, mefile, cname)
-        sub = GGB.read_bed(cname) 
+        try:
+            sub = GGB.read_bed(cname)  # for sparse data like single cell this may be empty
+        except:
+            self.irets = irets = []
+            LOG.info('#irets candidates:{0}'.format(len(irets)))
+            st['FINDIRETS.#irets_sj'] = len(irets)
+            cols = GGB.BEDCOLS[:6] # ['chr','st','ed','name','sc1','strand']
+            LOG.warning('******************** NO IRET FOUND!***********************')
+            return PD.DataFrame(N.zeros((0,len(cols))),columns=cols) # return empty dataframe
+
+
         # bed: idcol=name, moreover 
         # sj is reduced (some sj completely overlap with exon)
         sj2 = sj2.set_index('_id').ix[sub['name'].values].reset_index()
