@@ -181,6 +181,10 @@ class EvalMatch(object):
         # calc exon, junction, gene coverage
         self.prep_sjex(self.en1, np)
         self.prep_sjex(self.en2, np)
+        # register for deleting later, keep ref calc
+        self.en2.fname2('',self.datacode+'.covci.txt.gz')
+        self.en2.fname2('',self.datacode+'.ecov.txt.gz')
+        self.en2.fname2('',self.datacode+'.gcov.txt.gz')
         self.find_match()
         self.calc_stats()
         self.calc_completeness()
