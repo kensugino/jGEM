@@ -501,7 +501,15 @@ class REMOVEJIE(SUBASE):
         # covarage file
         binfile = self.bw2bed(pr['jie_binth'])
         # if nothing in binfile then skip
-        jiebw = GGB.read_bed(binfile)
+        try:
+            jiebw = GGB.read_bed(binfile)
+        except:
+            self.asm.jie = None
+            self.info = 'nothing above jie_binth {0}'.format(pr['jie_binth'])
+            self.stats['REMOVEJIE.#sj'] = len(sj)
+            self.stats['REMOVEJIE.#jie'] = 0
+            return            
+
         if len(jiebw)==0:
             self.asm.jie = None
             self.info = 'nothing above jie_binth {0}'.format(pr['jie_binth'])
