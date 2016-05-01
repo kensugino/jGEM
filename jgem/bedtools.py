@@ -315,7 +315,7 @@ def _runbedtools2(which, aname, cname, **kwargs):
         # delete output
         os.unlink(cname)
         raise RuntimeError(msg)
-    return UT.compress(cname)
+    return ret
 
 def _runbedtools3(which, aname, bname, cname, **kwargs):
     cmd = ['bedtools',which,'-a',aname,'-b',bname]
