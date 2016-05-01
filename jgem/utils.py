@@ -263,7 +263,7 @@ def check_integer(df, cols):
     return df
 
 def check_int_nan(d, when=['chr','st','ed'], icols=['st','ed']):
-    if not all([x in d.columns for x in cols]):
+    if not all([x in d.columns for x in when]):
         return d # only check when there are all of these
     idx = d[when[0]].isnull()
     for c in when[1:]:
