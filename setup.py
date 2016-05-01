@@ -16,11 +16,10 @@ with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
 
 
 # Use build_ext from Cython if found
-# Use build_ext from Cython
-# command_classes = {}
+command_classes = {}
 try:
     # import Cython.Distutils
-    # command_classes['build_ext'] = Cython.Distutils.build_ext
+    command_classes['build_ext'] = Cython.Distutils.build_ext
     from Cython.Build import cythonize
     have_cython = True
 except:
@@ -138,7 +137,7 @@ setup(
         #],
     },
     ext_modules = get_extension_modules(),
-    #cmdclass=command_classes,
+    cmdclass=command_classes,
 )
 
 

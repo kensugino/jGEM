@@ -218,14 +218,14 @@ cpdef get_total_bp_bedfile_helper_check_uniq( bedpath):
 cpdef list flatten_bed8(ADTYPE_t bed8):
     cdef list rslt, x1
     cdef int i
-    cdef unicode siz,sta,y,z
+    cdef str siz,sta,y,z
     cdef Py_ssize_t n = len(bed8)
     rslt = []
     for i in range(n):
         x = bed8[i]
-        siz = unicode(x[6])
-        sta = unicode(x[7])
-        if siz[len(siz)-1]==u',':
+        siz = str(x[6])
+        sta = str(x[7])
+        if siz[len(siz)-1]==',':
             siz = siz[:len(siz)-1]
             sta = sta[:len(siz)-1]
         for y,z in zip(siz.split(','),sta.split(',')):
