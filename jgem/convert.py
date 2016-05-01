@@ -10,7 +10,7 @@ import os
 import logging
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
-
+import uuid
 
 import pandas as PD
 
@@ -62,7 +62,8 @@ def gtf2exonsj(gtf, np=1):
     UT.set_exon_category(sj, ex)
 
     # find genes (connected components) set '_gidx'
-    prefix = os.path.abspath('./graphpre-')
+    tmp = './'+str(uuid.uuid4())+'_'
+    prefix = os.path.abspath(tmp) # need unique prefix for parallel processing
     genes = GP.find_genes4(sj,ex,
         filepre=prefix,
         np=np,
