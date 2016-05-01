@@ -139,7 +139,7 @@ cdef class BigWigFile( BBIFile ):
         return v.sd
         
     #cpdef get( self, char * chrom, bits32 start, bits32 end ):
-    cpdef get( self, str chrom, bits32 start, bits32 end ):
+    cpdef get( self, unicode chrom, bits32 start, bits32 end ):
         """
         Gets all data points over the regions `chrom`:`start`-`end`.
         """
@@ -154,7 +154,7 @@ cdef class BigWigFile( BBIFile ):
         return v.intervals
 
     #cpdef get_as_array( self, char * chrom, bits32 start, bits32 end ):
-    cpdef get_as_array( self, str chrom, bits32 start, bits32 end ):
+    cpdef get_as_array( self, unicode chrom, bits32 start, bits32 end ):
         """
         Gets all data points over the regions `chrom`:`start`-`end`.
         """
