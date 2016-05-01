@@ -2534,11 +2534,11 @@ class FINDSECOVTH(SUBASE):
             ax.set_title(title)
             ax.set_xlabel('log2(cov+gamma)')
             ax.set_ylabel('log2(count+1)')
-            ax.text(4,15,'res={:.1f}'.format(res))
-            ax.text(4,13.5,'slope={:.2f}'.format(a1))
-            ax.text(4,12,'ncovth={:.1f}'.format(th99))
-            ax.text(4,10.5,'covth={:.1f}'.format(th99*nf))
-            ax.text(4,9,'nf={:.1f}'.format(tnf))
+            ax.text(4,14.5,'res={:.1f}'.format(res))
+            ax.text(4,13.,'slope={:.2f}'.format(a1))
+            ax.text(4,11.5,'ncovth={:.1f}'.format(th99))
+            ax.text(4,10.,'covth={:.1f}'.format(th99*nf))
+            ax.text(4,8.5,'nf={:.1f}'.format(nf))
             ax.set_ylim([0,17])
             
             return res, th99
