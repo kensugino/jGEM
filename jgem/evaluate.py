@@ -242,6 +242,11 @@ class EvalMatch(object):
             idx = sj['a_id'].isin(aids) & sj['d_id'].isin(dids)
             sj = sj[idx].copy()
             en.sj = sj 
+        if '_id' not in ex.columns: # edge case (len(sj)==0)
+            ex['_id'] = N.arange(len(ex))
+        if '_gidx' not in ex.columns: # edge case (len(sj)==0)
+            ex['_gidx'] = N.arange(len(ex))
+            
         # length
         if 'len' not in sj.columns:
             sj['len'] = sj['ed'] - sj['st']
