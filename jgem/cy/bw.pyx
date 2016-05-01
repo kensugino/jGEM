@@ -326,7 +326,7 @@ cpdef read_gtf_helper( gtfpath, list parseattrs,  comment='#'):
         reader = codecs.getreader("utf-8")
         fp = reader( gfp )
     else:
-        fp = open(gtfpath,'r')
+        fp = codecs.open(gtfpath,encoding='utf-8')
         gfp = fp
 
     for line in fp: # skip initial comments
