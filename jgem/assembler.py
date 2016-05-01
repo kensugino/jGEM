@@ -1907,6 +1907,17 @@ class FINDSE(SUBASE):
             LOG.debug(' reading cached SE {0}...'.format(fname))
             se0 = GGB.read_bed(fname)
 
+        if len(se0)==0:
+            #return ae, se, me2
+            fn.write_bed(me, 'assemble.exons0', ncols=6)
+            UT.set_ids(me)
+            LOG.info('write exons ...=> assemble.exons0.txt.gz')
+            fn.write_txt(me, 'assemble.exons0', fm='h')
+            self.asm.ae = me
+            self.asm.se = se0
+            self.asm.me = me
+            return
+
         UT.set_ptyp(se0)
         idx = se0['ptyp']=='s'
         seme = se0[~idx] # 3' or 5' exons
