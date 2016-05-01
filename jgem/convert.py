@@ -63,6 +63,10 @@ def gtf2exonsj(gtf, np=1, graphpre=None):
     ex['name'] = ex['gene_id']
     ex['st'] = ex['st'] - 1
 
+    if len(sj)==0:
+        ex['_gidx'] = N.arange(len(ex))
+        return sj, ex
+
     UT.set_info(sj,ex)
     UT.set_exon_category(sj, ex)
 
