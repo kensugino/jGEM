@@ -13,6 +13,7 @@ LOG = logging.getLogger(__name__)
 import uuid
 
 import pandas as PD
+import numpy as N
 
 from jgem import utils as UT
 from jgem import gtfgffbed as GGB
