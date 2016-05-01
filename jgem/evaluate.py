@@ -530,6 +530,10 @@ class EvalMatch(object):
         # JCC
         s1 = self.s1
         jcc = s1.groupby('_gidx').size().to_frame('jc')
+        if '_gidx' not in self.s2: # adapt to old version where sj.txt.gz did not contain _gidx
+            a2g = UT.df2dict(self.e2, 'a_id','_gidx')
+            d2g = UT.df2dict(self.e2, 'd_id','_gidx')
+            self.s2['_gidx'] = [a2g.get(x,d2g.get(y,0)) for x,y in sj[['a_id','d_id']].values]
         l2g2 = UT.df2dict(self.s2, 'locus', '_gidx')
         s1['b__gidx'] = [l2g2.get(x,'.') for x in s1['locus'].values]
         s1o = s1[s1['b__gidx']!='.'] # overlapping
