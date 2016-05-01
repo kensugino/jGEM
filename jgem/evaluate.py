@@ -236,11 +236,12 @@ class EvalMatch(object):
         savesj = False
         saveex = False
         # check support
-        dids = set(ex['d_id'].values)
-        aids = set(ex['a_id'].values)
-        idx = sj['a_id'].isin(aids) & sj['d_id'].isin(dids)
-        sj = sj[idx].copy()
-        en.sj = sj 
+        if len(sj)>0:
+            dids = set(ex['d_id'].values)
+            aids = set(ex['a_id'].values)
+            idx = sj['a_id'].isin(aids) & sj['d_id'].isin(dids)
+            sj = sj[idx].copy()
+            en.sj = sj 
         # length
         if 'len' not in sj.columns:
             sj['len'] = sj['ed'] - sj['st']
