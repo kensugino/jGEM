@@ -298,7 +298,7 @@ class EvalMatch(object):
         en1 = self.en1
         en2 = self.en2
         # write internal,3,5,se exons separately for finding match
-        a = en1.fname('emtmp.ex.bed.gz')
+        a = en1.fname2('emtmp.ex.bed.gz', en2.code) # need to be unique to avoid parallel conflict (en1 ref shared)
         b = en2.fname('emtmp.ex.bed.gz')
         c = en1.fname2('emtmp.ex.ovl.txt.gz', en2.code)
         self.e1 = e1 = en1.model('ex')
