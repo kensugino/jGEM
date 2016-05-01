@@ -2377,7 +2377,7 @@ class FINDSECOVTH(SUBASE):
         # gamma, a1
         # residue, th99 for (ref, me, se)
         attrs = ['gamma','a1','ref_res','ref_th99bn','me_res','me_th99bn','se_res',
-                'ref_nf','me_nf','se_nf','se_th99']
+                'ref_nf','me_nf','se_nf','se_th99bn','se_th99']
         pr = dict([(x, getattr(self, x)) for x in attrs])
         for a in attrs:
             st['FINDSECOVTH.'+a] = pr[a]
@@ -2556,18 +2556,30 @@ class FINDSECOVTH(SUBASE):
         pr = self.params
         fn = self.fnobj
         if pr['findsecovth_useref'] and fn.refgtf.exists():
-            refcov = self.rex['cov'].values
+            cdf = self.rex
         else: # use ME cov
             ex = self.ex
             if 'cat' not in ex.columns:
                 sj = self.asm.sj
                 UT.set_exon_category(sj,ex)
-            refcov = ex[ex['cat']!='s']['cov'].values
-        refcov = refcov[refcov>0] # only use expressed 
+            if 'len' not in ex.columns:
+                ex['len'] = ex['ed']-ex['st']
+            cdf = ex[ex['cat']!='s']
+        cdf = cdf[cdf>0] # only use expressed 
         # normalize 1e4 factor is to match to 100bp readlen normalized to 1M reads
-        self.ref_nf = ref_nf = N.sum(refcov)/1e4
-        self.refcov = refcov = refcov/ref_nf
+        self.ref_nf = ref_nf = self.calc_normfactor(cdf) # N.sum(refcov)/1e4
+        self.refcov = refcov = cdf['cov'].values/ref_nf
         return refcov, ref_nf
+
+    def calc_normfactor(self, cdf):
+        # cdf['cov', and 'len',or 'st','ed']
+        # calculate total bp = sum(cov*len) ~ aligned*100
+        # so normalizing to aligned/1M ~ sum(cov*len)/1e8
+        if not 'len' in cdf.columns:
+            cdf = cdf[['cov','st','ed']].copy()
+            cdf['len'] = cdf['ed']-cdf['st']
+        totbp = (cdf['cov']*cdf['len']).sum()
+        return totbp/1e8
 
     def find_secovth(self):
         fn = self.fnobj
@@ -2622,20 +2634,24 @@ class FINDSECOVTH(SUBASE):
         if 'cat' not in ex.columns:
             sj = self.asm.sj
             UT.set_exon_category(sj,ex)
+        if 'len' not in ex.columns:
+            ex['len'] = ex['ed']-ex['st']
         me = ex[ex['cat']!='s']
-        me = me[me['cov']>0]['cov'].values
+        me = me[me['cov']>0]
         # normalize
-        self.me_nf = me_nf = N.sum(me)/1e4
-        self.me = me = me/me_nf
-        self.me_res,self.me_th99bn = self._fit_hist(me, gamma, a1, ax=ax,title='ME', nf=me_nf)
+        self.me_nf = me_nf = self.calc_normfactor(me) # N.sum(me)/1e4
+        self.mecov = mecov = me['cov'].values/me_nf
+        self.me_res,self.me_th99bn = self._fit_hist(mecov, gamma, a1, ax=ax,title='ME', nf=me_nf)
         
         # panel4 seall
         ax = axr[1][1]
-        secov = fn.read_txt('se.cov.all')
-        secov = secov[secov['cov']>0]['cov'].values
+        se = fn.read_txt('se.cov.all')
+        if 'len' not in se.columns:
+            se['len'] = se['ed']-se['st']
+        se = se[se['cov']>0]
         # normalize
-        self.se_nf = se_nf = N.sum(secov)/1e4
-        self.secov = secov = secov/se_nf
+        self.se_nf = se_nf = self.calc_normfactor(se) #N.sum(secov)/1e4
+        self.secov = secov = se['cov'].values/se_nf
         self.se_res,self.se_th99bn = self._fit_hist(secov, gamma, a1, ax=ax,title='SE candidates', nf=se_nf)
         self.se_th99 = se_nf*self.se_th99bn
         fname = fn.fname('findsecovth.pdf', category='stats')
