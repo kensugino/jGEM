@@ -248,6 +248,7 @@ def save_tsv(df, path, gzip=True, **kwargs):
     if path[-3:]=='.gz':
         path = path[:-3]
     makedirs(os.path.dirname(path))
+    df = check_int_nan(df, ['chr','st','ed'], ['st','ed'])
     df.to_csv(path, sep='\t', quoting=csv.QUOTE_NONE, **kwargs)
     if gzip:
         return compress(path)
@@ -261,13 +262,19 @@ def check_integer(df, cols):
             df[x] = df[x].astype(int)
     return df
 
-def check_int_nan(d):
-    idx = (d['chr'].isnull())|(d['st'].isnull())|(d['ed'].isnull())
-    if (N.sum(idx)>0) or (d.dtypes['st'] != int) or (d.dtypes['ed'] != int):
+def check_int_nan(d, when=['chr','st','ed'], icols=['st','ed']):
+    if not all([x in d.columns for x in cols]):
+        return d # only check when there are all of these
+    idx = d[when[0]].isnull()
+    for c in when[1:]:
+        idx = idx |d[c].isnull()
+    nannum = N.sum(idx)
+    notint = any([d.dtypes[c] != int for c in icols])
+    if nanum>0 or notint:
         d = d[~idx].copy()
-        if N.sum(idx)>0:
+        if nannum>0:
             LOG.warning('{0} NaN in chr/st/ed, discarding'.format(N.sum(idx)))
-        else:
+        if notint:
             LOG.warning('st,ed not integer')
         d['st'] = d['st'].astype(int)
         d['ed'] = d['ed'].astype(int)
