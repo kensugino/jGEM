@@ -266,9 +266,9 @@ def check_int_nan(d):
     if (N.sum(idx)>0) or (d.dtypes['st'] != int) or (d.dtypes['ed'] != int):
         d = d[~idx].copy()
         if N.sum(idx)>0:
-            LOG.warning('{1} NaN in chr/st/ed in file {0}, discarding'.format(fpath, N.sum(idx)))
+            LOG.warning('{0} NaN in chr/st/ed, discarding'.format(N.sum(idx)))
         else:
-            LOG.warning('st,ed not integer in file {0}'.format(fpath))
+            LOG.warning('st,ed not integer')
         d['st'] = d['st'].astype(int)
         d['ed'] = d['ed'].astype(int)
     return d
