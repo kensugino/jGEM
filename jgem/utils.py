@@ -332,6 +332,9 @@ def read_pandas(path,**kwargs):
             return PD.read_table(path+'.gz', compression='gzip', **kwargs)
     raise RuntimeError('file {0} do not exists'.format(path))
 
+def make_empty_df(colnames):
+    """ make an empty Pandas dataframe with colnames """
+    return PD.DataFrame(N.zeros((0,len(cols))),columns=colnames) 
 
 #### GZIP ###############################################################
 def compress(fname):

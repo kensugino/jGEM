@@ -161,6 +161,8 @@ def read_gtf(gtfname, onlytypes=[], parseattrs=DEFAULT_GTF_PARSE, rename={}):
 
     """
     recs,cols = cybw.read_gtf_helper(gtfname, parseattrs, '#')
+    if len(recs)==0 or len(recs[0])!=len(cols):
+        return UT.make_empty_df(cols)
     df = PD.DataFrame(recs, columns=cols)
     df['st'] = df['st'].astype(int)
     df['ed'] = df['ed'].astype(int)
