@@ -461,13 +461,14 @@ class EvalMatch(object):
             except:
                 xth = N.NaN
             auc4,maxx4,avgy4,x4,y4 = self._calc_binned(x2,y4,self.binsize)
-
+            p1 = float(hit)/pop if pop>0 else 0.
+            p2 = float(hit)/pop2 if pop2>0 else 0.
             self.ratios[which] = PD.DataFrame({'x':x, 'y':y, 'name':ns})
             self.stats[which] = {'detected1':pop, # int
                                  'matched':hit, # int
                                  'detected2':pop2, # int 
-                                 'p1':float(hit)/pop, # float
-                                 'p2':float(hit)/pop2, # float
+                                 'p1':p1, # float
+                                 'p2':p2, # float
                                  'auc':auc4, # float
                                  'maxx':list(maxx4), # list
                                  'avgy':list(avgy4), # list
