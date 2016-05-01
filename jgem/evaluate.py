@@ -546,7 +546,7 @@ class EvalMatch(object):
         g2jc2 = UT.series2dict(jc2)
         jcc['b_jc'] = [g2jc2.get(x,0) for x in jcc.index]
         jcc['y'] = jcc['b_jc']/jcc['jc']
-        jcc['x'] = [g2gcov[x] for x in jcc.index]
+        jcc['x'] = N.log2(N.array([g2gcov[x] for x in jcc.index])+1.)
         self.ratios['jcc'] = jcc[['x','y']]
         x,y = jcc['x'].values,jcc['y'].values
         x2,y2,xth = UT.fit_sigmoid(x,y,xlim,0.99)
