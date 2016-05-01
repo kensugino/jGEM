@@ -205,6 +205,10 @@ class EvalMatch(object):
             v['kind'] = k
         df = PD.concat(self.ratios.values(), ignore_index=True)
         UT.write_pandas(df, fname2, 'h')
+        # DP
+        dp = self.get_detection_percentages()
+        fname3 = self.en2.fname2('dp.txt.gz', self.en1.code,category='output')
+        UT.write_pandas(dp, fname3, 'ih')
 
     def load(self):
         fname1 = self.en2.fname2('stats.json',self.en1.code,category='output')
@@ -729,7 +733,6 @@ class EvalMatch(object):
                 title = '{1}/{0}'.format(p1c,p2c)
             fig.suptitle(title)
         return axr
-
 
 
 
