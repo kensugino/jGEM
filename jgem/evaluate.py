@@ -179,8 +179,8 @@ class EvalMatch(object):
 
         """
         # calc exon, junction, gene coverage
-        self.prep_sjex(self.en1, np)
-        self.prep_sjex(self.en2, np)
+        self.prep_sjex(self.en1, np, False)
+        self.prep_sjex(self.en2, np, False)
         # register for deleting later, keep ref calc
         self.en2.fname2('covci.txt.gz',self.datacode)
         self.en2.fname2('ecov.txt.gz',self.datacode)
@@ -229,7 +229,7 @@ class EvalMatch(object):
     def colname2(self, x, code):
         return '{0}_{1}_{2}'.format(x, self.datacode, code)
 
-    def prep_sjex(self, en, np=1):
+    def prep_sjex(self, en, np=1, savesjex=False):
         """ Assign ecov, gcov, jcnt """
         sj = en.model('sj')
         ex = en.model('ex')
@@ -293,9 +293,9 @@ class EvalMatch(object):
             sj[mcntname] = [l2m.get(x,0) for x in sj['locus']]
             sj[jcntname] = [x or y for x,y in sj[[ucntname,mcntname]].values]
             savesj = True
-        if saveex:
+        if saveex and savesjex:
             en.savemodel('ex',self.datacode)
-        if savesj:
+        if savesj and savesjex:
             en.savemodel('sj',self.datacode)
 
     def find_match(self):
