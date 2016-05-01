@@ -550,7 +550,7 @@ class EvalMatch(object):
                              'xth':xth}
 
     def _plot(self, x, y, ax, ca='go-', cf='r.-', cd='b.',pw='dfat',
-        binsize=25,xlim=(0,7),yth=0.99,scale=100,label='', which=None):
+        binsize=25,xlim=(0,7),yth=0.99,scale=100,label='', alpha=0.1, which=None):
         """Plot dots or sigmoid fit or binned average.
 
         Args:
@@ -570,7 +570,7 @@ class EvalMatch(object):
         if 'f' in pw or ('t' in pw and which is None):
             x2,y2,xth = UT.fit_sigmoid(x,y,xlim,yth)
         if 'd' in pw: # dot
-            ax.plot(x,scale*y,'b.', alpha=0.3, label=label)
+            ax.plot(x,scale*y,'b.', alpha=alpha, label=label)
         if 'f' in pw: # fit
             ax.plot(x2,scale*y2,cf, label=label)
         if 'a' in pw: # avg
@@ -659,7 +659,7 @@ class EvalMatch(object):
             fig.suptitle('{1}/{0}'.format(p1c,p2c))
         return axr
 
-    def plot_ratio(self,axr=None,plotxlabel=True,label='',disp='both', ylim=(0.01,1000)):
+    def plot_ratio(self,axr=None,plotxlabel=True,label='',disp='both', ylim=(0.01,1000), alpha=0.1):
         """Plot length ratios of best matching exons """
         st = self.stats
         p1c = st['code1'] # gen4
@@ -679,7 +679,7 @@ class EvalMatch(object):
             x = xy['x'].values
             y = xy['y'].values
             if disp!='pdf':
-                ax.plot(x,y,'.',ms=3, alpha=0.3)
+                ax.plot(x,y,'.',ms=3, alpha=alpha)
             #ax.plot(maxx,avgy,'ro-',ms=3,alpha=0.3)
             ax.set_yscale('log')
             ax.set_ylim(ylim)
@@ -699,7 +699,7 @@ class EvalMatch(object):
         return axr
         
     def plot_completeness(self, axr=None, tgts=['glc','ecc','jcc'], pw='dft', disp='both', 
-                        title=None, xlim=[0,10], xlimjcc=[0,40], **kw):
+                        title=None, xlim=[0,10], xlimjcc=[0,40], alpha=0.1, **kw):
         st = self.stats
         p1c = st['code1'] # gen4
         p2c = st['code2']
