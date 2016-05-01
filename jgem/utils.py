@@ -607,7 +607,8 @@ def chromdf(genome):
 
 def chroms(genome):
     "returns chromosome names"
-    df = read_pandas(chromsizes(genome), names=['chr','size'])
+    path = os.path.join(os.path.dirname(__file__), 'data', '{0}.chromosomes'.format(genome))
+    df = read_pandas(path,names=['chr'])
     return list(df['chr'])
 
 

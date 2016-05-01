@@ -94,3 +94,6 @@ def test_chromsizes():
 	assert UT.chroms('dm3') == ['chr2L','chr2LHet','chr2R','chr2RHet','chr3L','chr3LHet',
 								'chr3R','chr3RHet','chr4','chrX','chrXHet','chrYHet',
 								'chrU','chrUextra']
+	assert os.path.exists(UT.chromsizes('mm10'))
+	assert os.path.exists(UT.chromsizes('dm3'))
+	assert os.path.exists(UT.chromsizes('hg19'))
