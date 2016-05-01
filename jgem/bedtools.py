@@ -292,7 +292,7 @@ def bedtoolintersect(aname, bname, cname, **kwargs):
     return _bedtoolscatcherror('intersect', aname, bname, cname, **kwargs)
 
 def bedtoolmerge(aname, cname, **kwargs):
-    return _runbedtools2('merge',aname, cname, **kwargs)
+    return _bedtoolscatcherror2('merge',aname, cname, **kwargs)
 
 def bedtoolcomplement(aname, cname, chromsizes):
     return _runbedtools2('complement',aname,cname,g=chromsizes)
@@ -346,7 +346,6 @@ def _bedtoolscatcherror(which, aname, bname, cname, **kwargs):
         ret = _runbedtools3(which,aname,bname,cname,**kwargs)
     except RuntimeError:
         LOG.warning('bedtool error: repeating on uncompressed a:{0},b:{1},c:{2}'.format(aname,bname,cname))
-        print('bedtool error: repeating on uncompressed a:{0},b:{1},c:{2}'.format(aname,bname,cname))
         aname2 = UT.uncompresscopy(aname)
         bname2 = UT.uncompresscopy(bname)
         ret = _runbedtools3(which,aname2,bname2,cname,**kwargs)
@@ -354,6 +353,21 @@ def _bedtoolscatcherror(which, aname, bname, cname, **kwargs):
             os.unlink(aname2)
         if bname2 != bname:
             os.unlink(bname2)
+    return UT.compress(cname)
+
+def _bedtoolscatcherror2(which, aname, cname, **kwargs):
+    if not os.path.exists(aname):
+        raise ValueError('{0} does not exists'.format(aname))        
+    if cname.endswith('.gz'):
+        cname = cname[:-3]
+    try:
+        ret = _runbedtools2(which,aname,cname,**kwargs)
+    except RuntimeError:
+        LOG.warning('bedtool error: repeating on uncompressed a:{0},c:{1}'.format(aname,cname))
+        aname2 = UT.uncompresscopy(aname)
+        ret = _runbedtools2(which,aname2,cname,**kwargs)
+        if aname2 != aname:
+            os.unlink(aname2)
     return UT.compress(cname)
 
 def calc_ovlratio(aname, bname, tname, nacol, nbcol, idcol=['chr','st','ed']):
