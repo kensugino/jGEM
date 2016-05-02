@@ -2374,7 +2374,7 @@ class FINDSECOVTH(SUBASE):
 
     """
 
-    bins = N.arange(0.4,1.8,0.05)
+    bins = N.arange(0.3,2.8,0.1)
     """ gamma values to search """
 
     fitrange = (6,9)
@@ -2681,7 +2681,10 @@ class FINDSECOVTH(SUBASE):
         
         # panel4 seall
         ax = axr[1][1]
-        se = fn.read_txt('se.cov.all')
+        if not hasattr(self, 'se'):
+            self.se = se = fn.read_txt('se.cov.all')
+        else:
+            se = self.se
         if 'len' not in se.columns:
             se['len'] = se['ed']-se['st']
         se = se[se['cov']>0]
