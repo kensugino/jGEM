@@ -192,6 +192,31 @@ def bw2bed(bwfile, bedfile, chroms, th):
     out.close()
     return UT.compress(bedbase)
 
+def bw2bed_mp(bwfile, bedfile, chroms, th, np=4):
+    """ multi CPU version of bw2bed """
+
+    args = []
+    files = []
+    for chrom in chroms:
+        bedchromfile = bedfile+'.{0}.bed.gz'.format(chrom)
+        files.append(bedchromfile)
+        args.append((bwfile,bedchromfile,[chrom],th))
+
+    rslts = UT.process_mp(bw2bed, args, np=np, doreduce=False)
+
+    # concatenate gz files
+    with open(bedfile, 'wb') as dst:
+        for f in files:
+            with open(f, 'rb') as src:
+                shutil.copyfileobj(src, dst)
+
+    # clean up temp files
+    for f in files:
+        os.unlink(f)
+
+    return bedfile
+
+
 ### Merge BigWigs ##########################################################
 
 def get_bigwig_as_array(bwfile, chrom, st, ed):
