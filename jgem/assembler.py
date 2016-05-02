@@ -194,7 +194,7 @@ class Assembler(object):
             # always do consistency check if binth>0 (since support may be reduced)
             pr['checksjsupport'] = self.params['checksjsupport']=True
         prdf = PD.DataFrame(pr,index=['value']).T
-        fname = fn.fname('assemble.params.txt', category='output')
+        fname = fn.fname('assemble.params.txt', category='stats')
         if os.path.exists(fname):
             prdf0 = UT.read_pandas(fname,index_col=[0])
             if len(prdf)==len(prdf0):
