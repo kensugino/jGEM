@@ -148,7 +148,7 @@ class EvalMatch(object):
             'sb':'single exons (b)',
             'j':'junctions'}
 
-    def __init__(self, en1, en2, bigwig, sjfile, datacode, binsize=1000):
+    def __init__(self, en1, en2, bigwig, sjfile, datacode, binsize=500):
         """
         Args:
             en1: EvalNames object, reference
@@ -170,7 +170,7 @@ class EvalMatch(object):
         self.ratios = {} # holds dataframes of cov(x) and ratio(y)
         self.binsize = binsize
 
-    def calculate(self, np=1, saveintermediates=True):
+    def calculate(self, np=3, saveintermediates=False):
         """Calculate necessary data.
 
         1. for en1 and en2 calculate ecov,gcov,jcnt (prep_sjex)
@@ -191,6 +191,7 @@ class EvalMatch(object):
         if not saveintermediates:
             self.en1.delete(['temp'],['output','read'])
             self.en2.delete(['temp'],['output','read'])
+        self.save()
 
     def save(self):
         # [i,5,5b,3,3b,s,sb,j,glc,ecc,jcc]
@@ -246,7 +247,7 @@ class EvalMatch(object):
             ex['_id'] = N.arange(len(ex))
         if '_gidx' not in ex.columns: # edge case (len(sj)==0)
             ex['_gidx'] = N.arange(len(ex))
-            
+
         # length
         if 'len' not in sj.columns:
             sj['len'] = sj['ed'] - sj['st']
