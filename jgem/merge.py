@@ -206,6 +206,7 @@ class MergeInputs(object):
         self.params = MERGECOVPARAM.copy()
         self.params.update(kw)
         self.params['genome'] = genome
+        self.stats = {}
         self.chromsizes = UT.chromsizes(genome)
         self.chroms = UT.chroms(genome)
         self.tgts =  ['mep','men','se'] #'sep','sen']
@@ -217,6 +218,9 @@ class MergeInputs(object):
         UT.makedirs(os.path.dirname(fname1))
         with open(fname1,'w') as fp:
             json.dump(self.params, fp)
+        fname2 = self.fnobj.fname('stats.txt',category='output')
+        statdf = PD.DataFrame(self.stats, index=['value']).T
+        UT.write_pandas(statdf, fname2, 'ih')
 
     def prepare(self):
         """ Prepare merged bigwig coverage files, merged junction files and aggregated bigwig file (average cov)."""
@@ -404,6 +408,11 @@ class MergeInputs(object):
         LOG.info('selectsj: {0} smaller than th_maxcnt1({1})'.format(N.sum(~idx3),pr['th_maxcnt1']))
         LOG.info('selectsj: {0} larger than th_maxcnt2({1})'.format(N.sum(idx4),pr['th_maxcnt2']))
         LOG.info('selectsj: sj0:{0}=>sj1:{1}'.format(len(sj0), len(sj1)))
+        self.stats['<=th_detected'] = N.sum(~idx2)
+        self.stats['<=th_maxcnt1'] = N.sum(~idx3)
+        self.stats['>th_maxcnt2'] = N.sum(idx4)
+        self.stats['#sj0'] = len(sj0)
+        self.stats['#sj1'] = len(sj1)
 
         args = []
         cols0 = GGB.SJCOLS
@@ -415,14 +424,19 @@ class MergeInputs(object):
             ovlchrompath = fn.txtname('sj1.ovl.{0}'.format(chrom))
             sj4chrompath = fn.txtname('sj4.{0}'.format(chrom))
             sj2chrompath = fn.txtname('sj2.{0}'.format(chrom))
-            args.append((sj1chrompath, ovlchrompath, sj4chrompath, sj2chrompath, pr['th_ratio']))
+            args.append((sj1chrompath, ovlchrompath, sj4chrompath, sj2chrompath, pr['th_ratio'], chrom))
         
         # select_sj_chr(sj0chrompath, ovlpath, sj4chrompath, sj2chrompath, th_ratio)
-        rslts = UT.process_mp(select_sj_chr, args, np, doreduce=True)
+        rslts = UT.process_mp(select_sj_chr, args, np, doreduce=False)
         
-        # rslts contains selected locus
-        self.sj5 = sj5 = sj1.set_index('locus').ix[rslts]
+        # rslts contains [(chrom, [locus,...], stats),...]
+        sel = []
+        for chrom, loci, stats in rslts:
+            sel += loci
+            self.stats.update(stats)
+        self.sj5 = sj5 = sj1.set_index('locus').ix[sel]
         UT.write_pandas(sj5, fn.sj5_txt())
+        self.stats['#sj5'] = len(sj5)
 
     def write_sjpn(self):
         fn = self.fnobj
@@ -435,6 +449,8 @@ class MergeInputs(object):
         sj5n = sj5[sj5['strand'].isin(['-','.'])][cols]
         UT.write_pandas(sj5p, fn.sj_bed('p'), '')
         UT.write_pandas(sj5n, fn.sj_bed('n'), '')
+        self.stats['#sj5.p'] = len(sj5p)
+        self.stats['#sj5.n'] = len(sj5n)
 
     def aggregate_bigwigs(self):
         fn = self.fnobj
@@ -505,7 +521,7 @@ def make_sj_bed_chr(sjpaths,dstpath,chrom):
             dst.write(txt+'\n')
     return UT.compress(wpath)
 
-def select_sj_chr(sj1chrompath, ovlpath, sj4chrompath, sj2chrompath, th_ratio):
+def select_sj_chr(sj1chrompath, ovlpath, sj4chrompath, sj2chrompath, th_ratio, chrom):
     """Select aggregated junctions according to several metrics"""
     # calc self intersection to find overlapping junctions
     a = b = sj1chrompath
@@ -543,7 +559,8 @@ def select_sj_chr(sj1chrompath, ovlpath, sj4chrompath, sj2chrompath, th_ratio):
     UT.write_pandas(sj4[['locus']], sj4chrompath, 'h')
     # write out sj2 for debug
     UT.write_pandas(sj2, sj2chrompath, 'h')
-    return list(sj4['locus'].values)
+    stats = {chrom+'.#sj2':len(sj2), chrom+'.#sj4':len(sj4)}
+    return chrom, list(sj4['locus'].values), stats
 
 
 
