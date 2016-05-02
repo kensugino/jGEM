@@ -33,11 +33,11 @@ MERGECOVPARAM = dict(
     covth = 0, # exon read digitization threshold
     covdelta = 1, # exon read digitization unit
     uth=0, # unique count threshold
-    mth=5, # non-unique count threshold
+    mth=0, # 5, # non-unique count threshold
     th_ratio=1e-3, # discard junctions less than this portion within overlapping junctions
     th_detected=2, # at least observed in 3 samples
-    th_maxcnt1=0.1, # max read count should be larger than this
-    th_maxcnt2=1, # if max read count is larger than this then single sample observation is OK
+    th_maxcnt1=5, # max read count should be larger than this
+    th_maxcnt2=10, # if max read count is larger than this then single sample observation is OK
 )
 MERGEASMPARAM = dict(
     se_maxth=0.5,   # SE maxcov threshold
@@ -67,6 +67,22 @@ class MergeInputNames(FN.FileNamesBase):
         self.si = sampleinfo
         self.code = code
         self.outdir = outdir
+        # check required fields in sampleinfo
+        sicols = sampleinfo.columns
+        for c in ['sjbed_path','bw_path','sjexpre','name']:
+            if c not in sicols:
+                raise ValueError('{0} not in sampleinfo'.format(c))
+        # check existence of files
+        for f in sampleinfo['sjbed_path'].values:
+            if not os.path.exists(f):
+                raise ValueError('file {0} does not exists'.format(f))
+        for f in sampleinfo['bw_path'].values:
+            if not os.path.exists(f):
+                raise ValueError('file {0} does not exists'.format(f))
+        for f in sampleinfo['sjexpre'].values:
+            for suf in ['.ex.txt.gz','.sj.txt.gz']:
+                if not os.path.exists(f+suf):
+                    raise ValueError('file {0} does not exists'.format(f+suf))
 
         prefix = os.path.join(outdir, code)
         super(MergeInputNames, self).__init__(prefix)
@@ -85,6 +101,12 @@ class MergeInputNames(FN.FileNamesBase):
 
     def sj0_bed(self):
         return self.bedname('sj0', category='output')
+
+    def sj5_txt(self):
+        return self.txtname('sj5', category='output')
+
+    def sj1_txt(self):
+        return self.txtname('sj1', category='output')
 
     def sj_bed(self, strand):
         """SJ output, strand = p,n """
@@ -268,21 +290,19 @@ class MergeInputs(object):
         self.make_sj0_bed() # aggregate junctions
         self.collect_sj() # collect sample junction counts
         self.select_sj() # select junctions ==> do selection in the assembler? (keep it for now )
-        self.write_sj() # write sj.p, sj.n 
+        self.write_sjpn() # write sj.p, sj.n 
         self.fnobj.delete(delete=['temp'],protect=['output'])
 
     def make_sj0_bed(self):
         """Aggregate all junctions in the samples. Ucnt, mcnt will be the sum over all samples. """
         pr = self.params
         fn = self.fnobj
-        uth = pr['uth']
-        mth = pr['mth']
         np = pr['np']
         chroms = self.chroms
         sjpaths = fn.sjpaths() # [(name, sjpath),..]
         scode = 'sjbed.gz'
         asjpath = fn.fname(scode) # aggregated sj file
-        args = [(sjpaths, asjpath, x, uth, mth) for x in chroms]
+        args = [(sjpaths, asjpath, x) for x in chroms]
         UT.makedirs(os.path.dirname(asjpath))
         rslts = UT.process_mp(make_sj_bed_chr, args, np, doreduce=False)
 
@@ -327,11 +347,12 @@ class MergeInputs(object):
         Outputs:
             'allsj.txt.gz'
         """
+        # [Q] faster if make this into chr-wise?
         fn = self.fnobj
         if hasattr(self, 'sj0'):
-            msj = self.sj0
+            msj = self.sj0.copy()
         else:
-            self.sj0 = msj = GGB.read_sj(fn.sj0_bed())
+            msj = GGB.read_sj(fn.sj0_bed())
         # sc1: ucnt, tst: mcnt
 
         #sjpaths = fn.sjopaths() # [(name,sjpath),...], output of assembly (restricted)
@@ -348,86 +369,72 @@ class MergeInputs(object):
             msj[sname] = [l2u.get(x,0) for x in msj['locus']]  
         msj['#detected'] = (msj[snames]>0).sum(axis=1) # number of samples with reads>0
         msj['maxcnt'] = msj[snames].max(axis=1) # max reads
-        self.allsj = msj
         UT.write_pandas(msj, fn.allsj_txt(), 'h')
         UT.write_pandas(msj[['locus','#detected','maxcnt']], fn.allsj_stats(), 'h')
+        self.allsj = msj[['locus','#detected','maxcnt']].copy()
+        # del msj # hope for garbage collection?
 
     def select_sj(self):
-        """Select aggregated junctions according to several metrics"""
-        fn = self.fnobj
         pr = self.params
+        fn = self.fnobj
+        np = pr['np']
+        chroms = self.chroms
 
-        # calc self intersection to find overlapping junctions
-        a = b = fn.sj0_bed()
-        c = fn.fname('sj0.ovl.txt.gz')
-        c = BT.bedtoolintersect(a,b,c,wao=True)
-        # calc ratio
-        cols0 = GGB.SJCOLS
-        cols = cols0+['b_'+x for x in cols0]+['ovl']
-        sjovl = UT.read_pandas(c, names=cols)
-
-        sjovl = sjovl[sjovl['strand']==sjovl['b_strand']] # same strand
-        LOG.debug('len(sjovl)={0}'.format(len(sjovl)))
-
-        sjgr = sjovl.groupby(['chr','st','ed','strand'])
-        sj2 = sjgr[['ucnt','mcnt','name']].first()
-        sj2['ucnt_sum'] = sjgr['b_ucnt'].sum()
-        sj2['mcnt_sum'] = sjgr['b_mcnt'].sum()
-        sj2['sum'] = sj2['ucnt_sum']+sj2['mcnt_sum']
-        sj2['cnt'] = sj2['ucnt']+sj2['mcnt']
-        self.sj2 = sj2 = sj2.reset_index() # need chr,st,ed,strand at next step
-        sj2['locus'] = UT.calc_locus_strand(sj2)
-        sj2['ratio'] = sj2['ucnt']/sj2['ucnt_sum']
-        sj2['ratio_m'] = sj2['mcnt']/sj2['mcnt_sum']
-        sj2['ratio_a'] = sj2['cnt']/sj2['sum']
-
-        # add #detected, maxcnt
+        # start from sj0
+        if hasattr(self, 'sj0'):
+            sj0 = self.sj0
+        else:
+            sj0 = GGB.read_sj(fn.sj0_bed())
+        # threshold #detected, maxcnt
         if hasattr(self, 'allsj'):
             allsj = self.allsj
         else:
-            self.allsj = allsj = UT.read_pandas(fn.allsj_txt())
-
+            self.allsj = allsj = UT.read_pandas(fn.allsj_stats())
         l2d = UT.df2dict(allsj, 'locus', '#detected')
         l2m = UT.df2dict(allsj, 'locus', 'maxcnt')
-
-        sj2['#detected'] = [l2d[x] for x in sj2['locus']]
-        sj2['maxcnt'] = [l2m[x] for x in sj2['locus']]
-        UT.write_pandas(sj2, fn.sj2_txt(), 'h')
-
-        # select 
-        idx1 = (sj2['ratio']>=pr['th_ratio'])|(sj2['ratio_a']>=pr['th_ratio'])
-        idx2 = sj2['#detected']>pr['th_detected']
-        idx3 = sj2['maxcnt']>pr['th_maxcnt1']
-        idx4 = sj2['maxcnt']>pr['th_maxcnt2']
-
-        self.sj4 = sj4 = sj2[idx1&((idx2&idx3)|idx4)]
-        LOG.info('selectsj: in {0}'.format(len(sj2)))
-        LOG.info('selectsj: {0} smaller than th_ratio({1})'.format(N.sum(~idx1),pr['th_ratio']))
+        sj0['locus'] = UT.calc_locus_strand(sj0)
+        sj0['#detected'] = [l2d[x] for x in sj0['locus']]
+        sj0['maxcnt'] = [l2m[x] for x in sj0['locus']]
+        idx2 = sj0['#detected']>pr['th_detected']
+        idx3 = sj0['maxcnt']>pr['th_maxcnt1']
+        idx4 = sj0['maxcnt']>pr['th_maxcnt2']
+        sj1 = sj0[(idx2&idx3)|idx4].copy()
+        UT.write_pandas(sj1, fn.sj1_txt())
         LOG.info('selectsj: {0} smaller than th_detected({1})'.format(N.sum(~idx2),pr['th_detected']))
         LOG.info('selectsj: {0} smaller than th_maxcnt1({1})'.format(N.sum(~idx3),pr['th_maxcnt1']))
         LOG.info('selectsj: {0} larger than th_maxcnt2({1})'.format(N.sum(idx4),pr['th_maxcnt2']))
-        LOG.info('#selected SJ:{0}<={1}'.format(len(sj4),len(sj2)))
-        cols = GGB.SJCOLS
-        sjg = allsj.set_index('locus')[cols]
-        self.sj1 = sjg.ix[sj4['locus'].values]
-        # # sjgp = sjg.ix[sj4[sj4['strand']=='+']['locus'].values]
-        # # sjgn = sjg.ix[sj4[sj4['strand']=='-']['locus'].values]
-        # sjgp = sjg.ix[sj4[sj4['strand'].isin(['+','.'])]['locus'].values]
-        # sjgn = sjg.ix[sj4[sj4['strand'].isin(['-','.'])]['locus'].values]        
-        # UT.write_pandas(sjgp, fn.sj_bed('p'), '')
-        # UT.write_pandas(sjgn, fn.sj_bed('n'), '')
+        LOG.info('selectsj: sj0:{0}=>sj1:{1}'.format(len(sj0), len(sj1)))
 
-    def write_sj(self):
+        args = []
+        cols0 = GGB.SJCOLS
+        for chrom in self.chroms:
+            # make sj1chroms with 
+            tmp = sj1[sj1['chr']==chrom]
+            sj1chrompath = fn.bedname('sj1.{0}'.format(chrom))
+            UT.write_pandas(tmp[cols0], sj1chrompath, '')
+            ovlchrompath = fn.txtname('sj1.ovl.{0}'.format(chrom))
+            sj4chrompath = fn.txtname('sj4.{0}'.format(chrom))
+            sj2chrompath = fn.txtname('sj2.{0}'.format(chrom))
+            args.append((sj1chrompath, ovlchrompath, sj4chrompath, sj2chrompath, pr['th_ratio']))
+        
+        # select_sj_chr(sj0chrompath, ovlpath, sj4chrompath, sj2chrompath, th_ratio)
+        rslts = UT.process_mp(select_sj_chr, args, np, doreduce=True)
+        
+        # rslts contains selected locus
+        self.sj5 = sj5 = sj1.set_index('locus').ix[rslts]
+        UT.write_pandas(sj5, fn.sj5_txt())
+
+    def write_sjpn(self):
         fn = self.fnobj
         if hasattr(self, 'sj1'):
-            sjg = self.sj1
+            sj5 = self.sj5
         else:
-            sjg = self.sj0
+            sj5 = UT.read_pandas(fn.sj5_txt())
         cols = GGB.SJCOLS
-        sjgp = sjg[sjg['strand'].isin(['+','.'])][cols]
-        sjgn = sjg[sjg['strand'].isin(['-','.'])][cols]
-        UT.write_pandas(sjgp, fn.sj_bed('p'), '')
-        UT.write_pandas(sjgn, fn.sj_bed('n'), '')
+        sj5p = sj5[sj5['strand'].isin(['+','.'])][cols]
+        sj5n = sj5[sj5['strand'].isin(['-','.'])][cols]
+        UT.write_pandas(sj5p, fn.sj_bed('p'), '')
+        UT.write_pandas(sj5n, fn.sj_bed('n'), '')
 
     def aggregate_bigwigs(self):
         fn = self.fnobj
@@ -477,7 +484,7 @@ def make_ex_bed_chr(expaths, dstpre, chrom, covth, covdelta, tgts):
         v.close()
         UT.compress(paths[k])
 
-def make_sj_bed_chr(sjpaths,dstpath,chrom,uth,mth):
+def make_sj_bed_chr(sjpaths,dstpath,chrom):
     cols = ['chr','st','ed','strand','src','ucnt','mcnt']
     wpath = dstpath+chrom
     # n = len(sjpaths) # how many files?
@@ -491,10 +498,53 @@ def make_sj_bed_chr(sjpaths,dstpath,chrom,uth,mth):
             sj['src'] = name+':'+sj['_id'].astype(str)
             #sj['ucnt'] = sj['ucnt']*scale # average over all samples
             #sj['mcnt'] = sj['mcnt']*scale
-            sj0 = sj[(sj['chr']==chrom)&((sj['ucnt']>=uth)|(sj['mcnt']>=mth))][cols]
+            # sj0 = sj[(sj['chr']==chrom)&((sj['ucnt']>=uth)|(sj['mcnt']>=mth))][cols]
+            # at this stage collect everything 
+            sj0 = sj[(sj['chr']==chrom)][cols]
             txt = '\n'.join(['\t'.join(map(str, x)) for x in sj0.values])
             dst.write(txt+'\n')
     return UT.compress(wpath)
+
+def select_sj_chr(sj1chrompath, ovlpath, sj4chrompath, sj2chrompath, th_ratio):
+    """Select aggregated junctions according to several metrics"""
+    # calc self intersection to find overlapping junctions
+    a = b = sj1chrompath
+    c = ovlpath
+    c = BT.bedtoolintersect(a,b,c,wao=True)
+    # calc ratio
+    cols0 = GGB.SJCOLS
+    cols = cols0+['b_'+x for x in cols0]+['ovl']
+    sjovl = UT.read_pandas(c, names=cols)
+
+    sjovl = sjovl[sjovl['strand']==sjovl['b_strand']] # same strand
+    LOG.debug('len(sjovl)={0}'.format(len(sjovl)))
+
+    sjgr = sjovl.groupby(['chr','st','ed','strand'])
+    sj2 = sjgr[['ucnt','mcnt','name']].first()
+    sj2['ucnt_sum'] = sjgr['b_ucnt'].sum()
+    sj2['mcnt_sum'] = sjgr['b_mcnt'].sum()
+    sj2['sum'] = sj2['ucnt_sum']+sj2['mcnt_sum']
+    sj2['cnt'] = sj2['ucnt']+sj2['mcnt']
+    # self.sj2 = sj2 = sj2.reset_index() # need chr,st,ed,strand at next step
+    sj2 = sj2.reset_index() # need chr,st,ed,strand at next step
+    sj2['locus'] = UT.calc_locus_strand(sj2)
+    sj2['ratio'] = sj2['ucnt']/sj2['ucnt_sum']
+    sj2['ratio_m'] = sj2['mcnt']/sj2['mcnt_sum']
+    sj2['ratio_a'] = sj2['cnt']/sj2['sum']
+
+    # select 
+    idx1 = (sj2['ratio']>=th_ratio)|(sj2['ratio_a']>=th_ratio)
+    # self.sj4 = sj4 = sj2[idx1&((idx2&idx3)|idx4)]
+    sj4 = sj2[idx1]
+    # LOG.info('selectsj: in {0}'.format(len(sj2)))
+    LOG.info('selectsj: {0} smaller than th_ratio({1}) (in {3}) file:{2}'.format(N.sum(~idx1),th_ratio,sj1chrompath,len(sj2)))
+    cols = GGB.SJCOLS
+    # write out selected locus
+    UT.write_pandas(sj4[['locus']], sj4chrompath, 'h')
+    # write out sj2 for debug
+    UT.write_pandas(sj2, sj2chrompath, 'h')
+    return list(sj4['locus'].values)
+
 
 
 class MergeAssemble(object):

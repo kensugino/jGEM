@@ -39,7 +39,7 @@ def test_agg_bw2(sampleinfo, outdir):
 
 def test_make_sj_bed(sampleinfo, outdir):
 	fni = MG.MergeInputNames(sampleinfo, 'Fev_merge_test', outdir)
-	mi = MG.MergeInputs(fni, genome='mm10', np=1)
+	mi = MG.MergeInputs(fni, genome='mm10', np=3)
 	mi.make_sj_bed()
 	assert os.path.exists(fni.sj0_bed())
 	assert os.path.exists(fni.allsj_txt())
