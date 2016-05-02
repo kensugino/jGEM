@@ -247,7 +247,7 @@ class Assembler(object):
             # FIND53IR only deals with exons with length > SE sizeth = 50bp)
             # gap smaller than this will be missed if we skip FINDIRETS
             FINDIRETS(self)()
-            FINDSECOVTH(self)()
+            # FINDSECOVTH(self)() # not useful here since mep,men don't have real SEs
             FIND53IR(self)()
         else:
             FINDEDGES(self)()
