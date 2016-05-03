@@ -853,7 +853,7 @@ class MergeAssemble(object):
                     bwfile=fni.agg_bw(), #ex_bw('se'), 
                     bedfile=fna.fname('seallbw.bed.gz'), 
                     chroms=UT.chroms(pr['genome']), 
-                    th=pr['se_binth'], # 0
+                    th=0,  # pr['se_binth'],  #setting th>0 screws secovth calc? 
                     np=pr['np']
                     )
 
@@ -866,7 +866,7 @@ class MergeAssemble(object):
                                     bed=df, 
                                     bwname=fni.agg_bw(), #ex_bw('se'), 
                                     fname=fna.fname('se.cov.all.txt.gz'), 
-                                    np=0, #pr['np'],  # setting th>0 screws secovth calc?
+                                    np=pr['np'], 
                                     which='cov')
         # calculate MECOV
         self.mecov = mecov = CC.calc_cov_ovl_mp(
