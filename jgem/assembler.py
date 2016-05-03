@@ -2384,7 +2384,7 @@ class FINDSECOVTH(SUBASE):
     bins = N.arange(0.3,2.8,0.1)
     """ gamma values to search """
 
-    fitrange = (6,9)
+    fitrange = (4,6,9)
     """ x range to fit a line (fitmax,resmax)"""
     
     def call(self):
@@ -2513,7 +2513,7 @@ class FINDSECOVTH(SUBASE):
 
     def _fit_hist(self, refcov, gamma, a1=None, ax=None, title='', nf=1.):
         # find best gamma for gen4
-        fma,xma = self.fitrange
+        fma2,fma,xma = self.fitrange
         fmi = N.log2(gamma)
         nbins = float(max(min(100, len(refcov)/50), 50))
         width = (xma-fmi)/nbins
@@ -2526,6 +2526,7 @@ class FINDSECOVTH(SUBASE):
         # st,ed = 0,60 # range of fit
         st = 0 
         ed = int(nbins*(float(fma-fmi)/(xma-fmi)))
+        ed2 = int(nbins*(float(fma2-fmi)/(xma-fmi)))
         xf = x[0:ed]
         yo = y[0:ed]
         if a1 is None:
@@ -2534,13 +2535,14 @@ class FINDSECOVTH(SUBASE):
             a1,a0 = N.polyfit(x3,y3,1)
         else:
             LOG.info('ed={0} x[ed]={1}'.format(ed, x[ed]))
+            LOG.info('ed2={0} x[ed2]={1}'.format(ed2, x[ed2]))
             # st = 15 # throw away initial 14 points
             # x3 = x[st:ed]
             # y3 = y[st:ed]
             # a0 = N.mean(y3-a1*x3) # directly calculate intercept
             # change st and calculate ave_res take a0 for min ave_res
-            use = int(nbins*0.4) if nbins < 50 else 20
-            sts = range(st,ed-use)
+            use = int(nbins*0.3) if nbins < 50 else 15
+            sts = range(st,ed2-use)
             mres = []
             a0s = []
             for sttmp in sts:
