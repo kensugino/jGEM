@@ -2490,26 +2490,55 @@ class FINDSECOVTH(SUBASE):
         secov = CC.calc_cov_mp(bed=df, bwname=fn.bwfile, fname=fname, np=pr['np'])
         #os.unlink(cname)
     
-    def _calc_th99(self, xf,yo,yf,gamma,i0=0,i1=40):
-        idx = slice(i0,i1)
-        cp = N.sum(2**yf[idx]-gamma)   # condition positive
-        cn = N.sum(2**yo[idx]-gamma)-cp # condition negative
-        if cn<0:
-            cn = 0
-        fn = N.cumsum(2**yf[idx]-gamma) # false negative (condition positive but < th)
+    def _calc_th99(self, xf,yo,yf,gamma,i0=0,i1=40,th=0.01):
+        for i2 in range(i1,len(yf)): # i2 last where yf>0
+            if yf[i2]<0:
+                i2 -= 1
+                break
+        yo2 = N.array(list(yo[i0:i1])+list(yf[i1:i2])) # after i1 ignore (same as yf)
+        cntf = 2**yf[i0:i2]-1
+        cnto = 2**yo2[i0:i2]-1
+        cp = N.sum(cntf)   # total positive
+        cn = N.sum(cnto)-cp # total negative (observed - positive)
+        if cn<0: # due to noise when almost perfect
+            cn = 0 
+            th99x = xf[i0]
+            th99 = 2**th99x - gamma
+            return th99x,th99
+        fn = N.cumsum(cntf) # false negative (condition positive but < th)
         tp = cp - fn # true positive (condition positive and >= th)
-        tn = N.cumsum(2**yo[idx]-gamma) - fn  # true negative
-        tn[tn<0]=0
+        tn = N.cumsum(cnto) - fn  # true negative
+        tn[tn<0]=N.nan
         fp = cn - tn
-        fp[fp<0]=0
+        fp[fp<0]=N.nan
         tpr = tp/cp
         fpr = fp/cn
-        fpr[N.isnan(fpr)]=0
+        # fpr[N.isnan(fpr)]=0
         tf = tpr-fpr
-        tmp = N.nonzero(fpr<=0.01)[0]
-        th99x = xf[N.min(tmp)]
+        tmp = N.nonzero(fpr<=th)[0]
+        th99x = xf[i0+N.min(tmp)]
         th99 = 2**th99x - gamma
         return th99x,th99
+
+        # idx = slice(i0,i1)
+        # cp = N.sum(2**yf[idx]-gamma)   # condition positive
+        # cn = N.sum(2**yo[idx]-gamma)-cp # condition negative
+        # if cn<0:
+        #     cn = 0
+        # fn = N.cumsum(2**yf[idx]-gamma) # false negative (condition positive but < th)
+        # tp = cp - fn # true positive (condition positive and >= th)
+        # tn = N.cumsum(2**yo[idx]-gamma) - fn  # true negative
+        # tn[tn<0]=0
+        # fp = cn - tn
+        # fp[fp<0]=0
+        # tpr = tp/cp
+        # fpr = fp/cn
+        # fpr[N.isnan(fpr)]=0
+        # tf = tpr-fpr
+        # tmp = N.nonzero(fpr<=0.01)[0]
+        # th99x = xf[N.min(tmp)]
+        # th99 = 2**th99x - gamma
+        # return th99x,th99
 
     def _fit_hist(self, refcov, gamma, a1=None, ax=None, title='', nf=1.):
         # find best gamma for gen4
@@ -2533,6 +2562,7 @@ class FINDSECOVTH(SUBASE):
             x3 = x[st:ed]
             y3 = y[st:ed]
             a1,a0 = N.polyfit(x3,y3,1)
+            eidx = ed2
         else:
             # LOG.info('ed={0} x[ed]={1}'.format(ed, x[ed]))
             # 3rd version
@@ -2557,6 +2587,7 @@ class FINDSECOVTH(SUBASE):
             a0 = a0s[idx]
             r = ress[idx]
             min_st = sts[idx]
+            eidx = idx+4
             LOG.info('FINDSECOV: SE fit a0={0}, st={1}, x[st]={2}, res={3}'.format(a0,min_st,x[min_st],r))
 
             # old version
@@ -2588,7 +2619,7 @@ class FINDSECOVTH(SUBASE):
         res = N.sum((yo-yf)**2)
         
         if ax is not None: # also calculate th99
-            th99x,th99 = self._calc_th99(xf,yo,yf,gamma,0,40)
+            th99x,th99 = self._calc_th99(xf,yo,yf,gamma,0,eidx)
 
             ax.plot(x,y,'o',ms=3)
             ax.plot(x,a0+a1*x,'m-',lw=1)
