@@ -2546,8 +2546,8 @@ class FINDSECOVTH(SUBASE):
             mres = []
             a0s = []
             for sttmp in sts:
-                x3 = x[sttmp:ed]
-                y3 = y[sttmp:ed]
+                x3 = x[sttmp:ed2]
+                y3 = y[sttmp:ed2]
                 a0tmp = N.mean(y3-a1*x3)
                 yftmp = a0tmp+a1*x3
                 a0s.append(a0tmp)
