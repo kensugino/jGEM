@@ -849,7 +849,6 @@ class MergeAssemble(object):
             self.expn = expn = UT.read_pandas(fna.fname('mepn.ex.txt.gz'))
             self.sjpn = sjpn = UT.read_pandas(fna.fname('mepn.sj.txt.gz'))
 
-        chroms = list(expn.groupby('chr').first().index.values)
         sebin = BW.bw2bed_mp(
                     bwfile=fni.agg_bw(), #ex_bw('se'), 
                     bedfile=fna.fname('seallbw.bed.gz'), 

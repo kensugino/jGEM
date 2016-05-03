@@ -165,7 +165,7 @@ def apply_threshold(infile, threshold, chroms):
         if last_start >= 0:
             yield chrom, last_start, end
 
-def bw2bed(bwfile, bedfile, chroms, th):
+def bw2bed(bwfile, bedfile, chroms, th, compress=True):
     """Transform BigWig genomeCov to binary BED by thresholding. 
     Makes result file (bwfile[:-3]+'.binary%g.bed'.format(th))
 
@@ -191,7 +191,9 @@ def bw2bed(bwfile, bedfile, chroms, th):
     #out.write('\n') #<= this introduces space inbetween chroms in mp ode
     # which terminates bedtools at chr1
     out.close()
-    return UT.compress(bedbase)
+    if compress:
+        return UT.compress(bedbase)
+    return bedbase
 
 def bw2bed_mp(bwfile, bedfile, chroms, th, np=4):
     """ multi CPU version of bw2bed """
@@ -201,15 +203,20 @@ def bw2bed_mp(bwfile, bedfile, chroms, th, np=4):
     for chrom in chroms:
         bedchromfile = bedfile+'.{0}.bed.gz'.format(chrom)
         files.append(bedchromfile)
-        args.append((bwfile,bedchromfile,[chrom],th))
+        args.append((bwfile,bedchromfile,[chrom],th,False))
 
     rslts = UT.process_mp(bw2bed, args, np=np, doreduce=False)
 
     # concatenate gz files
-    with open(bedfile, 'wb') as dst:
-        for f in files:
+    bedbase = bedfile[:-3] if bedfile[-3:]=='.gz' else bedfile
+    with open(bedbase, 'wb') as dst:
+        for f in rslts:
             with open(f, 'rb') as src:
                 shutil.copyfileobj(src, dst)
+    # !!! bedtool gzip problem againg !!!
+    # bedtools only process first one if just concatenate gzipped files
+    # => concatenate unzipped and gzip whole thing at the end
+    bedfile = UT.compress(bedbase)
 
     # clean up temp files
     for f in files:
