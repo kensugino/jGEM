@@ -220,6 +220,17 @@ def bw2bed_mp(bwfile, bedfile, chroms, th, np=4):
 ### covbp, totbp, avgcov from bigwig array #################################
 
 def get_totbp_covbp_bw(bwfile, genome, chroms=None):
+    """ Calculate total bp, covered bp, mean coverage, covered %. 
+
+    Args:
+        bwfile: bigwig file
+        genome: UCSC genome name
+        chroms (list): of chromosomes
+
+    Returns:
+        Pandas dataframe
+        
+    """
     chromdf = UT.chromdf(genome).set_index('chr')['size']
     def one(chrom):
         csize = chromdf.ix[chrom]

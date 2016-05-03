@@ -223,6 +223,10 @@ def get_total_bp_bedfile(bedpath, bed12=False, chroms=None, returndics=False, ch
     Returns:
         totbp: total base pairs in BED
         covbp: covered base pairs
+
+    See:
+        :py:func:`jgem.bigwig.get_totbp_covbp_bw ` (>6x faster if you have bigwig)
+
     """
     if bed12:
         totbpdic,covbpdic = cybw.get_total_bp_bed12file_helper(bedpath)
