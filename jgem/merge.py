@@ -42,14 +42,16 @@ MERGECOVPARAM = dict(
     
     minsecovth=30, # min secov at individual sample level for SE to be included
     secovfactor=3, # *secovth is the threshold to include  
-    se_binth=0, # when extracting SE candidates from allsample.bw
-    use_se2=False, # add high cov SE from each sample?
 
 )
 MERGEASMPARAM = dict(
     # se_maxth=500,   # SE maxcov threshold
     se_gidstart=50000, # SE gidx start
-    se_binth = 0,
+    minsecovth=30, # min secov at individual sample level for SE to be included
+    # secovfactor=3, # *secovth is the threshold to include   
+    se_binth=0, # when extracting SE candidates from allsample.bw
+    use_se2=False, # add high cov SE from each sample?
+    secov_fpr_th=0.001, 
 )
 
 
@@ -616,6 +618,14 @@ class MergeAssemble(object):
 
     """
 
+    ecols = ['chr','st','ed','name','sc1','strand',
+             '_id','_gidx','gname','cat','ptyp','cov','len',
+             'a_id','d_id','a_degree','d_degree','a_pos','d_pos']
+    scols = ['chr','st','ed','name','sc1','strand',
+             '_id','_gidx','gname','st-1',
+             'a_id','d_id','a_degree','d_degree','a_pos','d_pos',
+            ]
+
     def __init__(self, fni, fna, saveintermediates=False, **kw):
         """
         Args:
@@ -746,15 +756,8 @@ class MergeAssemble(object):
         LOG.info('n0:{0}, np:{1}, nn:{2}, np+nn:{3}'.format(n0,np,nn,np+nn))
         
         # write EX,SJ
-        self.ecols = ecols = ['chr','st','ed','name','sc1','strand',
-                 '_id','_gidx','gname','cat','ptyp','cov','len',
-                 'a_id','d_id','a_degree','d_degree','a_pos','d_pos']
-        self.scols = scols = ['chr','st','ed','name','sc1','strand',
-                 '_id','_gidx','gname','st-1',
-                 'a_id','d_id','a_degree','d_degree','a_pos','d_pos',
-                ]
-        UT.write_pandas(expn[ecols], fna.fname('mepn.ex.txt.gz'), 'h')
-        UT.write_pandas(sjpn[scols], fna.fname('mepn.sj.txt.gz'), 'h')
+        UT.write_pandas(expn[self.ecols], fna.fname('mepn.ex.txt.gz'), 'h')
+        UT.write_pandas(sjpn[self.scols], fna.fname('mepn.sj.txt.gz'), 'h')
         
         # GENES BED
         gp = GGB.read_bed(fnp.genes_out())
@@ -897,7 +900,7 @@ class MergeAssemble(object):
         f.ex = mecov
         f.fnobj.sname = fna.code
         f.find_secovth()
-        th = pr['secovfactor']*max(f.se_th99, pr['minsecovth'])
+        th = max(f.se_th99, pr['minsecovth'])
         self.se1 = se1 = secov[secov['cov']>th].copy()
         self.stats['assemble_se2.secovth_found'] = f.se_th99
         self.stats['assemble_se2.secovth_used'] = th
@@ -952,7 +955,10 @@ class MergeAssemble(object):
         ecols = self.ecols # from assemble_me2
         sjpn = self.sjpn
         expn = self.expn
-        genes = self.genes
+        if not hasattr(self, 'genes'):
+            self.genes = genes = GGB.read_bed(fna.fname('mepn.genes.bed.gz'))
+        else:
+            genes = self.genes
         se0 = self.se0
         if ('cov' in expn) and ('cov' in se0):
             ecols = ecols+['cov']
