@@ -229,12 +229,12 @@ def get_totbp_covbp_bw(bwfile, genome, chroms=None):
 
     Returns:
         Pandas dataframe
-        
+
     """
     chromdf = UT.chromdf(genome).set_index('chr')['size']
     def one(chrom):
         csize = chromdf.ix[chrom]
-        a = BW.get_bigwig_as_array(bwfile, chrom, 0, csize)
+        a = get_bigwig_as_array(bwfile, chrom, 0, csize)
         totbp = N.sum(a)
         covbp = N.sum(a>0)
         acov = float(totbp)/covbp
