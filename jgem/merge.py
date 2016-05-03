@@ -852,7 +852,7 @@ class MergeAssemble(object):
         sebin = BW.bw2bed_mp(
                     bwfile=fni.agg_bw(), #ex_bw('se'), 
                     bedfile=fna.fname('seallbw.bed.gz'), 
-                    chroms=chroms, #UT.chroms(pr['genome']), 
+                    chroms=UT.chroms(pr['genome']), 
                     th=pr['se_binth'], # 0
                     np=pr['np']
                     )
