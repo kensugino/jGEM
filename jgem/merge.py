@@ -34,11 +34,12 @@ MERGECOVPARAM = dict(
     covth = 0, # exon read digitization threshold
     covdelta = 1, # exon read digitization unit
     uth=0, # unique count threshold
-    mth=0, # 5, # non-unique count threshold
+    mth=5, # non-unique count threshold
     th_ratio=1e-3, # discard junctions less than this portion within overlapping junctions
-    th_detected=1, # at least observed in 2 samples for non-unique
-    th_maxcnt=100, # max read count should be larger than this for non-unique reads
-    
+    th_detected=1, # at least observed in 2 samples
+    th_maxcnt=1, # max read count should be larger than this
+    th_maxcnt2=20, # if maxcnt larger than this ignore th_detected
+
     minsecovth=30, # min secov at individual sample level for SE to be included
     secovfactor=3, # *secovth is the threshold to include  
 
@@ -51,6 +52,9 @@ MERGEASMPARAM = dict(
     se_binth=0, # when extracting SE candidates from allsample.bw
     use_se2=False, # add high cov SE from each sample?
     secov_fpr_th=0.001, 
+    jie_binth=10,
+    uth=0,
+    mth=100,
 )
 
 
@@ -206,9 +210,9 @@ class MergeInputs(object):
             * th_ratio: threshold for selecting junctions by overlapping ratio 
               (default 0.001, i.e. if a junction's read is less than 1/1000 of the sum of 
               all the reads of overlapping junctions then the junction is discarded)
-            * th_detected: non-unique junctions need to be detected in more than this number of samples 
+            * th_detected: unctions need to be detected in more than this number of samples 
               (default 1)
-            * th_maxcnt: max junction reads across sample has to be larger than this for non-unique reads
+            * th_maxcnt: max junction reads across sample has to be larger than this
               (default 100)
 
         """
@@ -365,6 +369,8 @@ class MergeInputs(object):
         """
         # [Q] faster if make this into chr-wise?
         fn = self.fnobj
+        pr = self.params
+
         if hasattr(self, 'sj0'):
             msj = self.sj0.copy()
         else:
@@ -374,21 +380,42 @@ class MergeInputs(object):
         #sjpaths = fn.sjopaths() # [(name,sjpath),...], output of assembly (restricted)
         sjpaths = fn.sjpaths() # [(name,sjpath),...], input of assembly (all observed junctions)
         snames = [x[0] for x in sjpaths]
-
         msj['locus'] = UT.calc_locus_strand(msj)
-        for i, (sname,spath) in enumerate(sjpaths):
-            #scale = 1e6/float(aligned)
-            sj = GGB.read_sj(spath)
-            sj['locus'] = UT.calc_locus_strand(sj)
-            sj['cnt'] = (sj['ucnt']+sj['mcnt']) #*scale <== sjbed is already normalized
-            l2u = dict(UT.izipcols(sj, ['locus','cnt']))
-            msj[sname] = [l2u.get(x,0) for x in msj['locus']]  
-        msj['#detected'] = (msj[snames]>0).sum(axis=1) # number of samples with reads>0
-        msj['maxcnt'] = msj[snames].max(axis=1) # max reads
-        UT.write_pandas(msj, fn.allsj_txt(), 'h')
+        msjname = UT.write_pandas(msj[['locus']], fn.txtname('msj'))
+        np = pr['np']
+        n = int(N.ceil(len(sjpaths)/np))
+        args = []
+        files = []
+        for i in range(np):
+            sjpathpart = sjpaths[i*n:(i+1)*n]
+            allsjpartname =  fn.txtname('allsj.{0}'.format(i))
+            statpartname = fn.txtname('allsjstats.{0}'.format(i))
+            args.append((sjpathpart, msjname, allsjpartname, statpartname, i))
+            files.append((allsjpartname, statpartname))
+
+        rslts = UT.process_mp(collect_sj_part, args, np, doreduce=False)
+
+        # concat allsj, retrieve stats
+        dets = []
+        maxs = []
+        with open(fn.allsj_txt(), 'wb') as dst:
+            for aspn, spn in files:
+                with open(aspn, 'rb') as src:
+                    shutil.copyfileobj(src, dst) # allsj transposed (row=samples)
+                df = UT.read_pandas(spn,index_col=[0])
+                dets.append(df['#detected'])
+                maxs.append(df['maxcnt'])
+
+        dfdet = PD.concat(dets, axis=1)
+        dfmax = PD.concat(maxs, axis=1)
+        l2d = UT.series2dict(dfdet.sum(axis=1))
+        l2m = UT.series2dict(dfmax.max(axis=1))
+        msj['#detected'] = [l2d[x] for x in msj['locus']]
+        msj['maxcnt'] = [l2m[x] for x in msj['locus']]
+
         UT.write_pandas(msj[['locus','#detected','maxcnt']], fn.allsj_stats(), 'h')
         self.allsj = msj[['locus','#detected','maxcnt']].copy()
-        # del msj # hope for garbage collection?
+        
 
     def select_sj(self):
         pr = self.params
@@ -414,19 +441,19 @@ class MergeInputs(object):
         idx1 = sj0['ucnt']>0 # unique reads
         idx2 = sj0['#detected']>pr['th_detected']
         idx3 = sj0['maxcnt']>pr['th_maxcnt']
-        # idx4 = sj0['maxcnt']>pr['th_maxcnt2']
-        # sj1 = sj0[(idx2&idx3)|idx4].copy()
-        sj1 = sj0[idx1|(idx2&idx3)].copy()
+        idx4 = sj0['maxcnt']>pr['th_maxcnt2']
+        sj1 = sj0[(idx2&idx3)|idx4].copy()
+        # sj1 = sj0[idx1|(idx2&idx3)].copy()
         UT.write_pandas(sj1, fn.sj1_txt())
         LOG.info('selectsj: {0}/{1} non-unique junction)'.format(N.sum(~idx1), len(sj0)))
-        LOG.info('selectsj: {0} <=th_detected({1})'.format(N.sum((~idx1)&(~idx2)),pr['th_detected']))
-        LOG.info('selectsj: {0} <=th_maxcnt({1})'.format(N.sum((~idx1)&(~idx3)),pr['th_maxcnt']))
-        # LOG.info('selectsj: {0} larger than th_maxcnt2({1})'.format(N.sum(idx4),pr['th_maxcnt2']))
+        LOG.info('selectsj: {0} <=th_detected({1})'.format(N.sum((~idx2)),pr['th_detected']))
+        LOG.info('selectsj: {0} <=th_maxcnt({1})'.format(N.sum((~idx3)),pr['th_maxcnt']))
+        LOG.info('selectsj: {0} >th_maxcnt2({1})'.format(N.sum(idx4),pr['th_maxcnt2']))
         LOG.info('selectsj: sj0:{0}=>sj1:{1}'.format(len(sj0), len(sj1)))
-        self.stats['nonuniq<=th_detected'] = N.sum(~idx2)
-        self.stats['nonuniq<=th_maxcnt'] = N.sum(~idx3)
+        self.stats['<=th_detected'] = N.sum(~idx2)
+        self.stats['<=th_maxcnt'] = N.sum(~idx3)
         self.stats['#nonuniq'] = N.sum(~idx1)
-        # self.stats['>th_maxcnt2'] = N.sum(idx4)
+        self.stats['>th_maxcnt2'] = N.sum(idx4)
         self.stats['#sj0'] = len(sj0)
         self.stats['#sj1'] = len(sj1)
 
@@ -466,7 +493,6 @@ class MergeInputs(object):
         for f in sj2files:
             os.unlink(f)
         
-
     def write_sjpn(self):
         fn = self.fnobj
         if hasattr(self, 'sj1'):
@@ -606,7 +632,31 @@ def select_sj_chr(sj1chrompath, ovlpath, sj2chrompath, th_ratio, chrom):
     stats = {chrom+'.#sj2':len(sj2), chrom+'.#sj4':len(sj4)}
     return chrom, list(sj4['locus'].values), stats
 
+def collect_sj_part(sjpathpart, msjname, allsjpartname, statpartname, i):
+    msj = UT.read_pandas(msjname) # column locus
+    msj1 = msj.copy()
+    snames = []
+    for i, (sname,spath) in enumerate(sjpathpart):
+        sj = GGB.read_sj(spath)
+        sj['locus'] = UT.calc_locus_strand(sj)
+        # sj['cnt'] = (sj['ucnt']+sj['mcnt']) #*scale <== sjbed is already normalized
+        sj['jcnt'] = [x or y for x,y in sj[['ucnt','mcnt']].values]
+        l2u = UT.df2dict(sj, 'locus', 'jcnt')
+        msj[sname] = [l2u.get(x,0) for x in msj['locus']]
+        snames.append(sname)
 
+    msj1['#detected'] = (msj[snames]>0).sum(axis=1) # number of samples with reads>0
+    msj1['maxcnt'] = msj[snames].max(axis=1) # max reads
+
+    if i==0: # first one writes header
+        UT.write_pandas(msj.T, allsjpartname, 'ih')
+    else:
+        UT.write_pandas(msj.T, allsjpartname, 'i')
+    UT.write_pandas(msj1[['locus','#detected','maxcnt']], statpartname, 'h')
+
+    return (allsjpartname, statpartname)
+
+        
 
 class MergeAssemble(object):
     """Merge multiple assemblies into one. 
@@ -758,6 +808,7 @@ class MergeAssemble(object):
         LOG.info('n0:{0}, np:{1}, nn:{2}, np+nn:{3}'.format(n0,np,nn,np+nn))
         
         # write EX,SJ
+        expn['len'] = expn['ed']-expn['st']
         UT.write_pandas(expn[self.ecols], fna.fname('mepn.ex.txt.gz'), 'h')
         UT.write_pandas(sjpn[self.scols], fna.fname('mepn.sj.txt.gz'), 'h')
         
@@ -792,11 +843,13 @@ class MergeAssemble(object):
             self.expn = expn = UT.read_pandas(fna.fname('mepn.ex.txt.gz'))
             self.sjpn = sjpn = UT.read_pandas(fna.fname('mepn.sj.txt.gz'))
 
-        sebin = BW.bw2bed(
+        sebin = BW.bw2bed_mp(
                     bwfile=fni.ex_bw('se'), 
                     bedfile=fna.fname('sebw0.bed.gz'), 
                     chroms=UT.chroms(pr['genome']), 
-                    th=0)
+                    th=0,
+                    np=pr['np']
+                    )
 
         mefile = GGB.write_bed(expn, fna.fname('mepn.me.bed.gz'), ncols=3)
         sufile = BT.bedtoolintersect(sebin,mefile,fna.fname('mepn.se-me.bed.gz'),v=True) # -v subtract
@@ -988,13 +1041,14 @@ class MergeAssemble(object):
         self.ci0 = ci0 = UT.chopintervals(ex0, fname=fna.ci_out())
 
         # calculate glen, tlen
-        tlen = UT.calc_tlen(ex0, ci0)
-        g2tlen = UT.df2dict(tlen, 'index', 'tlen')
-        ex0['tlen'] = [g2tlen[x] for x in ex0['_gidx']]
-        gr = ex0.groupby('_gidx')
-        glen = gr['ed'].max() - gr['st'].min()
-        g2glen = UT.series2dict(glen)
-        ex0['glen'] = [g2glen[x] for x in ex0['_gidx']]
+        UT.set_glen_tlen(ex0,ci0)
+        # tlen = UT.calc_tlen(ex0, ci0)
+        # g2tlen = UT.df2dict(tlen, 'index', 'tlen')
+        # ex0['tlen'] = [g2tlen[x] for x in ex0['_gidx']]
+        # gr = ex0.groupby('_gidx')
+        # glen = gr['ed'].max() - gr['st'].min()
+        # g2glen = UT.series2dict(glen)
+        # ex0['glen'] = [g2glen[x] for x in ex0['_gidx']]
 
         # adjust genes bed
         se0['tst'] = se0['st']

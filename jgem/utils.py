@@ -571,6 +571,23 @@ def calc_tlen(ex, ci):
     gbed['ltlen'] = N.log10(gbed['tlen'])
     return gbed # column: tlen, ltlen, index:_gidx
 
+def set_glen_tlen(ex,ci):
+    if 'len' not in ex.columns:
+        ex['len'] = ex['ed']-ex['st']        
+    tlen = calc_tlen(ex, ci)
+    g2tlen = df2dict(tlen, 'index', 'tlen')
+    ex['tlen'] = [g2tlen[x] for x in ex['_gidx']]
+    gr = ex.groupby('_gidx')
+    g2gst = series2dict(gr['st'].min())
+    g2ged = series2dict(gr['ed'].max())
+    ex['gst'] = [g2gst[x] for x in ex['_gidx']]
+    ex['ged'] = [g2ged[x] for x in ex['_gidx']]
+    ex['glen'] = ex['ged']-ex['gst']
+    # glen = gr['ed'].max() - gr['st'].min()
+    # g2glen = series2dict(glen)
+    # ex['glen'] = [g2glen[x] for x in ex['_gidx']]
+
+
 #### BINNED AVG ########################################################
 def calc_binned(xs, ys, num=500, yth=0, returnsorted=False, returnminmax=False, method='mean'):
     idx = range(len(xs))

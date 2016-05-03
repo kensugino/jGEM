@@ -145,6 +145,10 @@ MPARAMDIFF = dict(
 
     find53ir_covratio=0.15,
     # find53ir_covth=0.03,
+
+    me_p0=-2,
+    me_p1=1,
+    me_p2=3.1,
 )
 MPARAMS = PARAMS.copy()
 MPARAMS.update(MPARAMDIFF)
@@ -242,6 +246,7 @@ class Assembler(object):
         SJ2EX(self)()
         # ADDJIE(self)() # no need to do this
         MERGEEXONS(self)()
+
         if pr['merging']:
             FINDEDGES2(self)()
             FIXSTRAND(self)()
@@ -250,6 +255,11 @@ class Assembler(object):
             FINDIRETS(self)()
             # FINDSECOVTH(self)() # not useful here since mep,men don't have real SEs
             FIND53IR(self)()
+            CALCCOV(self)()
+            SETINFO(self)() # SET ACCEPTOR/DONOR/EXON CATEGORY
+            FINDGENES(self)()
+
+            SELECTSEME2(self)() # SELECT ME and SE, saves exname2, exname3, sjname2
         else:
             FINDEDGES(self)()
             FIXSTRAND(self)()
@@ -257,12 +267,11 @@ class Assembler(object):
             FINDIRETS(self)()
             FINDSECOVTH(self)()
             FINDSE(self)()
+            CALCCOV(self)()
+            SETINFO(self)() # SET ACCEPTOR/DONOR/EXON CATEGORY
+            FINDGENES(self)()
 
-        CALCCOV(self)()
-        SETINFO(self)() # SET ACCEPTOR/DONOR/EXON CATEGORY
-        FINDGENES(self)()
-        SELECTSEME(self)() # SELECT ME and SE, saves exname2, exname3, sjname2
-        if not pr['merging']:
+            SELECTSEME(self)() # SELECT ME and SE, saves exname2, exname3, sjname2
             FIXEDGES2(self)() # TRIM 3',5' edges
 
         CONSISTENTSJ(self)() # remove sj without ex support
@@ -2810,7 +2819,11 @@ class SELECTSEME(SUBASE):
         
         # select SE cov > secovth
         secovth = self.stats.get('FINDSE.secovth', pr['secovth'])
-        ae['len'] = ae['ed']-ae['st']
+        # ae['len'] = ae['ed']-ae['st']
+        if ('glen' not in ae.columns) or ('tlen' not in ae.columns):
+            cipath = fn.txtname('ci', category='output')
+            ci = UT.chopintervals(ae, cipath)
+            UT.set_glen_tlen(ae, ci)        
         me, se = UT.mese(ae)
         se2 = se[(se['cov']>secovth)&(se['len']>pr['se_sizeth2'])]
         # sesizeth 50 (shorter in case of concatenation), sesizeth2 200 (real size threshold)
@@ -2905,6 +2918,65 @@ class SELECTSEME(SUBASE):
         LOG.info('se({0}) => se({1}) {2} removed'.format(len(se),len(se2),len(se)-len(se2)))
         st['SELECTSEME.#removed_se'] = len(se)-len(se2)
         return sj, ex2
+
+class SELECTSEME2(SUBASE):
+    """Remove the lower right corner of the tlen-glen plot.
+
+    Args:
+        sj: junction dataframe
+        ae: exon (all exon = single+multi exons) dataframe
+
+    Returns:
+        :sj: junction dataframe without spurious junctions
+        :ae: exon dataframe without spurious exons
+
+    Related Parameters:
+        * me_p0: intercept of the boundary line
+        * me_p1: slope of the boundary line  (ltlen = me_p0+me_p1*lglen)
+        * me_p2: log10(tlen) max to consider removing
+
+    Files:
+        * ex.txt.gz
+
+
+    """
+    
+    def call(self):
+        # remove Possible artifact corner from log(glen) - log(tlen) plots
+        sj = self.asm.sj
+        ae = self.asm.ae
+        fn = self.fnobj
+        pr = self.params        
+        p0 = pr['me_p0'] # intercept
+        p1 = pr['me_p1'] # slope
+        p2 = pr['me_p2'] # ltlen max
+        if ('glen' not in ae.columns) or ('tlen' not in ae.columns):
+            cipath = fn.txtname('ci', category='output')
+            ci = UT.chopintervals(ae, cipath)
+            UT.set_glen_tlen(ae, ci)
+        # MESE
+        me,se = UT.mese(ae)
+        gme = me.groupby('_gidx')[['glen','tlen']].first()
+        x = N.log10(gme['glen'])
+        y = N.log10(gme['tlen'])
+        i1 = (y-(p0+p1*x))>=0 # above the line
+        i2 = (y-p2)>=0 # above horizontal line
+        gme2 = gme[i1|i2] # not in the corner
+        nr = N.sum((~i1)&(~i2))
+        self.info = '#<slope:{0}, #<{1}:{2}, removed:{3}'.format(N.sum(~i1), p2, N.sum(~i2), nr)
+        me2 = me[me['_gidx'].isin(gme2.index.values)] # removed the genes in the corner
+        sj2 = sj
+        ex3 = PD.concat([me2,se], ignore_index=True)
+        self.stats['SELECTSEME2.#removed_genes'] = nr
+        self.stats['SELECTSEME2.#exons_before'] = len(me)
+        self.stats['SELECTSEME2.#exons_after'] = len(me2)
+
+        # SAVE
+        # fn.write_txt(sj2, 'sj', category='output')
+        fn.write_txt(ex3, 'ex', category='output')
+        self.asm.sj = sj2
+        self.asm.ae = ex3
+    
 
 def fixedge2(ex, find, params, chrom):
     ed = EdgeDetector(**params)
