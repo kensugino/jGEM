@@ -219,7 +219,7 @@ def bw2bed_mp(bwfile, bedfile, chroms, th, np=4):
     bedfile = UT.compress(bedbase)
 
     # clean up temp files
-    for f in files:
+    for f in rslts:
         os.unlink(f)
 
     return bedfile
