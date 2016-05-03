@@ -148,7 +148,8 @@ class EvalMatch(object):
             'sb':'single exons (b)',
             'j':'junctions'}
 
-    def __init__(self, en1, en2, bigwig, sjfile, datacode, binsize=500):
+    def __init__(self, en1, en2, bigwig, sjfile, datacode, binsize=500,
+                exclude_se_from_completeness=True):
         """
         Args:
             en1: EvalNames object, reference
@@ -169,6 +170,7 @@ class EvalMatch(object):
                       'binsize':binsize,'bigwig':bigwig, 'sjfile':sjfile}     
         self.ratios = {} # holds dataframes of cov(x) and ratio(y)
         self.binsize = binsize
+        self.exclude_se_from_completeness = exclude_se_from_completeness
 
     def calculate(self, np=3, saveintermediates=False):
         """Calculate necessary data.
@@ -494,7 +496,14 @@ class EvalMatch(object):
 
         """
         ov = self.ov # all
-        ov2 = ov[(ov['b__gidx']!='.')&((ov['strand']==ov['b_strand'])|(ov['b_strand']=='.'))] # actual overlap with correct strand
+        if self.exclude_se_from_completeness:
+            ov = ov[ov['cat']!='s']
+
+        # actual overlap with correct strand
+        ov2 = ov[(ov['b__gidx']!='.')&((ov['strand']==ov['b_strand'])|(ov['b_strand']=='.'))] 
+        if self.exclude_se_from_completeness:
+            ov2 = ov2[ov2['b_cat']!='s']
+
         gcovname = self.colname('gcov')
         g2gcov = UT.df2dict(self.e1, '_gidx', gcovname)
         xlim = [0,6]
