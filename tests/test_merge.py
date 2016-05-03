@@ -12,7 +12,9 @@ from jgem import merge as MG
 from jgem import gtfgffbed as GGB
 
 def test_MergeInputNames(testsampleinfo, outdir, datadir):
-	fn = MG.MergeInputNames(testsampleinfo, 'test-mergeinputnames', outdir)
+	with pytest.raises(ValueError):
+		fn = MG.MergeInputNames(testsampleinfo, 'test-mergeinputnames', outdir)
+	fn = MG.MergeInputNames(testsampleinfo, 'test-mergeinputnames', outdir, checkfiles=False)
 	p = os.path.join(outdir, 'test-mergeinputnames.')
 	expaths = fn.expaths()
 	assert ('sample1', 'assemblies/s1.ex.txt.gz') == expaths[0]
