@@ -45,7 +45,7 @@ PARAMS = dict(
     checksjsupport=False, # whether check splice junctions without read support (necessary when merging or binth>0)
     binth=0, # bigwig to bed threshold
 
-    jie_binth=320, #16,
+    jie_binth=32, #16,
     jie_sjth=100,    
     jie_ratio=0.01, # junctions in a exon ratio to surrounding junctions which define the exon
 
@@ -497,24 +497,31 @@ class REMOVEJIE(SUBASE):
         sjfile = self.sjfile()
         fn = self.fnobj
         pr = self.params
+        stats = self.stats
+        acov = BW.get_totbp_covbp_bw(fn.bwfile, pr['genome'], ['chr1']).ix['acov'].values[0]
+        jie_binth = pr['jie_binth']*acov
+        jie_sjth = pr['jie_sjth'] #*acov # seems no need to scale sjth 
+        stats['REMOVEJIE.jie_binth'] = jie_binth
+        stats['REMOVEJIE.jie_sjth'] = jie_sjth
+        stats['REMOVEJIE.acov'] = acov
 
         # covarage file
-        binfile = self.bw2bed(pr['jie_binth'])
+        binfile = self.bw2bed(jie_binth)
         # if nothing in binfile then skip
         try:
             jiebw = GGB.read_bed(binfile)
         except:
             self.asm.jie = None
             self.info = 'nothing above jie_binth {0}'.format(pr['jie_binth'])
-            self.stats['REMOVEJIE.#sj'] = len(sj)
-            self.stats['REMOVEJIE.#jie'] = 0
+            stats['REMOVEJIE.#sj'] = len(sj)
+            stats['REMOVEJIE.#jie'] = 0
             return            
 
         if len(jiebw)==0:
             self.asm.jie = None
             self.info = 'nothing above jie_binth {0}'.format(pr['jie_binth'])
-            self.stats['REMOVEJIE.#sj'] = len(sj)
-            self.stats['REMOVEJIE.#jie'] = 0
+            stats['REMOVEJIE.#sj'] = len(sj)
+            stats['REMOVEJIE.#jie'] = 0
             return            
 
         sjmp = BT.calc_ovlratio(
@@ -538,8 +545,8 @@ class REMOVEJIE(SUBASE):
         sj1 = sj[~idx].copy() # use these for "nearest donor/acceptor" exon extraction
         jie = sj[idx].copy() # junctions in exon, add later
         self.info = '#sj:{0}=>{1}, jie {2}'.format(len(sj), len(sj1), len(jie))
-        self.stats['REMOVEJIE.#sj'] = len(sj1)
-        self.stats['REMOVEJIE.#jie'] = len(jie)
+        stats['REMOVEJIE.#sj'] = len(sj1)
+        stats['REMOVEJIE.#jie'] = len(jie)
         #return sj1, jie
         self.asm.sj = sj1
         self.asm.jie = jie
