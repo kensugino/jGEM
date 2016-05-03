@@ -3,6 +3,7 @@ import pytest
 import pandas as PD
 import numpy as N
 import subprocess
+import gzip
 
 from jgem import utils as UT
 from jgem import bigwig as BW
@@ -50,3 +51,13 @@ def test_array2wiggle_chr(bigwig, tmpdir, mm10chromsizes):
 # def test_merge_bigwigs_mp():
 # 	pass
 
+def test_bw2bed_mp(bigwig,outdir):
+	bedfile = os.path.join(outdir, 'test_bw2bed_mp.bed.gz')
+	BW.bw2bed_mp(bigwig, bedfile, ['chr1','chr2','chr3'], th=100, np=2)
+	# count empty lines
+	cnt = 0
+	with gzip.open(bedfile) as fp:
+		for line in fp:
+			if line=='':
+				cnt += 1
+	assert cnt == 0
