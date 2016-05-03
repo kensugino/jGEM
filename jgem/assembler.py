@@ -2500,7 +2500,9 @@ class FINDSECOVTH(SUBASE):
         cnto = 2**yo2[i0:i2]-1
         cp = N.sum(cntf)   # total positive
         cn = N.sum(cnto)-cp # total negative (observed - positive)
+        LOG.debug('calc_th99, i0:{0},i1:{1},i2:{2},cp:{3},cn:{4}'.format(i0,i1,i2,cp,cn))
         if cn<0: # due to noise when almost perfect
+            LOG.warning('calc_th99, cn negative')
             cn = 0 
             th99x = xf[i0]
             th99 = 2**th99x - gamma
@@ -2515,9 +2517,10 @@ class FINDSECOVTH(SUBASE):
         fpr = fp/cn
         # fpr[N.isnan(fpr)]=0
         tf = tpr-fpr
-        tmp = N.nonzero(fpr<=th)[0]
-        th99x = xf[i0+N.min(tmp)]
+        tmp = N.nonzero(fpr<=th)
+        th99x = xf[i0+N.min(tmp[0])]
         th99 = 2**th99x - gamma
+        LOG.debug('calc_th99 fpr<=th index:{0},th99x:{1},th99:{2}'.format(str(tmp),th99x,th99))
         return th99x,th99
 
         # idx = slice(i0,i1)
@@ -2587,7 +2590,7 @@ class FINDSECOVTH(SUBASE):
             a0 = a0s[idx]
             r = ress[idx]
             min_st = sts[idx]
-            eidx = idx+4
+            eidx = min_st+4
             LOG.info('FINDSECOV: SE fit a0={0}, st={1}, x[st]={2}, res={3}'.format(a0,min_st,x[min_st],r))
 
             # old version
