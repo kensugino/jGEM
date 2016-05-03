@@ -424,6 +424,7 @@ class MergeInputs(object):
         self.stats['#sj1'] = len(sj1)
 
         args = []
+        sj2files = []
         cols0 = GGB.SJCOLS
         for chrom in self.chroms:
             # make sj1chroms with 
@@ -431,9 +432,11 @@ class MergeInputs(object):
             sj1chrompath = fn.bedname('sj1.{0}'.format(chrom))
             UT.write_pandas(tmp[cols0], sj1chrompath, '')
             ovlchrompath = fn.txtname('sj1.ovl.{0}'.format(chrom))
-            sj4chrompath = fn.txtname('sj4.{0}'.format(chrom))
+            # sj4chrompath = fn.txtname('sj4.{0}'.format(chrom))
             sj2chrompath = fn.txtname('sj2.{0}'.format(chrom))
-            args.append((sj1chrompath, ovlchrompath, sj4chrompath, sj2chrompath, pr['th_ratio'], chrom))
+            sj2files.append(sj2chrompath)
+            # args.append((sj1chrompath, ovlchrompath, sj4chrompath, sj2chrompath, pr['th_ratio'], chrom))
+            args.append((sj1chrompath, ovlchrompath, sj2chrompath, pr['th_ratio'], chrom))
         
         # select_sj_chr(sj0chrompath, ovlpath, sj4chrompath, sj2chrompath, th_ratio)
         rslts = UT.process_mp(select_sj_chr, args, np, doreduce=False)
@@ -446,6 +449,16 @@ class MergeInputs(object):
         self.sj5 = sj5 = sj1.set_index('locus').ix[sel]
         UT.write_pandas(sj5, fn.sj5_txt())
         self.stats['#sj5'] = len(sj5)
+
+        # concatenate sj2
+        sj2path = fn.txtname('sj2',category='output')
+        with open(sj2path, 'wb') as dst:
+            for f in sj2files:
+                with open(f, 'rb') as src:
+                    shutil.copyfileobj(src, dst)
+        for f in sj2path:
+            os.unlink(f)
+        
 
     def write_sjpn(self):
         fn = self.fnobj
@@ -545,7 +558,7 @@ def make_sj_bed_chr(sjpaths,dstpath,chrom):
             dst.write(txt+'\n')
     return UT.compress(wpath)
 
-def select_sj_chr(sj1chrompath, ovlpath, sj4chrompath, sj2chrompath, th_ratio, chrom):
+def select_sj_chr(sj1chrompath, ovlpath, sj2chrompath, th_ratio, chrom):
     """Select aggregated junctions according to several metrics"""
     # calc self intersection to find overlapping junctions
     a = b = sj1chrompath
@@ -580,7 +593,7 @@ def select_sj_chr(sj1chrompath, ovlpath, sj4chrompath, sj2chrompath, th_ratio, c
     LOG.info('selectsj: {0} smaller than th_ratio({1}) (in {3}) file:{2}'.format(N.sum(~idx1),th_ratio,sj1chrompath,len(sj2)))
     cols = GGB.SJCOLS
     # write out selected locus
-    UT.write_pandas(sj4[['locus']], sj4chrompath, 'h')
+    #UT.write_pandas(sj4[['locus']], sj4chrompath, 'h')
     # write out sj2 for debug
     UT.write_pandas(sj2, sj2chrompath, 'h')
     stats = {chrom+'.#sj2':len(sj2), chrom+'.#sj4':len(sj4)}
