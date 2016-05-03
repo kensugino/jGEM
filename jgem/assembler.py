@@ -45,9 +45,9 @@ PARAMS = dict(
     checksjsupport=False, # whether check splice junctions without read support (necessary when merging or binth>0)
     binth=0, # bigwig to bed threshold
 
-    jie_binth=32, #16,
+    jie_binth=10, #16,
     jie_sjth=100,    
-    jie_ratio=0.01, # junctions in a exon ratio to surrounding junctions which define the exon
+    #jie_ratio=0.01, # junctions in a exon ratio to surrounding junctions which define the exon
 
     ureadth=0, # SJ uniq read (can be -1 to use uread=0 but mread>0)
     mreadth=0, # SJ non-uniq read threshold

@@ -36,13 +36,14 @@ MERGECOVPARAM = dict(
     uth=0, # unique count threshold
     mth=0, # 5, # non-unique count threshold
     th_ratio=1e-3, # discard junctions less than this portion within overlapping junctions
-    th_detected=2, # at least observed in 3 samples
+    th_detected=1, # at least observed in 2 samples
     th_maxcnt1=5, # max read count should be larger than this
-    th_maxcnt2=20, # if max read count is larger than this then single sample observation is OK
+    th_maxcnt2=10, # if max read count is larger than this then single sample observation is OK
     
     minsecovth=30, # min secov at individual sample level for SE to be included
     secovfactor=3, # *secovth is the threshold to include  
     se_binth=10, # when extracting SE candidates from allsample.bw
+    use_se2=False, # add high cov SE from each sample?
 )
 MERGEASMPARAM = dict(
     # se_maxth=500,   # SE maxcov threshold
@@ -864,7 +865,7 @@ class MergeAssemble(object):
                                     bed=df, 
                                     bwname=fni.agg_bw(), #ex_bw('se'), 
                                     fname=fna.fname('se.cov.all.txt.gz'), 
-                                    np=pr['np'], 
+                                    np=0, #pr['np'],  # setting th>0 screws secovth calc?
                                     which='cov')
         # calculate MECOV
         self.mecov = mecov = CC.calc_cov_ovl_mp(
@@ -887,6 +888,9 @@ class MergeAssemble(object):
         # covciname = fna.fname('mepn.covci.txt.gz') # register as temp files, delete later
         # ecovname = fna.fname('mepn.ecov.txt.gz')
 
+        # * use minsecovth for safeguard
+        # * increase secovfactor? 
+
         # apply powerlaw threshold finding
         self.f = f = AS.FINDSECOVTH(self)
         f.ex = mecov
@@ -896,32 +900,36 @@ class MergeAssemble(object):
         self.stats['assemble_se2.secovth'] = f.se_th99
         self.stats['assemble_se2.#se1'] = len(se1)
 
-        # gather high confidence SE from each sample
-        sebin2 = BW.bw2bed_mp(
-                    bwfile=fni.ex_bw('se'), 
-                    bedfile=fna.fname('sebw0.bed.gz'), 
-                    chroms=UT.chroms(pr['genome']), 
-                    th=0,
-                    np=pr['np']
-                    )
-        sufile2 = BT.bedtoolintersect(sebin2,mefile,fna.fname('mepn.se2-me.bed.gz'),v=True) 
-        # -v subtract (remove overlapped)
-        df2 = GGB.read_bed(sufile2)
-        self.se2 = se2 = CC.calc_cov_mp(
-                                    bed=df2, 
-                                    bwname=fni.agg_bw(), #ex_bw('se'), 
-                                    fname=fna.fname('se2.cov.all.txt.gz'), 
-                                    np=pr['np'], 
-                                    which='cov')        
-        self.stats['assemble_se2.#se2'] = len(se2)
-
-        # combine remove overlapped
-        cols = ['chr','st','ed','cov']
-        s1p = UT.write_pandas(se1[cols], fna.fname('se1.bed.gz'), '')
-        s2p = UT.write_pandas(se2[cols], fna.fname('se2.bed.gz'), '')
-        sufile3 = BT.bedtoolintersect(s1p,s2p,fna.fname('mepn.se1-se2.bed.gz'),v=True) # -v subtract
-        se3 = UT.read_pandas(sufile3, names=cols)
-        self.se0 = se0 = PD.concat([se2[cols], se3[cols]], ignore_index=True)
+        if pr['use_se2']:
+            # gather high confidence SE from each sample
+            sebin2 = BW.bw2bed_mp(
+                        bwfile=fni.ex_bw('se'), 
+                        bedfile=fna.fname('sebw0.bed.gz'), 
+                        chroms=UT.chroms(pr['genome']), 
+                        th=0,
+                        np=pr['np']
+                        )
+            sufile2 = BT.bedtoolintersect(sebin2,mefile,fna.fname('mepn.se2-me.bed.gz'),v=True) 
+            # -v subtract (remove overlapped)
+            df2 = GGB.read_bed(sufile2)
+            self.se2 = se2 = CC.calc_cov_mp(
+                                        bed=df2, 
+                                        bwname=fni.agg_bw(), #ex_bw('se'), 
+                                        fname=fna.fname('se2.cov.all.txt.gz'), 
+                                        np=pr['np'], 
+                                        which='cov')        
+            self.stats['assemble_se2.#se2'] = len(se2)
+            LOG.info('#se1={0}, #se2={1}, secovth={2}'.format(len(se1),len(se2),f.se_th99))
+            # combine remove overlapped
+            cols = ['chr','st','ed','cov']
+            s1p = UT.write_pandas(se1[cols], fna.fname('se1.bed.gz'), '')
+            s2p = UT.write_pandas(se2[cols], fna.fname('se2.bed.gz'), '')
+            sufile3 = BT.bedtoolintersect(s1p,s2p,fna.fname('mepn.se1-se2.bed.gz'),v=True) # -v subtract
+            se3 = UT.read_pandas(sufile3, names=cols)
+            self.se0 = se0 = PD.concat([se2[cols], se3[cols]], ignore_index=True)
+        else:
+            LOG.info('#se1={0}, secovth={1}'.format(len(se1),f.se_th99))
+            self.se0 = se0 = se1
 
         # save 
         gid0 = max(pr['se_gidstart'], N.max(N.abs(expn['_gidx'])))
