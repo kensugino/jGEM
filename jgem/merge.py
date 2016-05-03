@@ -36,8 +36,8 @@ MERGECOVPARAM = dict(
     uth=0, # unique count threshold
     mth=0, # 5, # non-unique count threshold
     th_ratio=1e-3, # discard junctions less than this portion within overlapping junctions
-    th_detected=1, # at least observed in 2 samples
-    th_maxcnt1=5, # max read count should be larger than this
+    th_detected=0, # at least observed in 2 samples
+    th_maxcnt1=0, # max read count should be larger than this
     th_maxcnt2=10, # if max read count is larger than this then single sample observation is OK
     
     minsecovth=30, # min secov at individual sample level for SE to be included
