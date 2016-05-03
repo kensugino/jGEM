@@ -436,7 +436,7 @@ class MergeInputs(object):
             tmp = sj1[sj1['chr']==chrom]
             sj1chrompath = fn.bedname('sj1.{0}'.format(chrom))
             UT.write_pandas(tmp[cols0], sj1chrompath, '')
-            ovlchrompath = fn.txtname('sj1.ovl.{0}'.format(chrom))
+            ovlchrompath = fn.fname('sj1.ovl.{0}.txt'.format(chrom))
             # sj4chrompath = fn.txtname('sj4.{0}'.format(chrom))
             sj2chrompath = fn.txtname('sj2.{0}'.format(chrom))
             sj2files.append(sj2chrompath)

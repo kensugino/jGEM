@@ -346,6 +346,9 @@ def _bedtoolscatcherror(which, aname, bname, cname, **kwargs):
         
     if cname.endswith('.gz'):
         cname = cname[:-3]
+        compress=True
+    else:
+        compress=False
     try:
         ret = _runbedtools3(which,aname,bname,cname,**kwargs)
     except RuntimeError:
@@ -357,13 +360,18 @@ def _bedtoolscatcherror(which, aname, bname, cname, **kwargs):
             os.unlink(aname2)
         if bname2 != bname:
             os.unlink(bname2)
-    return UT.compress(cname)
+    if compress:
+        return UT.compress(cname)
+    return cname
 
 def _bedtoolscatcherror2(which, aname, cname, **kwargs):
     if not os.path.exists(aname):
         raise ValueError('{0} does not exists'.format(aname))        
     if cname.endswith('.gz'):
         cname = cname[:-3]
+        compress=True
+    else:
+        compress=False
     try:
         ret = _runbedtools2(which,aname,cname,**kwargs)
     except RuntimeError:
@@ -372,7 +380,9 @@ def _bedtoolscatcherror2(which, aname, cname, **kwargs):
         ret = _runbedtools2(which,aname2,cname,**kwargs)
         if aname2 != aname:
             os.unlink(aname2)
-    return UT.compress(cname)
+    if compress:
+        return UT.compress(cname)
+    return cname
 
 def calc_ovlratio(aname, bname, tname, nacol, nbcol, idcol=['chr','st','ed']):
     """Calculate overlapped portion of b onto a. 
