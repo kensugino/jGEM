@@ -72,6 +72,7 @@ PARAMS = dict(
 
 
     findsecovth=True, # whether to use adaptive secovth (pndr2)
+    secov_fpr_th=0.001, # FPR 
     minsecovth=5, #0.1,# minimum single exon coverage (normalized to million alignments)
     secovth=10, #0.5, # default SE cov threshold if not using adaptive version (pndr1)
     se_gap=170, #50,# single exon gap fill
@@ -2622,7 +2623,8 @@ class FINDSECOVTH(SUBASE):
         res = N.sum((yo-yf)**2)
         
         if ax is not None: # also calculate th99
-            th99x,th99 = self._calc_th99(xf,yo,yf,gamma,0,eidx)
+            th = self.params['secov_fpr_th']
+            th99x,th99 = self._calc_th99(xf,yo,yf,gamma,0,eidx,th)
 
             ax.plot(x,y,'o',ms=3)
             ax.plot(x,a0+a1*x,'m-',lw=1)
