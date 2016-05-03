@@ -188,7 +188,8 @@ def bw2bed(bwfile, bedfile, chroms, th):
     UT.makedirs(os.path.dirname(bedfile))
     out = open(bedbase,'w')
     out.write(''.join(['%s\t%i\t%i\n' % x for x in processor]))
-    out.write('\n')
+    #out.write('\n') #<= this introduces space inbetween chroms in mp ode
+    # which terminates bedtools at chr1
     out.close()
     return UT.compress(bedbase)
 

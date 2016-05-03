@@ -42,8 +42,9 @@ MERGECOVPARAM = dict(
     
     minsecovth=30, # min secov at individual sample level for SE to be included
     secovfactor=3, # *secovth is the threshold to include  
-    se_binth=10, # when extracting SE candidates from allsample.bw
+    se_binth=0, # when extracting SE candidates from allsample.bw
     use_se2=False, # add high cov SE from each sample?
+
 )
 MERGEASMPARAM = dict(
     # se_maxth=500,   # SE maxcov threshold
@@ -896,8 +897,10 @@ class MergeAssemble(object):
         f.ex = mecov
         f.fnobj.sname = fna.code
         f.find_secovth()
-        self.se1 = se1 = secov[secov['cov']>f.se_th99].copy()
-        self.stats['assemble_se2.secovth'] = f.se_th99
+        th = pr['secovfactor']*max(f.se_th99, pr['minsecovth'])
+        self.se1 = se1 = secov[secov['cov']>th].copy()
+        self.stats['assemble_se2.secovth_found'] = f.se_th99
+        self.stats['assemble_se2.secovth_used'] = th
         self.stats['assemble_se2.#se1'] = len(se1)
 
         if pr['use_se2']:
