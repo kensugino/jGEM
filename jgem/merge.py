@@ -36,9 +36,8 @@ MERGECOVPARAM = dict(
     uth=0, # unique count threshold
     mth=0, # 5, # non-unique count threshold
     th_ratio=1e-3, # discard junctions less than this portion within overlapping junctions
-    th_detected=0, # at least observed in 2 samples
-    th_maxcnt1=0, # max read count should be larger than this
-    th_maxcnt2=10, # if max read count is larger than this then single sample observation is OK
+    th_detected=1, # at least observed in 2 samples for non-unique
+    th_maxcnt=100, # max read count should be larger than this for non-unique reads
     
     minsecovth=30, # min secov at individual sample level for SE to be included
     secovfactor=3, # *secovth is the threshold to include  
@@ -207,11 +206,10 @@ class MergeInputs(object):
             * th_ratio: threshold for selecting junctions by overlapping ratio 
               (default 0.001, i.e. if a junction's read is less than 1/1000 of the sum of 
               all the reads of overlapping junctions then the junction is discarded)
-            * th_detected: junctions need to be detected in more than this number of samples (default 2)
-              unless max junction reads across samples is larger than th_maxcnt2
-            * th_maxcnt1: max junction reads across sample has to be larger than this (default 0.1)
-            * th_maxcnt2: if max junction reads across samples is larger than this, ignore th_detected
-              (default 4)
+            * th_detected: non-unique junctions need to be detected in more than this number of samples 
+              (default 1)
+            * th_maxcnt: max junction reads across sample has to be larger than this for non-unique reads
+              (default 100)
 
         """
         self.fnobj = fnobj
@@ -413,10 +411,12 @@ class MergeInputs(object):
         sj0['locus'] = UT.calc_locus_strand(sj0)
         sj0['#detected'] = [l2d[x] for x in sj0['locus']]
         sj0['maxcnt'] = [l2m[x] for x in sj0['locus']]
+        idx1 = sj0['ucnt']>0 # unique reads
         idx2 = sj0['#detected']>pr['th_detected']
-        idx3 = sj0['maxcnt']>pr['th_maxcnt1']
-        idx4 = sj0['maxcnt']>pr['th_maxcnt2']
-        sj1 = sj0[(idx2&idx3)|idx4].copy()
+        idx3 = sj0['maxcnt']>pr['th_maxcnt']
+        # idx4 = sj0['maxcnt']>pr['th_maxcnt2']
+        # sj1 = sj0[(idx2&idx3)|idx4].copy()
+        sj1 = sj0[idx1|(idx2&idx3)].copy()
         UT.write_pandas(sj1, fn.sj1_txt())
         LOG.info('selectsj: {0} smaller than th_detected({1})'.format(N.sum(~idx2),pr['th_detected']))
         LOG.info('selectsj: {0} smaller than th_maxcnt1({1})'.format(N.sum(~idx3),pr['th_maxcnt1']))
