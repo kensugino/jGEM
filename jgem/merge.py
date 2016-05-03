@@ -69,7 +69,7 @@ class MergeInputNames(FN.FileNamesBase):
 
     """
 
-    def __init__(self, sampleinfo, code, outdir):
+    def __init__(self, sampleinfo, code, outdir, checkfiles=True):
         self.si = sampleinfo
         self.code = code
         self.outdir = outdir
@@ -79,16 +79,17 @@ class MergeInputNames(FN.FileNamesBase):
             if c not in sicols:
                 raise ValueError('{0} not in sampleinfo'.format(c))
         # check existence of files
-        for f in sampleinfo['sjbed_path'].values:
-            if not os.path.exists(f):
-                raise ValueError('file {0} does not exists'.format(f))
-        for f in sampleinfo['bw_path'].values:
-            if not os.path.exists(f):
-                raise ValueError('file {0} does not exists'.format(f))
-        for f in sampleinfo['sjexpre'].values:
-            for suf in ['.ex.txt.gz','.sj.txt.gz']:
-                if not os.path.exists(f+suf):
-                    raise ValueError('file {0} does not exists'.format(f+suf))
+        if checkfiles:
+            for f in sampleinfo['sjbed_path'].values:
+                if not os.path.exists(f):
+                    raise ValueError('file {0} does not exists'.format(f))
+            for f in sampleinfo['bw_path'].values:
+                if not os.path.exists(f):
+                    raise ValueError('file {0} does not exists'.format(f))
+            for f in sampleinfo['sjexpre'].values:
+                for suf in ['.ex.txt.gz','.sj.txt.gz']:
+                    if not os.path.exists(f+suf):
+                        raise ValueError('file {0} does not exists'.format(f+suf))
 
         prefix = os.path.join(outdir, code)
         super(MergeInputNames, self).__init__(prefix)
@@ -456,7 +457,7 @@ class MergeInputs(object):
             for f in sj2files:
                 with open(f, 'rb') as src:
                     shutil.copyfileobj(src, dst)
-        for f in sj2path:
+        for f in sj2files:
             os.unlink(f)
         
 
@@ -914,9 +915,13 @@ class MergeAssemble(object):
                                     which='cov')        
         self.stats['assemble_se2.#se2'] = len(se2)
 
-        # combine
+        # combine remove overlapped
         cols = ['chr','st','ed','cov']
-        self.se0 = se0 = PD.concat([se1[cols], se2[cols]], ignore_index=True)
+        s1p = UT.write_pandas(se1[cols], fna.fname('se1.bed.gz'), '')
+        s2p = UT.write_pandas(se2[cols], fna.fname('se2.bed.gz'), '')
+        sufile3 = BT.bedtoolintersect(s1p,s2p,fna.fname('mepn.se1-se2.bed.gz'),v=True) # -v subtract
+        se3 = UT.read_pandas(sufile3, names=cols)
+        self.se0 = se0 = PD.concat([se2[cols], se3[cols]], ignore_index=True)
 
         # save 
         gid0 = max(pr['se_gidstart'], N.max(N.abs(expn['_gidx'])))
