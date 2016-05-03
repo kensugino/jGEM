@@ -2534,29 +2534,55 @@ class FINDSECOVTH(SUBASE):
             y3 = y[st:ed]
             a1,a0 = N.polyfit(x3,y3,1)
         else:
-            LOG.info('ed={0} x[ed]={1}'.format(ed, x[ed]))
-            LOG.info('ed2={0} x[ed2]={1}'.format(ed2, x[ed2]))
+            # LOG.info('ed={0} x[ed]={1}'.format(ed, x[ed]))
+            # 3rd version
+            # calculate a0 for each points in st2-ed2 (window +-2) take minimum
+            st2 = N.argmax(y) # max pos
+            st2 = N.max(N.min(st2, ed2-8), 0)
+            LOG.info('st2={2}, x[st2]={3}, ed2={0} x[ed2]={1}'.format(ed2, x[ed2], st2, x[st2]))
+            a0s = []
+            ress = []
+            sts = range(st2, ed2-4)
+            for sttmp in sts:
+                x3 = x[sttmp:sttmp+4]
+                y3 = y[sttmp:sttmp+4]
+                a0tmp = N.mean(y3-a1*x3) # intercept
+                x2 = x[:sttmp+2]
+                y2 = y[:sttmp+2]
+                yftmp = a0tmp+a1*x2
+                restmp = N.mean((y2-yftmp)**2)
+                a0s.append(a0tmp)
+                ress.append(restmp)
+            idx = N.argmin(a0s)
+            a0 = a0s[idx]
+            r = ress[idx]
+            min_st = sts[idx]
+            LOG.info('FINDSECOV: SE fit a0={0}, st={1}, x[st]={2}, res={3}'.format(a0,min_st,x[min_st],r))
+
+            # old version
             # st = 15 # throw away initial 14 points
             # x3 = x[st:ed]
             # y3 = y[st:ed]
             # a0 = N.mean(y3-a1*x3) # directly calculate intercept
             # change st and calculate ave_res take a0 for min ave_res
-            use = int(nbins*0.3) if nbins < 50 else 15
-            sts = range(st,ed2-use)
-            mres = []
-            a0s = []
-            for sttmp in sts:
-                x3 = x[sttmp:ed2]
-                y3 = y[sttmp:ed2]
-                a0tmp = N.mean(y3-a1*x3)
-                yftmp = a0tmp+a1*x3
-                a0s.append(a0tmp)
-                mres.append(N.mean((y3-yftmp)**2))
-            min_res = N.min(mres)
-            min_idx = mres.index(min_res)
-            a0 = a0s[min_idx]
-            min_st = sts[min_idx]
-            LOG.info('FINDSECOV: SE fit a0={0}, st={1}, x[st]={2}'.format(a0,min_st,x[min_st]))
+
+            # 2nd version
+            # use = int(nbins2*0.5) if nbins2 < 50 else 20
+            # sts = range(st,ed2-use)
+            # mres = []
+            # a0s = []
+            # for sttmp in sts:
+            #     x3 = x[sttmp:ed2]
+            #     y3 = y[sttmp:ed2]
+            #     a0tmp = N.mean(y3-a1*x3)
+            #     yftmp = a0tmp+a1*x3
+            #     a0s.append(a0tmp)
+            #     mres.append(N.mean((y3-yftmp)**2))
+            # min_res = N.min(mres)
+            # min_idx = mres.index(min_res)
+            # a0 = a0s[min_idx]
+            # min_st = sts[min_idx]
+            # LOG.info('FINDSECOV: SE fit a0={0}, st={1}, x[st]={2}'.format(a0,min_st,x[min_st]))
 
         yf = a0+a1*xf
         res = N.sum((yo-yf)**2)
