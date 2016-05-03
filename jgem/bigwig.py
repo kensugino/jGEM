@@ -217,6 +217,24 @@ def bw2bed_mp(bwfile, bedfile, chroms, th, np=4):
     return bedfile
 
 
+### covbp, totbp, avgcov from bigwig array #################################
+
+def get_totbp_covbp_bw(bwfile, genome, chroms=None):
+    chromdf = UT.chromdf(genome).set_index('chr')['size']
+    def one(chrom):
+        csize = chromdf.ix[chrom]
+        a = BW.get_bigwig_as_array(bwfile, chrom, 0, csize)
+        totbp = N.sum(a)
+        covbp = N.sum(a>0)
+        acov = float(totbp)/covbp
+        covp = float(covbp)/csize
+        return {'totbp':totbp,'covbp':covbp,'acov':acov,'cov%':covp}
+    if chroms is None:
+        chroms = UT.chroms(genome)
+    df = PD.DataFrame({x: one(x) for x in chroms})
+    return df
+
+
 ### Merge BigWigs ##########################################################
 
 def get_bigwig_as_array(bwfile, chrom, st, ed):
