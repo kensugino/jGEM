@@ -2538,7 +2538,7 @@ class FINDSECOVTH(SUBASE):
             # 3rd version
             # calculate a0 for each points in st2-ed2 (window +-2) take minimum
             st2 = N.argmax(y) # max pos
-            st2 = N.max(N.min(st2, ed2-8), 0)
+            st2 = max(min(st2, ed2-8), 0)
             LOG.info('st2={2}, x[st2]={3}, ed2={0} x[ed2]={1}'.format(ed2, x[ed2], st2, x[st2]))
             a0s = []
             ress = []
