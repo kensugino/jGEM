@@ -405,6 +405,7 @@ class MergeInputs(object):
         dets = []
         maxs = []
         mohs = []
+        tots = []
         with open(fn.allsj_txt(), 'wb') as dst:
             for aspn, spn in files:
                 with open(aspn, 'rb') as src:
@@ -413,18 +414,24 @@ class MergeInputs(object):
                 dets.append(df['#detected'])
                 maxs.append(df['maxcnt'])
                 mohs.append(df['maxoverhang'])
+                tots.append(df['totcnt'])
 
         dfdet = PD.concat(dets, axis=1)
         dfmax = PD.concat(maxs, axis=1)
         dfmoh = PD.concat(mohs, axis=1)
+        dftot = PD.concat(tots, axis=1)
+
         l2d = UT.series2dict(dfdet.sum(axis=1))
         l2m = UT.series2dict(dfmax.max(axis=1))
         l2o = UT.series2dict(dfmoh.max(axis=1))
+        l2t = UT.series2dict(dftot.sum(axis=1))
+
         msj['#detected'] = [l2d[x] for x in msj['locus']]
         msj['maxcnt'] = [l2m[x] for x in msj['locus']]
         msj['maxoverhang'] = [l2o[x] for x in msj['locus']]
+        msj['totcnt'] = [l2t[x] for x in msj['locus']]
 
-        cols = ['locus','#detected','maxcnt','maxoverhang']
+        cols = ['locus','#detected','maxcnt','totcnt','maxoverhang']
         UT.write_pandas(msj[cols], fn.allsj_stats(), 'h')
         self.allsj = msj[cols].copy()
         
@@ -671,13 +678,14 @@ def collect_sj_part(sjpathpart, msjname, allsjpartname, statpartname, i):
 
     msj1['#detected'] = (msj[snames]>0).sum(axis=1) # number of samples with reads>0
     msj1['maxcnt'] = msj[snames].max(axis=1) # max reads
+    msj1['totcnt'] = msj[snames].sum(axis=1)
     msj1['maxoverhang'] = maxoh['oh']
 
     if i==0: # first one writes header
         UT.write_pandas(msj.T, allsjpartname, 'ih')
     else:
         UT.write_pandas(msj.T, allsjpartname, 'i')
-    UT.write_pandas(msj1[['locus','#detected','maxcnt','maxoverhang']], statpartname, 'h')
+    UT.write_pandas(msj1[['locus','#detected','maxcnt','maxoverhang','totcnt']], statpartname, 'h')
 
     return (allsjpartname, statpartname)
 
