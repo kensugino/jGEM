@@ -968,14 +968,15 @@ class MergeAssemble(object):
             f.se = semax
             semax['cov'] = semax['max']
             f.find_secovth()
+            th = max(f.se_th99, pr['minsecovth'])
             semax['cov'] = secov['cov']
             self.se1 = se1 = semax[semax['max']>th].copy()
         else:
             f.se = secov
             secov['max'] = semax['max']
             f.find_secovth()
+            th = max(f.se_th99, pr['minsecovth'])
             self.se1 = se1 = secov[secov['cov']>th].copy()
-        th = max(f.se_th99, pr['minsecovth'])
         
 
         self.stats['assemble_se2.secovth_found'] = f.se_th99
