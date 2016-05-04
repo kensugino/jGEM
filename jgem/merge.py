@@ -53,8 +53,8 @@ MERGEASMPARAM = dict(
     use_se2=False, # add high cov SE from each sample?
     secov_fpr_th=0.005, 
     jie_binth=10,
-    uth=0,
-    mth=100,
+    ureadth=0,
+    mreadth=100,
     findsecov_usesemax=True
 )
 
@@ -389,7 +389,7 @@ class MergeInputs(object):
         files = []
         for i in range(np):
             sjpathpart = sjpaths[i*n:(i+1)*n]
-            allsjpartname =  fn.txtname('allsj.{0}'.format(i))
+            allsjpartname =  fn.txtname('allsjpart.{0}'.format(i))
             statpartname = fn.txtname('allsjstats.{0}'.format(i))
             args.append((sjpathpart, msjname, allsjpartname, statpartname, i))
             files.append((allsjpartname, statpartname))
