@@ -95,7 +95,10 @@ class EvalNames(FN.FileNamesBase):
 
         path = self.modelpath(which, code2)
         if os.path.exists(path): # file exists
-            df = UT.read_pandas(path)
+            if which == 'ci':
+                df = GGB.read_bed(path)
+            else:
+                df = UT.read_pandas(path)
             setattr(self, which, df)
             return df
         # file does not exists, if ci then make from ex
@@ -194,7 +197,7 @@ class EvalMatch(object):
         # self.en2.fname2('covci.txt.gz',dcode)
         # self.en2.fname2('ecov.txt.gz',dcode)
         # self.en2.fname2('gcov.txt.gz',dcode)
-        
+
         self.find_match()
         self.calc_stats()
         self.calc_completeness()
@@ -208,21 +211,22 @@ class EvalMatch(object):
         # light weight stats also usable from others ==> dict 
         #   auc, detected1, ..., sigmoid,...,maxx,avgx,avgy,...
         # ==> pickle or json
-        fname1 = self.en2.fname2('stats.json',self.en1.code,category='output')
+        decode = '{0}.{1}'.format(self.en1.code, self.datacode)
+        fname1 = self.en2.fname2('stats.json',decode,category='output')
         UT.makedirs(os.path.dirname(fname1))
         with open(fname1,'w') as fp:
             json.dump(self.stats, fp)
         # [i,5,5b,3,3b,s,sb,j] cov(x),ratio(y) => in a dataframe
         # [glc,ecc,jcc] gcov(x), ratio(y) => in a dataframe
         # ==> put all in one four column dataframe (kind, id, x, y) 
-        fname2 = self.en2.fname2('ratios.txt.gz',self.en1.code,category='output')
+        fname2 = self.en2.fname2('ratios.txt.gz',decode,category='output')
         for k, v in self.ratios.items():
             v['kind'] = k
         df = PD.concat(self.ratios.values(), ignore_index=True)
         UT.write_pandas(df, fname2, 'h')
         # DP
         dp = self.get_detection_percentages()
-        fname3 = self.en2.fname2('dp.txt.gz', self.en1.code,category='output')
+        fname3 = self.en2.fname2('dp.txt.gz', decode,category='output')
         UT.write_pandas(dp, fname3, 'ih')
 
     def load(self):
