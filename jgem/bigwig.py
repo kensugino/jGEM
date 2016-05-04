@@ -246,7 +246,7 @@ def get_totbp_covbp_bw(bwfile, genome, chroms=None):
         totbp = N.sum(a)
         covbp = N.sum(a>0)
         acov = float(totbp)/covbp
-        covp = float(covbp)/csize
+        covp = (float(covbp)/csize)*100.
         return {'totbp':totbp,'covbp':covbp,'acov':acov,'cov%':covp}
     if chroms is None:
         chroms = UT.chroms(genome)
@@ -279,7 +279,10 @@ def get_bigwig_as_array(bwfile, chrom, st, ed):
     with open(bwfile, mode='rb') as fobj:
         bw = BigWigFile(fobj)
         a = bw.get_as_array(chrom,st,ed)
-        a[N.isnan(a)]=0.
+        if a is None:
+            a = N.array([]) # null array
+        else:
+            a[N.isnan(a)]=0.
     return a
 
 def merge_bigwigs_chr(bwfiles, chrom, chromsize, dstpath, scale):

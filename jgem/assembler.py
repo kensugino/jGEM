@@ -258,8 +258,7 @@ class Assembler(object):
             CALCCOV(self)()
             SETINFO(self)() # SET ACCEPTOR/DONOR/EXON CATEGORY
             FINDGENES(self)()
-
-            SELECTSEME2(self)() # SELECT ME and SE, saves exname2, exname3, sjname2
+            # SELECTSEME2(self)() # SELECT ME and SE, saves exname2, exname3, sjname2
         else:
             FINDEDGES(self)()
             FIXSTRAND(self)()

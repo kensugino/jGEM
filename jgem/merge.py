@@ -39,6 +39,8 @@ MERGECOVPARAM = dict(
     th_detected=1, # at least observed in 2 samples
     th_maxcnt=1, # max read count should be larger than this
     th_maxcnt2=20, # if maxcnt larger than this ignore th_detected
+    i_detected=5, # intercept for #detected
+    i_maxcnt=10, # intercept for maxcnt
 
     minsecovth=30, # min secov at individual sample level for SE to be included
     secovfactor=3, # *secovth is the threshold to include  
@@ -49,10 +51,13 @@ MERGEASMPARAM = dict(
     se_gidstart=50000, # SE gidx start
     minsecovth=30, # min secov at individual sample level for SE to be included
     # secovfactor=3, # *secovth is the threshold to include   
-    se_binth=0, # when extracting SE candidates from allsample.bw
+    se_binth=10, # when extracting SE candidates from allsample.bw
+    sebinth_factor=10, # sebinth = averagecov/sebinth_factor
     use_se2=False, # add high cov SE from each sample?
-    secov_fpr_th=0.005, 
-    jie_binth=10,
+    se_minsize=100, # min size for SE
+    se_maxsize=10000, # in gen4 only one SE is larger than 10Kbp
+    secov_fpr_th=0.01, # FPR threshold
+    jie_binth=10, 
     ureadth=0,
     mreadth=100,
     findsecov_usesemax=True
@@ -443,8 +448,15 @@ class MergeInputs(object):
         idx2 = sj0['#detected']>pr['th_detected']
         idx3 = sj0['maxcnt']>pr['th_maxcnt']
         idx4 = sj0['maxcnt']>pr['th_maxcnt2']
-        sj1 = sj0[(idx2&idx3)|idx4].copy()
+        # sj1 = sj0[(idx2&idx3)|idx4].copy()
         # sj1 = sj0[idx1|(idx2&idx3)].copy()
+        yo = sj0['maxcnt']
+        xo = sj0['#detected']
+        i0 = pr['i_maxcnt']
+        i1 = pr['i_detected']
+        slope = -(float(i0)/i1)
+        idx5 = (yo - (i0 + slope*xo))>0 # above the corner
+        sj1 = sj0[idx5].copy()
         UT.write_pandas(sj1, fn.sj1_txt())
         LOG.info('selectsj: {0}/{1} non-unique junction)'.format(N.sum(~idx1), len(sj0)))
         LOG.info('selectsj: {0} <=th_detected({1})'.format(N.sum((~idx2)),pr['th_detected']))
@@ -672,7 +684,7 @@ class MergeAssemble(object):
     """
 
     ecols = ['chr','st','ed','name','sc1','strand',
-             '_id','_gidx','gname','cat','ptyp','cov','len',
+             '_id','_gidx','gname','cat','ptyp','len',
              'a_id','d_id','a_degree','d_degree','a_pos','d_pos']
     scols = ['chr','st','ed','name','sc1','strand',
              '_id','_gidx','gname','st-1',
@@ -730,7 +742,8 @@ class MergeAssemble(object):
         self.assemble_me1()
         self.assemble_me2()
         # self.assemble_se() # old method (threshold by max)
-        self.assemble_se2() # power law selection + high confidence from individual
+        # self.assemble_se2() # power law selection + high confidence from individual
+        self.assemble_se3() # use high conf from each sample just threshold at acov/10
         self.assemble_combine()
         self.assemble_writefiles()
         self.calc_merged_covs()
@@ -909,10 +922,10 @@ class MergeAssemble(object):
             self.sjpn = sjpn = UT.read_pandas(fna.fname('mepn.sj.txt.gz'))
 
         sebin = BW.bw2bed_mp(
-                    bwfile=fni.agg_bw(), #ex_bw('se'), 
-                    bedfile=fna.fname('seallbw.bed.gz'), 
+                    bwfile=fni.ex_bw('se'),  # fni.agg_bw(), # using allsample.bw is not a good idea makes huge intervals
+                    bedfile=fna.fname('sebw.bed.gz'), 
                     chroms=UT.chroms(pr['genome']), 
-                    th=0,  # pr['se_binth'],  #setting th>0 screws secovth calc? 
+                    th=pr['se_binth'],  #setting th>0 screws secovth calc? 
                     np=pr['np']
                     )
 
@@ -921,57 +934,66 @@ class MergeAssemble(object):
         df = GGB.read_bed(sufile)
 
         # calculate SECOV
-        self.secov = secov = CC.calc_cov_mp(
-                                    bed=df, 
-                                    bwname=fni.agg_bw(), #fni.ex_bw('se'), 
-                                    fname=fna.fname('se.cov.all.txt.gz'), 
-                                    np=pr['np'], 
-                                    which='cov')
+        if pr['findsecov_usesemax']:
+            self.semax = semax = CC.calc_cov_mp(
+                                        bed=df, 
+                                        bwname=fni.agg_bw(), #fni.ex_bw('se'), 
+                                        fname=fna.txtname('se.max.all'), 
+                                        np=pr['np'], 
+                                        which='max')
 
-        self.semax = semax = CC.calc_cov_mp(
-                                    bed=df, 
-                                    bwname=fni.agg_bw(), #fni.ex_bw('se'), 
-                                    fname=fna.fname('se.max.all.txt.gz'), 
-                                    np=pr['np'], 
-                                    which='max')
+            self.memax = memax = CC.calc_cov_mp(
+                                        bed=expn, 
+                                        bwname=fni.agg_bw(), #fni.ex_bw('se'), 
+                                        fname=fna.txtname('me.max.all'), 
+                                        np=pr['np'], 
+                                        which='max')
+        else:
+            self.secov = secov = CC.calc_cov_mp(
+                                        bed=df, 
+                                        bwname=fni.agg_bw(), #fni.ex_bw('se'), 
+                                        fname=fna.txtname('se.cov.all'), 
+                                        np=pr['np'], 
+                                        which='cov')
+            # calculate MECOV
+            self.mecov = mecov = CC.calc_cov_ovl_mp(
+                                        srcname=expn, 
+                                        bwname=fni.agg_bw(), 
+                                        dstname=fna.txtname('mepn.cov'), 
+                                        np=pr['np'], 
+                                        covciname=fna.txtname('mepn.covci'), 
+                                        ciname=fna.txtname('mepn.ci'), 
+                                        colname='cov', 
+                                        override=False)
 
-        # calculate MECOV
-        self.mecov = mecov = CC.calc_cov_ovl_mp(
-                                    srcname=expn, 
-                                    bwname=fni.agg_bw(), 
-                                    dstname=fna.txtname('mepn.cov'), 
-                                    np=pr['np'], 
-                                    covciname=fna.txtname('mepn.covci'), 
-                                    ciname=fna.txtname('mepn.ci'), 
-                                    colname='cov', 
-                                    override=False)
-
-        # whether to use ecov or ovlcov?
-        # self.mecov = meecov = CC.calc_ecov(
-        #                             expath=fna.fname('mepn.ex.txt.gz'), 
-        #                             cipath=fna.fname('mepn.ci.txt.gz'), 
-        #                             bwpath=fni.agg_bw(), 
-        #                             dstprefix=fna.fname('mepn'), 
-        #                             override=False, 
-        #                             np=pr['np'])
-        # covciname = fna.fname('mepn.covci.txt.gz') # register as temp files, delete later
-        # ecovname = fna.fname('mepn.ecov.txt.gz')
+            # whether to use ecov or ovlcov?
+            # self.mecov = meecov = CC.calc_ecov(
+            #                             expath=fna.fname('mepn.ex.txt.gz'), 
+            #                             cipath=fna.fname('mepn.ci.txt.gz'), 
+            #                             bwpath=fni.agg_bw(), 
+            #                             dstprefix=fna.fname('mepn'), 
+            #                             override=False, 
+            #                             np=pr['np'])
+            # covciname = fna.fname('mepn.covci.txt.gz') # register as temp files, delete later
+            # ecovname = fna.fname('mepn.ecov.txt.gz')
 
         # * use minsecovth for safeguard
         # * increase secovfactor? 
 
         # apply powerlaw threshold finding
         self.f = f = AS.FINDSECOVTH(self)
-        f.ex = mecov
         f.fnobj.sname = fna.code
         if pr['findsecov_usesemax']:
+            f.ex = memax
             f.se = semax
+            memax['cov'] = memax['max']
             semax['cov'] = semax['max']
             f.find_secovth()
             th = max(f.se_th99, pr['minsecovth'])
             semax['cov'] = secov['cov']
             self.se1 = se1 = semax[semax['max']>th].copy()
         else:
+            f.ex = mecov
             f.se = secov
             secov['max'] = semax['max']
             f.find_secovth()
@@ -1014,12 +1036,63 @@ class MergeAssemble(object):
             LOG.info('#se1={0}, secovth={1}'.format(len(se1),f.se_th99))
             self.se0 = se0 = se1
 
+        # size threshold
+        se0['len'] = se0['ed'] - se0['st']
+        self.se0 = se0 = se0[(se0['len']>pr['se_minsize'])&(se0['len']<pr['se_maxsize'])]
+
         # save 
         gid0 = max(pr['se_gidstart'], N.max(N.abs(expn['_gidx'])))
         se0['_gidx'] = N.arange(gid0,gid0+len(se0))
         se0['name'] = ['S{0}'.format(x) for x in se0['_gidx']]
         se0['gname'] = se0['name']
         se0['sc1'] = se0['cov']
+        se0['strand'] = '.'
+        sename = fna.fname('se.bed.gz',category='output')
+        GGB.write_bed(se0, sename, ncols=6)
+
+    def assemble_se3(self):
+        """ Calculate SE candidate (subtract ME) 
+        
+        1. set sebin to 1/10 average coverage
+        2. take intervals > 100bp        
+
+        """
+        fna = self.fna
+        fni = self.fni
+        pr = self.params
+
+        if hasattr(self, 'expn'):
+            expn = self.expn
+        else:
+            self.expn = expn = UT.read_pandas(fna.fname('mepn.ex.txt.gz'))
+            self.sjpn = sjpn = UT.read_pandas(fna.fname('mepn.sj.txt.gz'))
+
+        bwfile = fni.ex_bw('se')
+        cdf = BW.get_totbp_covbp_bw(bwfile, pr['genome'])
+        binth = cdf.ix['acov'].mean()/pr['sebinth_factor']
+        sebin = BW.bw2bed_mp(
+                    bwfile=bwfile, 
+                    bedfile=fna.fname('sebw0.bed.gz'), 
+                    chroms=UT.chroms(pr['genome']), 
+                    th=binth,
+                    np=pr['np']
+                    )
+
+        mefile = GGB.write_bed(expn, fna.fname('mepn.me.bed.gz'), ncols=3)
+        sufile = BT.bedtoolintersect(sebin,mefile,fna.fname('mepn.se-me.bed.gz'),v=True) # -v subtract
+        se1 = GGB.read_bed(sufile)
+        se1['len'] = se1['ed']-se1['st']
+        # threshold to get SE
+        smin = pr['se_minsize']
+        smax = pr['se_maxsize']
+        self.se0 = se0 = se1[(se1['len']>smin)&(se1['len']<smax)].copy()
+        
+        # save 
+        gid0 = max(pr['se_gidstart'], N.max(N.abs(expn['_gidx'])))
+        se0['_gidx'] = N.arange(gid0,gid0+len(se0))
+        se0['name'] = ['S{0}'.format(x) for x in se0['_gidx']]
+        se0['gname'] = se0['name']
+        se0['sc1'] = 0 #se0['max']
         se0['strand'] = '.'
         sename = fna.fname('se.bed.gz',category='output')
         GGB.write_bed(se0, sename, ncols=6)
@@ -1037,8 +1110,10 @@ class MergeAssemble(object):
         else:
             genes = self.genes
         se0 = self.se0
-        if ('cov' in expn) and ('cov' in se0):
+        if ('cov' in expn.columns) and ('cov' in se0.columns):
             ecols = ecols+['cov']
+        if ('max' in expn.columns) and ('max' in se0.columns):
+            ecols = ecols+['max']
 
         # match SE to ME: ecols
         se0['_id'] = N.arange(len(expn),len(expn)+len(se0))
@@ -1075,7 +1150,7 @@ class MergeAssemble(object):
         # adjust genes bed
         se0['tst'] = se0['st']
         se0['ted'] = se0['ed']
-        se0['sc2'] = se0['cov']
+        se0['sc2'] = se0['cov'] if ('cov' in se0.columns) else 0
         se0['#exons'] = 1
         se0['esizes'] = se0['len'].astype(str)+','
         se0['estarts'] = '0,'
