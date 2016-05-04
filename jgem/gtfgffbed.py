@@ -75,10 +75,11 @@ def read_sj(path, parsename=False):
         df = read_bed(path).rename(columns={'sc1':'ucnt','tst':'mcnt'})
         if parsename:
             # name is encoded as above 'motif-k0[k1]-u(reads)-m(reads)-o(maxoverhang)'
+            # motif(0), known(1), u(2), m(3), o(4)
             tmp = df['name'].str.split('-')
             df['motif'] = tmp.str[0]
             df['annotated'] = tmp.str[1].str[1]
-            df['maxoverhang'] = tmp.str[3].str[1:].astype(int)
+            df['maxoverhang'] = tmp.str[4].str[1:].astype(int)
     else:
         df = UT.read_pandas(path) # header should be there
     return df
