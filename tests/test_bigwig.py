@@ -61,3 +61,7 @@ def test_bw2bed_mp(bigwig,outdir):
 			if line=='':
 				cnt += 1
 	assert cnt == 0
+
+def test_get_totbp_covbp_bw(bigwig):
+	cdf = BW.get_totbp_covbp_bw(bigwig, 'mm10')
+	
