@@ -616,7 +616,7 @@ def select_sj_chr(sj1chrompath, ovlpath, sj2chrompath, th_ratio, chrom):
     sjovl = UT.read_pandas(c, names=cols)
 
     sjovl = sjovl[sjovl['strand']==sjovl['b_strand']] # same strand
-    LOG.debug('len(sjovl)={0}'.format(len(sjovl)))
+    LOG.debug('select_sj_chr:{1}:len(sjovl)={0}'.format(len(sjovl)))
 
     sjgr = sjovl.groupby(['chr','st','ed','strand'])
     sj2 = sjgr[['ucnt','mcnt','name']].first()
@@ -636,7 +636,8 @@ def select_sj_chr(sj1chrompath, ovlpath, sj2chrompath, th_ratio, chrom):
     # self.sj4 = sj4 = sj2[idx1&((idx2&idx3)|idx4)]
     sj4 = sj2[idx1]
     # LOG.info('selectsj: in {0}'.format(len(sj2)))
-    LOG.info('selectsj: {0} smaller than th_ratio({1}) (in {3}) file:{2}'.format(N.sum(~idx1),th_ratio,sj1chrompath,len(sj2)))
+    fname = os.path.basename(sj1chrompath)
+    LOG.info('selectsj:{0}<th_ratio({1})(in {3})file:{2}'.format(N.sum(~idx1),th_ratio,fname,len(sj2)))
     cols = GGB.SJCOLS
     # write out selected locus
     #UT.write_pandas(sj4[['locus']], sj4chrompath, 'h')
@@ -647,25 +648,30 @@ def select_sj_chr(sj1chrompath, ovlpath, sj2chrompath, th_ratio, chrom):
 
 def collect_sj_part(sjpathpart, msjname, allsjpartname, statpartname, i):
     msj = UT.read_pandas(msjname) # column locus
-    msj1 = msj.copy()
+    msj1 = msj.copy() 
+    maxoh = msj.copy() # max (maxoverhang)
+    maxoh['oh'] = 0
     snames = []
     for i, (sname,spath) in enumerate(sjpathpart):
-        sj = GGB.read_sj(spath)
+        sj = GGB.read_sj(spath, parsename=True)
         sj['locus'] = UT.calc_locus_strand(sj)
         # sj['cnt'] = (sj['ucnt']+sj['mcnt']) #*scale <== sjbed is already normalized
         sj['jcnt'] = [x or y for x,y in sj[['ucnt','mcnt']].values]
         l2u = UT.df2dict(sj, 'locus', 'jcnt')
+        l2o = UT.df2dict(sj, 'locus', 'maxoverhang')
         msj[sname] = [l2u.get(x,0) for x in msj['locus']]
+        maxoh['oh'] = [max(y, l2o.get(x,0)) for x,y in maxoh['locus','oh']]
         snames.append(sname)
 
     msj1['#detected'] = (msj[snames]>0).sum(axis=1) # number of samples with reads>0
     msj1['maxcnt'] = msj[snames].max(axis=1) # max reads
+    msj1['maxoverhang'] = maxoh['oh']
 
     if i==0: # first one writes header
         UT.write_pandas(msj.T, allsjpartname, 'ih')
     else:
         UT.write_pandas(msj.T, allsjpartname, 'i')
-    UT.write_pandas(msj1[['locus','#detected','maxcnt']], statpartname, 'h')
+    UT.write_pandas(msj1[['locus','#detected','maxcnt','maxoverhang']], statpartname, 'h')
 
     return (allsjpartname, statpartname)
 

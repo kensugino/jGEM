@@ -69,11 +69,19 @@ def sjtab2sjbed(sjtab, sjbed, scale=None):
     write_bed(sj, sjbed, ncols=7)
     return sj
 
-def read_sj(path):
+def read_sj(path, parsename=False):
     # read BED (input) or TXT (output) with consistent column names
     if path[-7:]=='.bed.gz' or path[-4:]=='.bed':
-        return read_bed(path).rename(columns={'sc1':'ucnt','tst':'mcnt'})
-    return UT.read_pandas(path) # header should be there
+        df = read_bed(path).rename(columns={'sc1':'ucnt','tst':'mcnt'})
+        if parsename:
+            # name is encoded as above 'motif-k0[k1]-u(reads)-m(reads)-o(maxoverhang)'
+            tmp = df['name'].str.split('-')
+            df['motif'] = tmp.str[0]
+            df['annotated'] = tmp.str[1].str[1]
+            df['maxoverhang'] = tmp.str[3].str[1:].astype(int)
+    else:
+        df = UT.read_pandas(path) # header should be there
+    return df
 
 
 # READ/WRITE       ######################################################################    
