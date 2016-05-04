@@ -68,16 +68,22 @@ class EvalNames(FN.FileNamesBase):
         suf = '{0}.{1}'.format(code2, suffix)
         return self.fname(suf, category)
 
-    def modelpath(self, which):
+    def modelpath(self, which, code2=None):
         """Returns path to junction(sj)/exon(ex)/choppedinterval(ci) file.
 
         Args:
             which: one of 'sj','ex','ci'
 
         """
-        return '{0}.{1}.txt.gz'.format(self.sjexbase, which)
+        path = '{0}.{1}.txt.gz'.format(self.sjexbase, which)
+        if code2 is None:
+            return path
+        path2 = self.fname2('{0}.txt.gz'.format(which),code2, category='read')
+        if os.path.exists(path2):
+            return path2
+        return path
 
-    def model(self, which):
+    def model(self, which, code2=None):
         """Returns model dataframe (junction/exon/chopped intervals).
 
         Args:
@@ -87,16 +93,16 @@ class EvalNames(FN.FileNamesBase):
         if hasattr(self, which): # cached
             return getattr(self, which)
 
-        path = self.modelpath(which)
+        path = self.modelpath(which, code2)
         if os.path.exists(path): # file exists
             df = UT.read_pandas(path)
             setattr(self, which, df)
             return df
         # file does not exists, if ci then make from ex
         if which=='ci':
-            expath = self.modelpath['ex']
+            expath = self.modelpath('ex', code2)
             if os.path.exists(expath):
-                self.ci = UT.chopintervals(self.model['ex'], path)
+                self.ci = UT.chopintervals(self.model('ex'), path)
             else:
                 raise RuntimeError('file {0} does not exist'.format(expath))
         else:
@@ -117,7 +123,7 @@ class EvalNames(FN.FileNamesBase):
         """
         if hasattr(self, which):
             if code2 is None:
-                path = self.modelpath(which)
+                path = self.modelpath(which, None)
             else:
                 path = self.fname2('{0}.txt.gz'.format(which),code2, category=category)
             return UT.write_pandas(getattr(self, which), path, 'h')
@@ -181,12 +187,14 @@ class EvalMatch(object):
 
         """
         # calc exon, junction, gene coverage
-        self.prep_sjex(self.en1, np, False)
-        self.prep_sjex(self.en2, np, False)
+        self.prep_sjex(self.en1, np, True)
+        self.prep_sjex(self.en2, np, True)
         # register for deleting later, keep ref calc
-        self.en2.fname2('covci.txt.gz',self.datacode)
-        self.en2.fname2('ecov.txt.gz',self.datacode)
-        self.en2.fname2('gcov.txt.gz',self.datacode)
+        dcode = self.datacode
+        # self.en2.fname2('covci.txt.gz',dcode)
+        # self.en2.fname2('ecov.txt.gz',dcode)
+        # self.en2.fname2('gcov.txt.gz',dcode)
+        
         self.find_match()
         self.calc_stats()
         self.calc_completeness()
@@ -232,10 +240,11 @@ class EvalMatch(object):
     def colname2(self, x, code):
         return '{0}_{1}_{2}'.format(x, self.datacode, code)
 
-    def prep_sjex(self, en, np=1, savesjex=False):
+    def prep_sjex(self, en, np=1, savesjex=True):
         """ Assign ecov, gcov, jcnt """
-        sj = en.model('sj')
-        ex = en.model('ex')
+        dcode = self.datacode
+        sj = en.model('sj',dcode)
+        ex = en.model('ex',dcode)
         savesj = False
         saveex = False
         # check support
@@ -303,9 +312,9 @@ class EvalMatch(object):
             sj[jcntname] = [x or y for x,y in sj[[ucntname,mcntname]].values]
             savesj = True
         if saveex and savesjex:
-            en.savemodel('ex',self.datacode)
+            en.savemodel('ex',dcode, category='output')
         if savesj and savesjex:
-            en.savemodel('sj',self.datacode)
+            en.savemodel('sj',dcode, category='output')
 
     def find_match(self):
         en1 = self.en1
