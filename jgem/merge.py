@@ -404,6 +404,7 @@ class MergeInputs(object):
         # concat allsj, retrieve stats
         dets = []
         maxs = []
+        mohs = []
         with open(fn.allsj_txt(), 'wb') as dst:
             for aspn, spn in files:
                 with open(aspn, 'rb') as src:
@@ -411,16 +412,21 @@ class MergeInputs(object):
                 df = UT.read_pandas(spn,index_col=[0])
                 dets.append(df['#detected'])
                 maxs.append(df['maxcnt'])
+                mohs.append(df['maxoverhang'])
 
         dfdet = PD.concat(dets, axis=1)
         dfmax = PD.concat(maxs, axis=1)
+        dfmoh = PD.concat(mohs, axis=1)
         l2d = UT.series2dict(dfdet.sum(axis=1))
         l2m = UT.series2dict(dfmax.max(axis=1))
+        l2o = UT.series2dict(dfmoh.max(axis=1))
         msj['#detected'] = [l2d[x] for x in msj['locus']]
         msj['maxcnt'] = [l2m[x] for x in msj['locus']]
+        msj['maxoverhang'] = [l2o[x] for x in msj['locus']]
 
-        UT.write_pandas(msj[['locus','#detected','maxcnt']], fn.allsj_stats(), 'h')
-        self.allsj = msj[['locus','#detected','maxcnt']].copy()
+        cols = ['locus','#detected','maxcnt','maxoverhang']
+        UT.write_pandas(msj[cols], fn.allsj_stats(), 'h')
+        self.allsj = msj[cols].copy()
         
 
     def select_sj(self):
