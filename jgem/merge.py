@@ -666,7 +666,7 @@ def collect_sj_part(sjpathpart, msjname, allsjpartname, statpartname, i):
         l2u = UT.df2dict(sj, 'locus', 'jcnt')
         l2o = UT.df2dict(sj, 'locus', 'maxoverhang')
         msj[sname] = [l2u.get(x,0) for x in msj['locus']]
-        maxoh['oh'] = [max(y, l2o.get(x,0)) for x,y in maxoh['locus','oh']]
+        maxoh['oh'] = [max(y, l2o.get(x,0)) for x,y in maxoh[['locus','oh']].values]
         snames.append(sname)
 
     msj1['#detected'] = (msj[snames]>0).sum(axis=1) # number of samples with reads>0
