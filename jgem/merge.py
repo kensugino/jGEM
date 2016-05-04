@@ -51,10 +51,11 @@ MERGEASMPARAM = dict(
     # secovfactor=3, # *secovth is the threshold to include   
     se_binth=0, # when extracting SE candidates from allsample.bw
     use_se2=False, # add high cov SE from each sample?
-    secov_fpr_th=0.001, 
+    secov_fpr_th=0.005, 
     jie_binth=10,
     uth=0,
     mth=100,
+    findsecov_usesemax=True
 )
 
 
@@ -922,10 +923,18 @@ class MergeAssemble(object):
         # calculate SECOV
         self.secov = secov = CC.calc_cov_mp(
                                     bed=df, 
-                                    bwname=fni.agg_bw(), #ex_bw('se'), 
+                                    bwname=fni.agg_bw(), #fni.ex_bw('se'), 
                                     fname=fna.fname('se.cov.all.txt.gz'), 
                                     np=pr['np'], 
                                     which='cov')
+
+        self.semax = semax = CC.calc_cov_mp(
+                                    bed=df, 
+                                    bwname=fni.agg_bw(), #fni.ex_bw('se'), 
+                                    fname=fna.fname('se.max.all.txt.gz'), 
+                                    np=pr['np'], 
+                                    which='max')
+
         # calculate MECOV
         self.mecov = mecov = CC.calc_cov_ovl_mp(
                                     srcname=expn, 
@@ -936,6 +945,7 @@ class MergeAssemble(object):
                                     ciname=fna.txtname('mepn.ci'), 
                                     colname='cov', 
                                     override=False)
+
         # whether to use ecov or ovlcov?
         # self.mecov = meecov = CC.calc_ecov(
         #                             expath=fna.fname('mepn.ex.txt.gz'), 
@@ -954,9 +964,20 @@ class MergeAssemble(object):
         self.f = f = AS.FINDSECOVTH(self)
         f.ex = mecov
         f.fnobj.sname = fna.code
-        f.find_secovth()
+        if pr['findsecov_usesemax']:
+            f.se = semax
+            semax['cov'] = semax['max']
+            f.find_secovth()
+            semax['cov'] = secov['cov']
+            self.se1 = se1 = semax[semax['max']>th].copy()
+        else:
+            f.se = secov
+            secov['max'] = semax['max']
+            f.find_secovth()
+            self.se1 = se1 = secov[secov['cov']>th].copy()
         th = max(f.se_th99, pr['minsecovth'])
-        self.se1 = se1 = secov[secov['cov']>th].copy()
+        
+
         self.stats['assemble_se2.secovth_found'] = f.se_th99
         self.stats['assemble_se2.secovth_used'] = th
         self.stats['assemble_se2.#se1'] = len(se1)

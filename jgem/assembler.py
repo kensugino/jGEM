@@ -2391,7 +2391,7 @@ class FINDSECOVTH(SUBASE):
 
     """
 
-    bins = N.arange(0.3,2.8,0.1)
+    bins = N.arange(0.1,2.8,0.1)
     """ gamma values to search """
 
     fitrange = (4,6,9)
