@@ -719,6 +719,41 @@ def read_ci(cipath):
     return UT.read_pandas(cipath, names=header)
 
 
+def union_contiguous(beddf, returndf=True):
+    """ Union contiguous records into one. 
+    Uses chr,st,ed (not strand) columns.
+    For other fields, values from the first record is used. 
+    """
+    pos_cols = ['chr','st','ed']
+    beddf = beddf.sort_values(pos_cols)
+    other_cols = [x for x in beddf.columns if x not in pos_cols]
+    cols = pos_cols+other_cols
+    def _gen():
+        rec0 = beddf.iloc[0][cols].values
+        # chr,st,ed = pos 0,1,2
+        for rec1 in beddf[cols].values[1:]:
+            if rec1[0] != rec0[0]: # chrom1 != chrom0 switch chrom
+                yield rec0
+                rec0 = rec1
+            elif rec0[2] < rec1[1]: # ed1<st0 new interval
+                yield rec0
+                rec0 = rec1
+            else: # overlapping/contiguous
+                rec0[2] = rec1[2] # update the end
+        yield rec0
+    recs = [x for x in _gen()]
+    if not returndf:
+        return recs
+    df = PD.DataFrame(recs, columns=cols)
+    return df
+
+def make_union_gene_bed(ex, gidx='_gidx'):
+    def _gen():
+        for k, v in ex.groupby(gidx):
+            for x in union_contiguous(v,returndf=False):
+                yield x
+    recs = [x for x in _gen()]
+    return PD.DataFrame(recs, columns=ex.columns)
 
 
 #### multiprocessing ##################################################
@@ -740,6 +775,7 @@ def process_mp(func, args, np, doreduce=True):
             rslts = p.map(mp_worker, a)
         finally:
             LOG.debug('closing pool')
+            # p.join()
             p.close()
     if doreduce:
         rslts = reduce(iadd, rslts, [])

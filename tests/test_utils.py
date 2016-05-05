@@ -2,8 +2,64 @@ import os, time
 import pytest
 import pandas as PD
 import numpy as N
+try:
+    from StringIO import StringIO
+except:
+    from io import StringIO
 
 from jgem import utils as UT
+
+
+def test_make_union_gene_bed():
+	TESTDATA=StringIO("""chr,st,ed,name,sc1,strand
+chr1,0,10,a,0,+
+chr1,5,20,a,1,-
+chr1,25,30,a,1,+
+chr1,40,45,b,2,-
+chr1,45,50,b,2,+
+chr1,49,55,c,2,+
+chr2,55,60,d,3,-
+chr2,60,70,d,4,+
+chr2,70,80,e,4,-
+chr2,80,90,e,5,+
+	""")
+	df = PD.DataFrame.from_csv(TESTDATA, sep=",", index_col=False)
+	print(df)
+	udf1 = UT.make_union_gene_bed(df, gidx='name')
+	print(udf1)
+	assert len(udf1) == 6
+	assert all(udf1.columns == ['chr','st','ed','name','sc1','strand'])
+	assert list(udf1.iloc[0]) == ['chr1',0,20,'a',0,'+']
+	assert list(udf1.iloc[-1]) == ['chr2',70,90,'e',4,'-']
+	udf2 = UT.make_union_gene_bed(df, gidx='sc1')
+	print(udf2)
+	assert len(udf2) == 7
+
+
+def test_union_contiguous():
+	TESTDATA=StringIO("""chr,st,ed,name,sc1,strand
+chr1,0,10,a,0,+
+chr1,5,20,a,0,-
+chr1,25,30,a,0,+
+chr1,40,45,a,0,-
+chr1,45,50,a,0,+
+chr1,49,55,a,0,+
+chr2,55,60,a,0,-
+chr2,60,70,a,0,+
+chr2,70,80,a,0,-
+chr2,80,90,a,0,+
+	""")
+
+	df = PD.DataFrame.from_csv(TESTDATA, sep=",", index_col=False)
+	print(df)
+	udf = UT.union_contiguous(df)
+	print(udf)
+	assert len(udf) == 4
+	assert all(udf.columns == ['chr','st','ed','name','sc1','strand'])
+	assert list(udf.iloc[0]) == ['chr1',0,20,'a',0,'+']
+	assert list(udf.iloc[-1]) == ['chr2',55,90,'a',0,'-']
+
+
 
 def test_calc_locus():
 	df =  PD.DataFrame({'chr':['chr1','chr2','chr3'],'st':[0,1,2],'ed':[10,20,30]})
