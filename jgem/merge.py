@@ -31,20 +31,26 @@ from jgem import convert as CV
 MERGECOVPARAM = dict(
     np = 1, # number of CPU to use
     genome = 'mm10', # UCSC genome name
+
+    # make ex bed param
     covth = 0, # exon read digitization threshold
     covdelta = 1, # exon read digitization unit
-    uth=0, # unique count threshold
-    mth=5, # non-unique count threshold
-    th_ratio=1e-3, # discard junctions less than this portion within overlapping junctions
-    th_detected=1, # at least observed in 2 samples
-    th_maxcnt=1, # max read count should be larger than this
-    th_maxcnt2=20, # if maxcnt larger than this ignore th_detected
-    i_detected=5, # intercept for #detected
-    i_maxcnt=10, # intercept for maxcnt
-
+    # make ex.se bed param
     minsecovth=30, # min secov at individual sample level for SE to be included
     secovfactor=3, # *secovth is the threshold to include  
 
+    # deprecated
+    th_maxcnt=1, # max read count should be larger than this
+    th_maxcnt2=20, # if maxcnt larger than this ignore th_detected
+
+    # select_sj params
+    uth=0, # unique count threshold
+    mth=200, # non-unique count threshold
+    th_detected=2, # at least observed in 2 samples
+    th_maxoverhang=25, # min maxoverhang
+    th_ratio=1e-2, # discard junctions less than this portion within overlapping junctions
+    i_detected=7, # intercept for #detected
+    i_maxcnt=14, # intercept for maxcnt
 )
 MERGEASMPARAM = dict(
     # se_maxth=500,   # SE maxcov threshold
@@ -59,8 +65,9 @@ MERGEASMPARAM = dict(
     secov_fpr_th=0.01, # FPR threshold
     jie_binth=10, 
     ureadth=0,
-    mreadth=100,
-    findsecov_usesemax=True
+    mreadth=200,
+    findsecov_usesemax=True,
+    do_selectseme=True,
 )
 
 
@@ -454,35 +461,49 @@ class MergeInputs(object):
             self.allsj = allsj = UT.read_pandas(fn.allsj_stats())
         l2d = UT.df2dict(allsj, 'locus', '#detected')
         l2m = UT.df2dict(allsj, 'locus', 'maxcnt')
+        l2o = UT.df2dict(allsj, 'locus', 'maxoverhang')
         sj0['locus'] = UT.calc_locus_strand(sj0)
         sj0['#detected'] = [l2d[x] for x in sj0['locus']]
         sj0['maxcnt'] = [l2m[x] for x in sj0['locus']]
-        idx1 = sj0['ucnt']>0 # unique reads
+        sj0['maxoverhang'] = [l2o[x] for x in sj0['locus']]
+
+        # uth=0, # unique count threshold
+        # mth=200, # non-unique count threshold
+        idx1 = (sj0['ucnt']>pr['uth'])|(sj0['mcnt']>pr['mth']) 
+        # th_detected=2, # at least observed in 2 samples
         idx2 = sj0['#detected']>pr['th_detected']
-        idx3 = sj0['maxcnt']>pr['th_maxcnt']
-        idx4 = sj0['maxcnt']>pr['th_maxcnt2']
-        # sj1 = sj0[(idx2&idx3)|idx4].copy()
-        # sj1 = sj0[idx1|(idx2&idx3)].copy()
+        # i_detected=7, # intercept for #detected
+        # i_maxcnt=14, # intercept for maxcnt
         yo = sj0['maxcnt']
         xo = sj0['#detected']
         i0 = pr['i_maxcnt']
         i1 = pr['i_detected']
         slope = -(float(i0)/i1)
-        idx5 = (yo - (i0 + slope*xo))>0 # above the corner
-        sj1 = sj0[idx5].copy()
-        UT.write_pandas(sj1, fn.sj1_txt())
-        LOG.info('selectsj: {0}/{1} non-unique junction)'.format(N.sum(~idx1), len(sj0)))
-        LOG.info('selectsj: {0} <=th_detected({1})'.format(N.sum((~idx2)),pr['th_detected']))
-        LOG.info('selectsj: {0} <=th_maxcnt({1})'.format(N.sum((~idx3)),pr['th_maxcnt']))
-        LOG.info('selectsj: {0} >th_maxcnt2({1})'.format(N.sum(idx4),pr['th_maxcnt2']))
-        LOG.info('selectsj: sj0:{0}=>sj1:{1}'.format(len(sj0), len(sj1)))
-        self.stats['<=th_detected'] = N.sum(~idx2)
-        self.stats['<=th_maxcnt'] = N.sum(~idx3)
-        self.stats['#nonuniq'] = N.sum(~idx1)
-        self.stats['>th_maxcnt2'] = N.sum(idx4)
-        self.stats['#sj0'] = len(sj0)
-        self.stats['#sj1'] = len(sj1)
+        idx3 = (yo - (i0 + slope*xo))>0 # above the corner
+        # th_maxoverhang=25, # min maxoverhang
+        idx4 = sj0['maxoverhang']>pr['th_maxoverhang']
+        # when there's ucnt (=sum of all uniq reads) that should be larger than maxcnt 
+        # if not there is possibly repeats associated bad mapping
+        idx5 = ~((sj0['ucnt']>0)&(sj0['ucnt']<sj0['maxcnt'])) # ~12K 
 
+        sj1 = sj0[idx1&idx2&idx3&idx4&idx5].copy()
+        UT.write_pandas(sj1, fn.sj1_txt())
+
+        LOG.info('selectsj: {0}/{1} uth,mth)'.format(N.sum(idx1), len(sj0)))
+        LOG.info('selectsj: remove {0} with th_detected({1})'.format(N.sum((~idx2)),pr['th_detected']))
+        LOG.info('selectsj: remove {0} with corner, {1},{2})'.format(N.sum((~idx3)),i0,i1))
+        LOG.info('selectsj: remove {0} with overhang {1})'.format(N.sum(~idx4),pr['th_maxoverhang']))
+        LOG.info('selectsj: remove {0} ucnt<maxcnt)'.format(N.sum(~idx5)))
+        LOG.info('selectsj: sj0:{0}=>sj1:{1}'.format(len(sj0), len(sj1)))
+        self.stats['SELECTSJ.th_detected'] = N.sum(idx2)
+        self.stats['SELECTSJ.corner'] = N.sum(idx3)
+        self.stats['SELECTSJ.uthmth'] = N.sum(idx1)
+        self.stats['SELECTSJ.overhang'] = N.sum(idx4)
+        self.stats['SELECTSJ.ucnt_maxcnt'] = N.sum(idx5)
+        self.stats['SELECTSJ.#sj0'] = len(sj0)
+        self.stats['SELECTSJ.#sj1'] = len(sj1)
+
+        # CALCULATE ratio and filter  
         args = []
         sj2files = []
         cols0 = GGB.SJCOLS
@@ -496,6 +517,7 @@ class MergeInputs(object):
             sj2chrompath = fn.txtname('sj2.{0}'.format(chrom))
             sj2files.append(sj2chrompath)
             # args.append((sj1chrompath, ovlchrompath, sj4chrompath, sj2chrompath, pr['th_ratio'], chrom))
+            # th_ratio=1e-2, # discard junctions less than this portion within overlapping junctions
             args.append((sj1chrompath, ovlchrompath, sj2chrompath, pr['th_ratio'], chrom))
         
         # select_sj_chr(sj0chrompath, ovlpath, sj4chrompath, sj2chrompath, th_ratio)
@@ -629,7 +651,7 @@ def select_sj_chr(sj1chrompath, ovlpath, sj2chrompath, th_ratio, chrom):
     sjovl = UT.read_pandas(c, names=cols)
 
     sjovl = sjovl[sjovl['strand']==sjovl['b_strand']] # same strand
-    LOG.debug('select_sj_chr:{1}:len(sjovl)={0}'.format(len(sjovl)))
+    LOG.debug('select_sj_chr:{1}:len(sjovl)={0}'.format(len(sjovl),chrom))
 
     sjgr = sjovl.groupby(['chr','st','ed','strand'])
     sj2 = sjgr[['ucnt','mcnt','name']].first()
@@ -645,6 +667,7 @@ def select_sj_chr(sj1chrompath, ovlpath, sj2chrompath, th_ratio, chrom):
     sj2['ratio_a'] = sj2['cnt']/sj2['sum']
 
     # select 
+    # th_ratio=1e-2, # discard junctions less than this portion within overlapping junctions    
     idx1 = (sj2['ratio']>=th_ratio)|(sj2['ratio_a']>=th_ratio)
     # self.sj4 = sj4 = sj2[idx1&((idx2&idx3)|idx4)]
     sj4 = sj2[idx1]
