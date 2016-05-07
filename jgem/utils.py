@@ -716,7 +716,7 @@ def read_ci(cipath):
     """ ci has txt ext but don't have header """
     # should have been assigned bed ext 
     header = ['chr','st','ed','name','id']
-    return UT.read_pandas(cipath, names=header)
+    return read_pandas(cipath, names=header)
 
 
 def union_contiguous(beddf, returndf=True):
