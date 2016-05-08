@@ -501,6 +501,17 @@ def bed2gtf(fpath, compress=True):
         subprocess.call(['gzip',fpath[:-3]])
     return bdpath
 
+def bed12Tobed6(bed12):
+    def _gen():
+        for rec in bed12.values:
+            esizes = [int(x) for x in rec[-2].split(',') if x!='']
+            estarts = [int(x) for x in rec[-1].split(',') if x!='']
+            for y,z in zip(estarts, esizes):
+                st = rec[1]+y
+                ed = st+z
+                yield (rec[0],st,ed,rec[3],rec[4],rec[5])
+    bed6 = PD.DataFrame([x for x in _gen()], names=['chr','st','ed','name','sc1','strand'])
+    return bed6
 
 # UTILS         ######################################################################
 
@@ -530,20 +541,5 @@ def chop_chrs_gtf(gtfname, chrs, outdir=None):
 
 
 
-
-#### FASTA/PANDAS ######################################################
-def fasta2panda(fname):
-    if fname.endswith('.gz'):
-        fa = gzip.open(fname).read()
-    else:
-        fa = open(fname).read()
-    def _parse(x):
-        lines = x.split('\n')
-        tid = lines[0].split()[0]
-        seq = ''.join(lines[1:])
-        return tid, seq
-    recs = [_parse(x) for x in fa.split('>') if x.strip()]
-    fadf = PD.DataFrame(recs, columns=['tid','seq'])
-    return fadf
 
 
