@@ -18,7 +18,7 @@ import collections
 import functools
 from functools import partial, reduce
 from operator import iadd
-from itertools import repeat 
+from itertools import repeat, groupby
 try:
     from itertools import izip_longest as zip_longest
 except:
@@ -770,7 +770,7 @@ def union_contiguous(beddf, returndf=True):
     df = PD.DataFrame(recs, columns=cols)
     return df
 
-def make_union_gene_bed(ex, gidx='_gidx'):
+def make_unionex(ex, gidx='_gidx'):
     """Makes gene bed df where overlapping exons belonging to a genes
     are concatenated.
 
@@ -784,9 +784,6 @@ def make_union_gene_bed(ex, gidx='_gidx'):
     return PD.DataFrame(recs, columns=ex.columns)
 
 
-def unionex2bed12(uex):
-    pass
-    
 
 #### multiprocessing ##################################################
 
