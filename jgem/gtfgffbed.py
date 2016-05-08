@@ -302,56 +302,63 @@ def read_bed(fpath):
     d['ed'] = d['ed'].astype(int)
     return d
 
-def write_gff(df, fname, compress=True):
+def write_gff(df, fname):
     """Write GFF file.
 
     Args:
         df: Pandas.DataFrame containing GFF data
-        fname: path 
-        compress: whether to gzip compress (default:True)
+        fname: path (if ends with .gz, gzipped)
 
     Returns:
         actual path written
     """
-    return write_ggb(df, fname, GFFCOLS, compress)
+    return write_ggb(df, fname, GFFCOLS)
     
-def write_gtf(df, fname, compress=True):
+def write_gtf(df, fname):
     """Write GTF file.
 
     Args:
         df: Pandas.DataFrame containing GTF data
-        fname: path 
-        compress: whether to gzip compress (default:True)
+        fname: path (if ends with .gz, gzipped)
 
     Returns:
         actual path written
     """
-    return write_ggb(df, fname, GTFCOLS, compress)
+    return write_ggb(df, fname, GTFCOLS)
     
-def write_bed(df, fname, compress=True, ncols=6):
+def write_bed(df, fname, ncols=None):
     """Write BED file.
 
     Args:
         df: Pandas.DataFrame containing BED data
-        fname: path 
-        compress: whether to gzip compress (default:True)
+        fname: path (if ends with .gz, gzipped)
         ncols: number of bed columns (default 12)
 
     Returns:
         actual path written
     """ 
-    return write_ggb(df, fname, BEDCOLS[:ncols], compress)
+    if ncols is None:
+        for i, x in enumerate(BEDCOLS):
+            if x not in df.columns:
+                ncols = i
+                break
+        else:
+            ncols = 12
+    return write_ggb(df, fname, BEDCOLS[:ncols])
     
-def write_ggb(df, fname, cols, compress=True):    
+def write_ggb(df, fname, cols):    
     # df.loc[:,'st'] = df['st'].astype(int)
     # df.loc[:,'ed'] = df['ed'].astype(int)
+    if fname[-3:]=='.gz':
+        compress=True
+        fname = fname[:-3]
+    else:
+        compress=False
     if (df.dtypes['st'] != int) or (df.dtypes['ed'] != int):
         LOG.warning('st,ed not integer: copy and converting')
         df = df.copy()
         df['st'] = df['st'].astype(int)
         df['ed'] = df['ed'].astype(int)
-    if fname[-3:]=='.gz':
-        fname = fname[:-3]
     UT.makedirs(os.path.dirname(fname))
     df[cols].to_csv(fname, index=False, header=False, sep='\t', quoting=csv.QUOTE_NONE)
     if compress:
@@ -543,7 +550,7 @@ def unionex2bed12(uex, gidx='_gidx', name='name', sc1='sc1', sc2='sc2'):
             yield (x[1],st0,ed0,x[4],x[5],x[6],st0,ed0,x[7],nex,esiz,ests)
     #bcols=['chr','st','ed','name','sc1','strand','tst','ted','sc1','#exons','esizes','estarts']
     bcols = BEDCOLS
-    df = PD.DataFrame([x for x in _gen()], columns=bcols)
+    df = PD.DataFrame([x for x in _gen()], columns=bcols).sort_values(['chr','st','ed'])
     return df
 
 
