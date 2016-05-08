@@ -83,7 +83,7 @@ def gtf2exonsj(gtf, np=1, graphpre=None):
 
     return sj, ex
 
-def bed2exonsj(bed12):
+def bed2exonsj(bed12, np=4, graphpre=None):
     """Extract exons and junctions from BED12
 
     Args:
@@ -93,8 +93,8 @@ def bed2exonsj(bed12):
         sj, ex: Pandas.DataFrames containing junction and exons
 
     """
-    esizes = bed12['esizes'].apply(lambda x: N.array(list(map(int, x[:-1].split(',')))))
-    estarts0 = bed12['estarts'].apply(lambda x: N.array(list(map(int, x[:-1].split(',')))))
+    esizes = bed12['esizes'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
+    estarts0 = bed12['estarts'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
     bed12['_estarts'] = bed12['st'] + estarts0
     bed12['_eends'] = bed12['_estarts']+esizes
     #istarts = eends[:-1]
@@ -120,6 +120,16 @@ def bed2exonsj(bed12):
 
     UT.set_info(sj,ex)
     UT.set_exon_category(sj, ex)
+
+    # find genes (connected components) set '_gidx'
+    if graphpre is None:
+        graphpre = './'+str(uuid.uuid4())+'_'
+    prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
+    genes = GP.find_genes4(sj,ex,
+        filepre=prefix,
+        np=np,
+        override=False,
+        separatese=True)
 
     return sj, ex
     

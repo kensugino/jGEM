@@ -6,6 +6,17 @@ LOG = logging.getLogger(__name__)
 
 from jgem import utils as UT
 from jgem import convert as CV
+from jgem import gtfgffbed as GGB
+
+
+def test_bed2exonsj(testbed12):
+	b12 = GGB.read_bed(testbed12)
+	sj,ex = CV.bed2exonsj(b12)
+	print(sj.iloc[:10])
+	print(ex.iloc[:10])
+	# assert 0
+
+
 
 ## [TODO] better testing on the followings?
 def test_gtf2exonsj(g4Xkr4gtf, g4Xkr4sjex):
