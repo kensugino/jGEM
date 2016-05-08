@@ -149,6 +149,8 @@ MPARAMDIFF = dict(
     me_p0=-2,
     me_p1=1,
     me_p2=3.1,
+
+    do_selectseme=False,
 )
 MPARAMS = PARAMS.copy()
 MPARAMS.update(MPARAMDIFF)
@@ -159,6 +161,10 @@ for k,v in MPARAMS.items():
     PARAMSDOC[k+'_m'] = v
 
 #LOG.debug(PARAMSDOC)
+
+
+# [TODO] Better 5',3' detection, check all internal exon, not just cut ones
+#        (current source of 5',3': edge, cut exons, SE attach)
 
 class Assembler(object):
 
@@ -258,7 +264,6 @@ class Assembler(object):
             CALCCOV(self)()
             SETINFO(self)() # SET ACCEPTOR/DONOR/EXON CATEGORY
             FINDGENES(self)()
-            # SELECTSEME2(self)() # SELECT ME and SE, saves exname2, exname3, sjname2
         else:
             FINDEDGES(self)()
             FIXSTRAND(self)()
@@ -270,7 +275,10 @@ class Assembler(object):
             SETINFO(self)() # SET ACCEPTOR/DONOR/EXON CATEGORY
             FINDGENES(self)()
 
-            SELECTSEME(self)() # SELECT ME and SE, saves exname2, exname3, sjname2
+        if pr['do_selectseme']:
+            SELECTSEME(self)()
+            # SELECTSEME2(self)() # SELECT ME and SE, saves exname2, exname3, sjname2
+        if pr['mergins']:
             FIXEDGES2(self)() # TRIM 3',5' edges
 
         CONSISTENTSJ(self)() # remove sj without ex support

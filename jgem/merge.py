@@ -45,12 +45,13 @@ MERGECOVPARAM = dict(
 
     # select_sj params
     uth=0, # unique count threshold
-    mth=200, # non-unique count threshold
-    th_detected=2, # at least observed in 2 samples
-    th_maxoverhang=25, # min maxoverhang
-    th_ratio=1e-2, # discard junctions less than this portion within overlapping junctions
-    i_detected=7, # intercept for #detected
-    i_maxcnt=14, # intercept for maxcnt
+    mth=100, # non-unique count threshold
+    th_detected=2, # observed in more than th_detected samples
+    th_maxoverhang=15, # min maxoverhang
+    th_ratio=1e-3, # discard junctions less than this portion within overlapping junctions
+    i_detected=1, # intercept for #detected
+    i_maxcnt=1, # intercept for maxcnt
+    th_maxcnt=1, # 
 )
 MERGEASMPARAM = dict(
     # se_maxth=500,   # SE maxcov threshold
@@ -67,7 +68,7 @@ MERGEASMPARAM = dict(
     ureadth=0,
     mreadth=200,
     findsecov_usesemax=True,
-    do_selectseme=True,
+    do_selectseme=False,
 )
 
 
@@ -422,6 +423,7 @@ class MergeInputs(object):
                 maxs.append(df['maxcnt'])
                 mohs.append(df['maxoverhang'])
                 tots.append(df['totcnt'])
+        UT.transpose_csv(fn.allsj_txt())
 
         dfdet = PD.concat(dets, axis=1)
         dfmax = PD.concat(maxs, axis=1)
@@ -453,7 +455,7 @@ class MergeInputs(object):
         if hasattr(self, 'sj0'):
             sj0 = self.sj0
         else:
-            sj0 = GGB.read_sj(fn.sj0_bed())
+            self.sj0 = sj0 = GGB.read_sj(fn.sj0_bed())
         # threshold #detected, maxcnt
         if hasattr(self, 'allsj'):
             allsj = self.allsj
@@ -467,39 +469,46 @@ class MergeInputs(object):
         sj0['maxcnt'] = [l2m[x] for x in sj0['locus']]
         sj0['maxoverhang'] = [l2o[x] for x in sj0['locus']]
 
-        # uth=0, # unique count threshold
-        # mth=200, # non-unique count threshold
         idx1 = (sj0['ucnt']>pr['uth'])|(sj0['mcnt']>pr['mth']) 
-        # th_detected=2, # at least observed in 2 samples
         idx2 = sj0['#detected']>pr['th_detected']
-        # i_detected=7, # intercept for #detected
-        # i_maxcnt=14, # intercept for maxcnt
         yo = sj0['maxcnt']
         xo = sj0['#detected']
         i0 = pr['i_maxcnt']
         i1 = pr['i_detected']
         slope = -(float(i0)/i1)
         idx3 = (yo - (i0 + slope*xo))>0 # above the corner
-        # th_maxoverhang=25, # min maxoverhang
         idx4 = sj0['maxoverhang']>pr['th_maxoverhang']
+        idx5 = sj0['maxcnt']>pr['th_maxcnt']
+
         # when there's ucnt (=sum of all uniq reads) that should be larger than maxcnt 
         # if not there is possibly repeats associated bad mapping
-        idx5 = ~((sj0['ucnt']>0)&(sj0['ucnt']<sj0['maxcnt'])) # ~12K 
+        # idx5 = ~((sj0['ucnt']>0)&(sj0['ucnt']<sj0['maxcnt'])) # ~12K 
+        # this was a bad idea, does not work at all
+
+        sj0['th_uthmth'] = idx1
+        sj0['th_detected'] = idx2
+        sj0['th_corner'] = idx3
+        sj0['th_overhang'] = idx4
+        sj0['th_maxcnt'] = idx5
+        UT.write_pandas(sj0, fn.txtname('sj0.with.thresholds',category='stats'))
 
         sj1 = sj0[idx1&idx2&idx3&idx4&idx5].copy()
+
         UT.write_pandas(sj1, fn.sj1_txt())
 
         LOG.info('selectsj: {0}/{1} uth,mth)'.format(N.sum(idx1), len(sj0)))
         LOG.info('selectsj: remove {0} with th_detected({1})'.format(N.sum((~idx2)),pr['th_detected']))
         LOG.info('selectsj: remove {0} with corner, {1},{2})'.format(N.sum((~idx3)),i0,i1))
         LOG.info('selectsj: remove {0} with overhang {1})'.format(N.sum(~idx4),pr['th_maxoverhang']))
-        LOG.info('selectsj: remove {0} ucnt<maxcnt)'.format(N.sum(~idx5)))
+        LOG.info('selectsj: remove {0} with th_maxcnt {1})'.format(N.sum(~idx5),pr['th_maxcnt']))
+        # LOG.info('selectsj: remove {0} ucnt<maxcnt)'.format(N.sum(~idx5)))
         LOG.info('selectsj: sj0:{0}=>sj1:{1}'.format(len(sj0), len(sj1)))
         self.stats['SELECTSJ.th_detected'] = N.sum(idx2)
         self.stats['SELECTSJ.corner'] = N.sum(idx3)
         self.stats['SELECTSJ.uthmth'] = N.sum(idx1)
         self.stats['SELECTSJ.overhang'] = N.sum(idx4)
-        self.stats['SELECTSJ.ucnt_maxcnt'] = N.sum(idx5)
+        self.stats['SELECTSJ.th_maxcnt'] = N.sum(idx5)
+        # self.stats['SELECTSJ.ucnt_maxcnt'] = N.sum(idx5)
         self.stats['SELECTSJ.#sj0'] = len(sj0)
         self.stats['SELECTSJ.#sj1'] = len(sj1)
 
@@ -705,9 +714,10 @@ def collect_sj_part(sjpathpart, msjname, allsjpartname, statpartname, i):
     msj1['maxoverhang'] = maxoh['oh']
 
     if i==0: # first one writes header
-        UT.write_pandas(msj.T, allsjpartname, 'ih')
+        cols = ['locus']+snames
+        UT.write_pandas(msj[cols].T, allsjpartname, 'h')
     else:
-        UT.write_pandas(msj.T, allsjpartname, 'i')
+        UT.write_pandas(msj[snames].T, allsjpartname, '')
     UT.write_pandas(msj1[['locus','#detected','maxcnt','maxoverhang','totcnt']], statpartname, 'h')
 
     return (allsjpartname, statpartname)
@@ -785,8 +795,8 @@ class MergeAssemble(object):
         self.assemble_me1()
         self.assemble_me2()
         # self.assemble_se() # old method (threshold by max)
-        # self.assemble_se2() # power law selection + high confidence from individual
-        self.assemble_se3() # use high conf from each sample just threshold at acov/10
+        self.assemble_se2() # power law selection + high confidence from individual
+        # self.assemble_se3() # use high conf from each sample just threshold at acov/10
         self.assemble_combine()
         self.assemble_writefiles()
         self.calc_merged_covs()
@@ -943,7 +953,7 @@ class MergeAssemble(object):
         """ 
         1. Calculate SE candidate using allsample.bw (ME subtracted) 
         2. Apply FINDSECOVTH procedure to find threshold
-        3. Addin high confidence SE from each sample (in se.bw)
+        3. Optionally addin high confidence SE from each sample (in se.bw)
         """
         # [TODO] also process sep, sen (stranded SEs)
         # [Q] Does power law still apply for aggregated coverages?
