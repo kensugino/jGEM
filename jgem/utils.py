@@ -165,6 +165,8 @@ def makedirs(path):
     """Make all the directories along the path, calls os.makedirs but 
     intercept irrelevant exceptions
     """
+    if path=='':
+        path='./'
     try:
         os.makedirs(path)
     except OSError as err:
