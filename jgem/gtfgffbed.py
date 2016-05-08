@@ -14,6 +14,7 @@ import gzip
 import logging
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
+from itertools import repeat, groupby
 
 import pandas as PD
 import numpy as N
@@ -512,6 +513,41 @@ def bed12Tobed6(bed12):
                 yield (rec[0],st,ed,rec[3],rec[4],rec[5])
     bed6 = PD.DataFrame([x for x in _gen()], names=['chr','st','ed','name','sc1','strand'])
     return bed6
+
+def unionex2bed12(uex, gidx='_gidx', name='name', sc1='sc1', sc2='sc2'):
+    """
+    Args:
+        uex: unionex
+        gidx: colname for unique gene id
+        name: colname for BED name field
+        sc1: colname for BED sc1 field
+        sc2: colname for BED sc2 field
+    """
+    cols0 = uex.columns
+    if sc1 not in cols0:
+        uex[sc1] = 0
+    if sc2 not in cols0:
+        uex[sc2] = 0
+    if name not in cols0:
+        uex[name] = uex[gidx]
+    bed = uex[[gidx,'chr','st','ed',name,sc1,'strand',sc2]].sort_values([gidx,'chr','st','ed'])
+    def _gen():
+        for gid, exs in groupby(bed.values, lambda x: x[0]):
+            exs = list(exs)
+            nex = len(exs)
+            st0 = exs[0][2]
+            ed0 = exs[-1][3]
+            esiz = ','.join([str(x[3]-x[2]) for x in exs])+','
+            ests = ','.join([str(x[2]-st0) for x in exs])+','
+            x = exs[0]
+            yield (x[1],st0,ed0,x[4],x[5],x[6],st0,ed0,x[7],nex,esiz,ests)
+    #bcols=['chr','st','ed','name','sc1','strand','tst','ted','sc1','#exons','esizes','estarts']
+    bcols = BEDCOLS
+    df = PD.DataFrame([x for x in _gen()], columns=bcols)
+    return df
+
+
+
 
 # UTILS         ######################################################################
 

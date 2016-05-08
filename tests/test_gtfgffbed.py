@@ -1,10 +1,35 @@
 import os
 import pytest
 import pandas as PD
+try:
+    from StringIO import StringIO
+except:
+    from io import StringIO
 
 from jgem import utils as UT
 from jgem import gtfgffbed as GGB
 import jgem.cy.bw as cybw
+
+def test_unionex2bed12():
+	TESTDATA=StringIO("""chr,st,ed,name,sc1,strand
+chr1,0,10,a,0,+
+chr1,15,20,a,1,-
+chr1,25,30,a,1,+
+chr1,40,45,b,2,-
+chr1,47,50,b,2,+
+chr1,49,55,c,2,+
+chr2,58,60,d,3,-
+chr2,65,70,d,4,+
+chr2,70,80,e,4,-
+chr2,85,90,e,5,+
+	""")
+	df = PD.DataFrame.from_csv(TESTDATA, sep=",", index_col=False)
+	df['_gidx'] = df['name']
+	print(df)
+	b12 = GGB.unionex2bed12(df)
+	print(b12)
+	# assert 0
+
 
 def test_read_gtf_cy(g4gtfpath):
 	#gtf = GGB.read_gtf(g4gtfpath)

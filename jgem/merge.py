@@ -1091,7 +1091,7 @@ class MergeAssemble(object):
 
         # size threshold
         se0['len'] = se0['ed'] - se0['st']
-        # self.se0 = se0 = se0[(se0['len']>pr['se_minsize'])&(se0['len']<pr['se_maxsize'])]
+        # self.se0 = se0 = se0[(se0['len']>pr['se_minsize'])&(se0['len']<pr['se_maxsize'])].copy()
 
         # save 
         gid0 = max(pr['se_gidstart'], N.max(N.abs(expn['_gidx'])))
@@ -1300,7 +1300,7 @@ class MergeAssemble(object):
 
 
     def make_union_gbed(self):
-        self.ugb = UT.make_union_gene_bed(self.ex0, '_gidx')
+        self.ugb = UT.make_unionex(self.ex0, '_gidx')
         fname = self.fna.fname('unionex.txt.gz', category='output')
         UT.write_pandas(self.ugb, fname,'h')
 

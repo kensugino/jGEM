@@ -34,6 +34,8 @@ RMSKPARAMS = dict(
     th_uexon=4,
     th_bp_ovl=50,
     th_ex_ovl=50,
+    datacode='',
+    gname='gname',
 )
 
 class RmskFilter(object):
@@ -67,7 +69,7 @@ class RmskFilter(object):
             self.uex = UT.read_pandas(uexpath)
         else:
             LOG.info('making union exons...saving to {0}'.format(uexpath))
-            self.uex = UT.make_union_gene_bed(self.ex, '_gidx')
+            self.uex = UT.make_unionex(self.ex, '_gidx')
             UT.write_pandas(self.uex, uexpath, 'h')
 
 
@@ -79,7 +81,7 @@ class RmskFilter(object):
         pr = self.params
         uex = count_repeats_mp(self.uex, self.gfc, np=pr['np'], col='#repbp')
         uex = count_repeats_viz_mp(uex, self.rmskviz, np=pr['np'], idcol='_id', expand=0, col='repnames')
-        self.ugb = self._make_gbed(self.ex, self.sj, uex )
+        self.ugb = self._make_gbed(self.ex, self.sj, uex, datacode=pr['datacode'], gname=pr['gname'])
 
     def _make_gbed(self, ex, sj, ugb, datacode='', gname='gname'):
         # rep%
@@ -144,11 +146,13 @@ class RmskFilter(object):
         self.ex2 = ex2 = ex0[ex0['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
         self.sj2 = sj2 = sj0[sj0['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
         self.uex2 = uex2 = uex[uex['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
+        self.gbed2 = gbed2 = UT.unionex2bed12(uex2,name='gname',sc1='gcov',sc2='tlen')
         # write out filtered ex,sj,ci,unionex,gb2
         UT.write_pandas(ex2, fn.txtname('ex', category='output'), 'h')
         UT.write_pandas(sj2, fn.txtname('sj', category='output'), 'h')
         UT.write_pandas(uex2, fn.txtname('unionex', category='output'), 'h')
-        UT.write_pandas(ugb2, fn.txtname('genes', category='output'), 'h')
+        UT.write_pandas(ugb2, fn.txtname('genes.stats', category='output'), 'h')
+        UT.write_pandas(gbed2, fn.bedname('genes', category='output'), '') # BED12
 
     def save_params(self):
         UT.save_json(self.params, self.fnobj.fname('params.json', category='output'))
@@ -199,7 +203,7 @@ def count_repeats(beddf, genomefastaobj, col='#repbp', returnseq=False, seqcol='
 
     Args:
         beddf: Pandas DataFrame with chr,st,ed columns, when calculating repeats bp
-         for genes, unioned bed should be used (use utils.make_union_gene_bed)
+         for genes, unioned bed should be used (use utils.make_unionex)
         genomefastaobj: an object with get(chr,st,ed) method that returns sequence
          (use fasta.GenomeFASTAChroms).
         col: column names where counts will be put in
@@ -245,7 +249,7 @@ def count_repeats_viz_mp(beddf, rmskvizpath, idcol='_id', np=3, prefix=None, exp
 
     Args:
         beddf: Pandas DataFrame with chr,st,ed cols, when calculating repeats bp
-         for genes, unioned bed should be used (use utils.make_union_gene_bed)
+         for genes, unioned bed should be used (use utils.make_unionex)
         idcol: colname for unique row id (default _id)
         rmskvizpath: path to repeat masker viz BED7 file (created using rmskviz2bed7)
         np: number of CPU to use
