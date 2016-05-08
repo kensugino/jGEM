@@ -183,7 +183,7 @@ def test_calccov(asm):
 def test_setinfo(asm):
 	f = AS.SETINFO(asm)
 	f()
-	LOG.info('{0},{1},{2},{3}'.format(len(asm.me),len(asm.sj),len(asm.ae),len(asm.se)))
+	# LOG.info('{0},{1},{2},{3}'.format(len(asm.me),len(asm.sj),len(asm.ae),len(asm.se)))
 	assert N.sum(~asm.ae['strand'].isin(['+','-','.']))==0
 	assert 'd_id' in asm.ae.columns
 	assert 'cat' in asm.ae.columns
@@ -192,7 +192,7 @@ def test_setinfo(asm):
 def test_findgenes(asm):
 	f = AS.FINDGENES(asm)
 	f()
-	LOG.info('{0},{1},{2},{3}'.format(len(asm.me),len(asm.sj),len(asm.ae),len(asm.se)))
+	# LOG.info('{0},{1},{2},{3}'.format(len(asm.me),len(asm.sj),len(asm.ae),len(asm.se)))
 	assert N.sum(~asm.ae['strand'].isin(['+','-','.']))==0
 	assert '_gidx' in asm.ae.columns
 	assert 'gname' in asm.ae.columns
@@ -203,14 +203,14 @@ def test_selectseme(asm):
 	f = AS.SELECTSEME(asm)
 	UT.set_exon_category(asm.sj,asm.ae)
 	f()
-	LOG.info('{0},{1},{2},{3}'.format(len(asm.me),len(asm.sj),len(asm.ae),len(asm.se)))
+	# LOG.info('{0},{1},{2},{3}'.format(len(asm.me),len(asm.sj),len(asm.ae),len(asm.se)))
 	# assert len(asm.ae) == 6169 #6153
 	
 
 def test_fixedges2(asm):
 	f = AS.FIXEDGES2(asm)
 	f()
-	LOG.info('{0},{1},{2},{3}'.format(len(asm.me),len(asm.sj),len(asm.ae),len(asm.se)))
+	# LOG.info('{0},{1},{2},{3}'.format(len(asm.me),len(asm.sj),len(asm.ae),len(asm.se)))
 	# assert len(asm.ae) == 6338 #6311
 	
 

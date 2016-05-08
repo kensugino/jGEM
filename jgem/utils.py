@@ -23,7 +23,7 @@ try:
     from itertools import izip_longest as zip_longest
 except:
     from itertools import zip_longest
-
+import json
 import shutil
 import uuid
 import multiprocessing
@@ -214,8 +214,13 @@ def transpose_csv(src, dst, linesep='\n', colsep='\t'):
         dp = open(dst,'w')
     dp.write(linesep.join(cols))
     dp.close()
-    
-        
+
+def save_json(obj, fname):
+    """ save obj (usually dict) in JSON format """
+    makedirs(os.path.dirname(fname))
+    with open(fname,'w') as fp:
+        json.dump(obj, fp)
+
 #### read/write PANDAS #####################################################
 
 def save_tsv_nidx_nhead(df, path, gzip=True, **kwargs):
@@ -778,6 +783,10 @@ def make_union_gene_bed(ex, gidx='_gidx'):
     recs = [x for x in _gen()]
     return PD.DataFrame(recs, columns=ex.columns)
 
+
+def unionex2bed12(uex):
+    pass
+    
 
 #### multiprocessing ##################################################
 
