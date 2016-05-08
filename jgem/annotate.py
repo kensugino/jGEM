@@ -58,7 +58,7 @@ class Comparator(object):
         self.cn_tgt = cn_tgt
         self.refgnamecol = gnamecol
         self.refgidxcol = gidxcol
-        self.calc_overlaps()
+        # self.calc_overlaps()
 
     def calc_overlaps(self):
         cref = self.cn_ref
@@ -196,8 +196,12 @@ class Comparator(object):
         self.g2s = g2s = self.ex_ref.groupby('_gidx')[sfld].apply(lambda x: list(set(x)))
         # self.g2s = g2s = UT.df2dict(e2g, '_gidx', sfld) # gidx => list of syms
         # convert _gidx => sym
-        self.g2gs = g2gs = {k:','.join(set(reduce(iadd,[g2s[int(z)] for z in v.keys()],[]))) for k,v in g2cnt.items()}
-        self.g2gs0 = g2gs0 = {k:','.join(g2s[int(v.most_common()[0][0])]) for k,v in g2cnt.items()}
+        try:
+            self.g2gs = g2gs = {k:','.join(set(reduce(iadd,[g2s[int(z)] for z in v.keys()],[]))) for k,v in g2cnt.items()}
+            self.g2gs0 = g2gs0 = {k:','.join(g2s[int(v.most_common()[0][0])]) for k,v in g2cnt.items()}
+        except:
+            self.g2gs = g2gs = {k:','.join(set(reduce(iadd,[g2s[z] for z in v.keys()],[]))) for k,v in g2cnt.items()}
+            self.g2gs0 = g2gs0 = {k:','.join(g2s[v.most_common()[0][0]]) for k,v in g2cnt.items()}
         #g2gs0 = {k:g2s[int(g2gi0[k])] for k,v in g2cnt.items()}
         ex[rcode+'_syms'] = [g2gs.get(x, N.nan) for x in ex['_gidx']]
         ex[rcode+'_sym0'] = [g2gs0.get(x,N.nan) for x in ex['_gidx']]
