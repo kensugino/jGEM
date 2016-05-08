@@ -51,7 +51,6 @@ MERGECOVPARAM = dict(
     th_ratio=1e-3, # discard junctions less than this portion within overlapping junctions
     i_detected=1, # intercept for #detected
     i_maxcnt=1, # intercept for maxcnt
-    th_maxcnt=1, # 
 )
 MERGEASMPARAM = dict(
     # se_maxth=500,   # SE maxcov threshold
