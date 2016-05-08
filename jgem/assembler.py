@@ -113,7 +113,7 @@ PARAMS = dict(
     writeiso=False,
     maxisonum=10,
     useallconnected=True,
-
+    do_selectseme=False,
     )
 # use different parameters for merging
 MPARAMDIFF = dict(
@@ -261,9 +261,6 @@ class Assembler(object):
             FINDIRETS(self)()
             # FINDSECOVTH(self)() # not useful here since mep,men don't have real SEs
             FIND53IR(self)()
-            CALCCOV(self)()
-            SETINFO(self)() # SET ACCEPTOR/DONOR/EXON CATEGORY
-            FINDGENES(self)()
         else:
             FINDEDGES(self)()
             FIXSTRAND(self)()
@@ -271,14 +268,14 @@ class Assembler(object):
             FINDIRETS(self)()
             FINDSECOVTH(self)()
             FINDSE(self)()
-            CALCCOV(self)()
-            SETINFO(self)() # SET ACCEPTOR/DONOR/EXON CATEGORY
-            FINDGENES(self)()
 
+        CALCCOV(self)()
+        SETINFO(self)() # SET ACCEPTOR/DONOR/EXON CATEGORY
+        FINDGENES(self)()
         if pr['do_selectseme']:
             SELECTSEME(self)()
             # SELECTSEME2(self)() # SELECT ME and SE, saves exname2, exname3, sjname2
-        if pr['mergins']:
+        if not pr['merging']:
             FIXEDGES2(self)() # TRIM 3',5' edges
 
         CONSISTENTSJ(self)() # remove sj without ex support
@@ -2535,7 +2532,12 @@ class FINDSECOVTH(SUBASE):
         # fpr[N.isnan(fpr)]=0
         tf = tpr-fpr
         tmp = N.nonzero(fpr<=th)
-        th99x = xf[i0+N.min(tmp[0])]
+        if len(tmp[0])==0:
+            LOG.warning('th99x not found using max pos')
+            st = i1
+        else:
+            st = N.min(tmp[0])
+        th99x = xf[i0+st]
         th99 = 2**th99x - gamma
         LOG.debug('calc_th99 fpr<=th index:{0},th99x:{1},th99:{2}'.format(str(tmp),th99x,th99))
         return th99x,th99
