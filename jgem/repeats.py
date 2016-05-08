@@ -19,6 +19,7 @@ import uuid
 
 import pandas as PD
 import numpy as N
+import matplotlib.pylab as P
 
 from jgem import utils as UT
 from jgem import fasta as FA
@@ -81,7 +82,9 @@ class RmskFilter(object):
         pr = self.params
         uex = count_repeats_mp(self.uex, self.gfc, np=pr['np'], col='#repbp')
         uex = count_repeats_viz_mp(uex, self.rmskviz, np=pr['np'], idcol='_id', expand=0, col='repnames')
-        self.ugb = self._make_gbed(self.ex, self.sj, uex, datacode=pr['datacode'], gname=pr['gname'])
+        self.ugb = ugb = self._make_gbed(self.ex, self.sj, uex, datacode=pr['datacode'], gname=pr['gname'])
+        UT.write_pandas(ugb, fn.txtname('all.genes.stats', category='output'), 'h')
+
 
     def _make_gbed(self, ex, sj, ugb, datacode='', gname='gname'):
         # rep%
@@ -101,7 +104,7 @@ class RmskFilter(object):
         gb2['ed'] = gr['ed'].max()
         gb2['glocus'] = UT.calc_locus(gb2,'chr','st','ed')
         # rmskviz, class=[Simple_repeats, LINE, SINE, LTR, DNA]
-        rcols = ['Simple_repeats','LINE','SINE','LTR','DNA']
+        rcols = ['Simple_repeat','LINE','SINE','LTR','DNA']
         for k in rcols:
             gb2[k] = gb2['repnames'].str.contains('#'+k)
 
@@ -148,13 +151,27 @@ class RmskFilter(object):
         self.sj2 = sj2 = sj0[sj0['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
         self.uex2 = uex2 = uex[uex['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
         gcovfld = 'gcov_'+pr['datacode'] if pr['datacode'] else 'gcov'
-        self.gbed2 = gbed2 = UT.unionex2bed12(uex2,name=pr['gname'],sc1=gcovfld,sc2='tlen')
-        # write out filtered ex,sj,ci,unionex,gb2
+        self.gbed2 = gbed2 = UT.unionex2bed12(uex2,name=pr['gname'],sc2=gcovfld,sc1='tlen')
+        # write out filtered ex,sj,ci,unionex,gbed
         UT.write_pandas(ex2, fn.txtname('ex', category='output'), 'h')
         UT.write_pandas(sj2, fn.txtname('sj', category='output'), 'h')
         UT.write_pandas(uex2, fn.txtname('unionex', category='output'), 'h')
         UT.write_pandas(ugb2, fn.txtname('genes.stats', category='output'), 'h')
         UT.write_pandas(gbed2, fn.bedname('genes', category='output'), '') # BED12
+
+        # also write filtered out genes 
+        self.ex3 = ex3 = ex0[~ex0['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
+        self.sj2 = sj2 = sj0[~sj0['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
+        self.uex3 = uex3 = uex[~uex['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
+        gcovfld = 'gcov_'+pr['datacode'] if pr['datacode'] else 'gcov'
+        self.gbed3 = gbed3 = UT.unionex2bed12(uex3,name=pr['gname'],sc2=gcovfld,sc1='tlen')
+        # write out filtered ex,sj,ci,unionex,gbed
+        UT.write_pandas(ex3, fn.txtname('removed.ex', category='output'), 'h')
+        UT.write_pandas(sj3, fn.txtname('removed.sj', category='output'), 'h')
+        UT.write_pandas(uex3, fn.txtname('removed.unionex', category='output'), 'h')
+        UT.write_pandas(ugb3, fn.txtname('removed.genes.stats', category='output'), 'h')
+        UT.write_pandas(gbed3, fn.bedname('removed.genes', category='output'), '') # BED12
+
 
     def save_params(self):
         UT.save_json(self.params, self.fnobj.fname('params.json', category='output'))
