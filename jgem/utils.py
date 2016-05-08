@@ -659,7 +659,13 @@ def invsig(y,x0,k):
     return x0 - N.log((1.-y)/y)/k
 
 def fit_sigmoid(x,y,xlim=(0,7),yth=0.99):
-    popt,pcov= SO.curve_fit(sigmoid, x, y)
+    try:
+        popt,pcov= SO.curve_fit(sigmoid, x, y)
+    except RuntimeError:
+        x2 = N.linspace(*xlim)
+        y2 = N.array([N.nan]*len(x2))
+        xth = N.nan
+        return x2,y2,xth
     x2 = N.linspace(*xlim)
     y2 = sigmoid(x2, *popt)
     xth = invsig(yth, *popt)
