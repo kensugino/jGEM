@@ -198,7 +198,24 @@ def notstale(opath,dpath,override=False):
         notstale = os.path.getmtime(dpath)>=os.path.getmtime(o)
     return notstale
 
-
+def transpose_file(src, dst, linesep='\n', colsep='\t'):
+    if src[-3:]=='.gz':
+        sp = gzip.open(src,'r')
+    else:
+        sp = open(src,'r')
+    rows = [x.strip().split(colsep) for x in sp]
+    sp.close()
+    
+    n = len(rows[0])
+    cols = [colsep.join([x[i] for x in rows]) for i in range(n)]
+    if dst[-3:]=='.gz':
+        dp = gzip.open(dst,'w')
+    else:
+        dp = open(dst,'w')
+    dp.write(linesep.join(cols))
+    dp.close()
+    
+        
 #### read/write PANDAS #####################################################
 
 def save_tsv_nidx_nhead(df, path, gzip=True, **kwargs):
@@ -335,6 +352,7 @@ def read_pandas(path,**kwargs):
 def make_empty_df(colnames):
     """ make an empty Pandas dataframe with colnames """
     return PD.DataFrame(N.zeros((0,len(colnames))),columns=colnames) 
+
 
 #### GZIP ###############################################################
 def compress(fname):
