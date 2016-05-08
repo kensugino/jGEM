@@ -422,7 +422,7 @@ class MergeInputs(object):
                 maxs.append(df['maxcnt'])
                 mohs.append(df['maxoverhang'])
                 tots.append(df['totcnt'])
-        UT.transpose_csv(fn.allsj_txt())
+        # UT.transpose_csv(fn.allsj_txt())
 
         dfdet = PD.concat(dets, axis=1)
         dfmax = PD.concat(maxs, axis=1)

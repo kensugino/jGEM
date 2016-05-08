@@ -198,7 +198,7 @@ def notstale(opath,dpath,override=False):
         notstale = os.path.getmtime(dpath)>=os.path.getmtime(o)
     return notstale
 
-def transpose_file(src, dst, linesep='\n', colsep='\t'):
+def transpose_csv(src, dst, linesep='\n', colsep='\t'):
     if src[-3:]=='.gz':
         sp = gzip.open(src,'r')
     else:
