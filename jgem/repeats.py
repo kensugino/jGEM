@@ -133,6 +133,7 @@ class RmskFilter(object):
         d = self.ugb
         pr = self.params
         fn = self.fnobj
+        pr.update(kw)
 
         idx1 = (d['rep%']>=pr['th_bp_ovl'])&(d['rviz%']>pr['th_ex_ovl'])
         idx2 = (d['#junc'].notnull())&(d['#uexons']<pr['th_uexon'])
@@ -146,7 +147,8 @@ class RmskFilter(object):
         self.ex2 = ex2 = ex0[ex0['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
         self.sj2 = sj2 = sj0[sj0['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
         self.uex2 = uex2 = uex[uex['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
-        self.gbed2 = gbed2 = UT.unionex2bed12(uex2,name='gname',sc1='gcov',sc2='tlen')
+        gcovfld = 'gcov_'+pr['datacode'] if pr['datacode'] else 'gcov'
+        self.gbed2 = gbed2 = UT.unionex2bed12(uex2,name=pr['gname'],sc1=gcovfld,sc2='tlen')
         # write out filtered ex,sj,ci,unionex,gb2
         UT.write_pandas(ex2, fn.txtname('ex', category='output'), 'h')
         UT.write_pandas(sj2, fn.txtname('sj', category='output'), 'h')
