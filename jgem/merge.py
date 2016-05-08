@@ -254,7 +254,7 @@ class MergeInputs(object):
         self.make_ex_bigwigs()
         self.make_sj_bed()
         self.aggregate_bigwigs()
-        fn.delete(delete=['temp'],protect=['output'])
+        self.fnobj.delete(delete=['temp'],protect=['output'])
         self.save_params()
 
     def make_ex_bigwigs(self):
@@ -474,6 +474,10 @@ class MergeInputs(object):
         xo = sj0['#detected']
         i0 = pr['i_maxcnt']
         i1 = pr['i_detected']
+        if i1<1:
+            LOG.warning('i_detected should be >0, setting to 1')
+            pr['i_detected'] = 1
+            i1 = 1
         slope = -(float(i0)/i1)
         idx3 = (yo - (i0 + slope*xo))>0 # above the corner
         idx4 = sj0['maxoverhang']>pr['th_maxoverhang']
