@@ -13,6 +13,7 @@ import gzip
 import codecs
 import os
 import errno
+from collections import defaultdict
 
 def makedirs2(path):
     """Make all the directories along the path, calls os.makedirs but 
@@ -238,13 +239,13 @@ cpdef list flatten_bed8(ADTYPE_t bed8):
 
 @cython.boundscheck(False) # turns off bounds-checking for entire function
 @cython.wraparound(False) # turns off negative indexing checking
-cpdef array2wiggle_chr(N.ndarray[F32_t] a,  chrom,  dstpath):
+cpdef array2wiggle_chr(N.ndarray[F32_t] a,  chrom,  dstpath, mode='w'):
     #cdef unicode txt
     cdef int i,j,st
     cdef F32_t c
 
     makedirs2(dstpath)
-    fobj = open(dstpath,'w')
+    fobj = open(dstpath, mode)
     i = 0
     cdef Py_ssize_t n = len(a)
     for i in range(n):
@@ -267,13 +268,13 @@ cpdef array2wiggle_chr(N.ndarray[F32_t] a,  chrom,  dstpath):
 
 @cython.boundscheck(False) # turns off bounds-checking for entire function
 @cython.wraparound(False) # turns off negative indexing checking
-cpdef array2wiggle_chr64(N.ndarray[F64_t] a,  chrom,  dstpath):
+cpdef array2wiggle_chr64(N.ndarray[F64_t] a,  chrom,  dstpath, mode='w'):
     #cdef unicode txt
     cdef int i,j,st
     cdef F64_t c
 
     makedirs2(dstpath)
-    fobj = open(dstpath,'w')
+    fobj = open(dstpath,mode)
     i = 0
     cdef Py_ssize_t n = len(a)
     for i in range(n):
@@ -356,3 +357,72 @@ cpdef read_gtf_helper( gtfpath, list parseattrs,  comment='#'):
 
     return recs, cols0
 
+# @cython.boundscheck(False) # turns off bounds-checking for entire function
+# @cython.wraparound(False) # turns off negative indexing checking
+# cpdef scan_make_map(path):
+
+#     cnt = defaultdict(set)
+#     if path[len(path)-3:len(path)]=='.gz':
+#         fp = gzip.open(path,'r')
+#         #reader = codecs.getreader("utf-8")
+#         #fp = reader( gfp )
+#     else:
+#         fp = open(path, 'rb')
+#         #fp = codecs.open(path,encoding='utf-8')
+#         #gfp = fp
+
+#     for line in fp:
+#         r = line.strip().split(b'\t')
+#         cnt[r[3]].add(r[6])
+#     fp.close()
+#     try: # py2
+#         dup = {k:len(v) for k,v in cnt.iteritems()}
+#     except:
+#         dup = {k:len(v) for k,v in cnt.items()}
+#     return dup # key is byte
+    
+# @cython.boundscheck(False) # turns off bounds-checking for entire function
+# @cython.wraparound(False) # turns off negative indexing checking
+# cpdef make_arrays(path, dstpre,  dupdic,  chromsizedic):
+#     # generator which makes an array
+#     cnt = defaultdict(set)
+
+#     if path[len(path)-3:len(path)]=='.gz':
+#         fp = gzip.open(path,'r')
+#         #reader = codecs.getreader("utf-8")
+#         #fp = reader( gfp )
+#     else:
+#         fp = open(path, 'rb')
+#         #fp = codecs.open(path,encoding='utf-8')
+#         #gfp = fp
+
+#     cdef bytes chrom = b''
+#     auniq = None
+#     aall = None
+#     # delete previous
+#     for suf in ['.uniq.wig','.wig']:
+#         if os.path.exists(dstpre+suf):
+#             os.unlink(dstpre+suf)
+
+#     for line in fp:
+#         rec = line.strip().split(b'\t')
+#         if chrom != rec[0].decode(): # chrom switch
+#             if auniq is not None:
+#                 # write 
+#                 array2wiggle_chr64(auniq, chrom,  dstpre+'.uniq.wig', 'a')
+#                 array2wiggle_chr64(aall, chrom,  dstpre+'.wig', 'a')
+#             # setup new array
+#             chrom=rec[0].decode()
+#             auniq = N.zeros(chromsizedic[chrom], dtype=float)
+#             aall =  N.zeros(chromsizedic[chrom], dtype=float)
+#         # uniq? col 3=name=read id
+#         st,ed = int(rec[1]),int(rec[2])
+#         dup = dupdic[rec[3]]
+#         if dup==1:
+#             auniq[st:ed] += 1
+#             aall[st:ed] += 1.
+#         else:
+#             aall[st:ed] += 1./dup
+#     if auniq is not None:
+#         array2wiggle_chr64(auniq, chrom,  dstpre+'.uniq.wig', 'a')
+#         array2wiggle_chr64(aall, chrom,  dstpre+'.wig', 'a')
