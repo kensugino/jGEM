@@ -743,7 +743,7 @@ class MergeAssemble(object):
              'a_id','d_id','a_degree','d_degree','a_pos','d_pos',
             ]
 
-    def __init__(self, fni, fna, saveintermediates=False, **kw):
+    def __init__(self, fni, fna, datacode='', saveintermediates=False, **kw):
         """
         Args:
             fni: MergeInputNames object
@@ -760,6 +760,7 @@ class MergeAssemble(object):
         self.params.update(kw)
         self.stats = {}
         self.fnobj = fna
+        self.datacode = datacode
         self.kw = kw
         self.saveintermediates = saveintermediates
         # set following params according to number of samples
@@ -1042,12 +1043,12 @@ class MergeAssemble(object):
             semax['cov'] = semax['max']
             f.find_secovth()
             th = max(f.se_th99, pr['minsecovth'])
-            semax['cov'] = secov['cov']
+            # semax['cov'] = secov['cov'] # secov not calculated
             self.se1 = se1 = semax[semax['max']>th].copy()
         else:
             f.ex = mecov
             f.se = secov
-            secov['max'] = semax['max']
+            # secov['max'] = semax['max'] # semax not calculated
             f.find_secovth()
             th = max(f.se_th99, pr['minsecovth'])
             self.se1 = se1 = secov[secov['cov']>th].copy()
@@ -1264,6 +1265,10 @@ class MergeAssemble(object):
         genes0['_gidx'] = [name2gidx(x) for x in genes0['name']]
         genes0['cov'] = [i2g[x] for x in genes0['_gidx']]
         
+        # make datacol
+        if self.datacode:
+            ex0['ecov_'+self.datacode] = ex0['ecov']
+            ex0['gcov_'+self.datacode] = ex0['gcov']
         # overwrite ex0, genes0
         UT.write_pandas(ex0, fna.ex_out('txt'), 'h')
         UT.write_pandas(genes0, fna.genes_out('txt'), 'h')
@@ -1287,6 +1292,9 @@ class MergeAssemble(object):
         sj0['ucnt'] = [l2u.get(x,0) for x in sj0['locus']]
         sj0['mcnt'] = [l2m.get(x,0) for x in sj0['locus']]
         sj0['jcnt'] = [x or y for x,y in sj0[['ucnt','mcnt']].values]
+        if self.datacode:
+            for c in ['ucnt','mcnt','jcnt']:
+                sj0[c+'_'+self.datacode] = sj0[c]
         # overwrite sj0
         UT.write_pandas(sj0, fna.sj_out('txt'), 'h')
 
