@@ -6,6 +6,11 @@ from jgem import bedtools as BT
 from jgem import gtfgffbed as GGB
 import gzip
 
+
+# def test_mapbed2bw(testbed7, outdir):
+# 	bwpre = os.path.join(outdir, 'mapbed2bw.test')
+# 	BT.mapbed2bw(testbed7, bwpre,'mm10')
+
 def test_get_total_bp(testbed, testbed12):
 	bed = GGB.read_bed(testbed)
 	r1 = BT.get_total_bp(bed)

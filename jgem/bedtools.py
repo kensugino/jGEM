@@ -12,6 +12,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
 import gzip
+from collections import defaultdict
 
 import pandas as PD
 import numpy as N
@@ -80,7 +81,9 @@ def bam2bed(bampath, bedpath):
     """
 
     cmd1 = ['bedtools','bamtobed','-i', bampath, '-split','-bed12']
-    awkscript = 'BEGIN{OFS="\t";c=1;}{if(d[$4]){$4=d[$4];}else{d[$4]=c;$4=c;c++;} n=split($11,a,","); n=split($12,b,","); for(i=1;i<=n;i++){st=$2+b[i]; print $1,st,st+a[i],$4,$5,$6,NR}}'
+    awkscript = 'BEGIN{OFS="\t";c=1;}{ n=split($11,a,","); n=split($12,b,","); for(i=1;i<=n;i++){st=$2+b[i]; print $1,st,st+a[i],$4,$5,$6,NR}}'    
+    # above keep the original name so that you can go back to fastq
+    # awkscript = 'BEGIN{OFS="\t";c=1;}{if(d[$4]){$4=d[$4];}else{d[$4]=c;$4=c;c++;} n=split($11,a,","); n=split($12,b,","); for(i=1;i<=n;i++){st=$2+b[i]; print $1,st,st+a[i],$4,$5,$6,NR}}'
     cmd2 = ['awk',awkscript]
     with open(bedpath, 'wb') as fp:
         p1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE)
@@ -98,7 +101,8 @@ def bam2bed12(bampath, bedpath):
     """
 
     cmd1 = ['bedtools','bamtobed','-i', bampath, '-split', '-bed12']
-    awkscript = 'BEGIN{OFS="\t";c=1;}{if(a[$4]){$4=a[$4];}else{a[$4]=c;$4=c;c++;}; $7=NR; print $0;}'
+    awkscript = 'BEGIN{OFS="\t";c=1;}{$7=NR; print $0;}'
+    #awkscript = 'BEGIN{OFS="\t";c=1;}{if(a[$4]){$4=a[$4];}else{a[$4]=c;$4=c;c++;}; $7=NR; print $0;}'
     cmd2 = ['awk',awkscript]
     with open(bedpath, 'wb') as fp:
         p1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE)
@@ -154,14 +158,14 @@ def bed2bw(bedpath, chromsizes, bwpath, scale=None):
     wig2bw(wigpath, chromsizes, bwpath)
     os.unlink(wigpath)
 
-def make_bw_from_bed(bedpath, chromsizes, bwpath):
-    """ convert BED to BIGWIG, normalize average coverage to 1 """
+def make_bw_from_bed0(bedpath, chromsizes, bwpath):
+    """ DEPRECATED convert BED to BIGWIG, normalize average coverage to 1 """
     totbp,covbp = get_total_bp_bedfile(bedpath)
     scale = float(covbp)/totbp # 1/avgcov
     bed2bw(bedpath, chromsizes, bwpath, scale)
 
-def make_bw_from_bam(bampath, chromsizes, bedpath, bwpath):
-    """ convert BAM to BIGWIG, normalize average coverage to 1 """
+def make_bw_from_bam0(bampath, chromsizes, bedpath, bwpath):
+    """ DEPRECATED convert BAM to BIGWIG, normalize average coverage to 1 """
     bam2bed(bampath, bedpath)
     make_bw_from_bed(bedpath, chromsizes, bwpath)
     
@@ -451,4 +455,80 @@ def read_ovl(c, acols, bcols=None):
     return UT.read_pandas(c, names=cols)
 
 
+### MAPBED to WIG ########################################################
+
+# dict read_id => set{map_id}
+# multimapper = dup = size(set{map_id})>1
+# weight = 1/dup
+# 1st pass calculate this map read_id => weight
+# for uniq.bw only use weight==1
+# for all.bw use all but use weight
+
+def mapbed2bw(bedpath, bwpre, genome):
+    # 1st path
+    dupdic = _scan_make_map(bedpath)
+    # 2nd path make wiggles
+    chromdic = UT.df2dict(UT.chromdf(genome), 'chr', 'size')
+    wigs = _make_arrays(bedpath, bwpre, dupdic, chromdic)
+    chromsizes = UT.chromsizes(genome)
+    for w in wigs:
+        suf = w.replace(bwpre,'').replace('.wig','')
+        wig2bw(w, chromsizes, bwpre+suf+'.bw')
+    for w in wigs:
+        os.unlink(w)
+
+def _scan_make_map(path):
+    cnt = defaultdict(set)
+    if path[-3:]=='.gz':
+        fp = gzip.open(path,'r')
+    else:
+        fp = open(path,'r')
+    for line in fp:
+        # chr,st,ed,name,sc1,strand,tst
+        # read_id:name(3), map_id:tst(6)
+        rec = line.strip().split(b'\t')
+        cnt[rec[3]].add(rec[6])
+    fp.close()
+    try:# py2
+        dup = {k:len(v) for k,v in cnt.iteritems()}
+    except:
+        dup = {k:len(v) for k,v in cnt.items()}
+    return dup
+    
+def _make_arrays(path, dstpre, dupdic, chromsizedic):
+    # generator which makes an array
+    if path[-3:]=='.gz':
+        fp = gzip.open(path,'r')
+    else:
+        fp = open(path,'rb')
+    chrom = u''
+    auniq = None
+    aall = None
+    # delete previous
+    for suf in ['.uniq.wig','.all.wig']:
+        if os.path.exists(dstpre+suf):
+            os.unlink(dstpre+suf)
+    
+    for line in fp:
+        rec = line.strip().split(b'\t')
+        if chrom != rec[0].decode(): # chrom switch
+            if auniq is not None:
+                cybw.array2wiggle_chr64(auniq, chrom,  dstpre+'.uniq.wig', 'a')
+                cybw.array2wiggle_chr64(aall, chrom,  dstpre+'.all.wig', 'a')
+            # setup new array
+            chrom=rec[0].decode()
+            auniq = N.zeros(chromsizedic[chrom], dtype=float)
+            aall =  N.zeros(chromsizedic[chrom], dtype=float)
+        # uniq? col 3=name=read id
+        st,ed = int(rec[1]),int(rec[2])
+        dup = dupdic[rec[3]]
+        if dup==1:
+            auniq[st:ed] += 1
+            aall[st:ed] += 1.
+        else:
+            aall[st:ed] += 1./dup
+    if auniq is not None:
+        cybw.array2wiggle_chr64(auniq, chrom,  dstpre+'.uniq.wig', 'a')
+        cybw.array2wiggle_chr64(aall, chrom,  dstpre+'.all.wig', 'a')
+    return [dstpre+'.uniq.wig', dstpre+'.all.wig']
 
