@@ -1290,10 +1290,10 @@ class MergeAssemble(object):
         genes0 = self.genes0
         # _gidx not in genes0
         def name2gidx(s):
-            if s[0]=='N':
-                return -int(s[2:])
-            if s[0]=='P':
-                return int(s[2:])
+            if s[:3]=='JNG':
+                return -int(s[3:])
+            if s[:3]=='JPG':
+                return int(s[3:])
             return int(s[1:])
         genes0['_gidx'] = [name2gidx(x) for x in genes0['name']]
         genes0['cov'] = [i2g[x] for x in genes0['_gidx']]
@@ -1346,11 +1346,11 @@ def link_data(pre, src, dst, which='bs'):
 
     bwtgts = ['.allsample.bw', '.ex.men.bw', '.ex.mep.bw', '.ex.se.bw']
     sjtgts = ['.allsj.stats.txt.gz','.allsj.txt.gz','.sj0.bed.gz']
-    tgts = []
-    if 'b' in which:
-        tgts+=bwtgts
-    if 's' in which:
-        tgts+=sjtgts
+    if len(tgts)==0:
+        if 'b' in which:
+            tgts+=bwtgts
+        if 's' in which:
+            tgts+=sjtgts
     for suf in tgts:
         a = pre+src+suf
         b = pre+dst+suf
@@ -1361,5 +1361,3 @@ def link_data(pre, src, dst, which='bs'):
         ret = subprocess.call(cmd)
         if ret !=0:
             print('error: {0}'.format(ret))
-    
-
