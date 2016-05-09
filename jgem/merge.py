@@ -332,6 +332,16 @@ class MergeInputs(object):
         self.write_sjpn() # write sj.p, sj.n 
         self.fnobj.delete(delete=['temp'],protect=['output'])
 
+    def prepare2(self):
+        """ When using previously aggregated data but only changing SJ selection parameters,
+        use this function instead of prepare above.
+
+        """
+        self.select_sj() # select junctions ==> do selection in the assembler? (keep it for now )
+        self.write_sjpn() # write sj.p, sj.n 
+        self.fnobj.delete(delete=['temp'],protect=['output'])
+        self.save_params()
+
     def make_sj0_bed(self):
         """Aggregate all junctions in the samples. Ucnt, mcnt will be the sum over all samples. """
         pr = self.params
@@ -1331,4 +1341,25 @@ class MergeAssemble(object):
 
 
 
+def link_data(pre, src, dst, which='bs'):
+    """Convenience function to link aggregated data"""
+
+    bwtgts = ['.allsample.bw', '.ex.men.bw', '.ex.mep.bw', '.ex.se.bw']
+    sjtgts = ['.allsj.stats.txt.gz','.allsj.txt.gz','.sj0.bed.gz']
+    tgts = []
+    if 'b' in which:
+        tgts+=bwtgts
+    if 's' in which:
+        tgts+=sjtgts
+    for suf in tgts:
+        a = pre+src+suf
+        b = pre+dst+suf
+        cmd = ['ln','-s', a, b]
+        print(' '.join(cmd))
+        if os.path.exists(b):
+            os.unlink(b)
+        ret = subprocess.call(cmd)
+        if ret !=0:
+            print('error: {0}'.format(ret))
+    
 
