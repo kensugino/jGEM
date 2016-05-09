@@ -58,7 +58,6 @@ class Comparator(object):
         self.cn_tgt = cn_tgt
         self.refgnamecol = gnamecol
         self.refgidxcol = gidxcol
-        # self.calc_overlaps()
 
     def calc_overlaps(self):
         cref = self.cn_ref
@@ -221,13 +220,14 @@ class Comparator(object):
         g2c = UT.df2dict(self.ex_tgt, '_gidx', 'gtcode_'+rcode)
         stgt[sgtfld] = [g2c.get(x,'u.me') for x in stgt['_gidx']]
                 
-    def annotate(self, overwrite=True):
+    def annotate(self, save=True, overwrite=True):
         """Annotate target by overlaps to reference.
 
         Args:
             overwrite (bool): overwrite original sj,ex files (default True)
 
         """
+        self.calc_overlaps()
         self.assign_tcode_ex()
         self.assign_intergenic()
         self.assign_antisense()
@@ -235,13 +235,14 @@ class Comparator(object):
         self.assign_tcode_sj()
         cntgt = self.cn_tgt
         cnref = self.cn_ref
-        if overwrite:
-            cntgt.savemodel('ex', category='output')
-            cntgt.savemodel('sj', category='output')
-        else:
-            refcode = cnref.code
-            cntgt.savemodel('ex', code2=refcode, category='output')
-            cntgt.savemodel('sj', code2=refcode, category='output')
+        if save:
+            if overwrite:
+                cntgt.savemodel('ex', category='output')
+                cntgt.savemodel('sj', category='output')
+            else:
+                refcode = cnref.code
+                cntgt.savemodel('ex', code2=refcode, category='output')
+                cntgt.savemodel('sj', code2=refcode, category='output')
         cntgt.delete(['temp'],protect=['output'])
         cnref.delete(['temp'],protect=['output'])
 
