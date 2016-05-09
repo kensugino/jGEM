@@ -629,13 +629,28 @@ class EvalMatch(object):
         ax.set_ylim([-5,105])
 
     def get_detection_percentages(self):
-        """Make a dataframe containing detection percentages. """
+        """Makes a dataframe containing detection percentages. """
         st = self.stats
         order = ['i','5','5b','3','3b','s','sb','j']#,'glc','ecc','jcc']
         dp1 = {k: 100.*st[k]['p1'] for k in order}
         dp2 = {k: 100.*st[k]['p2'] for k in order}
         df = PD.DataFrame({'%detected 1':dp1, '%detected 2':dp2})
         return df.ix[order]
+
+    def get_element_counts(self, sj, ex):
+        """Makes a dataframe containing counts of elements."""
+        cnts = {}
+        seidx = ex['cat']=='s'
+        cnts['#se'] = N.sum(seidx)
+        cnts['#me'] = len(ex)-cnts['#se']
+        # ng_se = len(set(ex[seidx]['_gidx'].values))
+        # assert(ng_se == cnts['#se'])
+        cnts['#megenes'] = len(set(ex[ex['cat']!='s']['_gidx'].values))
+        cnts['#genes'] = len(set(ex['_gidx'].values))
+        cnts['#j'] = len(sj)
+        return PD.DataFrame(cnts, index=['counts']).T
+
+
 
     def plot_detection(self, ax=None, w1=['i','5','3','s','j'],w2=[0]):
         """Make bar graphs of detection percentages.
