@@ -126,6 +126,9 @@ class MergeInputNames(FN.FileNamesBase):
     def bwpaths(self):
         return self.si[['name','bw_path']].values # BIGWIG
 
+    def bwpres(self):
+        return self.si[['name','bwpre']].values # BIGWIG
+
     def sj0_bed(self):
         return self.bedname('sj0', category='output')
 
@@ -158,6 +161,9 @@ class MergeInputNames(FN.FileNamesBase):
 
     def agg_bw(self):
         return self.fname('allsample.bw', category='output')
+
+    def agguniq_bw(self):
+        return self.fname('allsample.uniq.bw', category='output')
 
     def snames(self):
         return list(self.si['name'])
@@ -567,7 +573,7 @@ class MergeInputs(object):
         self.stats['#sj5.p'] = len(sj5p)
         self.stats['#sj5.n'] = len(sj5n)
 
-    def aggregate_bigwigs(self):
+    def aggregate_bigwigs0(self):
         fn = self.fnobj
         pr = self.params
         bwfiles = [x[1] for x in fn.bwpaths()] # [(name,bwfile),...]
@@ -575,6 +581,19 @@ class MergeInputs(object):
         # scale = 1./len(bwfiles) # average
         # BW.merge_bigwigs_mp(bwfiles, pr['genome'], dstpath, scale=scale, np=pr['np'])
         BW.merge_bigwigs_mp(bwfiles, pr['genome'], dstpath, scale=None, np=pr['np'])
+
+    def aggregate_bigwigs(self):
+        fn = self.fnobj
+        pr = self.params
+        # all
+        bwfiles = [x[1]+'.all.bw' for x in fn.bwpres()] # [(name,bwfile),...]
+        dstpath = fn.agg_bw()
+        BW.merge_bigwigs_mp(bwfiles, pr['genome'], dstpath, scale=None, np=pr['np'])
+        # unique
+        bwfiles = [x[1]+'.uniq.bw' for x in fn.bwpres()] # [(name,bwfile),...]
+        dstpath = fn.agguniq_bw()
+        BW.merge_bigwigs_mp(bwfiles, pr['genome'], dstpath, scale=None, np=pr['np'])
+
 
 def make_ex_bed_chr(expaths, dstpre, chrom, covth, covdelta, tgts, minsecovth, secovfactor):
     withcov = True
