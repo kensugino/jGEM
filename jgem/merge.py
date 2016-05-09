@@ -753,9 +753,9 @@ def collect_sj_part(sjpathpart, msjname, allsjpartname, statpartname, i):
 
     if i==0: # first one writes header
         cols = ['locus']+snames
-        UT.write_pandas(msj[cols].T, allsjpartname, 'h')
+        UT.write_pandas(msj[cols].T, allsjpartname, 'ih')
     else:
-        UT.write_pandas(msj[snames].T, allsjpartname, '')
+        UT.write_pandas(msj[snames].T, allsjpartname, 'i')
     UT.write_pandas(msj1[['locus','#detected','maxcnt','maxoverhang','totcnt']], statpartname, 'h')
 
     return (allsjpartname, statpartname)
