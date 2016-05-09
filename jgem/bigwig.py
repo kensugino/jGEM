@@ -307,6 +307,9 @@ def merge_bigwigs_mp(bwfiles, genome, dstpath, scale=None, np=7):
     chroms = UT.chroms(genome)
     chromfile = UT.chromsizes(genome)
     chromsizes = UT.df2dict(UT.chromdf(genome), 'chr', 'size')
+    # reorder chroms, so that chrX doesn't get processed alone at the end wasting MP time
+    tmp = sorted([(chromsizes[c],c) for c in chroms])[::-1]
+    chroms = [x[1] for x in tmp]
     args = [(bwfiles, c, chromsizes[c], dstpath+'.{0}.wig'.format(c), scale) for c in chroms]
 
     rslts = UT.process_mp(merge_bigwigs_chr, args, np, doreduce=False)
