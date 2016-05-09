@@ -595,14 +595,20 @@ class MergeInputs(object):
     def aggregate_bigwigs(self):
         fn = self.fnobj
         pr = self.params
+
         # all
+        LOG.info('collecting *.all.bw multimapper weighted')
         bwfiles = [x[1]+'.all.bw' for x in fn.bwpres()] # [(name,bwfile),...]
         dstpath = fn.agg_bw()
         BW.merge_bigwigs_mp(bwfiles, pr['genome'], dstpath, scale=None, np=pr['np'])
+        LOG.info('wrote to {0}'.format(dstpath))
+
         # unique
+        LOG.info('collecting *.uniq.bw only unique reads')
         bwfiles = [x[1]+'.uniq.bw' for x in fn.bwpres()] # [(name,bwfile),...]
         dstpath = fn.agguniq_bw()
         BW.merge_bigwigs_mp(bwfiles, pr['genome'], dstpath, scale=None, np=pr['np'])
+        LOG.info('wrote to {0}'.format(dstpath))
 
 
 def make_ex_bed_chr(expaths, dstpre, chrom, covth, covdelta, tgts, minsecovth, secovfactor):
@@ -834,6 +840,7 @@ class MergeAssemble(object):
         self.assemble_writefiles()
         self.calc_merged_covs()
         self.assign_sjcnt()
+        self.make_unionex()
         if not self.saveintermediates:
             self.fna.delete(delete=[],protect=['output'])
             # also delete outputs of mep, men assemblies
@@ -1294,7 +1301,7 @@ class MergeAssemble(object):
                 return -int(s[3:])
             if s[:3]=='JPG':
                 return int(s[3:])
-            return int(s[1:])
+            return int(s[2:])
         genes0['_gidx'] = [name2gidx(x) for x in genes0['name']]
         genes0['cov'] = [i2g[x] for x in genes0['_gidx']]
         
@@ -1332,7 +1339,7 @@ class MergeAssemble(object):
         UT.write_pandas(sj0, fna.sj_out('txt'), 'h')
 
 
-    def make_union_gbed(self):
+    def make_unionex(self):
         self.ugb = UT.make_unionex(self.ex0, '_gidx')
         fname = self.fna.fname('unionex.txt.gz', category='output')
         UT.write_pandas(self.ugb, fname,'h')
