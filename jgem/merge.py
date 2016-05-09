@@ -1450,6 +1450,60 @@ def collect_covs(dataset_code, si, assembly_code, sjexpre, which, outdir, np=7):
         os.unlink(fpath)
     
 
+def collect_sjcnts_worker(idf, subsi, acode, which, dstpath):
+    # idf ['_id', 'locus']
+    idf = idf.set_index('_id')
+    cols = []
+    for sname, sjpath in subsi[['name','sjbed_path']].values:
+        sj = GGB.read_sj(sjpath)
+        sj['locus'] = UT.calc_locus_strand(sj)
+        if which=='jcnt':
+            sj['jcnt'] = [x or y for x,y in sj[['ucnt','mcnt']].values]
+        l2u = UT.df2dict(sj, 'locus', which)
+        idf[sname] = [l2u.get(x,0) for x in idf['locus']]        
+        cols.append(sname)
+    UT.write_pandas(idf[cols], dstpath, 'ih') # don't want non-sample columns
+    return dstpath
 
+def collect_sjcnts(dataset_code, si, assembly_code, sjexpre, which, outdir, np=7):
+    """
+    Args:
+        dataset_code: identifier to indicate dataset
+        si: dataset sampleinfo dataframe 
+         (required cololums: name, sjbed_path=path to (converted) raw juncton count file)
+        assembly_code: identifier for assembly
+        sjexpre: assembly sjex path prefix
+        which: ucnt, mcnt, jcnt=ucnt or mcnt (when ucnt=0)
+        outdir: output directory
+
+    """    
+    sj = UT.read_pandas(sjexpre+'.sj.txt.gz')
+    sj['locus'] = UT.calc_locus_strand(sj)
+    idf = sj[['_id', 'locus']].copy()
+    dstpre = os.path.join(outdir, '{0}.{1}'.format(dataset_code, assembly_code))
+    batchsize = int(N.ceil(len(si)/float(np)))
+    args = []
+    files = []
+    si1 = si[['name','sjbed_path']]
+    for i in range(np):
+        subsi = si1.iloc[i*batchsize:(i+1)*batchsize].copy()
+        dstpath = dstpre+'.{0}.part{1}.txt.gz'.format(which, i)
+        files.append(dstpath)
+        args.append((idf, subsi, assembly_code, which, dstpath))
+
+    rslts = UT.process_mp(collect_sjcnts_worker, args, np=np, doreduce=False)
+
+    # concat part files
+    dfs = []
+    for fpath in files:
+        dfs.append(UT.read_pandas(fpath, index_col=[0]))
+    df = PD.concat(dfs, axis=1)
+
+    dstpath = dstpre+'.{0}.txt.gz'.format(which)
+    UT.write_pandas(df, dstpath, 'ih')
+    
+    for fpath in files:
+        os.unlink(fpath)
+    
 
 
