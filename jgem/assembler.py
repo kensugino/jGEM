@@ -114,6 +114,7 @@ PARAMS = dict(
     maxisonum=10,
     useallconnected=True,
     do_selectseme=False,
+    do_mergeexons=True,
     )
 # use different parameters for merging
 MPARAMDIFF = dict(
@@ -165,6 +166,8 @@ for k,v in MPARAMS.items():
 
 # [TODO] Better 5',3' detection, check all internal exon, not just cut ones
 #        (current source of 5',3': edge, cut exons, SE attach)
+# [TODO] Replace WRITEGENES with make_unionex and unionex2bed12
+
 
 class Assembler(object):
 
@@ -251,7 +254,8 @@ class Assembler(object):
         REMOVEJIE(self)()
         SJ2EX(self)()
         # ADDJIE(self)() # no need to do this
-        MERGEEXONS(self)()
+        if pr['do_mergeexons']:
+            MERGEEXONS(self)()
 
         if pr['merging']:
             FINDEDGES2(self)()
