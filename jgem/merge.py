@@ -438,7 +438,6 @@ class MergeInputs(object):
                 maxs.append(df['maxcnt'])
                 mohs.append(df['maxoverhang'])
                 tots.append(df['totcnt'])
-        # UT.transpose_csv(fn.allsj_txt())
 
         dfdet = PD.concat(dets, axis=1)
         dfmax = PD.concat(maxs, axis=1)
@@ -458,6 +457,7 @@ class MergeInputs(object):
         cols = ['locus','#detected','maxcnt','totcnt','maxoverhang']
         UT.write_pandas(msj[cols], fn.allsj_stats(), 'h')
         self.allsj = msj[cols].copy()
+        UT.transpose_csv(fn.allsj_txt())
         
 
     def select_sj(self):
@@ -982,7 +982,7 @@ class MergeAssemble(object):
         # save 
         gid0 = max(pr['se_gidstart'], N.max(N.abs(expn['_gidx'])))
         se0['_gidx'] = N.arange(gid0,gid0+len(se0))
-        se0['name'] = ['S{0}'.format(x) for x in se0['_gidx']]
+        se0['name'] = ['JS{0}'.format(x) for x in se0['_gidx']]
         se0['gname'] = se0['name']
         se0['sc1'] = se0['max']
         se0['strand'] = '.'
@@ -1136,7 +1136,7 @@ class MergeAssemble(object):
         # save 
         gid0 = max(pr['se_gidstart'], N.max(N.abs(expn['_gidx'])))
         se0['_gidx'] = N.arange(gid0,gid0+len(se0))
-        se0['name'] = ['S{0}'.format(x) for x in se0['_gidx']]
+        se0['name'] = ['JS{0}'.format(x) for x in se0['_gidx']]
         se0['gname'] = se0['name']
         se0['sc1'] = se0['cov']
         se0['strand'] = '.'
@@ -1183,7 +1183,7 @@ class MergeAssemble(object):
         # save 
         gid0 = max(pr['se_gidstart'], N.max(N.abs(expn['_gidx'])))
         se0['_gidx'] = N.arange(gid0,gid0+len(se0))
-        se0['name'] = ['S{0}'.format(x) for x in se0['_gidx']]
+        se0['name'] = ['JS{0}'.format(x) for x in se0['_gidx']]
         se0['gname'] = se0['name']
         se0['sc1'] = 0 #se0['max']
         se0['strand'] = '.'
@@ -1295,7 +1295,7 @@ class MergeAssemble(object):
 
         # set cov column for genes
         genes0 = self.genes0
-        # _gidx not in genes0
+        # _gidx not in genes0, [TODO] other method? This is very fragile. 
         def name2gidx(s):
             if s[:3]=='JNG':
                 return -int(s[3:])
@@ -1348,9 +1348,7 @@ class MergeAssemble(object):
 
 
 
-def link_data(pre, src, dst, which='bs'):
-    """Convenience function to link aggregated data"""
-
+def link_data(pre, src, dst, which='bs', tgts=[]):
     bwtgts = ['.allsample.bw', '.ex.men.bw', '.ex.mep.bw', '.ex.se.bw']
     sjtgts = ['.allsj.stats.txt.gz','.allsj.txt.gz','.sj0.bed.gz']
     if len(tgts)==0:
@@ -1368,3 +1366,90 @@ def link_data(pre, src, dst, which='bs'):
         ret = subprocess.call(cmd)
         if ret !=0:
             print('error: {0}'.format(ret))
+    
+# below tested in 2016-05-09-collect-covs.ipynb
+def covtype2path(prefix, acode, which):
+    if which=='ecov':
+        return prefix+'.{0}.ecov.txt.gz'.format(acode)
+    if which=='gcov':
+        return prefix+'.{0}.gcov.txt.gz'.format(acode)
+    if which=='uecov':
+        return prefix+'.{0}.uniq.ecov.txt.gz'.format(acode)
+    if which=='ugcov':
+        return prefix+'.{0}.uniq.gcov.txt.gz'.format(acode)
+    if which=='gcov1k':
+        return prefix+'.{0}1k.gcov.txt.gz'.format(acode)
+    if which=='ugcov1k':
+        return prefix+'.{0}1k.uniq.gcov.txt.gz'.format(acode)
+    raise ValueError('unknown cov type: {0}'.format(which))
+
+def collect_covs_worker(eidf, subsi, acode, which, dstpath):
+    if which in ['ecov','uecov']:
+        idcol = 'eid'
+        covcol = 'ecov'
+        ids = eidf['_id'].values
+        eidf = eidf.set_index('_id')
+    else:
+        idcol = '_gidx'
+        covcol = 'gcov'
+        ids = eidf['_gidx'].values
+        eidf = eidf.set_index('_gidx')
+
+    for sname, covpre in subsi[['name','covpre']].values:
+        covpath = covtype2path(covpre, acode, which)
+        cov = UT.read_pandas(covpath)
+        eidf[sname] = cov.set_index(idcol).ix[ids][covcol].values
+
+    UT.write_pandas(eidf, dstpath, 'ih')
+
+    return dstpath
+
+def collect_covs(dataset_code, si, assembly_code, sjexpre, which, outdir, np=7):
+    """
+    Args:
+        dataset_code: identifier to indicate dataset
+        si: dataset sampleinfo dataframe 
+         (required cololums: name, covpre=prefix to cov files)
+        assembly_code: identifier for assembly
+        sjexpre: assembly sjex path prefix
+        which: one of ecov,gcov,uecov,ugcov,gcov1k,ugcov1k
+        outdir: output directory
+
+    """
+    ex = UT.read_pandas(sjexpre+'.ex.txt.gz')
+    # index
+    if which in ['ecov','uecov']:
+        idf = ex[['_id']].copy()
+    else:
+        idf = ex.groupby('_gidx')[['chr']].first().reset_index().sort_values('_gidx')
+        idf = idf[['_gidx']].copy()
+
+    dstpre = os.path.join(outdir, '{0}.{1}'.format(dataset_code, assembly_code))
+    batchsize = int(N.ceil(len(si)/float(np)))
+    args = []
+    files = []
+    si1 = si[['name','covpre']]
+    for i in range(np):
+        subsi = si1.iloc[i*batchsize:(i+1)*batchsize].copy()
+        dstpath = dstpre+'.{0}.part{1}.txt.gz'.format(which, i)
+        files.append(dstpath)
+        args.append((idf, subsi, assembly_code, which, dstpath))
+
+    rslts = UT.process_mp(collect_covs_worker, args, np=np, doreduce=False)
+
+    # concat part files
+    dfs = []
+    for fpath in files:
+        dfs.append(UT.read_pandas(fpath, index_col=[0]))
+    df = PD.concat(dfs, axis=1)
+
+    dstpath = dstpre+'.{0}.txt.gz'.format(which)
+    UT.write_pandas(df, dstpath, 'ih')
+    
+    for fpath in files:
+        os.unlink(fpath)
+    
+
+
+
+
