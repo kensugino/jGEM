@@ -26,6 +26,7 @@ import jgem.cy.bw as cybw
 GTFCOLS = [u'chr',u'src',u'typ',u'st',u'ed',u'sc1',u'strand',u'sc2',u'extra']
 GFFCOLS = [u'chr',u'src',u'typ',u'st',u'ed',u'sc1',u'strand',u'sc2',u'attr']
 BEDCOLS = [u'chr', u'st', u'ed', u'name', u'sc1', u'strand', u'tst', u'ted', u'sc2', u'#exons', u'esizes', u'estarts']
+KGCOLS = [u'name',u'chr',u'strand',u'st',u'ed',u'cst',u'ced',u'excnts',u'exstarts',u'exends',u'proteinID',u'alignID']
 
 SJCOLS = [u'chr', u'st', u'ed', u'name', u'ucnt', u'strand', u'mcnt']
 
@@ -364,6 +365,11 @@ def write_ggb(df, fname, cols):
     if compress:
         return UT.compress(fname)
     return fname
+
+# UCSC knownGene #####################################################################
+
+def read_kg(path):
+    return UT.read_pandas(path, names=KGCOLS)
 
 
 # CONVERSION     ######################################################################

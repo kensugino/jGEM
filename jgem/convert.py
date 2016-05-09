@@ -133,6 +133,83 @@ def bed2exonsj(bed12, np=4, graphpre=None):
 
     return sj, ex
     
+def kg2exonsj(kg, np=4, graphpre=None):
+    """Extract exons and junctions from UCSC knownGene.txt.gz 
+
+    Args:
+        kg: Pandas.DataFrame containing UCSC knownGene data
+
+    Returns:
+        sj, ex: Pandas.DataFrames containing junction and exons
+
+    """
+    kg['_ests'] = kg['exstarts'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
+    kg['_eeds'] = kg['exends'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
+    
+    cols =['chr','st','ed','tname','strand']
+    def _egen():
+        for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_ests','_eeds']):
+            for st,ed in izip(est,eed):
+                yield (chrom,st,ed,tname,0,strand)
+    def _igen():
+        for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_ests','_eeds']):
+            for st,ed in izip(eed[:-1],est[1:]):
+                yield (chrom,st+1,ed,tname,0,strand)
+                # add 1 to match STAR SJ.tab.out 
+    ex = PD.DataFrame([x for x in _egen()], columns=GGB.BEDCOLS[:6])
+    ex['locus'] = UT.calc_locus_strand(ex)
+    ex = ex.groupby('locus').first().reset_index() # remove dup
+    sj = PD.DataFrame([x for x in _igen()], columns=GGB.BEDCOLS[:6])
+    sj['locus'] = UT.calc_locus_strand(sj)
+    sj = sj.groupby('locus').first().reset_index() # remove dup
+
+    UT.set_info(sj,ex)
+    UT.set_exon_category(sj, ex)
+
+    # find genes (connected components) set '_gidx'
+    if graphpre is None:
+        graphpre = './'+str(uuid.uuid4())+'_'
+    prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
+    genes = GP.find_genes4(sj,ex,
+        filepre=prefix,
+        np=np,
+        override=False,
+        separatese=True)
+
+    return sj, ex
+
+def make_sjex(path, np):
+    if path[-3:]=='.gz':
+        bpath = path[:-3]
+    else:
+        bpath = path
+    ext = bpath[-4:]
+    if ext not in ['.gtf', '.bed', '.txt']:
+        raise ValueError('unknown filetype {0}, should be either .gtf,.bed (bed12),.txt (ucsc knownGene)'.format(ext))
+    pathprefix = bpath[:-4]
+
+    if not os.path.exists(path):
+        raise ValueError('{0} file does not exists'.format(ext))
+
+    if ext=='.gtf':
+        df = GGB.read_gtf(path).sort_values(['chr',])
+        sj, ex = gtf2exonsj(df, np=np)
+    elif ext=='.bed': 
+        df = GGB.read_bed(path)
+        sj, ex = bed2exonsj(df, np=np)
+    elif ext=='.txt': # UCSC knownGene
+        df = GGB.read_kg(path)
+        sj, ex = kg2exonsj(df, np=np)
+    
+    # save
+    LOG.info('saving sj to {0}'.format(pathprefix+'.sj.txt.gz'))
+    UT.write_pandas(sj, pathprefix+'.sj.txt.gz', 'h')
+    LOG.info('saving ex to {0}'.format(pathprefix+'.ex.txt.gz'))
+    UT.write_pandas(ex, pathprefix+'.ex.txt.gz', 'h')    
+
+    return sj, ex
+
+
 
 # convienience class ###########################################################
 
