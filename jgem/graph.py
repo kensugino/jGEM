@@ -587,7 +587,7 @@ def find_genes4(sj, ae, filepre, cachename=None, np=1, override=False, depth=500
         cat = 'S' if len(ids)==1 else 'G'
         if strand=='N': # negative strand
             gid = -gid
-        gname = '{0}{1}{2}'.format(strand,cat,abs(gid))
+        gname = 'J{0}{1}{2}'.format(strand,cat,abs(gid))
         g2gn[gid] = gname
         for x in ids:
             i2g[x] = gid
