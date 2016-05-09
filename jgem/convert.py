@@ -203,7 +203,7 @@ def make_sjexci(path, np):
         sj, ex = bed2exonsj(df, np=np)
     elif ext=='.txt': # UCSC download
         if 'knownGene' in path:
-            df = GGB.read_ucsc_knwonGene(path)
+            df = GGB.read_ucsc_knownGene(path)
             sj, ex = kg2exonsj(df, np=np)
         elif 'refGene' in path:
             df = GGB.read_ucsc_refGene(path)
