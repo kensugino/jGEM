@@ -375,6 +375,7 @@ def calc_cov_chrom(c, b_iter):
 def calc_sjcnt(sjpath1, sjpath2, dstprefix, override=False, np=4):
     pass
 
+# [TODO] don't output chr,st,ed, only eid, ecov
 def calc_ecov(expath, cipath, bwpath, dstprefix, override=False, np=4):
     """Calculate exon coverages.
 
@@ -426,9 +427,10 @@ def calc_ecov(expath, cipath, bwpath, dstprefix, override=False, np=4):
     df.reset_index(inplace=True)
     e2cs = calc_ecov_mp(cc, None, np)
     df['ecov'] = [e2cs[x] for x in df['eid']]
-    UT.save_tsv_nidx_whead(df, ecovpath)
+    UT.save_tsv_nidx_whead(df[['eid','ecov']], ecovpath)
     return df
 
+# [TODO] only output _gidx, gcov
 def calc_gcov(expath, cipath, bwpath, dstprefix, override=False, np=4):
     """Calculate gene coverages.
 
@@ -513,6 +515,7 @@ def calc_gcov(expath, cipath, bwpath, dstprefix, override=False, np=4):
     _set_df2prop('glen2','glen2', 0)
 
     cols = ['_gidx','chr','st','ed','len','val','gcov','glen','len2','gcov2','cids','st2','ed2','glen2']
+    cols = ['_gidx', 'gcov']
     df = df[cols]
     UT.save_tsv_nidx_whead(df, gcovpath)
     return df
