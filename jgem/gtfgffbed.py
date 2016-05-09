@@ -27,6 +27,8 @@ GTFCOLS = [u'chr',u'src',u'typ',u'st',u'ed',u'sc1',u'strand',u'sc2',u'extra']
 GFFCOLS = [u'chr',u'src',u'typ',u'st',u'ed',u'sc1',u'strand',u'sc2',u'attr']
 BEDCOLS = [u'chr', u'st', u'ed', u'name', u'sc1', u'strand', u'tst', u'ted', u'sc2', u'#exons', u'esizes', u'estarts']
 KGCOLS = [u'name',u'chr',u'strand',u'st',u'ed',u'cst',u'ced',u'excnts',u'exstarts',u'exends',u'proteinID',u'alignID']
+RGCOLS = [u'bin',u'name',u'chr',u'strand',u'st',u'ed',u'cst',u'ced',u'excnts',u'exstarts',u'exends',
+            u'score',u'name2',u'cdsStartStat',u'cdsEndStat', u'exonFrames']
 
 SJCOLS = [u'chr', u'st', u'ed', u'name', u'ucnt', u'strand', u'mcnt']
 
@@ -366,11 +368,14 @@ def write_ggb(df, fname, cols):
         return UT.compress(fname)
     return fname
 
-# UCSC knownGene #####################################################################
+# UCSC knownGene/refGene ##############################################################
 
-def read_kg(path):
+def read_ucsc_knownGene(path):
     return UT.read_pandas(path, names=KGCOLS)
 
+def read_ucsc_refGene(path):
+    return UT.read_pandas(path, names=RGCOLS)
+    
 
 # CONVERSION     ######################################################################
 

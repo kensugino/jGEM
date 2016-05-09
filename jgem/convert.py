@@ -11,6 +11,10 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
 import uuid
+try:
+    from itertools import izip
+except:
+    izip = zip
 
 import pandas as PD
 import numpy as N
@@ -50,7 +54,7 @@ def gtf2exonsj(gtf, np=1, graphpre=None):
             chrom,strand,gid=g.iloc[0][['chr','strand','gene_id']]
             ists = g['ed'].values[:-1] + 1
             ieds = g['st'].values[1:] - 1
-            for st,ed in zip(ists,ieds):
+            for st,ed in izip(ists,ieds):
                 # chr,st,ed,name=tid,sc1,strand,gene_id
                 yield (chrom,st,ed,gid,0,strand)
     sj = PD.DataFrame([x for x in _igen()], columns=GGB.BEDCOLS[:6])
@@ -103,12 +107,12 @@ def bed2exonsj(bed12, np=4, graphpre=None):
     def _egen():
         for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_estarts','_eends']):
             #for st,ed in izip(est,eed):
-            for st,ed in zip(est,eed):
+            for st,ed in izip(est,eed):
                 yield (chrom,st,ed,tname,0,strand)
     def _igen():
         for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_estarts','_eends']):
             #for st,ed in izip(eed[:-1],est[1:]):
-            for st,ed in zip(eed[:-1],est[1:]):
+            for st,ed in izip(eed[:-1],est[1:]):
                 yield (chrom,st+1,ed,tname,0,strand)
                 # add 1 to match STAR SJ.tab.out 
     ex = PD.DataFrame([x for x in _egen()], columns=GGB.BEDCOLS[:6])
@@ -148,11 +152,11 @@ def kg2exonsj(kg, np=4, graphpre=None):
     
     cols =['chr','st','ed','tname','strand']
     def _egen():
-        for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_ests','_eeds']):
+        for chrom,tname,strand,est,eed in UT.izipcols(kg,['chr','name','strand','_ests','_eeds']):
             for st,ed in izip(est,eed):
                 yield (chrom,st,ed,tname,0,strand)
     def _igen():
-        for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_ests','_eeds']):
+        for chrom,tname,strand,est,eed in UT.izipcols(kg,['chr','name','strand','_ests','_eeds']):
             for st,ed in izip(eed[:-1],est[1:]):
                 yield (chrom,st+1,ed,tname,0,strand)
                 # add 1 to match STAR SJ.tab.out 
@@ -178,7 +182,7 @@ def kg2exonsj(kg, np=4, graphpre=None):
 
     return sj, ex
 
-def make_sjex(path, np):
+def make_sjexci(path, np):
     if path[-3:]=='.gz':
         bpath = path[:-3]
     else:
@@ -197,9 +201,13 @@ def make_sjex(path, np):
     elif ext=='.bed': 
         df = GGB.read_bed(path)
         sj, ex = bed2exonsj(df, np=np)
-    elif ext=='.txt': # UCSC knownGene
-        df = GGB.read_kg(path)
-        sj, ex = kg2exonsj(df, np=np)
+    elif ext=='.txt': # UCSC download
+        if 'knownGene' in path:
+            df = GGB.read_ucsc_knwonGene(path)
+            sj, ex = kg2exonsj(df, np=np)
+        elif 'refGene' in path:
+            df = GGB.read_ucsc_refGene(path)
+            sj, ex = kg2exonsj(df, np=np) # same as kg
     
     # save
     LOG.info('saving sj to {0}'.format(pathprefix+'.sj.txt.gz'))
@@ -207,6 +215,8 @@ def make_sjex(path, np):
     LOG.info('saving ex to {0}'.format(pathprefix+'.ex.txt.gz'))
     UT.write_pandas(ex, pathprefix+'.ex.txt.gz', 'h')    
 
+    # make ci
+    ci = UT.chopintervals(ex, pathprefix+'.ci.txt.gz')
     return sj, ex
 
 
