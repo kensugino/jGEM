@@ -163,7 +163,7 @@ class RmskFilter(object):
 
         # also write filtered out genes 
         self.ex3 = ex3 = ex0[~ex0['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
-        self.sj2 = sj2 = sj0[~sj0['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
+        self.sj3 = sj3 = sj0[~sj0['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
         self.uex3 = uex3 = uex[~uex['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
         gcovfld = 'gcov_'+pr['datacode'] if pr['datacode'] else 'gcov'
         self.gbed3 = gbed3 = GGB.unionex2bed12(uex3,name=pr['gname'],sc2=gcovfld,sc1='tlen')
