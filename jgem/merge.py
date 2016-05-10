@@ -869,7 +869,7 @@ def select_sj_chr(sj1chrompath, ovlpath, sj2chrompath, th_ratio, chrom):
     cols = cols0+['b_'+x for x in cols0]+['ovl']
     sjovl = UT.read_pandas(c, names=cols)
 
-    sjovl = sjovl[sjovl['strand']==sjovl['b_strand']] # same strand
+    # sjovl = sjovl[sjovl['strand']==sjovl['b_strand']] # same strand
     LOG.debug('select_sj_chr:{1}:len(sjovl)={0}'.format(len(sjovl),chrom))
 
     # sjgr = sjovl.groupby(['chr','st','ed','strand']) 
