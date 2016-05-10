@@ -114,7 +114,7 @@ PARAMS = dict(
     maxisonum=10,
     useallconnected=True,
     do_selectseme=False,
-    do_mergeexons=True,
+    do_mergeexons=False,
     )
 # use different parameters for merging
 MPARAMDIFF = dict(
@@ -262,7 +262,7 @@ class Assembler(object):
             FIXSTRAND(self)()
             # FIND53IR only deals with exons with length > SE sizeth = 50bp)
             # gap smaller than this will be missed if we skip FINDIRETS
-            FINDIRETS(self)()
+            # FINDIRETS(self)()
             # FINDSECOVTH(self)() # not useful here since mep,men don't have real SEs
             FIND53IR(self)()
         else:
