@@ -628,7 +628,7 @@ class MergeInputs(object):
             ovlcol = 'ovlratio.'+which
             sj[ovlcol] = [sid2ovl.get(x,N.nan) for x in sj['str_id']]
             # should use count ratios instead of actual reads as threshold ?
-            th = pr['jie_sjth']
+            th = jie_sjth
             idx = (sj[ovlcol]>=pr['jie_ovlth'])&(sj['ucnt']<th)&(sj['mcnt']<th)
             return idx
 
