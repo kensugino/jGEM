@@ -152,6 +152,8 @@ MPARAMDIFF = dict(
     me_p2=3.1,
 
     do_selectseme=False,
+    do_iretinmerge=False,
+
 )
 MPARAMS = PARAMS.copy()
 MPARAMS.update(MPARAMDIFF)
@@ -262,7 +264,8 @@ class Assembler(object):
             FIXSTRAND(self)()
             # FIND53IR only deals with exons with length > SE sizeth = 50bp)
             # gap smaller than this will be missed if we skip FINDIRETS
-            # FINDIRETS(self)()
+            if pr['do_iretinmerge']:
+                FINDIRETS(self)()
             # FINDSECOVTH(self)() # not useful here since mep,men don't have real SEs
             FIND53IR(self)()
         else:
