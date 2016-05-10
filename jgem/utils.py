@@ -200,11 +200,11 @@ def notstale(opath,dpath,override=False):
         notstale = os.path.getmtime(dpath)>=os.path.getmtime(o)
     return notstale
 
-def transpose_csv(src, dst, linesep='\n', colsep='\t'):
+def transpose_csv(src, dst, linesep=b'\n', colsep=b'\t'):
     if src[-3:]=='.gz':
-        sp = gzip.open(src,'r')
+        sp = gzip.open(src,'r') # byte
     else:
-        sp = open(src,'r')
+        sp = open(src,'rb')
     rows = [x.strip().split(colsep) for x in sp]
     sp.close()
     
@@ -213,7 +213,7 @@ def transpose_csv(src, dst, linesep='\n', colsep='\t'):
     if dst[-3:]=='.gz':
         dp = gzip.open(dst,'w')
     else:
-        dp = open(dst,'w')
+        dp = open(dst,'wb')
     dp.write(linesep.join(cols))
     dp.close()
 

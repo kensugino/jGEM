@@ -33,12 +33,22 @@ def test_MergeInputNames(testsampleinfo, outdir, datadir):
 	assert fn.snames() == ['sample1','sample2','sample3','sample4']
 
 
-def test_agg_bw2(sampleinfo, outdir):
+# def test_agg_bw2(sampleinfo, outdir):
+# 	fn = MG.MergeInputNames(sampleinfo, 'Fev_merge_test', outdir)
+# 	mi = MG.MergeInputs(fn, genome='mm10', np=3)
+# 	mi.aggregate_bigwigs()
+# 	assert os.path.exists(fn.agg_bw())
+
+def test_make_ex_bigwigs(sampleinfo, outdir):
 	fn = MG.MergeInputNames(sampleinfo, 'Fev_merge_test', outdir)
 	mi = MG.MergeInputs(fn, genome='mm10', np=3)
-	mi.aggregate_bigwigs()
-	assert os.path.exists(fn.agg_bw())
-
+	mi.make_ex_bigwigs()
+	assert os.path.exists(fn.ex_bw('mep'))
+	assert os.path.exists(fn.ex_bw('men'))
+	assert os.path.exists(fn.ex_bw('se'))
+	#assert os.path.exists(fn.ex_bw('sep'))
+	#assert os.path.exists(fn.ex_bw('sen'))
+	
 def test_make_sj_bed(sampleinfo, outdir):
 	fni = MG.MergeInputNames(sampleinfo, 'Fev_merge_test', outdir)
 	mi = MG.MergeInputs(fni, genome='mm10', np=1)
@@ -54,15 +64,7 @@ def test_make_sj_bed(sampleinfo, outdir):
 	# assert 'chr1:118545460-118547864:.' in sjp['locus'].values
 
 
-def test_make_ex_bigwigs(sampleinfo, outdir):
-	fn = MG.MergeInputNames(sampleinfo, 'Fev_merge_test', outdir)
-	mi = MG.MergeInputs(fn, genome='mm10', np=3)
-	mi.make_ex_bigwigs()
-	assert os.path.exists(fn.ex_bw('mep'))
-	assert os.path.exists(fn.ex_bw('men'))
-	assert os.path.exists(fn.ex_bw('se'))
-	#assert os.path.exists(fn.ex_bw('sep'))
-	#assert os.path.exists(fn.ex_bw('sen'))
+
 
 # def test_aggregate_bigwigs(testsampleinfo, outdir):
 # 	fn = MG.MergeInputNames(testsampleinfo, 'test-mergeinputnames', outdir)

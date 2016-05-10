@@ -51,6 +51,10 @@ MERGECOVPARAM = dict(
     th_ratio=1e-3, # discard junctions less than this portion within overlapping junctions
     i_detected=1, # intercept for #detected
     i_maxcnt=1, # intercept for maxcnt
+
+    jie_binth=10, # 10x average cov
+    jie_sjth=0.1, #   0.1x
+    jie_ovlth=0.95, # how much overlap to high coverage interval?
 )
 MERGEASMPARAM = dict(
     # se_maxth=500,   # SE maxcov threshold
@@ -63,11 +67,12 @@ MERGEASMPARAM = dict(
     se_minsize=100, # min size for SE
     se_maxsize=10000, # in gen4 only one SE is larger than 10Kbp
     secov_fpr_th=0.01, # FPR threshold
-    jie_binth=10, 
+    # jie_binth=10, # => moved
     ureadth=0,
     mreadth=200,
     findsecov_usesemax=True,
     do_selectseme=False,
+    do_mergeexons=False,
 )
 
 
@@ -135,6 +140,9 @@ class MergeInputNames(FN.FileNamesBase):
     def sj5_txt(self):
         return self.txtname('sj5', category='output')
 
+    def sj6_txt(self):
+        return self.txtname('sj6', category='output')
+
     def sj1_txt(self):
         return self.txtname('sj1', category='output')
 
@@ -148,6 +156,9 @@ class MergeInputNames(FN.FileNamesBase):
 
     def allsj_txt(self):
         return self.txtname('allsj', category='output')
+
+    def allsjT_txt(self):
+        return self.txtname('allsj.T', category='output')
 
     def allsj_stats(self):
         return self.txtname('allsj.stats', category='output')
@@ -329,6 +340,7 @@ class MergeInputs(object):
         self.make_sj0_bed() # aggregate junctions
         self.collect_sj() # collect sample junction counts
         self.select_sj() # select junctions ==> do selection in the assembler? (keep it for now )
+        self.remove_jie() # do remove jie here to use info on both strand (inside assmbler strand is separate)
         self.write_sjpn() # write sj.p, sj.n 
         self.fnobj.delete(delete=['temp'],protect=['output'])
 
@@ -338,6 +350,7 @@ class MergeInputs(object):
 
         """
         self.select_sj() # select junctions ==> do selection in the assembler? (keep it for now )
+        self.remove_jie() # do remove jie here to use info on both strand (inside assmbler strand is separate)
         self.write_sjpn() # write sj.p, sj.n 
         self.fnobj.delete(delete=['temp'],protect=['output'])
         self.save_params()
@@ -457,7 +470,7 @@ class MergeInputs(object):
         cols = ['locus','#detected','maxcnt','totcnt','maxoverhang']
         UT.write_pandas(msj[cols], fn.allsj_stats(), 'h')
         self.allsj = msj[cols].copy()
-        UT.transpose_csv(fn.allsj_txt())
+        UT.transpose_csv(fn.allsj_txt(), fn.allsjT_txt())
         
 
     def select_sj(self):
@@ -568,20 +581,82 @@ class MergeInputs(object):
                     shutil.copyfileobj(src, dst)
         for f in sj2files:
             os.unlink(f)
+
+    def remove_jie(self):
+        if hasattr(self, 'sj5'):
+            sj = self.sj5
+        else:
+            self.sj5 = sj = UT.read_pandas(fn.sj5_txt())
+
+        fn = self.fnobj
+        pr = self.params
+        stats = self.stats
+        sjcols = ['chr','st','ed','name','ucnt','strand','mcnt'] # has to match GGB.BEDCOLS[:7]
+        sjfile = UT.write_pandas(sj[sjcols], fn.bedname('sj5'), '') # BED used in BT.calc_ovlratio
+        sj['str_id'] = UT.calc_locus(sj)
+
+        def _get_idx(which):
+            bwfile = fn.ex_bw(which)
+            acov = BW.get_totbp_covbp_bw(bwfile, pr['genome'], ['chr1']).ix['acov'].values[0]
+            LOG.info('REMOVE_JIE ({0}) acov={1}'.format(which, acov))
+            jie_binth = pr['jie_binth']*acov
+            jie_sjth = pr['jie_sjth']*acov # seems no need to scale sjth ?
+            stats['REMOVEJIE({0}).jie_binth'.format(which)] = jie_binth
+            stats['REMOVEJIE({0}).jie_sjth'.format(which)] = jie_sjth
+            stats['REMOVEJIE({0}).acov'.format(which)] = acov
+            # covarage file
+            bedfile = fn.bedname2('bw'+which,jie_binth)
+            binfile = BW.bw2bed(
+                bwfile=bwfile,
+                bedfile=bedfile,
+                chroms=UT.chroms(pr['genome']),
+                th=jie_binth
+            )
+            jiebw = GGB.read_bed(binfile)
+            tname = fn.txtname('removejie.bw.ovl.'+which)
+            sjmp = BT.calc_ovlratio(
+                aname=sjfile, 
+                bname=binfile, 
+                tname=tname, 
+                nacol=7, 
+                nbcol=3, 
+                idcol=['chr','st','ed','strand']
+            )
+            # match records between sjmp and mg.sj
+            sjmp['str_id'] = UT.calc_locus(sjmp)
+            sid2ovl = UT.df2dict(sjmp, 'str_id','ovlratio')
+            ovlcol = 'ovlratio.'+which
+            sj[ovlcol] = [sid2ovl.get(x,N.nan) for x in sj['str_id']]
+            # should use count ratios instead of actual reads as threshold ?
+            th = pr['jie_sjth']
+            idx = (sj[ovlcol]>=pr['jie_ovlth'])&(sj['ucnt']<th)&(sj['mcnt']<th)
+            return idx
+
+        idxp = _get_idx('mep')
+        idxn = _get_idx('men')
+        sj1 = sj[(~idxp)&(~idxn)].copy() # use these for "nearest donor/acceptor" exon extraction
+        jie = sj[idxp|idxn].copy() # junctions in exon, add later
+        self.info = '#sj:{0}=>{1}, jie {2}'.format(len(sj), len(sj1), len(jie))
+        stats['REMOVEJIE.#sj'] = len(sj1)
+        stats['REMOVEJIE.#jie'] = len(jie)
+        #return sj1, jie
+        self.sj6 = sj1
+        self.jie = jie
+        UT.write_pandas(self.sj6, fn.sj6_txt())
         
     def write_sjpn(self):
         fn = self.fnobj
-        if hasattr(self, 'sj1'):
-            sj5 = self.sj5
+        if hasattr(self, 'sj6'):
+            sj6 = self.sj6
         else:
-            sj5 = UT.read_pandas(fn.sj5_txt())
+            sj6 = UT.read_pandas(fn.sj6_txt())
         cols = GGB.SJCOLS
-        sj5p = sj5[sj5['strand'].isin(['+','.'])][cols]
-        sj5n = sj5[sj5['strand'].isin(['-','.'])][cols]
-        UT.write_pandas(sj5p, fn.sj_bed('p'), '')
-        UT.write_pandas(sj5n, fn.sj_bed('n'), '')
-        self.stats['#sj5.p'] = len(sj5p)
-        self.stats['#sj5.n'] = len(sj5n)
+        sj6p = sj6[sj6['strand'].isin(['+','.'])][cols]
+        sj6n = sj6[sj6['strand'].isin(['-','.'])][cols]
+        UT.write_pandas(sj6p, fn.sj_bed('p'), '')
+        UT.write_pandas(sj6n, fn.sj_bed('n'), '')
+        self.stats['#sj6.p'] = len(sj6p)
+        self.stats['#sj6.n'] = len(sj6n)
 
     def aggregate_bigwigs0(self):
         fn = self.fnobj
@@ -1343,8 +1418,6 @@ class MergeAssemble(object):
         self.ugb = UT.make_unionex(self.ex0, '_gidx')
         fname = self.fna.fname('unionex.txt.gz', category='output')
         UT.write_pandas(self.ugb, fname,'h')
-
-
 
 
 

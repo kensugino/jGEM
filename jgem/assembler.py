@@ -248,10 +248,10 @@ class Assembler(object):
 
         if not pr['merging']:
             SELECTSJ(self)()
+            REMOVEJIE(self)()
         if pr['checksjsupport']:
             CHECKSJSUPPORT(self)()
 
-        REMOVEJIE(self)()
         SJ2EX(self)()
         # ADDJIE(self)() # no need to do this
         if pr['do_mergeexons']:

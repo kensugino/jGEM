@@ -57,6 +57,9 @@ class FileNamesBase(object):
     def bedname(self, suffix, category='temp'):
         return self.fname(suffix+'.bed.gz', category)
 
+    def bedname2(self, suf, th, cat='temp'):
+        return self.bedname('{0}{1:g}'.format(suf, th), cat)
+
     def delete(self, delete=['temp'], protect=[]):
         """Delete temporary files.
 
@@ -139,9 +142,6 @@ class FileNames(FileNamesBase):
         # FileNamesBase init
         prefix = os.path.join(outdir, sname)
         super(FileNames, self).__init__(prefix)
-
-    def bedname2(self, suf, th, cat='temp'):
-        return self.bedname('{0}{1:g}'.format(suf, th), cat)
 
     def refname(self,suf):
         return self.refgtf.fname(suf+'.txt.gz')

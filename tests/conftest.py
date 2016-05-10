@@ -45,6 +45,7 @@ def sampleinfo(datadir, gdatadir):
 	# si['sjfile'] = [os.path.join(datadir, 'SJ', x) for x in si['sjbed']]
 	si['bed_path'] = [os.path.join(datadir, 'BED', x) for x in si['mapbed']] 
 	si['bw_path'] = [os.path.join(gdatadir, 'bigwig', x) for x in si['bigwig']]
+	si['bwpre'] = [os.path.join(gdatadir, 'bigwig', x) for x in si['name']]
 	si['sjtab_path'] = [os.path.join(datadir, 'SJ', x) for x in si['sjtab']]
 	si['sjbed_path'] = [os.path.join(gdatadir, 'SJ', x) for x in si['sjbed']]
 	si['sjexpre'] = [os.path.join(gdatadir, 'assemblies', x) for x in si['name']]
@@ -52,6 +53,9 @@ def sampleinfo(datadir, gdatadir):
 	for bedfile, bwfile in si[['bed_path','bw_path']].values:
 		if not os.path.exists(bwfile):
 		    BT.bed2bw(bedfile, chromsizes, bwfile)		
+	for bedfile, bwpre in si[['bed_path','bwpre']].values:
+		if not os.path.exists(bwpre+'.all.bw'):
+		    BT.mapbed2bw(bedfile, bwpre, 'mm10')		
 	for sjtab, sjbed in si[['sjtab_path','sjbed_path']].values:
 		if not os.path.exists(sjbed):
 		    GGB.sjtab2sjbed(sjtab,sjbed)		
