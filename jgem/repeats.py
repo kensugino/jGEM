@@ -80,6 +80,8 @@ class RmskFilter(object):
         ALso make a dataframe containing summary. 
         """
         pr = self.params
+        fn = self.fnobj
+        
         uex = count_repeats_mp(self.uex, self.gfc, np=pr['np'], col='#repbp')
         uex = count_repeats_viz_mp(uex, self.rmskviz, np=pr['np'], idcol='_id', expand=0, col='repnames')
         self.ugb = ugb = self._make_gbed(self.ex, self.sj, uex, datacode=pr['datacode'], gname=pr['gname'])
