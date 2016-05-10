@@ -145,7 +145,7 @@ class RmskFilter(object):
         idx = ~(idx1&idx2)
         self.ugb2 = ugb2 = d[idx] # filtered
         self.ugb3 = ugb3 = d[~idx]
-        
+
         gids = ugb2.index.values
         ex0 = self.ex
         sj0 = self.sj
@@ -160,8 +160,8 @@ class RmskFilter(object):
         UT.write_pandas(ex2, fn.txtname('ex', category='output'), 'h')
         UT.write_pandas(sj2, fn.txtname('sj', category='output'), 'h')
 
-        GGB.write_bed(ex2, fn.bedname('ex', category='output'), 'h')
-        GGB.write_bed(sj2, fn.bedname('sj', category='output'), 'h')
+        GGB.write_bed(ex2, fn.bedname('ex', category='output'))
+        GGB.write_bed(sj2, fn.bedname('sj', category='output'))
         
         UT.write_pandas(uex2, fn.txtname('unionex', category='output'), 'h')
         UT.write_pandas(ugb2, fn.txtname('genes.stats', category='output'), 'h')
