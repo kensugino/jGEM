@@ -52,9 +52,14 @@ MERGECOVPARAM = dict(
     i_detected=1, # intercept for #detected
     i_maxcnt=1, # intercept for maxcnt
 
+    # for remove_jie (version one)
     jie_binth=10, # 10x average cov
     jie_sjth=0.1, #   0.1x
     jie_ovlth=0.95, # how much overlap to high coverage interval?
+    # for remove_jie verion 2, calculate sj threshod from coverage of the interval
+    jie_acovfactor=1, # binth = this x acov
+    jie_sjfactor=1e-3, # sjth = this x coverage (of the interval)
+
 )
 MERGEASMPARAM = dict(
     # se_maxth=500,   # SE maxcov threshold
@@ -340,7 +345,7 @@ class MergeInputs(object):
         self.make_sj0_bed() # aggregate junctions
         self.collect_sj() # collect sample junction counts
         self.select_sj() # select junctions ==> do selection in the assembler? (keep it for now )
-        self.remove_jie() # do remove jie here to use info on both strand (inside assmbler strand is separate)
+        self.remove_jie2() # do remove jie here to use info on both strand (inside assmbler strand is separate)
         self.write_sjpn() # write sj.p, sj.n 
         self.fnobj.delete(delete=['temp'],protect=['output'])
 
@@ -350,7 +355,7 @@ class MergeInputs(object):
 
         """
         self.select_sj() # select junctions ==> do selection in the assembler? (keep it for now )
-        self.remove_jie() # do remove jie here to use info on both strand (inside assmbler strand is separate)
+        self.remove_jie2() # do remove jie here to use info on both strand (inside assmbler strand is separate)
         self.write_sjpn() # write sj.p, sj.n 
         self.fnobj.delete(delete=['temp'],protect=['output'])
         self.save_params()
@@ -493,6 +498,7 @@ class MergeInputs(object):
         l2m = UT.df2dict(allsj, 'locus', 'maxcnt')
         l2o = UT.df2dict(allsj, 'locus', 'maxoverhang')
         sj0['locus'] = UT.calc_locus_strand(sj0)
+        sj0['str_id'] = UT.calc_locus(sj0)
         sj0['#detected'] = [l2d[x] for x in sj0['locus']]
         sj0['maxcnt'] = [l2m[x] for x in sj0['locus']]
         sj0['maxoverhang'] = [l2o[x] for x in sj0['locus']]
@@ -517,11 +523,11 @@ class MergeInputs(object):
         # idx5 = ~((sj0['ucnt']>0)&(sj0['ucnt']<sj0['maxcnt'])) # ~12K 
         # this was a bad idea, does not work at all
 
-        sj0['th_uthmth'] = idx1
-        sj0['th_detected'] = idx2
-        sj0['th_corner'] = idx3
-        sj0['th_overhang'] = idx4
-        sj0['th_maxcnt'] = idx5
+        sj0['th_uthmth'] = idx1.astype(int)
+        sj0['th_detected'] = idx2.astype(int)
+        sj0['th_corner'] = idx3.astype(int)
+        sj0['th_overhang'] = idx4.astype(int)
+        sj0['th_maxcnt'] = idx5.astype(int)
         UT.write_pandas(sj0, fn.txtname('sj0.with.thresholds',category='stats'))
 
         sj1 = sj0[idx1&idx2&idx3&idx4&idx5].copy()
@@ -565,11 +571,13 @@ class MergeInputs(object):
         rslts = UT.process_mp(select_sj_chr, args, np, doreduce=False)
         
         # rslts contains [(chrom, [locus,...], stats),...]
+        # rslts contains [(chrom, [str_id,...], stats),...]  # no strand 2016-05-10
         sel = []
         for chrom, loci, stats in rslts:
             sel += loci
             self.stats.update(stats)
-        self.sj5 = sj5 = sj1.set_index('locus').ix[sel]
+        # self.sj5 = sj5 = sj1.set_index('locus').ix[sel]
+        self.sj5 = sj5 = sj1.set_index('str_id').ix[sel]
         UT.write_pandas(sj5, fn.sj5_txt())
         self.stats['#sj5'] = len(sj5)
 
@@ -649,6 +657,90 @@ class MergeInputs(object):
         self.jie = jie
         UT.write_pandas(self.sj6, fn.sj6_txt())
         
+    def remove_jie2(self):
+        # adaptive threshold version
+        if hasattr(self, 'sj5'):
+            sj = self.sj5
+        else:
+            self.sj5 = sj = UT.read_pandas(fn.sj5_txt())
+
+        fn = self.fnobj
+        pr = self.params
+        stats = self.stats
+        sjcols = ['chr','st','ed','name','ucnt','strand','mcnt'] # has to match GGB.BEDCOLS[:7]
+        sjfile = UT.write_pandas(sj[sjcols], fn.bedname('sj5'), '') # BED used in BT.calc_ovlratio
+        sj['str_id'] = UT.calc_locus(sj)
+
+        def _get_idx(which):
+            bwfile = fn.ex_bw(which)
+            acov = BW.get_totbp_covbp_bw(bwfile, pr['genome'], ['chr1']).ix['acov'].values[0]
+            LOG.info('REMOVE_JIE ({0}) acov={1}'.format(which, acov))
+
+            # find high cov regions
+            jie_binth = pr['jie_acovfactor']*acov
+            bedfile = fn.bedname2('bw'+which,jie_binth)
+            binfile = BW.bw2bed(
+                bwfile=bwfile,
+                bedfile=bedfile,
+                chroms=UT.chroms(pr['genome']),
+                th=jie_binth
+            )
+            # find overlap of junctions and high cov region
+            jiebw = GGB.read_bed(binfile)
+
+            tname = fn.txtname('removejie.bw.ovl.'+which)
+            sjmp = BT.calc_ovlratio(
+                aname=sjfile, 
+                bname=binfile, 
+                tname=tname, 
+                nacol=7, 
+                nbcol=3, 
+                idcol=['chr','st','ed'],
+                returnbcols=True
+            )
+            LOG.debug(sjmp.columns)
+            # match records between sjmp and mg.sj
+            sjmp['str_id'] = UT.calc_locus(sjmp) # sjmp [...](7 sj cols)+[b_chr,b_st,b_ed]
+            sjmp['hcid'] = UT.calc_locus(sjmp, 'b_chr', 'b_st', 'b_ed')
+            # calc high cov region coverages
+            hcov = CC.calc_cov_mp(
+                bed=jiebw, 
+                bwname=bwfile,
+                fname=fn.txtname('removejie.bw.cov.'+which),
+                np=pr['np'], 
+                which='cov')
+            hcov['hcid'] = UT.calc_locus(hcov)
+            hcid2cov = UT.df2dict(hcov, 'hcid', 'cov')
+            sjmp['hccov'] = [hcid2cov.get(x,N.nan) for x in sjmp['hcid']]
+            sjmpovl = sjmp[sjmp['ovlratio']>=pr['jie_ovlth']] # target junctions
+            sid2cov = UT.df2dict(sjmpovl, 'str_id', 'hccov') # there should be only one overlapping hc interval
+            thcol = 'covth.'+which
+            sj[thcol] = [sid2cov.get(x,0) for x in sj['str_id']]
+            sj[thcol] = sj[thcol]*pr['jie_sjfactor']
+            idx = (sj['ucnt']<sj[thcol])&(sj['mcnt']<sj[thcol])
+
+            stats['REMOVEJIE({0}).jie_binth'.format(which)] = jie_binth
+            stats['REMOVEJIE({0}).acov'.format(which)] = acov
+            stats['REMOVEJIE({0}).removed'.format(which)] = N.sum(idx)
+            return idx
+
+        self.idxp = idxp = _get_idx('mep')
+        self.idxn = idxn = _get_idx('men')
+        LOG.debug('REMOVEJIE.idxp hits = {0}'.format(N.sum(idxp)))
+        LOG.debug('REMOVEJIE.idxn hits = {0}'.format(N.sum(idxn)))
+        jieidx = idxp|idxn
+        LOG.debug('REMOVEJIE.jieidxn hits = {0}'.format(N.sum(jieidx)))
+
+        sj1 = sj[~jieidx].copy() # use these for "nearest donor/acceptor" exon extraction
+        jie = sj[jieidx].copy() # junctions in exon, add later
+        self.info = '#sj:{0}=>{1}, jie {2}'.format(len(sj), len(sj1), len(jie))
+        stats['REMOVEJIE.#sj'] = len(sj1)
+        stats['REMOVEJIE.#jie'] = len(jie)
+        #return sj1, jie
+        self.sj6 = sj1
+        self.jie = jie
+        UT.write_pandas(self.sj6, fn.sj6_txt())
+
     def write_sjpn(self):
         fn = self.fnobj
         if hasattr(self, 'sj6'):
@@ -780,7 +872,8 @@ def select_sj_chr(sj1chrompath, ovlpath, sj2chrompath, th_ratio, chrom):
     sjovl = sjovl[sjovl['strand']==sjovl['b_strand']] # same strand
     LOG.debug('select_sj_chr:{1}:len(sjovl)={0}'.format(len(sjovl),chrom))
 
-    sjgr = sjovl.groupby(['chr','st','ed','strand'])
+    # sjgr = sjovl.groupby(['chr','st','ed','strand']) 
+    sjgr = sjovl.groupby(['chr','st','ed'])  # ignore strand
     sj2 = sjgr[['ucnt','mcnt','name']].first()
     sj2['ucnt_sum'] = sjgr['b_ucnt'].sum()
     sj2['mcnt_sum'] = sjgr['b_mcnt'].sum()
@@ -788,7 +881,8 @@ def select_sj_chr(sj1chrompath, ovlpath, sj2chrompath, th_ratio, chrom):
     sj2['cnt'] = sj2['ucnt']+sj2['mcnt']
     # self.sj2 = sj2 = sj2.reset_index() # need chr,st,ed,strand at next step
     sj2 = sj2.reset_index() # need chr,st,ed,strand at next step
-    sj2['locus'] = UT.calc_locus_strand(sj2)
+    # sj2['locus'] = UT.calc_locus_strand(sj2)
+    sj2['str_id'] = UT.calc_locus(sj2)
     sj2['ratio'] = sj2['ucnt']/sj2['ucnt_sum']
     sj2['ratio_m'] = sj2['mcnt']/sj2['mcnt_sum']
     sj2['ratio_a'] = sj2['cnt']/sj2['sum']
@@ -807,7 +901,9 @@ def select_sj_chr(sj1chrompath, ovlpath, sj2chrompath, th_ratio, chrom):
     # write out sj2 for debug
     UT.write_pandas(sj2, sj2chrompath, 'h')
     stats = {chrom+'.#sj2':len(sj2), chrom+'.#sj4':len(sj4)}
-    return chrom, list(sj4['locus'].values), stats
+    # return chrom, list(sj4['locus'].values), stats
+    return chrom, list(sj4['str_id'].values), stats
+
 
 def collect_sj_part(sjpathpart, msjname, allsjpartname, statpartname, i):
     msj = UT.read_pandas(msjname) # column locus

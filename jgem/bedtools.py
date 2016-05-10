@@ -388,7 +388,7 @@ def _bedtoolscatcherror2(which, aname, cname, **kwargs):
         return UT.compress(cname)
     return cname
 
-def calc_ovlratio(aname, bname, tname, nacol, nbcol, idcol=['chr','st','ed']):
+def calc_ovlratio(aname, bname, tname, nacol, nbcol, idcol=['chr','st','ed'], returnbcols=False):
     """Calculate overlapped portion of b onto a. 
     Will check existence of result file (tname) and uses it if newer than input files.
 
@@ -422,7 +422,10 @@ def calc_ovlratio(aname, bname, tname, nacol, nbcol, idcol=['chr','st','ed']):
     cols = acols + bcols +['ovl']
     df = UT.read_pandas(cname, names=cols)
     dfg = df.groupby(idcol) #['chr','st','ed'])
-    dfa = dfg.first().reset_index()[acols]
+    if returnbcols:
+        dfa = dfg.first().reset_index()[acols+bcols]
+    else:
+        dfa = dfg.first().reset_index()[acols]        
     if nacol==12:# sum of exon sizes
         dfa['len'] = [N.sum(map(int, x.split(',')[:-1])) for x in dfa['esizes']]
     else: 
