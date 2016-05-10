@@ -135,6 +135,7 @@ class EvalNames(FN.FileNamesBase):
 WSDEFAULT = ['i',('5','5b'),('3','3b'),('s','sb'),'j']
 WSDEFAULT1 = ['i','5','3','s','j']
 WSDEFAULT2 = ['i','5','5b','3','3b','s','sb','j']
+WSDEFAULT3 = ['i','5b','3b','sb','j']
 
 class EvalMatch(object):
     """Compare two models against a genome coverage (bigwig) 
