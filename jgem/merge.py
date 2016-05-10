@@ -632,10 +632,15 @@ class MergeInputs(object):
             idx = (sj[ovlcol]>=pr['jie_ovlth'])&(sj['ucnt']<th)&(sj['mcnt']<th)
             return idx
 
-        idxp = _get_idx('mep')
-        idxn = _get_idx('men')
-        sj1 = sj[(~idxp)&(~idxn)].copy() # use these for "nearest donor/acceptor" exon extraction
-        jie = sj[idxp|idxn].copy() # junctions in exon, add later
+        self.idxp = idxp = _get_idx('mep')
+        self.idxn = idxn = _get_idx('men')
+        LOG.debug('REMOVEJIE.idxp hits = {0}'.format(N.sum(idxp)))
+        LOG.debug('REMOVEJIE.idxn hits = {0}'.format(N.sum(idxn)))
+        jieidx = idxp|idxn
+        LOG.debug('REMOVEJIE.jieidxn hits = {0}'.format(N.sum(jieidx)))
+
+        sj1 = sj[~jieidx].copy() # use these for "nearest donor/acceptor" exon extraction
+        jie = sj[jieidx].copy() # junctions in exon, add later
         self.info = '#sj:{0}=>{1}, jie {2}'.format(len(sj), len(sj1), len(jie))
         stats['REMOVEJIE.#sj'] = len(sj1)
         stats['REMOVEJIE.#jie'] = len(jie)
