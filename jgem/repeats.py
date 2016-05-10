@@ -156,6 +156,7 @@ class RmskFilter(object):
         self.uex2 = uex2 = uex[uex['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
         gcovfld = 'gcov_'+pr['datacode'] if pr['datacode'] else 'gcov'
         self.gbed2 = gbed2 = GGB.unionex2bed12(uex2,name=pr['gname'],sc2=gcovfld,sc1='tlen')
+        gbed2['sc2'] = gbed2['sc2'].astype(int)
         # write out filtered ex,sj,ci,unionex,gbed
         UT.write_pandas(ex2, fn.txtname('ex', category='output'), 'h')
         UT.write_pandas(sj2, fn.txtname('sj', category='output'), 'h')
@@ -173,6 +174,7 @@ class RmskFilter(object):
         self.uex3 = uex3 = uex[~uex['_gidx'].isin(gids)].sort_values(['chr','st','ed'])
         gcovfld = 'gcov_'+pr['datacode'] if pr['datacode'] else 'gcov'
         self.gbed3 = gbed3 = GGB.unionex2bed12(uex3,name=pr['gname'],sc2=gcovfld,sc1='tlen')
+        gbed3['sc2'] = gbed3['sc2'].astype(int)
         # write out filtered ex,sj,ci,unionex,gbed
         UT.write_pandas(ex3, fn.txtname('removed.ex', category='output'), 'h')
         UT.write_pandas(sj3, fn.txtname('removed.sj', category='output'), 'h')

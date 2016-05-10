@@ -558,7 +558,7 @@ def unionex2bed12(uex, gidx='_gidx', name='name', sc1='sc1', sc2='sc2'):
             esiz = ','.join([str(x[3]-x[2]) for x in exs])+','
             ests = ','.join([str(x[2]-st0) for x in exs])+','
             x = exs[0]
-            yield (x[1],st0,ed0,x[4],x[5],int(x[6]),st0,ed0,int(x[7]),nex,esiz,ests)
+            yield (x[1],st0,ed0,x[4],x[5],x[6],st0,ed0,x[7],nex,esiz,ests)
     #bcols=['chr','st','ed','name','sc1','strand','tst','ted','sc1','#exons','esizes','estarts']
     bcols = BEDCOLS
     df = PD.DataFrame([x for x in _gen()], columns=bcols).sort_values(['chr','st','ed'])
