@@ -396,7 +396,7 @@ def calc_ecov(expath, cipath, bwpath, dstprefix, override=False, np=4):
     if UT.notstale([expath, cipath], covcipath, override):
         cc = UT.read_pandas(covcipath)
     else:
-        if UT.notstale(expath, cipath, override):
+        if UT.notstale(expath, cipath, False): # you do not want to override ci
             ci = UT.read_pandas(cipath, names=['chr','st','ed','name','id'])
         else:
             ex = UT.read_pandas(expath)
@@ -455,7 +455,7 @@ def calc_gcov(expath, cipath, bwpath, dstprefix, override=False, np=4):
     if UT.notstale([expath, cipath], covcipath, override):
         cc = UT.read_pandas(covcipath)
     else:
-        if UT.notstale(expath, cipath, override):
+        if UT.notstale(expath, cipath, False):
             ci = UT.read_pandas(cipath, names=['chr','st','ed','name','id'])
         else:
             ci = UT.chopintervals(ex, cipath, idcol='_id')
