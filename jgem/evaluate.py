@@ -230,10 +230,11 @@ class EvalMatch(object):
         UT.write_pandas(dp, fname3, 'ih')
 
     def load(self):
-        fname1 = self.en2.fname2('stats.json',self.en1.code,category='output')
+        decode = '{0}.{1}'.format(self.en1.code, self.datacode)
+        fname1 = self.en2.fname2('stats.json',decode,category='output')
         with open(fname1,'r') as fp:
             self.stats = json.load(fp)
-        fname2 = self.en2.fname2('ratios.txt.gz',self.en1.code,category='output')
+        fname2 = self.en2.fname2('ratios.txt.gz',decode,category='output')
         df = UT.read_pandas(fname2)
         for k in df['kind'].unique():
             self.ratios[k] = df[df['kind']==k][['x','y']]
@@ -294,7 +295,8 @@ class EvalMatch(object):
                 np=np)
             tmp = gcov.set_index('_gidx').ix[ex['_gidx'].values]
             ex[gcovname] = tmp['gcov'].values
-            ex['glen'] = tmp['glen'].values # glen is only dependent on model not data
+            if 'glen' in tmp:
+                ex['glen'] = tmp['glen'].values # glen is only dependent on model not data
             saveex = True
         # sjcnt
         ucntname = self.colname('ucnt')

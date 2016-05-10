@@ -67,14 +67,14 @@ def test_count_repeats(datadir):
 	""")
 	df = PD.DataFrame.from_csv(TESTDATA, sep=",", index_col=False)
 	print(df)
-	udf = UT.make_union_gene_bed(df, gidx='name')
+	udf = UT.make_unionex(df, gidx='name')
 	chromdir = os.path.join(datadir, 'FASTA')
 	gfc = FA.GenomeFASTAChroms(chromdir)
 	RP.count_repeats(udf, gfc, returnseq=True)
 	print(udf)
 	assert list(udf['#repbp']) == [0,0,0,3,15,20]
 	assert udf.iloc[3]['seq'] == 'TCTgag'
-	udf = UT.make_union_gene_bed(df, gidx='sc1')
+	udf = UT.make_unionex(df, gidx='sc1')
 	RP.count_repeats(udf, gfc, returnseq=False)
 	print(udf)
 	assert list(udf['#repbp']) == [0,0,0,3,5,10,10,10]
@@ -95,14 +95,14 @@ def test_count_repeats_mp(datadir):
 	""")
 	df = PD.DataFrame.from_csv(TESTDATA, sep=",", index_col=False)
 	print(df)
-	udf = UT.make_union_gene_bed(df, gidx='name')
+	udf = UT.make_unionex(df, gidx='name')
 	chromdir = os.path.join(datadir, 'FASTA')
 	gfc = FA.GenomeFASTAChroms(chromdir)
 	RP.count_repeats_mp(udf, gfc, returnseq=True)
 	print(udf)
 	assert list(udf['#repbp']) == [0,0,0,3,15,20]
 	assert udf.iloc[3]['seq'] == 'TCTgag'
-	udf = UT.make_union_gene_bed(df, gidx='sc1')
+	udf = UT.make_unionex(df, gidx='sc1')
 	udf = RP.count_repeats_mp(udf, gfc, returnseq=False)
 	print(udf)
 	assert list(udf['#repbp']) == [0,0,0,3,5,10,10,10]

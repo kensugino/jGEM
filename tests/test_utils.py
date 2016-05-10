@@ -26,13 +26,13 @@ chr2,80,90,e,5,+
 	""")
 	df = PD.DataFrame.from_csv(TESTDATA, sep=",", index_col=False)
 	print(df)
-	udf1 = UT.make_union_gene_bed(df, gidx='name')
+	udf1 = UT.make_unionex(df, gidx='name')
 	print(udf1)
 	assert len(udf1) == 6
 	assert all(udf1.columns == ['chr','st','ed','name','sc1','strand'])
 	assert list(udf1.iloc[0]) == ['chr1',0,20,'a',0,'+']
 	assert list(udf1.iloc[-1]) == ['chr2',70,90,'e',4,'-']
-	udf2 = UT.make_union_gene_bed(df, gidx='sc1')
+	udf2 = UT.make_unionex(df, gidx='sc1')
 	print(udf2)
 	assert len(udf2) == 7
 

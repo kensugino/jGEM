@@ -132,8 +132,8 @@ chr1	30	40
 	c = tmpdir.join('c.bed')
 	c1 = BT.bedtoolintersect(str(a),str(b),str(c), wa=True)
 	print(c1)
-	assert c1==str(c)+'.gz'
-	cdata = gzip.open(c1).read().decode('ascii')
+	assert c1==str(c)
+	cdata = open(c1).read()
 	assert cdata == odata
 
 def test_calcovlratio(tmpdir):
@@ -172,6 +172,6 @@ chr1	100	150
 	b = tmpdir.join('b.bed')
 	a.write(adata)
 	c = BT.fillgap(str(a),str(b), gap=50)
-	cdata = gzip.open(str(c)).read().decode('ascii')
+	cdata = open(str(c)).read()
 	assert odata == cdata
 
