@@ -58,7 +58,7 @@ MERGECOVPARAM = dict(
     jie_ovlth=0.95, # how much overlap to high coverage interval?
     # for remove_jie verion 2, calculate sj threshod from coverage of the interval
     jie_acovfactor=1, # binth = this x acov
-    jie_sjfactor=1e-3, # sjth = this x coverage (of the interval)
+    jie_sjfactor=1e-3, # sjth = this x coverage (of the interval), a bit too low? 2e-3?
 
 )
 MERGEASMPARAM = dict(
@@ -718,6 +718,7 @@ class MergeInputs(object):
             sj[thcol] = [sid2cov.get(x,0) for x in sj['str_id']]
             sj[thcol] = sj[thcol]*pr['jie_sjfactor']
             idx = (sj['ucnt']<sj[thcol])&(sj['mcnt']<sj[thcol])
+            # idx = (sj['ucnt']<sj[thcol]) # [TODO] it probably makes more sense to just use ucnt
 
             stats['REMOVEJIE({0}).jie_binth'.format(which)] = jie_binth
             stats['REMOVEJIE({0}).acov'.format(which)] = acov
@@ -869,6 +870,7 @@ def select_sj_chr(sj1chrompath, ovlpath, sj2chrompath, th_ratio, chrom):
     cols = cols0+['b_'+x for x in cols0]+['ovl']
     sjovl = UT.read_pandas(c, names=cols)
 
+    # [TODO] select overlaps > some threshold (>50%)
     # sjovl = sjovl[sjovl['strand']==sjovl['b_strand']] # same strand
     LOG.debug('select_sj_chr:{1}:len(sjovl)={0}'.format(len(sjovl),chrom))
 
@@ -1079,11 +1081,16 @@ class MergeAssemble(object):
         exp,exn = self._remove_se_from_me()
         sjp = UT.read_pandas(fnp.sj_out())
         sjn = UT.read_pandas(fnn.sj_out())
+        # keep a/d id but assign sign
+        for c in ['a_id', 'd_id']:
+            exn[c] = -exn[c]
+            sjn[c] = -sjn[c]
         self.expn = expn = PD.concat([exp,exn], ignore_index=True)
         self.sjpn = sjpn = PD.concat([sjp,sjn], ignore_index=True)
+        # renew unique id 
         expn['_id'] = N.arange(len(expn))
         sjpn['_id'] = N.arange(len(sjpn))
-        
+
         # stats
         n0 = len(set(expn['_gidx'].values))
         np = len(set(exp['_gidx'].values))
@@ -1401,7 +1408,7 @@ class MergeAssemble(object):
         # fix id, ad info
         UT.set_ids(sj0)
         UT.set_ids(ex0)
-        UT.set_ad_info(sj0,ex0)
+        #UT.set_ad_info(sj0,ex0)
         
         # make ci
         self.ci0 = ci0 = UT.chopintervals(ex0, fname=fna.ci_out())
