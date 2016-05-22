@@ -13,6 +13,9 @@ logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
 import gzip
 from collections import defaultdict
+import glob
+import shutil
+
 
 import pandas as PD
 import numpy as N
@@ -90,6 +93,8 @@ def bam2bed(bampath, bedpath):
         p2 = subprocess.Popen(cmd2, stdin=p1.stdout, stdout=fp)
         err = p2.communicate()[1]
     return err
+
+
 
 @compressQ('bedpath', None)
 def bam2bed12(bampath, bedpath):
@@ -467,71 +472,342 @@ def read_ovl(c, acols, bcols=None):
 # for uniq.bw only use weight==1
 # for all.bw use all but use weight
 
-def mapbed2bw(bedpath, bwpre, genome):
-    # 1st path
-    dupdic = _scan_make_map(bedpath)
-    # 2nd path make wiggles
-    chromdic = UT.df2dict(UT.chromdf(genome), 'chr', 'size')
-    wigs = _make_arrays(bedpath, bwpre, dupdic, chromdic)
-    chromsizes = UT.chromsizes(genome)
-    for w in wigs:
-        suf = w.replace(bwpre,'').replace('.wig','')
-        wig2bw(w, chromsizes, bwpre+suf+'.bw')
-    for w in wigs:
-        os.unlink(w)
+@logerr(0)
+def splitbedgz(bedgz, prefix):
+    """Split gzipped bed file into separate files according to chromosome. 
+    Uses zcat and awk. 
 
-def _scan_make_map(path):
+    Args:
+        bedgz: path to gzipped bed file
+        prefix: output path prefix
+
+    """
+    cmd1 = ['zcat', bedgz]
+    awkscript = 'BEGIN{{FS="\t"}}{{print > "{0}."$1".bed"}}'.format(prefix)
+    cmd2 = ['awk', awkscript]
+    p1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE)
+    p2 = subprocess.Popen(cmd2, stdin=p1.stdout)
+    err = p2.communicate()[1]
+    return err
+
+from collections import Counter
+import csv
+import io
+
+# SJTABMOTIF = {0:'non-canonical',1:'GT/AG',2:'CT/AC',3:'GC/AG',4:'CT/GC',5:'AT/AC',6:'GT/AT'}
+STED2STRAND = dict(
+    GTAG='+',
+    CTAC='-',
+    GCAG='+',
+    CTGC='-',
+    ATAC='+',
+    GTAT='-',
+)
+
+def _scan_make_map(paths, dstpath):
     cnt = defaultdict(set)
-    if path[-3:]=='.gz':
-        fp = gzip.open(path,'r')
-    else:
-        fp = open(path,'r')
-    for line in fp:
-        # chr,st,ed,name,sc1,strand,tst
-        # read_id:name(3), map_id:tst(6)
-        rec = line.strip().split(b'\t')
-        cnt[rec[3]].add(rec[6])
-    fp.close()
-    try:# py2
-        dup = {k:len(v) for k,v in cnt.iteritems()}
-    except:
-        dup = {k:len(v) for k,v in cnt.items()}
-    return dup
-    
-def _make_arrays(path, dstpre, dupdic, chromsizedic):
-    # generator which makes an array
-    if path[-3:]=='.gz':
-        fp = gzip.open(path,'r')
-    else:
-        fp = open(path,'rb')
-    chrom = u''
-    auniq = None
-    aall = None
-    # delete previous
-    for suf in ['.uniq.wig','.all.wig']:
-        if os.path.exists(dstpre+suf):
-            os.unlink(dstpre+suf)
-    
-    for line in fp:
-        rec = line.strip().split(b'\t')
-        if chrom != rec[0].decode(): # chrom switch
-            if auniq is not None:
-                cybw.array2wiggle_chr64(auniq, chrom,  dstpre+'.uniq.wig', 'a')
-                cybw.array2wiggle_chr64(aall, chrom,  dstpre+'.all.wig', 'a')
-            # setup new array
-            chrom=rec[0].decode()
-            auniq = N.zeros(chromsizedic[chrom], dtype=float)
-            aall =  N.zeros(chromsizedic[chrom], dtype=float)
-        # uniq? col 3=name=read id
-        st,ed = int(rec[1]),int(rec[2])
-        dup = dupdic[rec[3]]
-        if dup==1:
-            auniq[st:ed] += 1
-            aall[st:ed] += 1.
+    #csp = defaultdict(int)
+    for path in paths:
+        if path[-3:]=='.gz':
+            with gzip.open(path) as gz_file:
+                with io.BufferedReader(gz_file) as fp:
+                    for line in fp:
+                        rec = line.strip().split(b'\t')
+                        cnt[rec[3]].add(rec[6]) # for each read how many locations?
         else:
-            aall[st:ed] += 1./dup
-    if auniq is not None:
-        cybw.array2wiggle_chr64(auniq, chrom,  dstpre+'.uniq.wig', 'a')
-        cybw.array2wiggle_chr64(aall, chrom,  dstpre+'.all.wig', 'a')
-    return [dstpre+'.uniq.wig', dstpre+'.all.wig']
+            with open(path,'rb') as fp:
+                for line in fp: # chr,st,ed,name,sc1,strand,tst
+                    rec = line.strip().split(b'\t') # read_id:name(3), map_id:tst(6)
+                    cnt[rec[3]].add(rec[6]) # for each read how many locations?
+                    # csp[rec[6]] += 1 # count # segments in a read if >1 spliced
+    try:# py2
+        dup = PD.DataFrame({k:len(v) for k,v in cnt.iteritems() if len(v)>1}, index=['cnt']).T
+    except:
+        dup = PD.DataFrame({k:len(v) for k,v in cnt.items() if len(v)>1}, index=['cnt']).T
+    UT.write_pandas(dup, dstpath,'ih')
 
+
+def pathcode(sse, strand):
+    # sse: splice [(st,ed),...]
+    if strand in ['+','.']:
+        return ','.join(['{0}|{1}'.format(*x) for x in sse])
+    return ','.join(['{1}|{0}'.format(*x) for x in sse[::-1]])
+
+def pcode2pos(pcode):
+    tmp = [[int(x) for x in y.split('|') for y in pcode.split(',')]]
+    if tmp[0][0]<tmp[0][1]: # pos strand
+        return tmp
+    return [x[::-1] for x in tmp[::-1]]
+
+def process_mapbed(bedpath, dstpre, genome, chromdir, stranded='.', np=10):
+    """
+    Args:
+        bedpath: path to gzipped BED7 file (converted from BAM)
+        dstpre: path prefix to destination
+        genome: UCSC genome (mm10 etc.)
+        chromdir: directory containing chromosome sequence in FASTA
+        np: number of CPU to use
+
+    Outputs:
+        1. dstpre+'.ex.p.bw'
+        2. dstpre+'.ex.n.bw'
+        3. dstpre+'.ex.u.bw'
+        4. dstpre+'.sj.p.bw'
+        5. dstpre+'.sj.n.bw'
+        6. dstpre+'.sj.u.bw'
+        7. dstpre+'.ex.p.uniq.bw'
+        8. dstpre+'.ex.n.uniq.bw'
+        9. dstpre+'.ex.u.uniq.bw'
+        10. dstpre+'.sj.p.uniq.bw'
+        11. dstpre+'.sj.n.uniq.bw'
+        12. dstpre+'.sj.u.uniq.bw'
+        13. dstpre+'.sjpath.bed' BED12 (sc1:ucnt, sc2:jcnt=ucnt+mcnt)
+    """
+    chroms = UT.chroms(genome)
+    chromdf = UT.chromdf(genome)
+    chromsizes = UT.chromsizes(genome)
+
+    # split into chroms
+    UT.makedirs(dstpre)
+    splitbedgz(bedpath, dstpre) # ~30sec
+    duppath = dstpre+'.dupitems.txt'
+    chroms = [c for c in chroms if os.path.exists(dstpre+'.{0}.bed'.format(c))]
+    files = [dstpre+'.{0}.bed'.format(c) for c in chroms]
+    _scan_make_map(files, duppath)
+
+    files0 = [dstpre+'.{0}.bed' for c  in chromdf['chr']] # to be deleted
+    args = [(dstpre, x, genome, chromdir, stranded) for x in chroms]
+    # spread to CPUs
+    rslts = UT.process_mp(_process_mapbed_chr, args, np=np, doreduce=False)
+    # concatenate chr files
+    files1 = []
+    dstpath = dstpre+'.sjpath.bed'
+    LOG.info('making {0}...'.format(dstpath))
+    with open(dstpath, 'wb') as dst:
+        for c in chroms:
+            srcpath = dstpre+'.{0}.sjpath.bed'.format(c)
+            files1.append(srcpath)
+            with open(srcpath, 'rb') as src:
+                shutil.copyfileobj(src, dst)
+    dstpath = UT.compress(dstpath)
+
+    for kind in ['.ex','.sj']:
+        for strand in ['.p','.n','.u']:
+            for suf in ['','.uniq']:
+                    wigpath = dstpre+kind+suf+strand+'.wig'
+                    bwpath = dstpre+kind+suf+strand+'.bw'
+                    with open(wigpath, 'wb') as dst:
+                        for c in chroms:
+                            srcpath = dstpre+kind+suf+strand+'.{0}.wig'.format(c)
+                            files1.append(srcpath)
+                            if os.path.exists(srcpath):                            
+                                with open(srcpath,'rb') as src:
+                                    shutil.copyfileobj(src, dst)
+                    LOG.info('making {0}...'.format(bwpath))
+                    if os.path.getsize(wigpath)>0:
+                        wig2bw(wigpath, chromsizes, bwpath)
+                    files1.append(wigpath)
+
+    # clean up temp files
+    for x in files0+files1:
+        if os.path.exists(x):
+            os.unlink(x)
+
+STRANDMAP0 = {'+':'.p','-':'.n','.':'.u'}
+
+STRANDMAP = {('+','+'):'.p',
+             ('+','-'):'.n',
+             ('+','.'):'.u',
+             ('-','+'):'.n',
+             ('-','-'):'.p',
+             ('-','.'):'.u',
+             ('.','+'):'.u',
+             ('.','-'):'.u',
+             ('.','.'):'.u'}
+
+def _process_mapbed_chr(dstpre, chrom, genome, chromdir, stranded):
+    # 1st pass: calc dupdic
+    bedpath = dstpre+'.{0}.bed'.format(chrom)
+    dupids = UT.read_pandas(dstpre+'.dupitems.txt', index_col=[0]).index
+    # 2nd pass make wiggles
+    gfc = FA.GenomeFASTAChroms(chromdir)
+    chromsize = UT.df2dict(UT.chromdf(genome), 'chr', 'size')[chrom]
+    
+    # mqth MAPQ threshold there are ~6% <10
+    # generator which makes an array
+    fp = open(bedpath,'rb')
+
+    wigs = {}
+    wigpaths = {}
+    for kind in ['.ex','.sj']:
+        wigs[kind] = {}
+        wigpaths[kind] = {}
+        for strand in ['.p','.n','.u']:
+            wigs[kind][strand] = {}
+            wigpaths[kind][strand] = {}
+            for suf in ['','.uniq']:
+                wigpath = dstpre+kind+suf+strand+'.{0}.wig'.format(chrom)
+                if os.path.exists(wigpath):
+                    os.unlink(wigpath)
+                wigpaths[kind][strand][suf] = wigpath
+                wigs[kind][strand][suf] = N.zeros(chromsize, dtype=float)
+
+    sjs = [] # path: (chr, st, ed, pcode, ucnt, strand, acnt)
+    # pcode = a(apos)d(dpos) = a(ed)d(st) if strand=='+' else a(st)d(ed)
+    # ucnt = unique read counts
+    # acnt = multi-read adjusted all counts (=ucnt+Sum(mcnt(i)/dup(i)))
+    # delete previous
+    sjbed12 = dstpre+'.{0}.sjpath.bed'.format(chrom)
+    if os.path.exists(sjbed12):
+        os.unlink(sjbed12)
+
+    def _write_arrays():
+        for kind in ['.ex','.sj']:
+            for strand in ['.p','.n','.u']:
+                for suf in ['','.uniq']:
+                    cybw.array2wiggle_chr64(wigs[kind][strand][suf], chrom,  wigpaths[kind][strand][suf], 'w')
+        
+    def _write_sj(sjs):
+        # sjs = [(chr,st,ed,pathcode(name),ureads(sc1),strand,tst,ted,areads(sc2),cse),...]
+        sjdf = PD.DataFrame(sjs, columns=GGB.BEDCOLS[:9]+['cse'])
+        sjdfgr = sjdf.groupby('name')
+        sj = sjdfgr.first()
+        sj['sc1'] = sjdfgr['sc1'].sum().astype(int) # ucnt
+        sj['sc2'] = sjdfgr['sc2'].sum().astype(int) # jcnt=ucnt+mcnt
+        sj['st'] = sjdfgr['st'].min()
+        sj['ed'] = sjdfgr['ed'].max()
+        sj['#exons'] = sj['cse'].apply(len)+1
+        sj['ests'] = [[0]+[z[1]-st for z in cse] for st,cse in sj[['st','cse']].values]
+        sj['eeds'] = [[z[0]-st for z in cse]+[ed-st] for st,ed,cse in sj[['st','ed','cse']].values]
+        esizes = [[u-v for u,v in zip(x,y)] for x,y in sj[['eeds','ests']].values]
+        sj['estarts'] = ['{0},'.format(','.join([str(y) for y in x])) for x in sj['ests']]
+        sj['esizes'] = ['{0},'.format(','.join([str(y) for y in x])) for x in esizes]
+        sj = sj.reset_index()
+        with open(sjbed12, 'w') as f:
+            sj[GGB.BEDCOLS].to_csv(f, index=False, header=False, sep='\t', quoting=csv.QUOTE_NONE)
+            
+    def _append_sj(cse, css, csj, chrom,ureads,areads):
+        if (len(cse)>0): # spits out splice rec
+            # chr,st,ed,pathcode,ureads,strand,tst,ted,areads
+            tst = cse[0][0]
+            ted = cse[-1][1]
+            if len(css)>0:
+                strand = Counter(css).most_common()[0][0]
+            else:
+                strand = '.'
+            name = pathcode(cse, strand)
+            st = int(csj[0][1]) # first segment start
+            ed = int(csj[-1][2]) # last segment end
+            sjs.append((chrom,st,ed,name,ureads,strand,tst,ted,areads,cse))   
+    
+    def _add_to_ex_arrays(st,ed,dup,strand):
+        kind='.ex'
+        strand = STRANDMAP[(strand,stranded)]
+        dic = wigs[kind][strand]
+        if not dup:
+            dic['.uniq'][st:ed] += 1
+            dic[''][st:ed] += 1
+        else:
+            dic[''][st:ed] += 1
+
+    def _add_to_sj_arrays(sst,sed,dup,strand):
+        kind='.sj'
+        s = STRANDMAP0[strand]
+        dic = wigs[kind][s]
+        # add to the arrays
+        if not dup:
+            dic['.uniq'][sst:sed] += 1
+            dic[''][sst:sed] += 1
+            ureads,areads = 1,1
+        else:
+            dic[''][sst:sed] += 1
+            ureads,areads = 0,1
+        return ureads,areads
+        
+    csj = [] # current collection of spliced reads
+    css = [] # current strands
+    cse = [] # current (sst,sed)
+    csn = 0 # current segment number
+    ureads,areads = 1,1 # uniq, total reads it's either 1,1 or 0,1
+    pmid = None # previous map id common to spliced segments
+    for line in fp:
+        rec = line.strip().split(b'\t')
+        # 7 column bed: chr(0), st(1), ed(2), name(3), mapq(4), strand(5), mapid(6)
+        cchr = rec[0].decode()
+        st,ed = int(rec[1]),int(rec[2])
+        dup = rec[3] in dupids #dic[rec[3]]
+        estrand = rec[5]
+        _add_to_ex_arrays(st,ed,dup,estrand)
+        # process splice
+        if pmid != rec[6]: # new map 
+            _append_sj(cse, css, csj, chrom, ureads, areads)
+            csj,css,cse,csn = [rec],[],[],0 # reset running params
+        else: # add segments
+            csj.append(rec)            
+            prec = csj[-2] # previous rec
+            sst = int(prec[2]) # ed of previous segment
+            sed = int(rec[1]) # st of current segment
+            cse.append((sst,sed))
+            # find strand
+            sted = gfc.get(chrom,sst,sst+2)+gfc.get(chrom,sed-2,sed)
+            strand = STED2STRAND.get(sted,'.')
+            if strand != '.':
+                css.append(strand)
+            ureads,areads = _add_to_sj_arrays(sst,sed,dup,strand)
+        pmid = rec[6]
+
+    _append_sj(cse, css, csj, chrom, ureads, areads)
+
+    _write_arrays()
+    _write_sj(sjs)
+
+
+
+# sj0 => bw #################################################################
+# bed with cov to array => array to wig = to bw
+
+def sj02wig(sjchr, chrom, chromsize, pathtmpl):
+    a = {'+':N.zeros(chromsize, dtype=N.float64),
+         '-':N.zeros(chromsize, dtype=N.float64),
+         '.':N.zeros(chromsize, dtype=N.float64)}
+    for st,ed,v,strand in sjchr[['st','ed','jcnt','strand']].values:
+        a[strand][st-1:ed] += v
+    for strand in a:
+        path = pathtmpl.format(strand)
+        cybw.array2wiggle_chr64(a[strand], chrom, path)
+    
+
+def sj02bw(sj0, pathpre, genome, np=12):
+    chroms = UT.chroms(genome)
+    chromdf = UT.chromdf(genome).sort_values('size',ascending=False)
+    chroms = [x for x in chromdf['chr'] if x in chroms]
+    chromdic = UT.df2dict(chromdf, 'chr', 'size')
+    if 'jcnt' not in sj0:
+        sj0['jcnt'] = sj0['ucnt']+sj0['mcnt']
+    files = []
+    args = []
+    for c in chroms:
+        f = '{0}.{1}.{{0}}.wig'.format(pathpre,c)
+        args.append((sj0[sj0['chr']==c], c, chromdic[c], f))
+        files.append(f)
+    rslts = UT.process_mp(sj02wig, args, np=np, doreduce=False)
+    rmfiles = []
+    for strand in ['+','-','.']:
+        s = STRANDMAP0[strand]
+        wig = pathpre+'.sj{0}.wig'.format(s)
+        bwpath = pathpre+'.sj{0}.bw'.format(s)
+        with open(wig, 'w') as dst:
+            for tmpl in files:
+                f = tmpl.format(strand)
+                with open(f,'r') as src:
+                    shutil.copyfileobj(src, dst)
+                rmfiles.append(f)
+        rmfiles.append(wig)
+        wig2bw(wig, UT.chromsizes(genome), bwpath)
+    for f in rmfiles:
+        os.unlink(f)
+    os.unlink(wig)
+
+    
+    
+                
