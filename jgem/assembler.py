@@ -115,6 +115,8 @@ PARAMS = dict(
     useallconnected=True,
     do_selectseme=False,
     do_mergeexons=False,
+
+    clustersep_factor=1e-3,
     )
 # use different parameters for merging
 MPARAMDIFF = dict(
@@ -169,7 +171,9 @@ for k,v in MPARAMS.items():
 # [TODO] Better 5',3' detection, check all internal exon, not just cut ones
 #        (current source of 5',3': edge, cut exons, SE attach)
 # [TODO] Replace WRITEGENES with make_unionex and unionex2bed12
-
+# [TODO] Remove all part trying to use cache (previous calculation)
+#        Speed is not problem with multi CPU calculation anymore.
+#        Using previous leftover (often with error) is just a cause of another error. 
 
 class Assembler(object):
 
@@ -259,15 +263,18 @@ class Assembler(object):
         if pr['do_mergeexons']:
             MERGEEXONS(self)()
 
+        # CLUSTERSEPARATOR(self)()
+
         if pr['merging']:
             FINDEDGES2(self)()
+
             FIXSTRAND(self)()
             # FIND53IR only deals with exons with length > SE sizeth = 50bp)
             # gap smaller than this will be missed if we skip FINDIRETS
             if pr['do_iretinmerge']:
                 FINDIRETS(self)()
-            # FINDSECOVTH(self)() # not useful here since mep,men don't have real SEs
-            FIND53IR(self)()
+            # FINDSECOVTH(self)() #
+            FIND53IR(self)() # max(minsecov, secovth) is used to get SE here
         else:
             FINDEDGES(self)()
             FIXSTRAND(self)()
@@ -792,6 +799,115 @@ class MERGEEXONS(SUBASE):
         #return me
         self.asm.me = me
 
+
+class CLUSTERSEPARATOR(SUBASE):
+    """Separate possibly different genes connected by proximity of acceptor/donor.
+
+    """
+    # Regard gene as a connected graph, exons as nodes and junctions as edges.
+    # In a node, if a junction abundance is less than cluster_th*total_abundance,
+    # then duplicate the node and sever the connection. 
+    # a new node connected to the non-abundant junction with either a_id or d_id set to null 
+    # original node a_id or d_id will be set to null or note depending on what's left there
+    # !!! new node also NEED to have a NEW a_id/d_id not overlapping with existing one
+    # this id should also assigned to separated junction as well. And here after a_id/d_id
+    # should be carried over and never recalculated from position
+
+    # [TODO] the rest of the assembly procedures have to be modified to carry over 
+    #        a_id, d_id (both sj & ex) throughout
+
+    # Start from selecting abundant junctions, then to nodes connected to them are the 
+    # ones to check. 
+    # Set "cat" at the end. Also make sure name has either starts with "[" or 
+    # endseith "]"" at the bounded side.
+    # ==> NEED a facility to NOT connect junction and exon even if they 
+
+    def call(self):
+        ### IN ###
+        sj = self.asm.sj
+        me = self.asm.me
+        fn = self.fnobj
+        pr = self.params
+        st = self.stats
+        ##########
+
+        if '_id' not in sj:
+            UT.set_ids(sj)
+            UT.set_ids(me)
+
+        UT.set_exon_category(sj, me)
+
+        # select SJ
+        cf = pr['clustersep_factor'] # 1e-3
+        # how much ucnt to have *cf > 10?
+        th = 10/cf
+        sj1 = sj[sj['ureads']>th]
+        LOG.debug('CLUSTERSEP.#sj1={0}'.format(len(sj1)))
+        # find exons to consider
+        aids = set(sj1['a_id'].values)
+        dids = set(sj1['d_id'].values)
+        idx = me['a_id'].isin(aids)|me['d_id'].isin(dids)
+        ex1 = me[idx] # these are connected to abundant junctions
+        ex2 = me[~idx] # don't have to process these
+        LOG.debug('CLUSTERSEP.#ex1={0}'.format(len(ex1)))
+        # check each exon
+        aid2sid = sj.groupby('a_id')['_id'].apply(lambda x: list(x))
+        did2sid = sj.groupby('d_id')['_id'].apply(lambda x: list(x))
+        if 'jcnt' not in sj:
+            sj['jcnt'] = [x or y for x,y in sj[['ureads','mreads']].values]
+        sid2ucnt = UT.df2dict(sj, '_id', 'jcnt')
+        cols = ['chr','st','ed','name','sc1', 'strand','a_id','d_id'] # a_id => 6, d_id =>7
+        caid = sj['a_id'].max()
+        cdid = sj['d_id'].max()
+        def _gen():
+            for ex in ex1[cols].values:
+                asids = aid2sid[ex[6]]
+                dsids = did2sid[ex[7]]
+                acnts = [sid2unct.get(x,0) for x in asids]
+                dcnts = [sid2unct.get(x,0) for x in dsids]
+                tot = N.sum(acnts) + N.sum(dcnts)
+                sjth = float(tot)*cf
+                atgts = [x for x,y in zip(asids,acnts) if y<sjth]
+                dtgts = [x for x,y in zip(dsids,dcnts) if y<sjth]
+                # a junctions < sjth?
+                if len(atgts)>0:
+                    # make new node
+                    nex = ex.copy()
+                    # modify a_id
+                    caid += 1
+                    nex[6] = caid
+                    sj.loc[sj['_id'].isin(atgts),'a_id'] = caid
+                    nex[7] = 0 # separate from other set d_id to null
+                    yield nex
+                    if len(atgts)==len(asids): # all of a side are gone
+                        ex[6] = 0 # set a_id of original to null
+                # d junctions < sjth?
+                if len(dtgts)>0:
+                    nex = ex.copy()
+                    cdid += 1
+                    nex[7] = cdid
+                    sj.loc[sj['_id'].isin(dtgts),'d_id'] = cdid
+                    nex[6] = 0 # set a_id to null
+                    yield nex
+                    if len(dtgts)==len(dsids): # all of d side are gone
+                        ex[7] = 0 # set d_id of the original null 
+                yield ex
+        ex3 = PD.DataFrame([x for x in _gen()], columns=cols) # <= ex1
+        me = PD.concat([ex3[cols], ex2[cols]],ignore_index=True).sort_values(['chr','st','ed'])
+
+        # reset "cat" column
+        UT.set_exon_category(sj, me)
+
+        ### OUT ###
+        fn.write_txt(sj, 'clustersep.sj')
+        fn.write_txt(me, 'clustersep.me')
+        self.asm.sj = sj
+        self.asm.me = me
+        ###########
+
+
+# [TODO] fix to use "cat" (from a_id, d_id) instead of looking into the exon name
+# 
 class FINDEDGES2(SUBASE):
     """Find edges 
 
@@ -843,10 +959,15 @@ class FINDEDGES2(SUBASE):
         st = self.stats
         self.me = me
         self.sj = sj
+        ## "cat" filed?
+        if 'cat' not in me.columns:
+            UT.set_exon_category(sj,me)
 
         # bounded (kind: a,b)=> cut
         me['_id2'] = N.arange(len(me))
-        idx = me['name'].str.contains('s|e|f') # unbounded
+        idx0 = me['name'].str.contains('s|e|f') # unbounded
+        idx1 = me['cat'].isin(['5','3','s'])
+        idx = idx0|idx1 # unbounded won't become bounded but bounded may have been separated 
         me1 = me[~idx] # bounded cut these
         me2 = me[idx] # not (a,b) kind:(s,e,f) => fix (~20K)
 
@@ -2170,7 +2291,8 @@ class FIND53IR(SUBASE):
         override = pr['override']
         np = pr['np']
 
-        # calc SE candidates (subtract ME) and calc cov
+        # calc SE candidates (subtract ME) and calc cov <= [TODO] better use separate parameters 
+        # than real SE extraction part
         fname = fn.txtname('se.cov.tmp')
         aname = fn.txtname('se.cov.all')
         if (not override) and os.path.exists(fname):
@@ -2237,7 +2359,7 @@ class FIND53IR(SUBASE):
         d['bound'] = (d['ename'].str.startswith('['))&(d['ename'].str.endswith(']'))
         # SE
         dse = d[d['echr']=='.'].copy() # no overlap
-        dse = dse[dse['cov']>secovth]
+        dse = dse[dse['cov']>secovth] # 
         dse['sc1'] = dse['cov'] # for writing BED
         # ME
         dme = d[(d['attachleft']&d['bound'])|(d['attachright']&d['bound'])].copy()
