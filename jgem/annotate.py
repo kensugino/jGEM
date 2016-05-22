@@ -249,3 +249,28 @@ class Comparator(object):
 
         
    
+#### REFEFENCE ANNOTATION RELATED #######################################################
+
+def gencode_remove_badSE(ex):
+    """Gencode put some single exons (SEs) together with overlapping gene, then annotate these 
+    SEs with annotation of the overlapping gene, for example, gene_type as "protein_coding", 
+    when they are not protein_coding at all. This messes things up when calculating threshold
+    to distinguish protein_coding and non_coding using PhyloCSF, etc. 
+
+    This function detect these SEs and returns a set of _gidx's which does not contain these
+    bad SEs.
+
+    """
+    tmp = ex.groupby(['gene_name','_gidx']).first().reset_index()
+    tmpsize = tmp.groupby('gene_name').size()
+
+    gids1 = tmpsize[tmpsize==1].index.values # set of unique ones
+    gids2 = tmpsize[tmpsize>1].index.values # have unconnected subcomponents=>clean up these
+
+    tgts = tmp[tmp['gene_name'].isin(gids2)] 
+    tgts2 = tgts[tgts['cat']!='s'] # remove SE which belong to another gene
+
+    gidx1 = tmp[tmp['gene_name'].isin(gids1)]['_gidx'].values
+    gidx2 = tgts2['_gidx'].values
+    gidx0 = sorted(set(list(gidx1)+list(gidx2)))
+    return gidx0   
