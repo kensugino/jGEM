@@ -7,6 +7,7 @@
 
 """
 import os
+import tempfile
 import logging
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
@@ -434,7 +435,7 @@ class GTFWriter(BEDWriter):
         for i,ex in exons.iterrows():
             extra = 'gene_id:"{0}"; transcript_id:"{1}"; etype:"{2}"; eid:"{3}"'.format(
                      gname, name, ex['ptyp'], ex['name'])
-            yield (chrom,'.', 'exon',ex['st'],ex['ed'],0,ex['strand'],0,extra)
+            yield (chrom,'.', 'exon',str(ex['st']+1),str(ex['ed']),0,ex['strand'],0,extra)
                     
     def write(self, fname):
         # with open(fname,'w') as fobj:
@@ -445,3 +446,129 @@ class GTFWriter(BEDWriter):
         self.df = gtfdf = PD.DataFrame(gtfex, columns=GGB.GTFCOLS)
         GGB.write_gtf(gtfdf, fname)
 
+#######
+
+# gene (exons & junctions) => tree traversal  (see write_gtf)
+
+# from ponder import graph as PG
+# from ponder import utils as UT
+
+# import miscdefs as MD
+# import eg as EG
+
+class Writer2(object):
+
+    def __init__(self, sjexpre, th=0.1):
+        self.sjexpre = sjexpre
+        self.th = th
+        self.sj = sj = UT.read_pandas(sjexpre+'.sj.txt.gz')
+        self.ex = ex = UT.read_pandas(sjexpre+'.ex.txt.gz')
+        self.mg = mg = GP.MEGraph3(sj,ex) # only consider splice junction connections
+        self.exg = ex.set_index('_gidx')
+        self.exi = ex.set_index('_id')
+        self.nullidx = UT.find_nullidx(self.ex)
+        self.e2c = dict(UT.izipcols(ex, ['_id', 'cat']))
+        self.precalc_branch_p()
+        
+    def precalc_branch_p(self):
+        # junction branch: P(sj,d_id=>a_id)
+        sj = self.sj[['d_id','_id','jcnt']].copy().set_index('_id')
+        sj['tot'] = sj.groupby('d_id').sum().ix[sj['d_id'].values].values
+        sj['p'] = sj['jcnt']/sj['tot']
+        sj.fillna(0,inplace=True) # where tot is zero ???
+        # exons which share an acceptor: P(ex,a_id)
+        ex = self.ex[['a_id','_id','ecov']].copy().set_index('_id')
+        ex['tot'] = ex.groupby('a_id').sum().ix[ex['a_id'].values].values
+        ex['p'] = ex['ecov']/ex['tot']
+        ex.fillna(0,inplace=True)
+        j2nd = self.mg.j2nd
+        j2nd['psj'] = sj.ix[j2nd['_id'].values]['p'].values
+        j2nd['pex'] = ex.ix[j2nd['e_id_a'].values]['p'].values
+        j2nd['p'] = j2nd['psj']*j2nd['pex']
+        self.d2ep = j2nd.groupby('e_id_d')[['e_id_a','p']]
+        
+    def ex_d_e2p(self,eid):
+        try:
+            return dict(UT.izipcols(self.d2ep.get_group(eid), ['e_id_a','p']))
+        except:
+            return {}
+        
+    def _dfs(self, exs, p, top):
+        # exs: list of exon ids
+        x = exs[-1]
+        th = self.th
+        if (self.e2c[x] == '3'): # leaf
+            yield exs,p
+        else:
+            e2p = self.ex_d_e2p(x)
+            for y in e2p: # connected exons
+                pn = p*e2p[y] # new probability
+                if (y!=top) and pn>th:
+                    for z in self._dfs(exs+[y], pn, top):
+                        yield z
+                    
+    def depth_first_visit(self, gid):
+        # gid: _gidx
+        exons = self.exg.ix[[gid]] # exons in the gene
+        if len(exons)==1: # single exon
+            yield [exons.iloc[0]['_id']], 1.
+        else:
+            # starts
+            for s in exons[exons['cat']=='5']['_id']:
+                for t in self._dfs([s],1.,s):
+                    yield t
+        
+    def path2gtfrec(self, eids, gid, cnt, p):
+        exons = self.exi.ix[eids].reset_index()
+        exons = exons.sort_values(['st','ed'])
+        # name = gname.tidx
+        tid = '{0}.{1}'.format(gid,cnt)
+        tmpl = 'gene_id "{0}"; transcript_id "{1}"; exon_number "{6}"; etype "{2}"; eid "{3}"; p "{4:.4f}"; ecov "{5:.4f}";'
+        for i, (cat,eid,chrom,st,ed,strand,ecov) in enumerate(exons[['cat','_id','chr','st','ed','strand','ecov']].values):
+            extra = tmpl.format(gid, tid, cat, eid, p, ecov, i+1)
+            if '_' not in chrom:
+                #yield '\t'.join([chrom,'.', 'exon',str(st),str(ed),'0',strand,'0',extra])
+                # 2016-02-25 : bug! one base extra at start
+                yield '\t'.join([chrom,'.', 'exon',str(st+1),str(ed),'0',strand,'0',extra])
+    
+    def path2bedrec(self, eids, gid, cnt, p):
+        exons = self.exi.ix[eids].reset_index()
+        exons = exons.sort_values(['st','ed'])
+        chrom,strand = exons.iloc[0][['chr','strand']]
+        st = exons.iloc[0]['st']
+        ed = exons.iloc[-1]['ed']
+        gcov = exons.iloc[0]['gcov']
+        name = '{0}.{1}'.format(gid,cnt)
+        sc1 = '{:.4f}'.format(p)
+        sc2 = '{:.1f}'.format(gcov)
+        nexons = str(len(exons))
+        esizes = ','.join(map(str, (exons['ed']-exons['st']).values))+','
+        estarts = ','.join(map(str, (exons['st']-st).values))+','
+        yield '\t'.join([chrom,str(st),str(ed),name,sc1,strand,str(st),str(ed),sc2,nexons,esizes,estarts])
+
+    def gen_gtf(self, gid):
+        for i, (subpath, p) in enumerate(self.depth_first_visit(gid)):
+            for rec in self.path2gtfrec(subpath, gid, i+1, p):
+                yield rec
+                        
+    def gen_bed(self, gid):
+        for i, (subpath, p) in enumerate(self.depth_first_visit(gid)):
+            for rec in self.path2bedrec(subpath, gid, i+1, p):
+                yield rec
+
+
+    def write(self, fname, gids=None, th=None):
+        if fname[-4:]=='.gtf':
+            formatter = self.gen_gtf
+        else:
+            formatter = self.gen_bed
+        if th:
+            self.th = th
+        if gids is None:
+            gids = sorted(set(self.ex['_gidx'].values))
+        with open(fname,'w') as fobj:
+            for gid in gids:
+                recs = [x for x in formatter(gid)]
+                if len(recs)>0:
+                    fobj.write('\n'.join(recs)+'\n')
+        
