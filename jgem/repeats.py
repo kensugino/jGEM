@@ -160,6 +160,7 @@ class RmskFilter(object):
         # write out filtered ex,sj,ci,unionex,gbed
         UT.write_pandas(ex2, fn.txtname('ex', category='output'), 'h')
         UT.write_pandas(sj2, fn.txtname('sj', category='output'), 'h')
+        UT.chopintervals(ex2, fn.txtname('ci', category='output'))
 
         GGB.write_bed(ex2, fn.bedname('ex', category='output'))
         GGB.write_bed(sj2, fn.bedname('sj', category='output'))
@@ -178,6 +179,7 @@ class RmskFilter(object):
         # write out filtered ex,sj,ci,unionex,gbed
         UT.write_pandas(ex3, fn.txtname('removed.ex', category='output'), 'h')
         UT.write_pandas(sj3, fn.txtname('removed.sj', category='output'), 'h')
+        UT.chopintervals(ex3, fn.txtname('removed.ci', category='output'))
         UT.write_pandas(uex3, fn.txtname('removed.unionex', category='output'), 'h')
         UT.write_pandas(ugb3, fn.txtname('removed.genes.stats', category='output'), 'h')
         UT.write_pandas(gbed3, fn.bedname('removed.genes', category='output'), '') # BED12
