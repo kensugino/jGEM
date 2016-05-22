@@ -89,7 +89,9 @@ class GenomeFASTAChroms(object):
             self._read(chrom)
         return self.chroms[chrom][st:ed]
 
-
+    def clear_cache(self):
+        for c in list(self.chroms.keys()): 
+            del self.chrroms[k]
 
 
 
