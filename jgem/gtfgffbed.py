@@ -329,7 +329,7 @@ def write_gtf(df, fname):
     """
     return write_ggb(df, fname, GTFCOLS)
     
-def write_bed(df, fname, ncols=None):
+def write_bed(df, fname, ncols=None, mode='w'):
     """Write BED file.
 
     Args:
@@ -347,9 +347,9 @@ def write_bed(df, fname, ncols=None):
                 break
         else:
             ncols = 12
-    return write_ggb(df, fname, BEDCOLS[:ncols])
+    return write_ggb(df, fname, BEDCOLS[:ncols], mode=mode)
     
-def write_ggb(df, fname, cols):    
+def write_ggb(df, fname, cols, mode='w'):    
     # df.loc[:,'st'] = df['st'].astype(int)
     # df.loc[:,'ed'] = df['ed'].astype(int)
     if fname[-3:]=='.gz':
@@ -363,7 +363,8 @@ def write_ggb(df, fname, cols):
         df['st'] = df['st'].astype(int)
         df['ed'] = df['ed'].astype(int)
     UT.makedirs(os.path.dirname(fname))
-    df[cols].to_csv(fname, index=False, header=False, sep='\t', quoting=csv.QUOTE_NONE)
+    with open(fname, mode) as f:
+        df[cols].to_csv(f, index=False, header=False, sep='\t', quoting=csv.QUOTE_NONE)
     if compress:
         return UT.compress(fname)
     return fname
