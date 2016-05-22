@@ -119,6 +119,17 @@ def df2dict(df,f1,f2):
         return df[fld].values
     return dict(zip(_getval(f1), _getval(f2)))
 
+def make_dict(df,f1,f2):
+    """Make dict but maps to sets
+    """
+    dic = {}
+    for k,v in df[[f1,f2]].values:
+        dic.setdefault(k,set()).add(v)
+    return dic
+
+def subdict(dic, keys):
+    return {k:dic[k] for k in keys}
+
 def izipcols(df, cols, index=False):
     """Return an iterator to go through rows of Pandas.DataFrame
     (Much faster than DataFrame.rows() which involves instantiation of Series objects)
@@ -541,7 +552,7 @@ def find_nullidx(ex):
 
 def set_exon_category(sj,ex):
     # 5', 3', i, s
-    if ('a_pos' not in sj.columns) or ('a_pos' not in ex.columns):
+    if ('a_id' not in sj.columns) or ('a_id' not in ex.columns):
         set_ad_info(sj, ex) 
     nullidx = find_nullidx(ex)
     aidx = ex['a_id']!=nullidx
@@ -581,32 +592,32 @@ def me_se(ex):
     me = ex[~seidx]
     return me, se
 
-def calc_tlen(ex, ci):
+def calc_tlen(ex, ci, gidx='_gidx'):
     """ calculate gene transcript length, here just union of exons """
     ci['len'] = ci['ed']-ci['st']
     ci['eid'] = ci['name'].astype(str).apply(lambda x: [int(y) for y in x.split(',')])
     if ('id' not in ci.columns):
         ci['id'] = ci['sc1']
     ccf = flattendf(ci[['eid','chr','st','ed','len','id','name']], 'eid')
-    e2g = df2dict(ex, '_id','_gidx')
-    ccf['_gidx'] = [e2g[x] for x in ccf['eid']]
+    e2g = df2dict(ex, '_id',gidx)
+    ccf[gidx] = [e2g[x] for x in ccf['eid']]
     # ignore duplicated ci, just take unique set within the gene
-    ccf1 = ccf.groupby(['_gidx','id']).first().reset_index() 
-    gbed = ccf1.groupby('_gidx')['len'].sum().to_frame('tlen')
+    ccf1 = ccf.groupby([gidx,'id']).first().reset_index() 
+    gbed = ccf1.groupby(gidx)['len'].sum().to_frame('tlen')
     gbed['ltlen'] = N.log10(gbed['tlen'])
     return gbed # column: tlen, ltlen, index:_gidx
 
-def set_glen_tlen(ex,ci):
+def set_glen_tlen(ex,ci,gidx='_gidx'):
     if 'len' not in ex.columns:
         ex['len'] = ex['ed']-ex['st']        
-    tlen = calc_tlen(ex, ci)
+    tlen = calc_tlen(ex, ci, gidx)
     g2tlen = df2dict(tlen, 'index', 'tlen')
-    ex['tlen'] = [g2tlen[x] for x in ex['_gidx']]
-    gr = ex.groupby('_gidx')
+    ex['tlen'] = [g2tlen[x] for x in ex[gidx]]
+    gr = ex.groupby(gidx)
     g2gst = series2dict(gr['st'].min())
     g2ged = series2dict(gr['ed'].max())
-    ex['gst'] = [g2gst[x] for x in ex['_gidx']]
-    ex['ged'] = [g2ged[x] for x in ex['_gidx']]
+    ex['gst'] = [g2gst[x] for x in ex[gidx]]
+    ex['ged'] = [g2ged[x] for x in ex[gidx]]
     ex['glen'] = ex['ged']-ex['gst']
     # glen = gr['ed'].max() - gr['st'].min()
     # g2glen = series2dict(glen)
@@ -791,6 +802,14 @@ def make_unionex(ex, gidx='_gidx'):
     recs = [x for x in _gen()]
     return PD.DataFrame(recs, columns=ex.columns)
 
+
+def name2gidx(s):
+    if s[:2]=='JN':
+        return -int(s[3:])
+    if s[:2]=='JP':
+        return int(s[3:])
+    if s[:2]=='JS':
+        return int(s[2:])
 
 
 #### multiprocessing ##################################################
