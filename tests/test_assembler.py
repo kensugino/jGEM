@@ -67,6 +67,11 @@ def test_sj2ex(asm):
 	# assert len(asm.me) == 5274
 	# assert len(asm.sj) == 4981
 	
+def test_clusterseparator(asm):
+	f = AS.CLUSTERSEPARATOR(asm)
+	f()
+	LOG.info('{0},{1}'.format(len(asm.me),len(asm.sj)))
+	
 
 def test_mergeexons(asm):
 	f = AS.MERGEEXONS(asm)
