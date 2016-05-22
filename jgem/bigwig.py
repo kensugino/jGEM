@@ -68,8 +68,8 @@ def cnt_bam(fpath):
     return int(firstline[0])+int(firstline[2])
 
 
-def wig2bw(wigpath, chromsizes, bwpath):
-    pass
+# def wig2bw(wigpath, chromsizes, bwpath):  # in bedtools
+#     pass
 
 def bam2bw(fpath, chromsizes, bpath, aligned=None):
     """
@@ -276,9 +276,16 @@ def get_bigwig_as_array(bwfile, chrom, st, ed):
     #     for s,e,v in it:
     #         a[s-st:e-st] += v
     # return a
-    with open(bwfile, mode='rb') as fobj:
-        bw = BigWigFile(fobj)
-        a = bw.get_as_array(chrom,st,ed)
+    if UT.isstring(bwfile):
+        with open(bwfile, mode='rb') as fobj:
+            bw = BigWigFile(fobj)
+            a = bw.get_as_array(chrom,st,ed)
+            if a is None:
+                a = N.array([]) # null array
+            else:
+                a[N.isnan(a)]=0.
+    else:
+        a = bwfile.get_as_array(chrom,st,ed)
         if a is None:
             a = N.array([]) # null array
         else:
@@ -367,4 +374,48 @@ def merge_bigwigs_mp(bwfiles, genome, dstpath, scale=None, np=7):
     #                 txt = []
     #         fobj.write(txt)
     # return dstpath
+
+
+
+### Convenience classes ###################################################
+
+class BWObj(object):
+    
+    def __init__(self, fpath):
+        self.fpath = fpath
+        
+    def __enter__(self):
+        self.fobj = open(self.fpath, 'rb')
+        self.bw = BigWigFile(self.fobj)
+        return self
+        
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.fobj.close()
+        
+    def get(self, chrom, st, ed):
+        a = self.bw.get_as_array(chrom,st,ed)
+        if a is None:
+            a = N.array([]) # null array
+        else:
+            a[N.isnan(a)]=0.
+        return a
+
+class BWs(object):
+
+    def __init__(self, paths):
+        self.bwobjs = [BWObj(p) for p in paths]
+
+    def __enter__(self):
+        for b in self.bwobjs:
+            b.__enter__()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        for b in self.bwobjs:
+            b.__exit__(, exc_type, exc_value, traceback)
+
+    def get(self, chrom, st, ed):
+        a = self.bwobjs.get(chrom, st, ed)
+        for b in self.bwobjs[1:]:
+            a += b.get(chrom, st, ed)
+        return a
 
