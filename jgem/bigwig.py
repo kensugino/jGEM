@@ -414,7 +414,7 @@ class BWs(object):
             b.__exit__(exc_type, exc_value, traceback)
 
     def get(self, chrom, st, ed):
-        a = self.bwobjs.get(chrom, st, ed)
+        a = self.bwobjs[0].get(chrom, st, ed)
         for b in self.bwobjs[1:]:
             a += b.get(chrom, st, ed)
         return a
