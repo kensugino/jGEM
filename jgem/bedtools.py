@@ -13,8 +13,12 @@ logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
 import gzip
 from collections import defaultdict
+from collections import Counter
 import glob
 import shutil
+
+import gzip
+import csv
 
 
 import pandas as PD
@@ -473,6 +477,7 @@ def read_ovl(c, acols, bcols=None):
 # for all.bw use all but use weight
 
 @logerr(0)
+
 def splitbedgz(bedgz, prefix):
     """Split gzipped bed file into separate files according to chromosome. 
     Uses zcat and awk. 
@@ -484,15 +489,14 @@ def splitbedgz(bedgz, prefix):
     """
     cmd1 = ['zcat', bedgz]
     awkscript = 'BEGIN{{FS="\t"}}{{print > "{0}."$1".bed"}}'.format(prefix)
+    #print(awkscript)
     cmd2 = ['awk', awkscript]
     p1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE)
     p2 = subprocess.Popen(cmd2, stdin=p1.stdout)
     err = p2.communicate()[1]
     return err
 
-from collections import Counter
-import csv
-import io
+
 
 # SJTABMOTIF = {0:'non-canonical',1:'GT/AG',2:'CT/AC',3:'GC/AG',4:'CT/GC',5:'AT/AC',6:'GT/AT'}
 STED2STRAND = dict(
@@ -525,8 +529,7 @@ def _scan_make_map(paths, dstpath):
     except:
         dup = PD.DataFrame({k:len(v) for k,v in cnt.items() if len(v)>1}, index=['cnt']).T
     UT.write_pandas(dup, dstpath,'ih')
-
-
+    
 def pathcode(sse, strand):
     # sse: splice [(st,ed),...]
     if strand in ['+','.']:
@@ -570,12 +573,12 @@ def process_mapbed(bedpath, dstpre, genome, chromdir, stranded='.', np=10):
     # split into chroms
     UT.makedirs(dstpre)
     splitbedgz(bedpath, dstpre) # ~30sec
-    duppath = dstpre+'.dupitems.txt'
+    duppath = dstpre+'.dupitems.txt.gz'
     chroms = [c for c in chroms if os.path.exists(dstpre+'.{0}.bed'.format(c))]
     files = [dstpre+'.{0}.bed'.format(c) for c in chroms]
     _scan_make_map(files, duppath)
 
-    files0 = [dstpre+'.{0}.bed' for c  in chromdf['chr']] # to be deleted
+    files0 = [dstpre+'.{0}.bed'.format(c) for c  in chromdf['chr'].values] # to be deleted
     args = [(dstpre, x, genome, chromdir, stranded) for x in chroms]
     # spread to CPUs
     rslts = UT.process_mp(_process_mapbed_chr, args, np=np, doreduce=False)
@@ -594,26 +597,26 @@ def process_mapbed(bedpath, dstpre, genome, chromdir, stranded='.', np=10):
     for kind in ['.ex','.sj']:
         for strand in ['.p','.n','.u']:
             for suf in ['','.uniq']:
-                    wigpath = dstpre+kind+suf+strand+'.wig'
-                    bwpath = dstpre+kind+suf+strand+'.bw'
-                    with open(wigpath, 'wb') as dst:
-                        for c in chroms:
-                            srcpath = dstpre+kind+suf+strand+'.{0}.wig'.format(c)
-                            files1.append(srcpath)
-                            if os.path.exists(srcpath):                            
-                                with open(srcpath,'rb') as src:
-                                    shutil.copyfileobj(src, dst)
-                    LOG.info('making {0}...'.format(bwpath))
-                    if os.path.getsize(wigpath)>0:
-                        wig2bw(wigpath, chromsizes, bwpath)
-                    files1.append(wigpath)
+                pre = dstpre+kind+suf+strand
+                wigpath = pre+'.wig'
+                bwpath = pre+'.bw'
+                with open(wigpath, 'wb') as dst:
+                    for c in chroms:
+                        srcpath = pre+'.{0}.wig'.format(c)
+                        files1.append(srcpath)
+                        if os.path.exists(srcpath):
+                            with open(srcpath,'rb') as src:
+                                shutil.copyfileobj(src, dst)
+                LOG.info('making {0}...'.format(bwpath))
+                if os.path.getsize(wigpath)>0:
+                    wig2bw(wigpath, chromsizes, bwpath)
+                files1.append(wigpath)
 
     # clean up temp files
     for x in files0+files1:
         if os.path.exists(x):
+            LOG.debug('deleting {0}...'.format(x))
             os.unlink(x)
-
-STRANDMAP0 = {'+':'.p','-':'.n','.':'.u'}
 
 STRANDMAP = {('+','+'):'.p',
              ('+','-'):'.n',
@@ -628,7 +631,7 @@ STRANDMAP = {('+','+'):'.p',
 def _process_mapbed_chr(dstpre, chrom, genome, chromdir, stranded):
     # 1st pass: calc dupdic
     bedpath = dstpre+'.{0}.bed'.format(chrom)
-    dupids = UT.read_pandas(dstpre+'.dupitems.txt', index_col=[0]).index
+    dupids = UT.read_pandas(dstpre+'.dupitems.txt.gz', index_col=[0]).index
     # 2nd pass make wiggles
     gfc = FA.GenomeFASTAChroms(chromdir)
     chromsize = UT.df2dict(UT.chromdf(genome), 'chr', 'size')[chrom]
@@ -704,23 +707,20 @@ def _process_mapbed_chr(dstpre, chrom, genome, chromdir, stranded):
         kind='.ex'
         strand = STRANDMAP[(strand,stranded)]
         dic = wigs[kind][strand]
+        dic[''][st:ed] += 1
         if not dup:
             dic['.uniq'][st:ed] += 1
-            dic[''][st:ed] += 1
-        else:
-            dic[''][st:ed] += 1
 
     def _add_to_sj_arrays(sst,sed,dup,strand):
         kind='.sj'
-        s = STRANDMAP0[strand]
+        s = {'+':'.p','-':'.n','.':'.u'}[strand]
         dic = wigs[kind][s]
         # add to the arrays
+        dic[''][sst:sed] += 1
         if not dup:
             dic['.uniq'][sst:sed] += 1
-            dic[''][sst:sed] += 1
             ureads,areads = 1,1
         else:
-            dic[''][sst:sed] += 1
             ureads,areads = 0,1
         return ureads,areads
         
@@ -762,10 +762,6 @@ def _process_mapbed_chr(dstpre, chrom, genome, chromdir, stranded):
     _write_sj(sjs)
 
 
-
-# sj0 => bw #################################################################
-# bed with cov to array => array to wig = to bw
-
 def sj02wig(sjchr, chrom, chromsize, pathtmpl):
     a = {'+':N.zeros(chromsize, dtype=N.float64),
          '-':N.zeros(chromsize, dtype=N.float64),
@@ -776,6 +772,8 @@ def sj02wig(sjchr, chrom, chromsize, pathtmpl):
         path = pathtmpl.format(strand)
         cybw.array2wiggle_chr64(a[strand], chrom, path)
     
+
+STRANDMAP0 = {'+':'.p','-':'.n','.':'.u'}
 
 def sj02bw(sj0, pathpre, genome, np=12):
     chroms = UT.chroms(genome)
@@ -807,7 +805,4 @@ def sj02bw(sj0, pathpre, genome, np=12):
     for f in rmfiles:
         os.unlink(f)
     os.unlink(wig)
-
     
-    
-                
