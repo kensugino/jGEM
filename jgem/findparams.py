@@ -31,7 +31,7 @@ from jgem import bedtools as BT
 from jgem import bigwig as BW
 from jgem import gtfgffbed as GGB
 
-from jgem.bigwig import BWObj, BWs 
+from jgem.bigwig import BWObj #, BWs 
 
 
 def find_maxgap(arr, emin, emax, th, win, gapmode):
@@ -79,6 +79,24 @@ def average(arr, n):
     end =  n * int(len(arr)/n)
     return N.mean(arr[:end].reshape(-1, n), 1)
 
+class BWs(object):
+
+    def __init__(self, paths):
+        self.bwobjs = [BWObj(p) for p in paths]
+
+    def __enter__(self):
+        for b in self.bwobjs:
+            b.__enter__()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        for b in self.bwobjs:
+            b.__exit__(exc_type, exc_value, traceback)
+
+    def get(self, chrom, st, ed):
+        a = self.bwobjs[0].get(chrom, st, ed)
+        for b in self.bwobjs[1:]:
+            a += b.get(chrom, st, ed)
+        return a
 
 COPYCOLS = ['chr','st','ed','_gidx','locus','gene_id','gene_type']
 
@@ -92,28 +110,24 @@ class ParamFinder(object):
         self.refpre = refpre
         self.bwpre = bwpre
         self.genome = genome
-        # .ex.p.bw, .ex.n.bw, .ex.u.bw, .sj.p.bw, .sj.n.bw, .sj.u.bw
+        self.ex = ex = UT.read_pandas(self.refpre+'.ex.txt.gz')
+        self.sj = sj = UT.read_pandas(self.refpre+'.sj.txt.gz')
         S2S = {'+':'.p','-':'.n','.':'.u'}
         self.bwpaths = bwp = {
-            'ex': {s:bwpre+'.ex.{0}.bw'.format(S2S[s]) for s in S2S},
-            'sj': {s:bwpre+'.sj.{0}.bw'.format(S2S[s]) for s in S2S},
+            'ex': {s:bwpre+'.ex{0}.bw'.format(S2S[s]) for s in S2S},
+            'sj': {s:bwpre+'.sj{0}.bw'.format(S2S[s]) for s in S2S},
         }
-        self.bws = bws = {'ex':{},'sj':{}}
-        bws['ex']['.'] = BWs([bwp['ex']['.']])
-        bws['ex']['+'] = BWs([bwp['ex']['+'],bwp['ex']['.']]) if os.path.exists(bwp['ex']['+']) else bws['ex']['.']
-        bws['ex']['-'] = BWs([bwp['ex']['-'],bwp['ex']['.']]) if os.path.exists(bwp['ex']['-']) else bws['ex']['.']
-        bws['sj']['+'] = BWs([bwp['sj']['+'],bwp['sj']['.']])
-        bws['sj']['-'] = BWs([bwp['sj']['-'],bwp['sj']['.']])
-        bws['sj']['.'] = BWs([bwp['sj']['.']])
-
+        self.bws = make_bws(bwp)
+        
+    def extract_all(self):
         self.extract_nonovl_exons()
         self.extract_exi53()
         self.extract_53_pair() # intergenic
 
     def extract_nonovl_exons(self):
+        ex = self.ex
+        sj = self.sj
         # nonovl exons    
-        self.ex = ex = UT.read_pandas(self.refpre+'.ex.txt.gz')
-        self.sj = sj = UT.read_pandas(self.refpre+'.sj.txt.gz')
         ex['gene_type'] = ex['extra'].str.split(';').str[2].str.split().str[1].str[1:-1]
         cols0 = ['chr','st','ed','_id']
         a = self.refpre+'.ex.bed.gz'
@@ -139,7 +153,8 @@ class ParamFinder(object):
         LOG.info('#non-ex-ovl-ex={0}, #non-sj-ovl-ex={1}'.format(len(enonov), len(snonov)))
         ids = set(enonov.index).intersection(snonov.index)
         LOG.info('#non-ovl-ex={0}'.format(len(ids)))
-        self.nov_ex = novex = ex.set_index('_id').ix[ids].sort_values(['chr','st','ed'])
+        self.nov_ex = novex = ex.set_index('_id').ix[ids].sort_values(['chr','st','ed']).reset_index()
+        novex['len'] = novex['ed']-novex['st']
         self.ne_i = novex[novex['cat']=='i']
         self.ne_5 = novex[novex['cat']=='5']
         self.ne_3 = novex[novex['cat']=='3']
@@ -197,29 +212,33 @@ class ParamFinder(object):
             df[f] =exdfi[f].values
         return df
 
-    def extract_35_pair(ex, tmpprefix):
+    def extract_53_pair(self):
+        # between genes
+        ex = self.ex
+        tmpprefix = self.refpre
         ex['_apos'] = ex['a_pos'].str.split(':').str[1].astype(int)
         ex['_dpos'] = ex['d_pos'].str.split(':').str[1].astype(int)
         ex.loc[ex['cat']=='3','spos'] = ex['_apos']
         ex.loc[ex['cat']=='5','spos'] = ex['_dpos']
         cols = ['chr','st','ed','name','strand','_gidx1','_gidx2']
         def _find(ecs, chrom, strand):
-            asc = strand=='+'
-            e53 = ecs[ecs['cat'].isin(['3','5'])].sort_values('spos', ascending=asc)
-            esorted = echrstrand.sort_values('_apos', ascending=asc)
-            v1 = e53.iloc[:-1][['spos','cat','_gidx','_id']].values
-            v2 = e53.iloc[1:][['spos','cat','_gidx','_id']].values
+            e53 = ecs[ecs['cat'].isin(['3','5'])].sort_values('spos')
+            #esorted = echrstrand.sort_values('_apos')
+            v1 = e53.iloc[:-1][['spos','cat','_gidx','_id','st','ed']].values
+            v2 = e53.iloc[1:][['spos','cat','_gidx','_id','st','ed']].values
             pairs = []
             if strand=='+':
                 for r1,r2 in zip(v1,v2):
-                    if (r1[1]=='3')&(r2[1]=='5'): # 
-                        name = 'e{1}-e{3}'.format(r1[2],r1[3],r2[2],r2[3])
-                        pairs.append((chrom,r1[0],r2[0],name,strand,r1[2],r2[2]))
+                    if r1[2]!=r2[2]: # not same gene
+                        if (r1[1]=='3')&(r2[1]=='5')&(r1[5]<r2[4]): # non overlapping 3=>5
+                            name = '+g{0}e{1}|g{2}e{3}'.format(r1[2],r1[3],r2[2],r2[3])
+                            pairs.append((chrom,r1[0],r2[0],name,strand,r1[2],r2[2]))
             else:
                 for r1,r2 in zip(v1,v2):
-                    if (r1[1]=='3')&(r2[1]=='5'): # 
-                        name = 'g{0}.e{1}-g{2}.e{3}'.format(r1[2],r1[3],r2[2],r2[3])
-                        pairs.append((chrom,r2[0],r1[0],name,strand,r1[2],r2[2]))
+                    if r1[2]!=r2[2]:
+                        if (r1[1]=='5')&(r2[1]=='3')&(r1[5]<r2[4]): # 
+                            name = '-g{0}e{1}|g{2}e{3}'.format(r1[2],r1[3],r2[2],r2[3])
+                            pairs.append((chrom,r1[0],r2[0],name,strand,r1[2],r2[2]))
 
             df = PD.DataFrame(pairs, columns=cols)
             return df
@@ -230,9 +249,9 @@ class ParamFinder(object):
                 rslts.append(_find(echrstrand, chrom, strand))
         df = PD.concat(rslts, ignore_index=True).sort_values(['chr','st','ed'])
         # intersect with internal exons
-        a = tmpprefix+'.exi.bed' # ncol 3
+        a = tmpprefix+'.53.exi.bed' # ncol 3
         b = tmpprefix+'.53.bed' #ncol 5
-        c = tmpprefix+'.i53ovl.txt'
+        c = tmpprefix+'.53.exi.ovl.txt'
         exi = ex[ex['cat']=='i'].sort_values(['chr','st','ed'])
         UT.write_pandas(exi[['chr','st','ed']], a, '')
         UT.write_pandas(df, b, '')
@@ -242,19 +261,22 @@ class ParamFinder(object):
         sdf = cdf[cdf['ovl']==0][cols]
         sdf['locus'] = UT.calc_locus(sdf)
         sdf['len'] = sdf['ed']-sdf['st']
+        sdf = sdf[sdf['len']>20]
         UT.write_pandas(sdf, tmpprefix+'.e53pair.bed.gz')
-        return sdf
+        sdf.index.name='_id'
+        self.e53 = sdf.reset_index()
 
     def calc_params_mp(self, beddf,  win=600, siz=10, covfactor=1e-3, direction='>', gapmode='53', np=10):
         chroms = UT.chroms(self.genome)
         args = []
         for c in chroms:
             bedc = beddf[beddf['chr']==c]
-            args.append((bedc, self.bws, win, siz, covfactor, direction, gapmode))
+            if len(bedc)>0:
+                args.append((bedc, self.bwpaths.copy(), win, siz, covfactor, direction, gapmode))
         rslts = UT.process_mp(calc_params_chr, args, np=np, doreduce=False)
         df = PD.concat(rslts, ignore_index=True)
         return df
-        
+    
     def parseplot(self, locus, figsize=(15,6)):
         bws = self.bws
         chrom,tmp,strand = locus.split(':')
@@ -355,22 +377,34 @@ class ParamFinder(object):
     
     
 
+def make_bws(bwp):
+    # .ex.p.bw, .ex.n.bw, .ex.u.bw, .sj.p.bw, .sj.n.bw, .sj.u.bw
+    bws = {'ex':{},'sj':{}}
+    bws['ex']['.'] = BWs([bwp['ex']['.']])
+    bws['ex']['+'] = BWs([bwp['ex']['+'],bwp['ex']['.']]) if os.path.exists(bwp['ex']['+']) else bws['ex']['.']
+    bws['ex']['-'] = BWs([bwp['ex']['-'],bwp['ex']['.']]) if os.path.exists(bwp['ex']['-']) else bws['ex']['.']
+    bws['sj']['+'] = BWs([bwp['sj']['+'],bwp['sj']['.']])
+    bws['sj']['-'] = BWs([bwp['sj']['-'],bwp['sj']['.']])
+    bws['sj']['.'] = BWs([bwp['sj']['.']])
+    return bws
 
-def calc_params_chr(exdf, bws, win=300, siz=10, covfactor=1e-3, direction='>', gapmode='i'):
+def calc_params_chr(exdf, bwp, win=300, siz=10, covfactor=1e-3, direction='>', gapmode='i'):
+    bws = make_bws(bwp)
+    
     ebw = bws['ex']
     sbw = bws['sj']
     recs = []
-    cols = ['emax','emin',
+    cols = ['_id','emax','emin',
             'emaxIn','eminIn','gapIn','gposIn',
             'emaxOut','eminOut','gapOut','gposOut',
             'eIn','sIn',
             'eOut','sOut',
-            'gap']
+            'gap','gap0']
     for strand in ['+','-','.']:
         exdfsub = exdf[exdf['strand']==strand]
         with ebw[strand]:
             with sbw[strand]:
-                for chrom,st,ed in exdfsub[['chr','st','ed']].values:
+                for chrom,st,ed,_id in exdfsub[['chr','st','ed','_id']].values:
                     #win = ed-st # same size as exon
                     left = max(0, st-win)
                     if left==0:
@@ -378,10 +412,8 @@ def calc_params_chr(exdf, bws, win=300, siz=10, covfactor=1e-3, direction='>', g
                     right = ed+win
                     stpos = st-left
                     edpos = ed-left
-                    a1 = ebw[strand].get_as_array(chrom,left,right)
-                    b1 = sbw[strand].get_as_array(chrom,left,right)
-                    a1[N.isnan(a1)] = 0.
-                    b1[N.isnan(b1)] = 0.
+                    a1 = ebw[strand].get(chrom,left,right)
+                    b1 = sbw[strand].get(chrom,left,right)
                      
                     exl10 = N.mean(a1[stpos:stpos+siz])
                     sjl10 = N.mean(b1[stpos-siz:stpos])
@@ -393,8 +425,10 @@ def calc_params_chr(exdf, bws, win=300, siz=10, covfactor=1e-3, direction='>', g
                     gapth = exmax*covfactor
                     if ((direction=='>')&(strand=='+'))|((direction!='>')&(strand=='-')):
                         gap = find_maxgap(a1[stpos:edpos],exmin, exmax, gapth, win, gapmode)
+                        gap0 = find_maxgap(a1[stpos:edpos],exmin, exmax, 0, win, gapmode)
                     else:
                         gap = find_maxgap(a1[stpos:edpos][::-1],exmin, exmax, gapth, win, gapmode)
+                        gap0 = find_maxgap(a1[stpos:edpos][::-1],exmin, exmax, 0, win, gapmode)
                     maxl = N.max(a1[:stpos])
                     maxr = N.max(a1[edpos:])
                     minl = N.min(a1[:stpos])
@@ -402,22 +436,23 @@ def calc_params_chr(exdf, bws, win=300, siz=10, covfactor=1e-3, direction='>', g
                     gapl,posl = find_firstgap(a1[:stpos][::-1],minl,maxl,gapth,win)
                     gapr,posr = find_firstgap(a1[edpos:],minr,maxr,gapth,win)
                     if strand=='+':
-                        recs.append([exmax,exmin,
+                        recs.append([_id,exmax,exmin,
                                      maxl,minl,gapl,posl, 
                                      maxr,minr,gapr,posr, 
                                      exl10,sjl10,
                                      exr10,sjr10,
-                                     gap])
+                                     gap,gap0])
                     else:
-                        recs.append([exmax,exmin,
+                        recs.append([_id,exmax,exmin,
                                      maxr,minr,gapr,posr, 
                                      maxl,minl,gapl,posl, 
                                      exr10,sjr10,
                                      exl10,sjl10,
-                                     gap])
+                                     gap,gap0])
 
     df = PD.DataFrame(recs, columns=cols)
     exdfi = exdf.set_index('_id').ix[df['_id'].values]
     for f in COPYCOLS:
-        df[f] =exdfi[f].values
+        if f in exdfi:
+            df[f] =exdfi[f].values
     return df
