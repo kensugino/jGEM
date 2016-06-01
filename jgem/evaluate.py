@@ -304,7 +304,7 @@ class EvalMatch(object):
             ecovname = self.colname('ecov')
             if ecovname not in ex.columns:
                 ex[ecovname] = 0
-             gcovname = self.colname('gcov')
+            gcovname = self.colname('gcov')
             if gcovname not in ex.columns:
                 ex[gcovname] = 0
         # sjcnt
