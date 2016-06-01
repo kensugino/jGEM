@@ -471,7 +471,7 @@ def _set_pos(bed, fld, stfld, edfld):
     opos = bed['chr']+':'+pos+':.'
     bed.loc[bed['strand']=='+', fld] = ppos
     bed.loc[bed['strand']=='-', fld] = npos
-    bed.loc[bed['strand']=='.', fld] = opos
+    bed.loc[bed['strand'].isin(['.','.+','.-']), fld] = opos
 
 def set_ad_info(sj, me):
     """assign donor/acceptor id
