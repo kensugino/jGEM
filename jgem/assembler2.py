@@ -1642,7 +1642,7 @@ class LocalAssembler(object):
         bed['sc1'] = N.ceil(bed['ltcov']*100).astype(int)
         sm = {'+':Colors('R', cmax),
               '-':Colors('B', cmax),
-              '.':Colors('gray', cmax)}
+              '.':Colors('G', cmax)}
         bed['sc2'] = [sm[s].RGB(x) for x,s in bed[['ltcov','strand']].values]
         self.bed12 = bed
         GGB.write_bed(bed, pre+'.paths.bed.gz',ncols=12)
@@ -2063,11 +2063,13 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.', mincovth=5, minsizeth=20
     se0 = sedf[(sedf['ecov']>th)&(sedf['len']>minsizeth)].copy()
     LOG.info('SE covth={0:.2f}'.format(th))
     se0['strand'] = sestrand
+    se0['name'] = ''
+    se0['kind'] = 's'
     # find intergenic
     a = dstpre+'.se0.bed'
     b = dstpre+'.gspans.bed'
     cols = ['chr','st','ed','ecov','strand']
-    UT.write_pandas(se0[cols], a, '')
+    UT.write_pandas(se0[EXDFCOLS], a, '')
     UT.write_pandas(gspans[['chr','st','ed']],b,'')
     c = dstpre+'.se.txt.gz'
     BT.bedtoolintersect(a,b,c,v=True)
@@ -2077,6 +2079,10 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.', mincovth=5, minsizeth=20
     LOG.info('#SE = {0}'.format(len(se1)))
     os.unlink(a)
     os.unlink(b)
+    # merge exdf & se ==> update .exdf.txt.gz?
+
+    # update .paths.txt.gz, .paths.bed.gz?
+
     return c
 
 def find_threshold(x0,x1,minth):

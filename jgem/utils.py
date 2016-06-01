@@ -469,9 +469,9 @@ def _set_pos(bed, fld, stfld, edfld):
     ppos = bed['chr']+':'+pos+':+'
     npos = bed['chr']+':'+neg+':-'
     opos = bed['chr']+':'+pos+':.'
-    bed.loc[bed['strand']=='+', fld] = ppos
-    bed.loc[bed['strand']=='-', fld] = npos
-    bed.loc[bed['strand'].isin(['.','.+','.-']), fld] = opos
+    bed.loc[bed['strand'].isin(['+','.+']), fld] = ppos
+    bed.loc[bed['strand'].isin(['-','.-']), fld] = npos
+    bed.loc[bed['strand'].isin(['.',]), fld] = opos
 
 def set_ad_info(sj, me):
     """assign donor/acceptor id

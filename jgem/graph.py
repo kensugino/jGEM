@@ -579,7 +579,7 @@ def find_genes4(sj, ae, filepre, cachename=None, np=1, override=False, depth=500
     g2gn = {}
     i2s = dict(UT.izipcols(ae, ['_id','strand'])) # eid => strand
     #i2c = dict(UT.izipcols(ae, ['_id','cat'])) # eid => category
-    s2n = {'+':'P','-':'N','.':''}
+    s2n = {'+':'P','-':'N','.':'','.+':'','.-':''}
     c2n = {'s':'S','i':'G','5':'G','3':'G'}
     for i, ids in enumerate(genes):
         gid = i+1
