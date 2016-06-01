@@ -191,8 +191,8 @@ class EvalMatch(object):
 
         """
         # calc exon, junction, gene coverage
-        self.prep_sjex(self.en1, np, True)
-        self.prep_sjex(self.en2, np, True)
+        self.prep_sjex(self.en1, np, True, True)
+        self.prep_sjex(self.en2, np, True, False)
         # register for deleting later, keep ref calc
         dcode = self.datacode
         # self.en2.fname2('covci.txt.gz',dcode)
@@ -246,7 +246,7 @@ class EvalMatch(object):
     def colname2(self, x, code):
         return '{0}_{1}_{2}'.format(x, self.datacode, code)
 
-    def prep_sjex(self, en, np=1, savesjex=True):
+    def prep_sjex(self, en, np=1, savesjex=True, calccovs=True):
         """ Assign ecov, gcov, jcnt """
         dcode = self.datacode
         sj = en.model('sj',dcode)
@@ -273,32 +273,40 @@ class EvalMatch(object):
             ex['len'] = ex['ed'] - ex['st']
             saveex = True
         # ecov
-        ecovname = self.colname('ecov')
-        if ecovname not in ex.columns:
-            ecov = CC.calc_ecov(
-                expath=en.modelpath('ex'), 
-                cipath=en.modelpath('ci'), 
-                bwpath=self.bigwig, 
-                dstprefix=en.fname2('',self.datacode),  # cov is data dependent
-                override=False, # override previous?
-                np=np)
-            ex[ecovname] = ecov.set_index('eid').ix[ex['_id'].values]['ecov'].values
-            saveex = True
-        # gcov, glen
-        gcovname = self.colname('gcov')
-        if gcovname not in ex.columns:
-            gcov = CC.calc_gcov(
-                expath=en.modelpath('ex'), 
-                cipath=en.modelpath('ci'), 
-                bwpath=self.bigwig, 
-                dstprefix=en.fname2('',self.datacode), 
-                override=False, # reuse covci from ecov calc
-                np=np)
-            tmp = gcov.set_index('_gidx').ix[ex['_gidx'].values]
-            ex[gcovname] = tmp['gcov'].values
-            if 'glen' in tmp:
-                ex['glen'] = tmp['glen'].values # glen is only dependent on model not data
-            saveex = True
+        if calccovs:
+            ecovname = self.colname('ecov')
+            if ecovname not in ex.columns:
+                ecov = CC.calc_ecov(
+                    expath=en.modelpath('ex'), 
+                    cipath=en.modelpath('ci'), 
+                    bwpath=self.bigwig, 
+                    dstprefix=en.fname2('',self.datacode),  # cov is data dependent
+                    override=False, # override previous?
+                    np=np)
+                ex[ecovname] = ecov.set_index('eid').ix[ex['_id'].values]['ecov'].values
+                saveex = True
+            # gcov, glen
+            gcovname = self.colname('gcov')
+            if gcovname not in ex.columns:
+                gcov = CC.calc_gcov(
+                    expath=en.modelpath('ex'), 
+                    cipath=en.modelpath('ci'), 
+                    bwpath=self.bigwig, 
+                    dstprefix=en.fname2('',self.datacode), 
+                    override=False, # reuse covci from ecov calc
+                    np=np)
+                tmp = gcov.set_index('_gidx').ix[ex['_gidx'].values]
+                ex[gcovname] = tmp['gcov'].values
+                if 'glen' in tmp:
+                    ex['glen'] = tmp['glen'].values # glen is only dependent on model not data
+                saveex = True
+        else:
+            ecovname = self.colname('ecov')
+            if ecovname not in ex.columns:
+                ex[ecovname] = 0
+             gcovname = self.colname('gcov')
+            if gcovname not in ex.columns:
+                ex[gcovname] = 0
         # sjcnt
         ucntname = self.colname('ucnt')
         mcntname = self.colname('mcnt')
@@ -414,11 +422,11 @@ class EvalMatch(object):
             if which != 'j':
                 da1 = da1[da1[ecovname]>0]
                 dw = dw[dw[ecovname]>0]
-                da2 = da2[da2[ecovname]>0]
+                #da2 = da2[da2[ecovname]>0]
             else:
                 da1 = da1[da1[jcntname]>0]                
                 dw = dw[dw[jcntname]>0]                
-                da2 = da2[da2[jcntname]>0]
+                #da2 = da2[da2[jcntname]>0]
             pop = set(da1['_id'].values)
             hit = set(dw['_id'].values)
             pop2 = set(da2['_id'].values)
