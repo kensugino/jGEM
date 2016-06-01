@@ -43,7 +43,6 @@ from jgem import bigwig as BW
 from jgem import bedtools as BT
 from jgem import gtfgffbed as GGB
 from jgem import taskqueue as TQ
-import jgem.cy.as2 as cyas2
 
 ####### BigWigs ########################################################################
      
