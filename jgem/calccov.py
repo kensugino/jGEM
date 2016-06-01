@@ -145,7 +145,7 @@ def calc_ecov_chrom(covci,blocksize):
     def _calc_ecov(st,ed):
         # construct matrix
         c = covci.iloc[st:ed]
-        emax = reduce(max,c['eidmax'].values, 0)
+        emax = reduce(max,c['eidmax'].values, 0) # why not just use e['eidmax'].max()?
         emin = reduce(min,c['eidmin'].values, c['eidmax'].max())
         nc = len(c)
         ne = emax+1-emin

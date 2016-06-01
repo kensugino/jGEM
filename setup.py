@@ -38,6 +38,7 @@ def get_extension_modules():
     if have_numpy and have_cython:
         # jgem
         extensions.append( Extension( "jgem.cy.bw", [ "jgem/cy/bw.pyx" ], include_dirs=[numpy.get_include()]  ) )
+        extensions.append( Extension( "jgem.cy.as2", [ "jgem/cy/as2.pyx" ], include_dirs=[numpy.get_include()]  ) )
         # Reading UCSC "big binary index" files
         extensions.append( Extension( "jgem.bxbbi.bpt_file", [ "jgem/bxbbi/bpt_file.pyx" ] ) )
         extensions.append( Extension( "jgem.bxbbi.cirtree_file", [ "jgem/bxbbi/cirtree_file.pyx" ] ) )

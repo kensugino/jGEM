@@ -419,3 +419,38 @@ class BWs(object):
             a += b.get(chrom, st, ed)
         return a
 
+    
+class MultiBigWigs(object):
+    
+    def __init__(self, plus, minus=[]):
+        """
+        Args:
+            plus: list of bigwig paths to add
+            minus: list of bigwig paths to subtract
+            
+        """
+        self.ps = set(plus)
+        self.ns = set(minus)
+        
+    def make_bws(self):
+        self.bws = bws = {}
+        bws['p'] = [BWObj(f) for f in self.ps if os.path.exists(f)]
+        bws['n'] = [BWObj(f) for f in self.ns if os.path.exists(f)]
+        
+    def __enter__(self):
+        for k in ['p','n']:
+            for b in self.bws[k]:
+                b.__enter__()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        for k in ['p','n']:
+            for b in self.bws[k]:
+                b.__exit__(exc_type, exc_value, traceback)
+
+    def get(self, chrom, st, ed):
+        a = self.bws['p'][0].get(chrom, st, ed)
+        for b in self.bws['p'][1:]:
+            a += b.get(chrom, st, ed)    
+        for b in self.bws['n']:
+            a -= b.get(chrom, st, ed)
+        return a

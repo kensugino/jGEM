@@ -781,13 +781,31 @@ def union_contiguous(beddf, returndf=True):
                 yield rec0
                 rec0 = rec1
             else: # overlapping/contiguous
-                rec0[edpos] = rec1[edpos] # update the end
+                #rec0[edpos] = rec1[edpos] # update the end <== bug if next record
+                # is include in the previous, end will be wrong
+                rec0[edpos] = max(rec0[edpos], rec1[edpos])
         yield rec0
     recs = [x for x in _gen()]
     if not returndf:
         return recs
     df = PD.DataFrame(recs, columns=cols)
     return df
+
+def union_contiguous_intervals(arr):
+    """ Union contiguous intervals.
+    arr = list of [(st,ed),...]
+    """
+    arr = sorted(arr)
+    def _gen():
+        st0,ed0 = arr[0]
+        for st1,ed1 in arr[1:]:
+            if ed0 < st1: # ed1<st0 new interval
+                yield [st0,ed0]
+                st0,ed0 = st1,ed1
+            else: # overlapping/contiguous
+                ed0 = max(ed0, ed1)
+        yield [st0,ed0]
+    return [x for x in _gen()]
 
 def make_unionex(ex, gidx='_gidx'):
     """Makes gene bed df where overlapping exons belonging to a genes

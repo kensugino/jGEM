@@ -99,6 +99,8 @@ class BWs(object):
         return a
 
 COPYCOLS = ['chr','st','ed','_gidx','locus','gene_id','gene_type']
+CALCFLUXCOLS = ['_id', 'sdelta','ecovavg','ecovmin','ecovmax',
+                'sin','sout','ein','eout','sdin','sdout']
 
 class ParamFinder(object):
     """
@@ -108,10 +110,13 @@ class ParamFinder(object):
     """
     def __init__(self, refpre, bwpre, genome):
         self.refpre = refpre
-        self.bwpre = bwpre
         self.genome = genome
         self.ex = ex = UT.read_pandas(self.refpre+'.ex.txt.gz')
         self.sj = sj = UT.read_pandas(self.refpre+'.sj.txt.gz')
+        self.set_bws(bwpre)
+        
+    def set_bws(self, bwpre):
+        self.bwpre = bwpre
         S2S = {'+':'.p','-':'.n','.':'.u'}
         self.bwpaths = bwp = {
             'ex': {s:bwpre+'.ex{0}.bw'.format(S2S[s]) for s in S2S},
@@ -162,7 +167,7 @@ class ParamFinder(object):
 
     def extract_exi53(self):
         # internal exons overlapping with either 5 or 3 prime exons?
-        cols0 = ['chr','st','ed','_id']
+        cols0 = ['chr','st','ed','_id', 'sc1','strand']
         cols = cols0+['b_'+x for x in cols0]+['ovl']
         ex = self.ex
 
@@ -181,37 +186,90 @@ class ParamFinder(object):
         a5i = self.refpre + '.ex5-ovl-exi.txt.gz'
         a3i = self.refpre + '.ex3-ovl-exi.txt.gz'
 
-        e5i0 = BT.calc_ovlratio(a5,ai,a5i,4,4)
-        e3i0 = BT.calc_ovlratio(a3,ai,a3i,4,4)
+        nc = len(cols0)
+        e5i0 = BT.calc_ovlratio(a5,ai,a5i,nc,nc)
+        e3i0 = BT.calc_ovlratio(a3,ai,a3i,nc,nc)
 
-        self.e5i = e5i = e5i0[e5i0['ovlratio']==1]
-        self.e3i = e3i = e3i0[e3i0['ovlratio']==1]
-
-    def calc_flux(self, exdf):
-        ebw = self.bws['ex']
-        sbw = self.bws['sj']
-        recs = []
-        cols = ['_id', 'sdelta','ecovavg','ecovmin','ecovmax','sin','sout']
-        for strand in ['+','-','.']:
-            exdfsub = exdf[exdf['strand']==strand]
-            with ebw[strand]:
-                with sbw[strand]:
-                    for chrom, st, ed, _id in exdf[['chr','st','ed', '_id']].values:
-                        ecov = ebw[strand].get(chrom,st-1,ed+1)
-                        scov = sbw[strand].get(chrom,st-1,ed+1)
-                        if strand=='+':
-                            sd = scov[-1]-scov[0]
-                            sin,sout = scov[0],scov[-1]
-                        else:
-                            sd = scov[0]-scov[-1]
-                            sin,sout = scov[-1],scov[0]
-                        recs.append([_id, sd, ecov.mean(), ecov.min(), ecov.max(),sin,sout])
-        df = PD.DataFrame(recs, columns=cols)
-        exdfi = exdf.set_index('_id').ix[df['_id'].values]
+        self.e5i = e5i = e5i0[e5i0['ovlratio']==1].rename(columns={'name':'_id'})
+        self.e3i = e3i = e3i0[e3i0['ovlratio']==1].rename(columns={'name':'_id'})
+    
+    def calc_flux_mp(self, beddf, np=10):
+        chroms = UT.chroms(self.genome)
+        args = []
+        for c in chroms:
+            bedc = beddf[beddf['chr']==c]
+            if len(bedc)>0:
+                args.append((bedc, self.bwpaths.copy()))
+        rslts = UT.process_mp(calc_flux_chr, args, np=np, doreduce=True)
+        df = PD.DataFrame(rslts, columns=CALCFLUXCOLS)
+        exdfi = beddf.set_index('_id').ix[df['_id'].values]
         for f in COPYCOLS:
-            df[f] =exdfi[f].values
+            if f in exdfi:
+                df[f] =exdfi[f].values
+        df['len'] = df['ed']-df['st']
         return df
+    
+    def calc_all_flux_mp(self, np=10):
+        dic = {}
+        for x in ['ne_i','ne_5','ne_3','e5i','e3i']:
+            df = getattr(self, x)
+            print('calculating {0}...'.format(x))
+            dic[x] = self.calc_flux_mp(df, np=np)
+        dicb = {}
+        for x in ['ne_5','ne_3','e5i','e3i']:
+            f = dic[x]
+            f['kind'] = 1
+            idx = N.abs(N.log2(f['sin']+1)-N.log2(f['sout']+1))>1
+            idx = idx & (f['sdin']!=0)|(f['sdout']!=0) # should have either in or out
+            dicb[x] = f[idx]
+        f = dic['ne_i']
+        f['kind'] = 0
+        idx = (f['ecovmax']>1)&((f['sdin']!=0)&(f['sdout']!=0)) # should have both in&out
+        dicb['ne_i'] = f[idx]
 
+        D = PD.concat(dicb.values(),ignore_index=True)
+        D['lsin'] = N.log2(D['sin']+1)
+        D['lsout'] = N.log2(D['sout']+1)
+        D['sdiff'] = N.abs(D['lsin']-D['lsout'])
+        D['smean'] = (D['lsin']+D['lsout'])/2.
+        X = D[['sdiff','smean']].values
+        Y = D['kind'].values
+        lr = LogisticRegression()
+        lr.fit(X,Y)
+        Z = lr.predict(X)
+        return locals()
+
+    def calc_all_53gap_mp(self, np=14):
+        d5 = self.calc_params_mp(self.ne_5, win=8192, np=np, gapmode='53', direction='<')
+        d3 = self.calc_params_mp(self.ne_3, win=8192, np=np, gapmode='53', direction='>')
+        i5 = (d5['sOut']>0)&(d5['emax']>0)
+        i3 = (d3['sIn']>0)&(d3['emax']>0)
+        d50 = d5[i5]
+        d30 = d3[i3]
+        def _fitone(d0, x, y1, y2):
+            da = d0[[x,y1]].copy().rename(columns={y1:'gap',x:'sin'})
+            db = d0[[x,y2]].copy().rename(columns={y2:'gap',x:'sin'})
+            da['kind'] = 1
+            db['kind'] = 0
+            D = PD.concat([da,db],ignore_index=True)
+            D['lsin'] = N.log2(D['sin']+1)
+            D['lgap'] = N.log2(D['gap']+1)
+            X = D[['lsin','lgap']].values
+            Y = D['kind'].values
+            lr = LogisticRegression()
+            lr.fit(X,Y)
+            Z = lr.predict(X)
+            return locals()
+        fit5_005 = _fitone(d50,'sOut','gap005','gapIn')
+        fit5_002 = _fitone(d50,'sOut','gap002','gapIn')
+        fit5_000 = _fitone(d50,'sOut','gap000','gapIn')
+        fit3_005 = _fitone(d30,'sIn', 'gap005','gapOut')
+        fit3_002 = _fitone(d30,'sIn', 'gap002','gapOut')
+        fit3_000 = _fitone(d30,'sIn', 'gap000','gapOut')
+        return locals()
+        
+        
+        
     def extract_53_pair(self):
         # between genes
         ex = self.ex
@@ -261,22 +319,29 @@ class ParamFinder(object):
         sdf = cdf[cdf['ovl']==0][cols]
         sdf['locus'] = UT.calc_locus(sdf)
         sdf['len'] = sdf['ed']-sdf['st']
-        sdf = sdf[sdf['len']>20]
+        maxexonsize = self.ne_i['len'].max()
+        sdf = sdf[(sdf['len']>20)&(sdf['len']<2*maxexonsize)]
         UT.write_pandas(sdf, tmpprefix+'.e53pair.bed.gz')
         sdf.index.name='_id'
+        
         self.e53 = sdf.reset_index()
 
-    def calc_params_mp(self, beddf,  win=600, siz=10, covfactor=1e-3, direction='>', gapmode='53', np=10):
+    def calc_params_mp(self, beddf,  win=600, siz=10, direction='>', gapmode='53', np=10):
         chroms = UT.chroms(self.genome)
         args = []
         for c in chroms:
             bedc = beddf[beddf['chr']==c]
             if len(bedc)>0:
-                args.append((bedc, self.bwpaths.copy(), win, siz, covfactor, direction, gapmode))
-        rslts = UT.process_mp(calc_params_chr, args, np=np, doreduce=False)
-        df = PD.concat(rslts, ignore_index=True)
+                args.append((bedc, self.bwpaths.copy(), win, siz, direction, gapmode))
+        rslts = UT.process_mp(calc_params_chr, args, np=np, doreduce=True)
+        df = PD.DataFrame(rslts, columns=CALCPARAMCOLS)
+        exdfi = beddf.set_index('_id').ix[df['_id'].values]
+        for f in COPYCOLS:
+            if f in exdfi:
+                df[f] =exdfi[f].values
+        df['len'] = df['ed']-df['st']
         return df
-    
+        
     def parseplot(self, locus, figsize=(15,6)):
         bws = self.bws
         chrom,tmp,strand = locus.split(':')
@@ -388,18 +453,19 @@ def make_bws(bwp):
     bws['sj']['.'] = BWs([bwp['sj']['.']])
     return bws
 
-def calc_params_chr(exdf, bwp, win=300, siz=10, covfactor=1e-3, direction='>', gapmode='i'):
+CALCPARAMCOLS = ['_id','emax','emin',
+            'emaxIn','eminIn','gapIn','gposIn',
+            'emaxOut','eminOut','gapOut','gposOut',
+            'eIn','sIn','sdIn',
+            'eOut','sOut','sdOut',
+            'gap000', 'gap001', 'gap002','gap005']#,'gap010','gap015','gap020']
+
+def calc_params_chr(exdf, bwp, win=300, siz=10,  direction='>', gapmode='i'):
     bws = make_bws(bwp)
-    
     ebw = bws['ex']
     sbw = bws['sj']
     recs = []
-    cols = ['_id','emax','emin',
-            'emaxIn','eminIn','gapIn','gposIn',
-            'emaxOut','eminOut','gapOut','gposOut',
-            'eIn','sIn',
-            'eOut','sOut',
-            'gap','gap0']
+    cols =CALCPARAMCOLS
     for strand in ['+','-','.']:
         exdfsub = exdf[exdf['strand']==strand]
         with ebw[strand]:
@@ -419,16 +485,19 @@ def calc_params_chr(exdf, bwp, win=300, siz=10, covfactor=1e-3, direction='>', g
                     sjl10 = N.mean(b1[stpos-siz:stpos])
                     exr10 = N.mean(a1[edpos-siz:edpos])
                     sjr10 = N.mean(b1[edpos:edpos+siz])
+                    sdifl = b1[stpos]-b1[stpos-1]
+                    sdifr = b1[edpos]-b1[edpos-1]
                     exmax = N.max(a1[stpos:edpos])
                     exmin = N.min(a1[stpos:edpos])
                     #gapth = sjl10*covfactor if strand=='+' else sjr10*covfactor
-                    gapth = exmax*covfactor
-                    if ((direction=='>')&(strand=='+'))|((direction!='>')&(strand=='-')):
-                        gap = find_maxgap(a1[stpos:edpos],exmin, exmax, gapth, win, gapmode)
-                        gap0 = find_maxgap(a1[stpos:edpos],exmin, exmax, 0, win, gapmode)
-                    else:
-                        gap = find_maxgap(a1[stpos:edpos][::-1],exmin, exmax, gapth, win, gapmode)
-                        gap0 = find_maxgap(a1[stpos:edpos][::-1],exmin, exmax, 0, win, gapmode)
+                    gaps = {}
+                    cfs = [0,0.01,0.02,0.05]#,0.1,0.15,0.2]:
+                    for covfactor in cfs:
+                        gapth = exmax*covfactor
+                        if ((direction=='>')&(strand=='+'))|((direction!='>')&(strand=='-')):
+                            gaps[covfactor] = find_maxgap(a1[stpos:edpos],exmin, exmax, gapth, win, gapmode)
+                        else:
+                            gaps[covfactor] = find_maxgap(a1[stpos:edpos][::-1],exmin, exmax, gapth, win, gapmode)
                     maxl = N.max(a1[:stpos])
                     maxr = N.max(a1[edpos:])
                     minl = N.min(a1[:stpos])
@@ -439,20 +508,41 @@ def calc_params_chr(exdf, bwp, win=300, siz=10, covfactor=1e-3, direction='>', g
                         recs.append([_id,exmax,exmin,
                                      maxl,minl,gapl,posl, 
                                      maxr,minr,gapr,posr, 
-                                     exl10,sjl10,
-                                     exr10,sjr10,
-                                     gap,gap0])
+                                     exl10,sjl10,sdifl,
+                                     exr10,sjr10,sdifr]+[gaps[x] for x in cfs])
                     else:
                         recs.append([_id,exmax,exmin,
                                      maxr,minr,gapr,posr, 
                                      maxl,minl,gapl,posl, 
-                                     exr10,sjr10,
-                                     exl10,sjl10,
-                                     gap,gap0])
+                                     exr10,sjr10,sdifr,
+                                     exl10,sjl10,sdifl]+[gaps[x] for x in cfs])
+    return recs
 
-    df = PD.DataFrame(recs, columns=cols)
-    exdfi = exdf.set_index('_id').ix[df['_id'].values]
-    for f in COPYCOLS:
-        if f in exdfi:
-            df[f] =exdfi[f].values
-    return df
+def calc_flux_chr(exdf, bwp):
+    bws = make_bws(bwp)
+    ebw = bws['ex']
+    sbw = bws['sj']
+    recs = []
+    cols = CALCFLUXCOLS
+    for strand in ['+','-','.']:
+        exdfsub = exdf[exdf['strand']==strand]
+        with ebw[strand]:
+            with sbw[strand]:
+                for chrom, st, ed, _id in exdf[['chr','st','ed', '_id']].values:
+                    ecov = ebw[strand].get(chrom,st-1,ed+1)
+                    scov = sbw[strand].get(chrom,st-1,ed+1)
+                    if strand=='+':
+                        sd = scov[-1]-scov[0]
+                        sin,sout = scov[0],scov[-1]
+                        ein,eout = ecov[0],ecov[-1]
+                        sdin= scov[1]-scov[0]
+                        sdout = scov[-1]-scov[-2]
+                    else:
+                        sd = scov[0]-scov[-1]
+                        sin,sout = scov[-1],scov[0]
+                        ein,eout = ecov[-1],ecov[0]
+                        sdout= -scov[1]+scov[0]
+                        sdin = -scov[-1]+scov[-2]
+                    recs.append([_id, sd, ecov.mean(), ecov.min(), ecov.max(),
+                                 sin,sout,ein,eout,sdin,sdout])
+    return recs
