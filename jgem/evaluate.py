@@ -274,6 +274,7 @@ class EvalMatch(object):
             saveex = True
         # ecov
         if calccovs:
+            print('calccov for {0}'.format(en.code))
             ecovname = self.colname('ecov')
             if ecovname not in ex.columns:
                 ecov = CC.calc_ecov(

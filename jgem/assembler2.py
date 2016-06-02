@@ -198,7 +198,7 @@ class EdgeFinder(object):
         
     
 EF5 = EdgeFinder(-0.2, -0.8, 5.4, 0)
-EF3 = EdgeFinder(-0.2, -0.5, 4.9, 0) # -0.25, -0.5, 4.5
+EF3 = EdgeFinder(-0.25, -0.5, 4.8, 0) # -0.25, -0.5, 4.5
 
 ####### Gene Graph ###########################################
 
@@ -857,7 +857,7 @@ def set_ad_pos(df, which='sj'):
     df['apos'] = df['apos'].astype(int)
 
 def _pc(st,ed,strand,sep):
-    if strand in ['+','.+']:
+    if strand in ['+','.+','.']:
         return '{0}{2}{1}'.format(int(st),int(ed),sep)
     return '{1}{2}{0}'.format(int(st),int(ed),sep)
 
@@ -1642,7 +1642,7 @@ class LocalAssembler(object):
         bed['sc1'] = N.ceil(bed['ltcov']*100).astype(int)
         sm = {'+':Colors('R', cmax),
               '-':Colors('B', cmax),
-              '.':Colors('G', cmax)}
+              '.':Colors('C', cmax)}
         bed['sc2'] = [sm[s].RGB(x) for x,s in bed[['ltcov','strand']].values]
         self.bed12 = bed
         GGB.write_bed(bed, pre+'.paths.bed.gz',ncols=12)
@@ -2042,7 +2042,8 @@ def find_SE_chrom(bwpre, dstpre, genome, chrom, exstrand='+', minsizeth=200):
     UT.write_pandas(df[['chr','st','ed','ecov','len']], dstpath, '')
     return dstpath
 
-def find_SE(dstpre, chroms, exstrand='+', sestrand='.', mincovth=5, minsizeth=200):
+def find_SE(dstpre, chroms, exstrand='+', sestrand='.', 
+    mincovth=5, minsizeth=200, minsep=1000, cmax=9):
     # concatenate
     dstpath = dstpre+'.se0.txt.gz'
     if not os.path.exists(dstpath):
@@ -2057,33 +2058,57 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.', mincovth=5, minsizeth=20
         concatenate_chroms(chroms, dstpre)
     sedf = UT.read_pandas(dstpath, names=['chr','st','ed','ecov','len'])
     exdf = UT.read_pandas(dstpre+'.exdf.txt.gz', names=EXDFCOLS) 
-    paths = UT.read_pandas(dstpre+'.paths.txt.gz',names=PATHCOLS)
-    gspans = UT.union_contiguous(paths)
+    # gspans = UT.union_contiguous(paths)
     th = find_threshold(exdf['ecov'].values, sedf['ecov'].values, mincovth)
     se0 = sedf[(sedf['ecov']>th)&(sedf['len']>minsizeth)].copy()
-    LOG.info('SE covth={0:.2f}'.format(th))
+    LOG.info('SE covth={0:.2f}, len(se0)={1}'.format(th, len(se0)))
     se0['strand'] = sestrand
-    se0['name'] = ''
+    se0['name'] = [_pc(st,ed,sestrand,',') for st,ed in se0[['st','ed']].values ]
     se0['kind'] = 's'
-    # find intergenic
+    c = dstpre+'.se1.txt.gz'
+    # UT.write_pandas(se0, c, 'h')
+    # return (c, th, len(sedf), len(se0))
+    # check irets in bundle workers?
+    # find intervals at least minsep separated from exons
     a = dstpre+'.se0.bed'
-    b = dstpre+'.gspans.bed'
-    cols = ['chr','st','ed','ecov','strand']
+    b = dstpre+'.espans.bed'
+    # cols = ['chr','st','ed','ecov','strand']
     UT.write_pandas(se0[EXDFCOLS], a, '')
-    UT.write_pandas(gspans[['chr','st','ed']],b,'')
-    c = dstpre+'.se.txt.gz'
+    exdf['st0'] = exdf['st']-minsep
+    exdf['ed0'] = exdf['ed']+minsep
+    UT.write_pandas(exdf[['chr','st0','ed0']],b,'')
+    c = dstpre+'.sedf.txt.gz'
     BT.bedtoolintersect(a,b,c,v=True)
-    se1 = UT.read_pandas(c, names=cols)
+    se1 = UT.read_pandas(c, names=EXDFCOLS)
     cbed = dstpre+'.se.bed.gz'
     GGB.write_bed(se1, cbed, ncols=3)
     LOG.info('#SE = {0}'.format(len(se1)))
     os.unlink(a)
     os.unlink(b)
     # merge exdf & se ==> update .exdf.txt.gz?
-
     # update .paths.txt.gz, .paths.bed.gz?
-
-    return c
+    bed = GGB.read_bed(dstpre+'.paths.bed.gz') # chr,st,ed,name,sc1,strand,sc2,tst,ted,#exons,esizes,estarts
+    se1['ltcov'] = N.log2(se1['ecov']+2)
+    se1['sc1'] = N.ceil(se1['ltcov']*100).astype(int)
+    sm = {'+':Colors('R', cmax),
+          '-':Colors('B', cmax),
+          '.':Colors('C', cmax)}
+    se1['sc2'] = [sm[s].RGB(x) for x,s in se1[['ltcov','strand']].values]
+    se1['tst'] = se1['st']
+    se1['ted'] = se1['ed']
+    se1['#exons'] = 1
+    se1['len'] = se1['ed']-se1['st']
+    se1['esizes'] = se1['len'].astype(str)+','
+    se1['estarts'] = '0,'
+    bed1 = PD.concat([bed, se1], ignore_index=True)
+    GGB.write_bed(bed1, dstpre+'.paths.withse.bed.gz', ncols=12)
+    dic = dict(
+        sepath= c, 
+        secovth=th, 
+        num_se_candidates=len(sedf), 
+        num_se0=len(se0), 
+        num_se1=len(se1))
+    return dic
 
 def find_threshold(x0,x1,minth):
     x0 = N.log2(x0+1)
@@ -2104,12 +2129,12 @@ def find_threshold(x0,x1,minth):
     for i in range(4,len(d0sdd)):
         if d0sdd[i-1]*d0sdd[i]<0:
             break
-    th = b0[1:][i]
+    th = b0[1:][i+2]
     if th<minth:
         return minth
-    if th>0.7*xmax:
-        LOG.warning('find_threshold: threshold too large {0} returning 0.7*xmid {1}'.format(th,0.7*xmid))
-        return 0.7*xmax
+    if th>0.8*xmax:
+        LOG.warning('find_threshold: threshold too large {0} returning 0.8*xmax {1}'.format(th,0.7*xmid))
+        return 0.8*xmax
     return th
 
 
@@ -2125,7 +2150,7 @@ class SampleAssembler(object):
                 minbundlesize=10e6, 
                 np=4, 
                 chroms=None, 
-                maxwaittime=180,
+                maxwaittime=360,
                 semincovth=5,
                 seminsizeth=50,
                 ):
@@ -2156,57 +2181,58 @@ class SampleAssembler(object):
                 args = (self.bwpre, self.genome, [chrom], self.mingap, self.minbundlesize)
                 task = TQ.Task(tname,find_bundles, args)
                 server.add_task(task)
-            while True:
-                name, rslt = server.get_result()
-                # check for stucked workers, 
-                # for wid in server.winfo:
-                # rtime = time.time() - server.winfo[wid]['_stime']
-                # if rtime > self.maxwaittime:
-                #   LOG.warning('Worker#{0} seems dead. Shutting down.'.format(wid))
-                # ...
-                if name.startswith('find_bundle.'):
-                    print('{0}:{1}'.format(name, len(rslt)))
-                    chrom = name.split('.')[1]
-                    bundles[chrom] = rslt
-                    for c,st,ed in rslt:
-                        tname = 'bundle_assembler.{0}:{1}-{2}'.format(c,st,ed)
-                        args = (self.bwpre, c, st, ed, self.dstpre)
-                        task = TQ.Task(tname, bundle_assembler, args)
+            while server.check_error(self.maxwaittime): # loop
+                try:
+                    name, rslt = server.get_result(timeout=5) # block until result come in
+                except TQ.Empty:
+                    name, rslt = None, None
+                if name is not None:
+                    if name.startswith('find_bundle.'):
+                        print('{0}:{1}'.format(name, len(rslt)))
+                        chrom = name.split('.')[1]
+                        bundles[chrom] = rslt
+                        for c,st,ed in rslt:
+                            tname = 'bundle_assembler.{0}:{1}-{2}'.format(c,st,ed)
+                            args = (self.bwpre, c, st, ed, self.dstpre)
+                            task = TQ.Task(tname, bundle_assembler, args)
+                            server.add_task(task)
+                    if name.startswith('bundle_assembler.'):
+                        bname = name.split('.')[1]
+                        chrom = bname.split(':')[0]
+                        bundlestatus.setdefault(chrom,{})[bname] = rslt
+                        if len(bundlestatus[chrom])==len(bundles[chrom]): # all done
+                            print('concatenate chrom {0}'.format(chrom))
+                            tname = 'concatenate_bundles.{0}'.format(chrom)
+                            args = (bundles[chrom], chrom, self.dstpre)
+                            task = TQ.Task(tname, concatenate_bundles, args)
+                            server.add_task(task)
+                    if name.startswith('concatenate_bundles.'):
+                        chrom = name.split('.')[1]
+                        chromstatus[chrom] = rslt
+                        # start SE finder for chrom
+                        print('start SE finder for chrom {0}'.format(chrom))
+                        tname = 'find_SE_chrom.{0}'.format(chrom)
+                        # bwpre, dstpre, genome, chrom, exstrand='+', minsizeth
+                        args = (self.bwpre, self.dstpre, self.genome, chrom, '+',self.seminsizeth)
+                        task = TQ.Task(tname, find_SE_chrom, args)
                         server.add_task(task)
-                if name.startswith('bundle_assembler.'):
-                    bname = name.split('.')[1]
-                    chrom = bname.split(':')[0]
-                    bundlestatus.setdefault(chrom,{})[bname] = rslt
-                    if len(bundlestatus[chrom])==len(bundles[chrom]): # all done
-                        tname = 'concatenate_bundles.{0}'.format(chrom)
-                        args = (bundles[chrom], chrom, self.dstpre)
-                        task = TQ.Task(tname, concatenate_bundles, args)
-                        server.add_task(task)
-                if name.startswith('concatenate_bundles.'):
-                    chrom = name.split('.')[1]
-                    chromstatus[chrom] = rslt
-                    # start SE finder for chrom
-                    tname = 'find_SE_chrom.{0}'.format(chrom)
-                    # bwpre, dstpre, genome, chrom, exstrand='+', minsizeth
-                    args = (self.bwpre, self.dstpre, self.genome, chrom, '+',self.seminsizeth)
-                    task = TQ.Task(tname, find_SE_chrom, args)
-                    server.add_task(task)
-                if name.startswith('find_SE_chrom.'):
-                    chrom = name.split('.')[1]
-                    find_se_chrom_status[chrom] = rslt
-                    if len(find_se_chrom_status)==len(self.chroms):
-                        tname = 'find_SE'
-                        # dstpre, chroms, exstrand='+', sestrand='.', mincovth=5, minsizeth
-                        args = (self.dstpre, self.chroms, '+', '.', self.semincovth, self.seminsizeth)
-                        task = TQ.Task(tname, find_SE, args)
-                        server.add_task(task)
-                if name== 'find_SE':
-                    break
-                    # tname = 'concatenate_chroms'
-                    # args = (self.chroms, self.dstpre)
-                    # task = TQ.Task(tname, concatenate_chroms, args)
-                    # server.add_task(task)
-                # if name== 'concatenate_chroms':
-                #     break
+                    if name.startswith('find_SE_chrom.'):
+                        chrom = name.split('.')[1]
+                        find_se_chrom_status[chrom] = rslt
+                        if len(find_se_chrom_status)==len(self.chroms):
+                            print('start SE finder')
+                            tname = 'find_SE'
+                            # dstpre, chroms, exstrand='+', sestrand='.', mincovth=5, minsizeth
+                            args = (self.dstpre, self.chroms, '+', '.', self.semincovth, self.seminsizeth)
+                            task = TQ.Task(tname, find_SE, args)
+                            server.add_task(task)
+                    if name== 'find_SE':
+                        break
+                        # tname = 'concatenate_chroms'
+                        # args = (self.chroms, self.dstpre)
+                        # task = TQ.Task(tname, concatenate_chroms, args)
+                        # server.add_task(task)
+                    # if name== 'concatenate_chroms':
+                    #     break
             print('Exit Loop')
         print('Done')

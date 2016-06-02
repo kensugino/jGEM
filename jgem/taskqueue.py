@@ -1,5 +1,26 @@
+"""
+
+.. module:: taskqueue
+    :synopsis:  multiprocessor stuffs
+
+..  moduleauthor:: Ken Sugino <ken.sugino@gmail.com>
+
+"""
+
 import multiprocessing
+from multiprocessing import TimeoutError
+try:
+    from Queue import Empty, Full
+except:
+    from queue import Empty, Full
 import time
+import traceback
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
+LOG = logging.getLogger(__name__)
+
+# c.f. http://stackoverflow.com/questions/19924104/python-multiprocessing-handling-child-errors-in-parent
 
 class Worker(multiprocessing.Process):
     
@@ -9,7 +30,7 @@ class Worker(multiprocessing.Process):
         self.winfo = winfo
         self.task_queue = task_queue
         self.result_queue = result_queue
-        self.winfo[self.index] = {}
+        self.winfo[self.index] = {'status':'ready'}
         
     def set_info(self, **kw):
         d = self.winfo[self.index]
@@ -19,20 +40,37 @@ class Worker(multiprocessing.Process):
     def run(self):
         proc_name = self.name
         while True:
-            next_task = self.task_queue.get()
-            if next_task is None:
-                # Poison pill means shutdown
-                print('{0}: Exiting'.format(proc_name))
+            wi = self.winfo[self.index]
+            if wi.get('stop',False):
+                print('{0}: Exiting (through stop)'.format(proc_name))
                 self.set_info(status='exit')
-                self.task_queue.task_done()
                 break
-            print('{0}: starting {1}'.format(proc_name, next_task.name))
-            self.set_info(_stime=time.time(), status='running')
-            answer = next_task()
-            self.task_queue.task_done()
-            self.result_queue.put((next_task.name, answer))
-            print('{0}: finished {1}'.format(proc_name, next_task.name))
-            self.set_info(_etime=time.time(), status='waiting')
+            try:
+                next_task = self.task_queue.get(timeout=10)                
+                if next_task is None:
+                    # Poison pill means shutdown
+                    print('{0}: Exiting (through shutdown)'.format(proc_name))
+                    self.set_info(status='exit')
+                    self.task_queue.task_done()
+                    break
+                print('{0}: starting {1}'.format(proc_name, next_task.name))
+                self.set_info(_stime=time.time(), status='running')
+                try:
+                    answer = next_task()
+                    self.result_queue.put((next_task.name, answer))
+                    print('{0}: finished {1}'.format(proc_name, next_task.name))
+                    self.set_info(_etime=time.time(), status='waiting')
+                except Exception as e:
+                    tb = traceback.format_exc()
+                    print('{0} ({1}): error'.format(proc_name, next_task.name))
+                    print(e)
+                    print(tb)
+                    self.set_info(error=str(e), trackback=str(tb),
+                                 _etime=time.time(), status='waiting')
+                finally:
+                    self.task_queue.task_done()
+            except Empty:
+                pass
         return
     
 
@@ -44,7 +82,6 @@ class Task(object):
         self.name = name
 
     def __call__(self):
-        #print('Task {0} start'.format(self.name))
         return self.func(*self.args)
         
 class Server(object):
@@ -57,143 +94,102 @@ class Server(object):
         self.manager = multiprocessing.Manager()
         self.winfo = wi = self.manager.dict()
         self.workers = [ Worker(i, wi, tq, rq) for i in range(np)]
+        self.status = 'ready' # ready=>started=>stopped
         
     def start(self):
-        print('{1}: Starting {0} workers'.format(self.np, self.name))
-        for w in self.workers:
-            w.start()
+        if self.status=='ready':
+            LOG.info('{1}: Starting {0} workers'.format(self.np, self.name))
+            for w in self.workers:
+                w.start()
+            self.status = 'started'
+        else:
+            LOG.warninig('{0} already started'.format(self.name))
             
     def add_task(self, task):
         self.task_queue.put(task)
         
     def get_result(self, block=True, timeout=None):
         return self.result_queue.get(block,timeout)
+
+    def set_info(self, i, **kw):
+        d = self.winfo[i]
+        d.update(kw)
+        self.winfo[i] = d # need to trigger __set_item__
+
+    def get_info(self, i):
+        return self.winfo[i]
+
+    def stop(self):
+        if self.status=='started':
+            for i in range(len(self.workers)):
+                self.set_info(i, stop=True)
+            self.status = 'stopped'
+            for i in range(len(self.workers)):
+                self.workers[i].join()
+            LOG.info('{0} stopped'.format(self.name))
+        else:
+            LOG.warning('{0} not running (status: {1})'.format(self.name, self.status))
     
     def shutdown(self):
+        if self.status == 'started':
+            # send signals to workers
+            for i in range(len(self.workers)):
+                self.task_queue.put(None)
+            # Wait for all of the tasks to finish
+            self.task_queue.join()
+            self.status = 'shutdown'
+            LOG.info('{0} shutdown'.format(self.name))
+        else:
+            LOG.info('{0} shutdown for status ({1})'.format(self.name, self.status))
+
+    def check_error(self, maxtime=None):
         for i in range(len(self.workers)):
-            self.task_queue.put(None)
-        # Wait for all of the tasks to finish
-        self.task_queue.join()
-        print('{0} shutdown'.format(self.name))
-        
+            wi = self.get_info(i)
+            err = wi.get('error', None)
+            wname = self.workers[i].name
+            if (err is not None):
+                tb = wi['trackback']
+                # stop whole thing
+                print('STOPPING SERVER EXCEPTION in  {0}'.format(wname))
+                print(err)
+                print(tb)
+                self.stop()
+                return False
+            if wi.get('_etime',0)<wi.get('_stime',0):
+                elapsed = time.time()-wi['_stime']
+            else:
+                elapsed = 0
+            if (elapsed>maxtime):
+                print('STOPPING SERVER: elapsed {0}sec in  {1}'.format(elapsed, wname))
+                self.stop()
+                return False
+        return True
+
     def __enter__(self):
         self.start()
         
     def __exit__(self, exc_type, exc_value, traceback):
         self.shutdown()
-#################### 
-
-class Worker2(multiprocessing.Process):
-    
-    def __init__(self, task_queue):
-        multiprocessing.Process.__init__(self)
-        self.task_queue = task_queue
-
-    def run(self):
-        proc_name = self.name
-        while True:
-            next_task = self.task_queue.get()
-            if next_task is None:
-                # Poison pill means shutdown
-                print('{0}: Exiting'.format(proc_name))
-                self.task_queue.task_done()
-                break
-            print('{0}: {1}'.format(proc_name, next_task.name))
-            next_task()
-            self.task_queue.task_done()
-        return
-    
-
-class Task2(object):
-    
-    def __init__(self, name, result_queue, func, args=[], kwargs={}):
-        self.func = func
-        self.args = args
-        self.name = name
-        self.result_queue = result_queue
-        self.kwargs = kwargs
-        
-    def __call__(self):
-        print('Task {0} start'.format(self.name))
-        rslt = self.func(*self.args, **self.kwargs)
-        self.result_queue.put((self.name, rslt))
-        
-#
-class Server2(object):
-    
-    def __init__(self, np=2, name='Server'):
-        self.np = np
-        self.name = name
-        self.task_queue = tq = multiprocessing.JoinableQueue()
-        self.workers = [ Worker2(tq) for i in range(np)]
-        
-    def start(self):
-        print('Server {1}: Starting {0} workers'.format(self.np, self.name))
-        for w in self.workers:
-            w.start()
-            
-    def add_task(self, task):
-        self.task_queue.put(task)
-            
-    def shutdown(self):
-        for i in range(len(self.workers)):
-            self.task_queue.put(None)
-        # Wait for all of the tasks to finish
-        self.task_queue.join()
-        print('Server {0} shutdown'.format(self.name))
-        
-    def __enter__(self):
-        self.start()
-        
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.shutdown()
-        
-
-######      
-def loop2():
-    server = Server(2)
-    manager = multiprocessing.Manager()
-    rq1 = manager.Queue()
-    #rq2 = multiprocessing.Queue()
-    # Wait for results
-    p1 = {}
-    p2 = {}
-    with server:
-        # Enqueue initial jobs
-        num_jobs = 10
-        for i in range(num_jobs):
-            tname = 'phase1_{0}'.format(i)
-            t = Task(tname, rq1, func1, (i,i,i))
-            server.add_task(t)
-        while True:
-            name,ans = rq1.get()
-            print('Result: name:{0}, answer:{1}'.format(name,ans))
-            if name.startswith('phase1_'):
-                tname = 'phase2_{0}'.format(ans)
-                t = Task(tname, rq1, func2, kwargs={'x':ans} )
-                server.add_task(t)
-                p1[name] = ans
-            if name.startswith('phase2_'):
-                p2[name] = ans
-            if len(p2)==num_jobs:
-                break
-        print('Exit Loop')
-    print('Done')
 
 
 ######        
 def func1(a,b,c):
-    time.sleep(0.2)
+    time.sleep(0.5)
     return a+b+c
 
 def func2(x):
-    time.sleep(0.1)
+    time.sleep(1)
     return x*x
 
+def func3(x):
+    time.sleep(0.1)
+    raise RuntimeError('test error message')
+
 def loop():
-    server = Server(2)
+    num_workers = 2 
+    server = Server(num_workers)
     # Enqueue initial jobs
-    num_jobs = 10
+    num_jobs = 5
     for i in range(num_jobs):
         tname = 'phase1_{0}'.format(i)
         args = (i,i,i)
@@ -204,22 +200,35 @@ def loop():
     p1 = {}
     p2 = {}
     with server:
-        while True:
-            result = server.get_result()
-            print('Result: name:{0}, answer:{1}'.format(*result))
-            wi = server.winfo
-            for k,v in wi.items():
-                print('  {0:.2f}: elapsed'.format(time.time()-v['_stime']))
-            if result[0].startswith('phase1_'):
-                tname = 'phase2_{0}'.format(result[1])
-                args = (result[1],)
-                t = Task(tname, func2, args)
-                server.add_task(t)
-                p1[result[0]] = result[1]
-            if result[0].startswith('phase2_'):
-                p2[result[0]] = result[1]
-            if len(p2)==num_jobs:
-                break
+        running = True
+        while server.check_error(4):
+            print('####### loop head #######')
+            try:
+                result = server.get_result(timeout=5) # block until result come in
+            except Empty:
+                result = None
+                print('queue empty server: {0}'.format(server.name))
+            if result is not None:
+                print('Result: name:{0}, answer:{1}'.format(*result))
+                wi = server.winfo
+                # for k,v in wi.items():
+                #     print('  {0:.2f}: elapsed'.format(time.time()-v['_stime']))
+                if result[0].startswith('phase1_'):
+                    tname = 'phase2_{0}'.format(result[1])
+                    args = (result[1],)
+                    t = Task(tname, func2, args)
+                    server.add_task(t)
+                    p1[result[0]] = result[1]
+                    # if result[1] == 3:
+                    #     print('!!!!!!!!!!!!!!!!!!!!!!!  putting in func3')
+                    #     server.add_task(Task('ERRORTASK',func3,(1,)))                    
+                if result[0].startswith('phase2_'):
+                    p2[result[0]] = result[1]
+                    if result[1] == 9:
+                        print('!!!!!!!!!!!!!!!!!!!!!!!  putting in func3')
+                        server.add_task(Task('ERRORTASK',func3,(1,)))                    
+                # if len(p2)==num_jobs:
+                #     break
         print('Exit Loop')
     print('Done')        
     print(p1)

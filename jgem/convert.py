@@ -27,7 +27,36 @@ from jgem import graph as GP
 
 # GTF <=> EX,SJ    ######################################################################
 
-def gtf2exonsj(gtf, np=1, graphpre=None):
+
+def as2exsj(dstpre, np=7):
+    ex = UT.read_pandas(dstpre+'.exdf.txt.gz', names=A2.EXDFCOLS)
+    sj = UT.read_pandas(dstpre+'.sjdf.txt.gz', names=A2.SJDFCOLS)
+    se = UT.read_pandas(dstpre+'.sedf.txt.gz', names=A2.EXDFCOLS)
+    paths = UT.read_pandas(dstpre+'.paths.txt.gz', names=A2.PATHCOLS)
+    #ex.loc[ex['strand'].isin(['.+','.-']),'strand'] = '.'
+    #sj.loc[sj['strand'].isin(['.+','.-']),'strand'] = '.'
+    sj['st'] = sj['st']+1 
+    cols = A2.EXDFCOLS
+    ex = PD.concat([ex[cols],se[cols]],ignore_index=True)
+    UT.set_info(sj,ex)
+    UT.set_exon_category(sj, ex)
+
+    # find genes (connected components) set '_gidx'
+    graphpre = dstpre+str(uuid.uuid4())+'_'
+    prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
+    genes = GP.find_genes4(sj,ex,
+        filepre=prefix,
+        np=np,
+        override=False,
+        separatese=True)
+    ex.loc[ex['kind']=='3','cat'] = '3'
+    ex.loc[ex['kind']=='5','cat'] = '5'
+    UT.write_pandas(ex, dstpre+'.ex.txt.gz', 'h')
+    UT.write_pandas(sj, dstpre+'.sj.txt.gz', 'h')
+    ci = UT.chopintervals(ex, dstpre+'.ci.txt.gz')
+    return sj, ex
+
+def gtf2exonsj(gtf, np=12, graphpre=None):
     """Extract exons and sj from GTF
     exon, junction coordinates = zero based (same as BED)
     junction start-1 = exon end
@@ -45,7 +74,26 @@ def gtf2exonsj(gtf, np=1, graphpre=None):
         sj = UT.make_empty_df(cols)
         ex = UT.make_empty_df(cols)
         return sj,ex
-    exons = gtf[gtf['typ']=='exon'].copy()
+    exons = gtf[gtf['typ']=='exon'].sort_values(['chr','st','ed'])
+    exons['_id'] = N.arange(len(exons))
+    exons.sort_values(['transcript_id','st','ed'],inplace=True)
+    # 5',3'
+    ex_s = exons.groupby('transcript_id').size()
+    tid_s = ex_s[ex_s==1].index
+    id_m = ex_s[ex_s>1].index
+    ex_m = exons[exons['transcript_id'].isin(id_m)]
+    ex_m.sort_values(['transcript_id','st','ed'], inplace=True)
+    ex_f = ex_m.groupby('transcript_id').first()
+    ex_l = ex_m.groupby('transcript_id').last()
+    if5 = list(ex_f[ex_f['strand']=='+']['_id'].values)
+    if3 = list(ex_f[ex_f['strand']=='-']['_id'].values)
+    il5 = list(ex_l[ex_l['strand']=='-']['_id'].values)
+    il3 = list(ex_l[ex_l['strand']=='+']['_id'].values)
+    exons['kind'] = 'i'
+    exons.loc[exons['transcript_id'].isin(tid_s),'kind'] = 's'
+    exons.loc[exons['_id'].isin(if5+il5),'kind'] = '5'
+    exons.loc[exons['_id'].isin(if3+il3),'kind'] = '3'
+
     # find junctions
     def _igen():
         for k, g in exons.groupby('transcript_id'):
@@ -65,7 +113,7 @@ def gtf2exonsj(gtf, np=1, graphpre=None):
     #cols = ['chr','st','ed','gene_id','sc1','strand']
     ex = exons #[cols]
     ex['locus'] = UT.calc_locus_strand(ex)
-    ex = ex.groupby('locus').first().reset_index()
+    ex = ex.groupby(['locus','kind']).first().reset_index()
     ex['name'] = ex['gene_id']
     ex['st'] = ex['st'] - 1
 
@@ -88,100 +136,176 @@ def gtf2exonsj(gtf, np=1, graphpre=None):
 
     return sj, ex
 
-def bed2exonsj(bed12, np=4, graphpre=None):
-    """Extract exons and junctions from BED12
+# def gtf2exonsj(gtf, np=1, graphpre=None):
+#     """Extract exons and sj from GTF
+#     exon, junction coordinates = zero based (same as BED)
+#     junction start-1 = exon end
+#     junction end = exon start
 
-    Args:
-        bed12: Pandas.DataFrame containing BED12 data
+#     Args:
+#         gtf: Pandas.DataFrame 
 
-    Returns:
-        sj, ex: Pandas.DataFrames containing junction and exons
+#     Returns:
+#         sj, ex: Pandas.DataFrames for splice junctions and exons
 
-    """
-    esizes = bed12['esizes'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
-    estarts0 = bed12['estarts'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
-    bed12['_estarts'] = bed12['st'] + estarts0
-    bed12['_eends'] = bed12['_estarts']+esizes
-    #istarts = eends[:-1]
-    #iends = estarts[1:]
-    cols =['chr','st','ed','tname','strand']
-    def _egen():
-        for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_estarts','_eends']):
-            #for st,ed in izip(est,eed):
-            for st,ed in izip(est,eed):
-                yield (chrom,st,ed,tname,0,strand)
-    def _igen():
-        for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_estarts','_eends']):
-            #for st,ed in izip(eed[:-1],est[1:]):
-            for st,ed in izip(eed[:-1],est[1:]):
-                yield (chrom,st+1,ed,tname,0,strand)
-                # add 1 to match STAR SJ.tab.out 
-    ex = PD.DataFrame([x for x in _egen()], columns=GGB.BEDCOLS[:6])
-    ex['locus'] = UT.calc_locus_strand(ex)
-    ex = ex.groupby('locus').first().reset_index()
-    sj = PD.DataFrame([x for x in _igen()], columns=GGB.BEDCOLS[:6])
-    sj['locus'] = UT.calc_locus_strand(sj)
-    sj = sj.groupby('locus').first().reset_index()
+#     """
+#     if len(gtf)==0: # edge case
+#         cols = GGB.BEDCOLS[:6]+['locus','_id','cat']
+#         sj = UT.make_empty_df(cols)
+#         ex = UT.make_empty_df(cols)
+#         return sj,ex
+#     exons = gtf[gtf['typ']=='exon'].copy()
+#     # 5',3'
+#     exons.sort_values(['transcript_id','exon_number'])
+#     ex_f = exons.groupby('transcript_id').first()
+#     ex_l = exons.groupby('transcript_id').last()
+#     if5 = ex_f[ex_f['strand']=='+'].index
+#     if3 = ex_f[ex_f['strand']=='-'].index
+#     il5 = ex_l[ex_l['strand']=='-'].index
+#     il3 = ex_l[ex_l['strand']=='+'].index
+#     ex_s = exons.groupby('transcript_id').size()
+#     tid_s = ex_s[ex_s==1].index
+#     exons['kind'] = 'i'
+#     exons.loc[exons['transcript_id'].isin(tid_s),'kind'] = 's'
+#     exons.loc[exons['transcript_id'].isin(list(if5)+list(il5)),'kind'] = '5'
+#     exons.loc[exons['transcript_id'].isin(list(if3)+list(il3)),'kind'] = '3'
 
-    UT.set_info(sj,ex)
-    UT.set_exon_category(sj, ex)
+#     # find junctions
+#     def _igen():
+#         for k, g in exons.groupby('transcript_id'):
+#             if len(g)<2:
+#                 continue
+#             g = g.sort_values(['st','ed'])
+#             chrom,strand,gid=g.iloc[0][['chr','strand','gene_id']]
+#             ists = g['ed'].values[:-1] + 1
+#             ieds = g['st'].values[1:] - 1
+#             for st,ed in izip(ists,ieds):
+#                 # chr,st,ed,name=tid,sc1,strand,gene_id
+#                 yield (chrom,st,ed,gid,0,strand)
+#     sj = PD.DataFrame([x for x in _igen()], columns=GGB.BEDCOLS[:6])
+#     sj['locus'] = UT.calc_locus_strand(sj)
+#     sj = sj.groupby('locus').first().reset_index()
 
-    # find genes (connected components) set '_gidx'
-    if graphpre is None:
-        graphpre = './'+str(uuid.uuid4())+'_'
-    prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
-    genes = GP.find_genes4(sj,ex,
-        filepre=prefix,
-        np=np,
-        override=False,
-        separatese=True)
+#     #cols = ['chr','st','ed','gene_id','sc1','strand']
+#     ex = exons #[cols]
+#     ex['locus'] = UT.calc_locus_strand(ex)
+#     ex = ex.groupby('locus').first().reset_index()
+#     ex['name'] = ex['gene_id']
+#     ex['st'] = ex['st'] - 1
 
-    return sj, ex
+#     if len(sj)==0:
+#         ex['_gidx'] = N.arange(len(ex))
+#         return sj, ex
+
+#     UT.set_info(sj,ex)
+#     UT.set_exon_category(sj, ex)
+
+#     # find genes (connected components) set '_gidx'
+#     if graphpre is None:
+#         graphpre = './'+str(uuid.uuid4())+'_'
+#     prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
+#     genes = GP.find_genes4(sj,ex,
+#         filepre=prefix,
+#         np=np,
+#         override=False,
+#         separatese=True)
+
+#     return sj, ex
+
+# def bed2exonsj(bed12, np=4, graphpre=None):
+#     """Extract exons and junctions from BED12
+
+#     Args:
+#         bed12: Pandas.DataFrame containing BED12 data
+
+#     Returns:
+#         sj, ex: Pandas.DataFrames containing junction and exons
+
+#     """
+#     esizes = bed12['esizes'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
+#     estarts0 = bed12['estarts'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
+#     bed12['_estarts'] = bed12['st'] + estarts0
+#     bed12['_eends'] = bed12['_estarts']+esizes
+#     #istarts = eends[:-1]
+#     #iends = estarts[1:]
+#     cols =['chr','st','ed','tname','strand']
+#     def _egen():
+#         for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_estarts','_eends']):
+#             #for st,ed in izip(est,eed):
+#             for st,ed in izip(est,eed):
+#                 yield (chrom,st,ed,tname,0,strand)
+#     def _igen():
+#         for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_estarts','_eends']):
+#             #for st,ed in izip(eed[:-1],est[1:]):
+#             for st,ed in izip(eed[:-1],est[1:]):
+#                 yield (chrom,st+1,ed,tname,0,strand)
+#                 # add 1 to match STAR SJ.tab.out 
+#     ex = PD.DataFrame([x for x in _egen()], columns=GGB.BEDCOLS[:6])
+#     ex['locus'] = UT.calc_locus_strand(ex)
+#     ex = ex.groupby('locus').first().reset_index()
+#     sj = PD.DataFrame([x for x in _igen()], columns=GGB.BEDCOLS[:6])
+#     sj['locus'] = UT.calc_locus_strand(sj)
+#     sj = sj.groupby('locus').first().reset_index()
+
+#     UT.set_info(sj,ex)
+#     UT.set_exon_category(sj, ex)
+
+#     # find genes (connected components) set '_gidx'
+#     if graphpre is None:
+#         graphpre = './'+str(uuid.uuid4())+'_'
+#     prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
+#     genes = GP.find_genes4(sj,ex,
+#         filepre=prefix,
+#         np=np,
+#         override=False,
+#         separatese=True)
+
+#     return sj, ex
     
-def kg2exonsj(kg, np=4, graphpre=None):
-    """Extract exons and junctions from UCSC knownGene.txt.gz 
+# def kg2exonsj(kg, np=4, graphpre=None):
+#     """Extract exons and junctions from UCSC knownGene.txt.gz 
 
-    Args:
-        kg: Pandas.DataFrame containing UCSC knownGene data
+#     Args:
+#         kg: Pandas.DataFrame containing UCSC knownGene data
 
-    Returns:
-        sj, ex: Pandas.DataFrames containing junction and exons
+#     Returns:
+#         sj, ex: Pandas.DataFrames containing junction and exons
 
-    """
-    kg['_ests'] = kg['exstarts'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
-    kg['_eeds'] = kg['exends'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
+#     """
+#     kg['_ests'] = kg['exstarts'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
+#     kg['_eeds'] = kg['exends'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
     
-    cols =['chr','st','ed','tname','strand']
-    def _egen():
-        for chrom,tname,strand,est,eed in UT.izipcols(kg,['chr','name','strand','_ests','_eeds']):
-            for st,ed in izip(est,eed):
-                yield (chrom,st,ed,tname,0,strand)
-    def _igen():
-        for chrom,tname,strand,est,eed in UT.izipcols(kg,['chr','name','strand','_ests','_eeds']):
-            for st,ed in izip(eed[:-1],est[1:]):
-                yield (chrom,st+1,ed,tname,0,strand)
-                # add 1 to match STAR SJ.tab.out 
-    ex = PD.DataFrame([x for x in _egen()], columns=GGB.BEDCOLS[:6])
-    ex['locus'] = UT.calc_locus_strand(ex)
-    ex = ex.groupby('locus').first().reset_index() # remove dup
-    sj = PD.DataFrame([x for x in _igen()], columns=GGB.BEDCOLS[:6])
-    sj['locus'] = UT.calc_locus_strand(sj)
-    sj = sj.groupby('locus').first().reset_index() # remove dup
+#     cols =['chr','st','ed','tname','strand']
+#     def _egen():
+#         for chrom,tname,strand,est,eed in UT.izipcols(kg,['chr','name','strand','_ests','_eeds']):
+#             for st,ed in izip(est,eed):
+#                 yield (chrom,st,ed,tname,0,strand)
+#     def _igen():
+#         for chrom,tname,strand,est,eed in UT.izipcols(kg,['chr','name','strand','_ests','_eeds']):
+#             for st,ed in izip(eed[:-1],est[1:]):
+#                 yield (chrom,st+1,ed,tname,0,strand)
+#                 # add 1 to match STAR SJ.tab.out 
+#     ex = PD.DataFrame([x for x in _egen()], columns=GGB.BEDCOLS[:6])
+#     ex['locus'] = UT.calc_locus_strand(ex)
+#     ex = ex.groupby('locus').first().reset_index() # remove dup
+#     sj = PD.DataFrame([x for x in _igen()], columns=GGB.BEDCOLS[:6])
+#     sj['locus'] = UT.calc_locus_strand(sj)
+#     sj = sj.groupby('locus').first().reset_index() # remove dup
 
-    UT.set_info(sj,ex)
-    UT.set_exon_category(sj, ex)
+#     UT.set_info(sj,ex)
+#     UT.set_exon_category(sj, ex)
 
-    # find genes (connected components) set '_gidx'
-    if graphpre is None:
-        graphpre = './'+str(uuid.uuid4())+'_'
-    prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
-    genes = GP.find_genes4(sj,ex,
-        filepre=prefix,
-        np=np,
-        override=False,
-        separatese=True)
+#     # find genes (connected components) set '_gidx'
+#     if graphpre is None:
+#         graphpre = './'+str(uuid.uuid4())+'_'
+#     prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
+#     genes = GP.find_genes4(sj,ex,
+#         filepre=prefix,
+#         np=np,
+#         override=False,
+#         separatese=True)
 
-    return sj, ex
+#     return sj, ex
 
 def make_sjexci(path, np):
     if path[-3:]=='.gz':
@@ -220,6 +344,21 @@ def make_sjexci(path, np):
     ci = UT.chopintervals(ex, pathprefix+'.ci.txt.gz')
     return sj, ex
 
+
+def make_sjex(gtfpath, dstpre, np=12):
+    if UT.isstring(gtfpath):
+        gtf = GGB.read_gtf(gtfpath)
+    else:
+        gtf = gtfpath
+    sj,ex = gtf2exonsj(gtf, np=np)
+    print(ex.groupby(['kind','cat']).size())
+    ex.loc[ex['kind']=='5','cat'] = '5'
+    ex.loc[ex['kind']=='3','cat'] = '3'
+    UT.write_pandas(ex, dstpre+'.ex.txt.gz', 'h')
+    UT.write_pandas(sj, dstpre+'.sj.txt.gz', 'h')
+    # make ci
+    ci = UT.chopintervals(ex, dstpre+'.ci.txt.gz')
+    return {'sj':sj,'ex':ex}
 
 
 # convienience class ###########################################################
