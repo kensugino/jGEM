@@ -1606,6 +1606,8 @@ class LocalAssembler(object):
                 elif ne==1:
                     s,e = es.iloc[0][['st','ed']]
                     ex.loc[idx,'ecov'] = cov(s,e)
+        idxnan = ex['ecov'].isnull()
+        ex.loc[idxnan,'ecov'] = [cov(s,e) for s,e in ex[idxnan][['st','ed']].values]
         self._ne2ecov = UT.df2dict(ex, 'name', 'ecov')
         
     def write(self, cmax=9):
@@ -1894,10 +1896,18 @@ def drawspan2(la,st,ed,win=10000, figsize=(15,6), df2=None, df3=None, delta=500,
 
 
 def bundle_assembler(bwpre, chrom, st, ed, dstpre):
-    LOG.info('assembling bunle {0}:{1}-{2}'.format(chrom,st,ed))
+    bname = bundle2bname((chrom,st,ed))
+    bsuf = '.{0}_{1}_{2}'.format(chrom,st,ed)
+    LOG.info('assembling bunle {0}'.format(bname))
+    sufs = ['.exdf.txt.gz',
+            '.sjdf.txt.gz',
+            '.paths.txt.gz',
+            '.paths.bed.gz',
+            '.unused.sjpath.bed.gz']
+    if all([os.path.exists(dstpre+bsuf+x) for x in sufs]):
+        return bname
     la = LocalAssembler(bwpre, chrom, st, ed, dstpre)
     return la.process()
-
 
 def bname2bundle(bname):
     # bname = 'chrom:st-ed'
@@ -1947,15 +1957,16 @@ def concatenate_bundles(bundles, bundlestatus, chrom, dstpre):
     files = []
     for suf in sufs:
         dstpath = '{0}.{1}.{2}'.format(dstpre, chrom, suf)
-        with open(dstpath, 'wb') as dst:
-            for chrom, st, ed in bundles:
-                bname = bundle2bname((chrom,st,ed))
-                if bundlestatus[bname] is None:
-                    continue
-                srcpath = '{0}.{1}_{2}_{3}.{4}'.format(dstpre, chrom, st, ed, suf)
-                files.append(srcpath)
-                with open(srcpath, 'rb') as src:
-                    shutil.copyfileobj(src, dst)
+        if not os.path.exists(dstpath):
+            with open(dstpath, 'wb') as dst:
+                for chrom, st, ed in bundles:
+                    bname = bundle2bname((chrom,st,ed))
+                    if bundlestatus[bname] is None:
+                        continue
+                    srcpath = '{0}.{1}_{2}_{3}.{4}'.format(dstpre, chrom, st, ed, suf)
+                    files.append(srcpath)
+                    with open(srcpath, 'rb') as src:
+                        shutil.copyfileobj(src, dst)
     # cleanup
     for f in files:
         os.unlink(f)
@@ -1970,13 +1981,14 @@ def concatenate_chroms(chroms, dstpre):
     files = []
     for suf in sufs:
         dstpath = '{0}.{1}'.format(dstpre, suf)
-        with open(dstpath, 'wb') as dst:
-            for chrom in chroms:
-                srcpath = '{0}.{1}.{2}'.format(dstpre, chrom, suf)
-                if os.path.exists(srcpath):
-                    files.append(srcpath)
-                    with open(srcpath, 'rb') as src:
-                        shutil.copyfileobj(src, dst)
+        if not os.path.exists(dstpath):
+            with open(dstpath, 'wb') as dst:
+                for chrom in chroms:
+                    srcpath = '{0}.{1}.{2}'.format(dstpre, chrom, suf)
+                    if os.path.exists(srcpath):
+                        files.append(srcpath)
+                        with open(srcpath, 'rb') as src:
+                            shutil.copyfileobj(src, dst)
     # cleanup
     for f in files:
         os.unlink(f)
@@ -2114,6 +2126,8 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.',
     return dic
 
 def find_threshold(x0,x1,minth):
+    x0 = x0[~N.isnan(x0)]  # why exdf contains NaN?
+    x1 = x1[~N.isnan(x1)]
     x0 = N.log2(x0+1)
     x1 = N.log2(x1+1)
     xmax = max(x0.max(), x1.max())
@@ -2145,6 +2159,24 @@ def smooth( v, wsize):
     swin = N.ones(wsize)
     v0 = N.concatenate([swin*v[0], v, swin*v[-1]])
     return N.convolve(v0, swin/float(wsize), 'same')[wsize:-wsize]
+
+LAPARAMS = dict(
+    uth=1, 
+    mth=3, 
+    sjratioth=2e-3, 
+    usjratioth=1e-2,
+    covfactor=0.05, 
+    covth=0.1,
+    upperpathnum=5000,
+)
+SEPARAMS = dict(
+    semincovth=5,
+    seminsizeth=50,
+)
+BUNDLEPARAMS = dict(
+    mingap=5e5, 
+    minbundlesize=30e6, 
+)
 
 class SampleAssembler(object):
 
@@ -2195,6 +2227,7 @@ class SampleAssembler(object):
                         chrom = name.split('.')[1]
                         bundles[chrom] = rslt
                         for c,st,ed in rslt:
+                            print('put task##bundle_assembler {0}'.format(chrom))
                             tname = 'bundle_assembler.{0}:{1}-{2}'.format(c,st,ed)
                             args = (self.bwpre, c, st, ed, self.dstpre)
                             task = TQ.Task(tname, bundle_assembler, args)
@@ -2204,7 +2237,7 @@ class SampleAssembler(object):
                         chrom = bname.split(':')[0]
                         bundlestatus.setdefault(chrom,{})[bname] = rslt
                         if len(bundlestatus[chrom])==len(bundles[chrom]): # all done
-                            print('concatenate chrom {0}'.format(chrom))
+                            print('put task##concatenate_bundles {0}'.format(chrom))
                             tname = 'concatenate_bundles.{0}'.format(chrom)
                             args = (bundles[chrom], bundlestatus[chrom], chrom, self.dstpre)
                             task = TQ.Task(tname, concatenate_bundles, args)
@@ -2213,7 +2246,7 @@ class SampleAssembler(object):
                         chrom = name.split('.')[1]
                         chromstatus[chrom] = rslt
                         # start SE finder for chrom
-                        print('start SE finder for chrom {0}'.format(chrom))
+                        print('put task##find_SE_chrom {0}'.format(chrom))
                         tname = 'find_SE_chrom.{0}'.format(chrom)
                         # bwpre, dstpre, genome, chrom, exstrand='+', minsizeth
                         args = (self.bwpre, self.dstpre, self.genome, chrom, '+',self.seminsizeth)

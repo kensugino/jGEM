@@ -497,7 +497,6 @@ def splitbedgz(bedgz, prefix):
     return err
 
 
-
 # SJTABMOTIF = {0:'non-canonical',1:'GT/AG',2:'CT/AC',3:'GC/AG',4:'CT/GC',5:'AT/AC',6:'GT/AT'}
 STED2STRAND = dict(
     GTAG='+',
@@ -517,12 +516,18 @@ def _scan_make_map(paths, dstpath):
                 with io.BufferedReader(gz_file) as fp:
                     for line in fp:
                         rec = line.strip().split(b'\t')
-                        cnt[rec[3]].add(rec[6]) # for each read how many locations?
+                        if len(rec)==7:
+                            cnt[rec[3]].add(rec[6]) # for each read how many locations?
+                        else:
+                            print('wrong#fields:{0} in {1}'.format(len(rec),path))
         else:
             with open(path,'rb') as fp:
                 for line in fp: # chr,st,ed,name,sc1,strand,tst
                     rec = line.strip().split(b'\t') # read_id:name(3), map_id:tst(6)
-                    cnt[rec[3]].add(rec[6]) # for each read how many locations?
+                    if len(rec)==7:
+                        cnt[rec[3]].add(rec[6]) # for each read how many locations?
+                    else:
+                        print('wrong#fields:{0} in {1}'.format(len(rec),path))
                     # csp[rec[6]] += 1 # count # segments in a read if >1 spliced
     try:# py2
         dup = PD.DataFrame({k:len(v) for k,v in cnt.iteritems() if len(v)>1}, index=['cnt']).T
