@@ -1898,6 +1898,7 @@ def drawspan2(la,st,ed,win=10000, figsize=(15,6), df2=None, df3=None, delta=500,
 def bundle_assembler(bwpre, chrom, st, ed, dstpre):
     bname = bundle2bname((chrom,st,ed))
     bsuf = '.{0}_{1}_{2}'.format(chrom,st,ed)
+    csuf = '.{0}'.format(chrom)
     LOG.info('assembling bunle {0}'.format(bname))
     sufs = ['.exdf.txt.gz',
             '.sjdf.txt.gz',
@@ -1905,6 +1906,8 @@ def bundle_assembler(bwpre, chrom, st, ed, dstpre):
             '.paths.bed.gz',
             '.unused.sjpath.bed.gz']
     if all([os.path.exists(dstpre+bsuf+x) for x in sufs]):
+        return bname
+    if all([os.path.exists(dstpre+csuf+x) for x in sufs]):
         return bname
     la = LocalAssembler(bwpre, chrom, st, ed, dstpre)
     return la.process()
