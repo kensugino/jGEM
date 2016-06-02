@@ -1485,8 +1485,7 @@ class LocalAssembler(object):
         exa = self.arrs['ex'][strand]
         def cov(s,e):
             o = self.st
-            return N.mean(exa[s-o:e-o]
-
+            return N.mean(exa[s-o:e-o])
         if len(lpos)>1: # left most up to tst [(lpos0,lpos1),(lpos1,lops2),...,(lpos(n-1),tst)]
             lcov0 = {} # cumulative sum
             for s,e in zip(lpos, lpos[1:]+[tst]):
