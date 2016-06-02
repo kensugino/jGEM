@@ -441,7 +441,7 @@ def calc_ecov(expath, cipath, bwpath, dstprefix, override=False, np=4):
     df['st'] = ccfg['st'].min()
     df['ed'] = ccfg['ed'].max()
     df.reset_index(inplace=True)
-    # e2cs = calc_ecov_mp(cc, None, np) # eid(_id) => cov
+    e2cs = calc_ecov_mp(cc, None, np) # eid(_id) => cov
     # l2cs = {e2l[x]: e2cs[x] for x in e2cs} # locus2 => cov
     # ex['ecov'] = [l2cs[x] for x in ex['locus2']]
     df['ecov'] = [e2cs[x] for x in df['eid']]
