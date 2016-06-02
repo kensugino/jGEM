@@ -476,7 +476,6 @@ def read_ovl(c, acols, bcols=None):
 # for uniq.bw only use weight==1
 # for all.bw use all but use weight
 
-@logerr(0)
 
 def splitbedgz(bedgz, prefix):
     """Split gzipped bed file into separate files according to chromosome. 
