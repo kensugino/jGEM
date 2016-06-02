@@ -613,9 +613,10 @@ def process_mapbed(bedpath, dstpre, genome, chromdir, stranded='.', np=10):
                 files1.append(wigpath)
 
     # clean up temp files
+    LOG.info('deleting intermediate files...')
     for x in files0+files1:
         if os.path.exists(x):
-            LOG.debug('deleting {0}...'.format(x))
+            #LOG.debug('deleting {0}...'.format(x))
             os.unlink(x)
 
 STRANDMAP = {('+','+'):'.p',
