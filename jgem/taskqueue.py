@@ -155,7 +155,7 @@ class Server(object):
                 print(tb)
                 self.stop()
                 return False
-            if wi.get('_etime',0)<wi.get('_stime',0):
+            if wi.get('_etime',0)<wi.get('_stime',0): # running
                 elapsed = time.time()-wi['_stime']
             else:
                 elapsed = 0

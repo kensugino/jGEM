@@ -50,21 +50,23 @@ from jgem import taskqueue as TQ
 class SjExBigWigs(object):
     
     def __init__(self, bwpre):
+        if type(bwpre)!=type([]):
+            bwpre = [bwpre]
         self.bwpre = bwpre
         S2S = {'+':'.p','-':'.n','.':'.u','r+':'.rp','r-':'.rn','r.':'.ru'}
         bwp = {
-            'ex': {s:bwpre+'.ex{0}.bw'.format(S2S[s]) for s in S2S},
-            'sj': {s:bwpre+'.sj{0}.bw'.format(S2S[s]) for s in S2S},
+            'ex': {s:[b+'.ex{0}.bw'.format(S2S[s]) for b in bwpre] for s in S2S},
+            'sj': {s:[b+'.sj{0}.bw'.format(S2S[s]) for b in bwpre] for s in S2S},
         }
         self.bwpaths = bwpaths = {'ex':{},'sj':{}}
-        bwpaths['ex']['+'] = {'p':[bwp['ex']['+'],bwp['ex']['.']],}
-        bwpaths['ex']['-'] = {'p':[bwp['ex']['-'],bwp['ex']['.']],}
-        bwpaths['ex']['.'] = {'p':[bwp['ex']['.']],}        
-        bwpaths['ex']['a'] = {'p':[bwp['ex']['+'],bwp['ex']['-'],bwp['ex']['.']],}
-        bwpaths['sj']['+'] = {'p':[bwp['sj']['+'],bwp['sj']['.']],}
-        bwpaths['sj']['-'] = {'p':[bwp['sj']['-'],bwp['sj']['.']],}
-        bwpaths['sj']['.'] = {'p':[bwp['sj']['.']],}
-        bwpaths['sj']['a'] = {'p':[bwp['sj']['+'],bwp['sj']['-'],bwp['sj']['.']],}
+        bwpaths['ex']['+'] = {'p':bwp['ex']['+']+bwp['ex']['.'],}
+        bwpaths['ex']['-'] = {'p':bwp['ex']['-']+bwp['ex']['.'],}
+        bwpaths['ex']['.'] = {'p':bwp['ex']['.'],}        
+        bwpaths['ex']['a'] = {'p':bwp['ex']['+']+bwp['ex']['-']+bwp['ex']['.'],}
+        bwpaths['sj']['+'] = {'p':bwp['sj']['+']+bwp['sj']['.'],}
+        bwpaths['sj']['-'] = {'p':bwp['sj']['-']+bwp['sj']['.'],}
+        bwpaths['sj']['.'] = {'p':bwp['sj']['.'],}
+        bwpaths['sj']['a'] = {'p':bwp['sj']['+']+bwp['sj']['-']+bwp['sj']['.'],}
         
         # bwpaths['ex']['+'] = {'p':[bwp['ex']['+'],bwp['ex']['.']],
         #                       'n':[bwp['ex']['r+'],bwp['ex']['r.']]}
@@ -919,7 +921,8 @@ class LocalAssembler(object):
                 arrs[k] = {}
                 for s in ['+','-']:
                     arrs[k][s] = sjexbw.bws[k][s].get(chrom, st, ed)
-        self.load_and_filter_sjpaths(sjpaths)
+        self._sjpaths=sjpaths
+        # self.load_and_filter_sjpaths(sjpaths) # => move to process
 
     def __str__(self):
         return 'LocalAssembler({0}:{1}-{2}, bwpre:{3}, dstpre:{4}'.format(self.chrom,self.st,self.ed,self.bwpre,self.dstpre)
@@ -933,42 +936,73 @@ class LocalAssembler(object):
     def logdebug(self, msg):
         self._log(msg, 'debug')
         
-    def load_and_filter_sjpaths(self, sjpaths0):
+    def _read_sjpaths(self):
+        sjpaths0 = self._sjpaths
+        if sjpaths0 is not None:
+            return sjpaths0
+
+        chrom,st,ed = self.chrom,self.st,self.ed
+        if UT.isstring(self.bwpre):
+            sj = GGB.read_bed(self.bwpre+'.sjpath.bed.gz')
+            idx0 = (sj['chr']==chrom)&(sj['tst']>=st)&(sj['ted']<=ed)        
+            return sj[idx0]
+        # list of bwpres, load and merge
+        sjps0 = [GGB.read_bed(b+'.sjpath.bed.gz') for b in self.bwpre]
+        sjps = []
+        for sj in sjps0:
+            idx0 = (sj['chr']==chrom)&(sj['tst']>=st)&(sj['ted']<=ed)        
+            sjps.append(sj[idx0])
+        sjp = PD.concat(sjps, ignore_index=True)
+        sjg = sjp.groupby(['chr','name'])
+        sj = sjg.first()
+        # chr,st,ed,name,sc1,strand,tst,ted,sc2,#exons,esizes,estarts
+        sj['st'] = sjg['st'].min()
+        sj['ed'] = sjg['ed'].max()
+        sj['sc1'] = sjg['sc1'].sum()
+        sj['sc2'] = sjg['sc2'].sum()
+        self._sjps = sjps 
+        sj = sj.reset_index()
+        return sj
+
+    def load_and_filter_sjpaths(self):
+        sjpaths0 = self._read_sjpaths()
         bwpre = self.bwpre
-        if sjpaths0 is None:
-            sjpaths0 = GGB.read_bed(bwpre+'.sjpath.bed.gz')
         chrom,st,ed = self.chrom,self.st,self.ed
         uth,mth = self.uth,self.mth
         sjratioth = self.sjratioth
         usjratioth = self.usjratioth
 
-        idx0 = (sjpaths0['chr']==chrom)&(sjpaths0['tst']>=st)&(sjpaths0['ted']<=ed)
-        s0 = sjpaths0[idx0]
+        #idx0 = (sjpaths0['chr']==chrom)&(sjpaths0['tst']>=st)&(sjpaths0['ted']<=ed)
+        #s0 = sjpaths0[idx0]
+        self._sjpaths0 = s0 = sjpaths0
         idxu = s0['strand']=='.' # unstranded => duplicates into '.+','.-'
-        # if unstranded junction share donor/acceptor sites with stranded one then assign that strand
-        sj_pn = s0[~idxu]
-        if len(sj_pn)>0:
-            tst2str = UT.df2dict(sj_pn, 'tst', 'strand')
-            ted2str = UT.df2dict(sj_pn, 'ted', 'strand')
-            sj_u = s0[idxu].copy()
-            sj_u['strand'] = [tst2str.get(x,y) for x,y in sj_u[['tst','strand']].values]
-            sj_u['strand'] = [ted2str.get(x,y) for x,y in sj_u[['ted','strand']].values]
-            idx_n = sj_u['strand']=='-'
-            sj_u.loc[idx_n, 'name'] = [reversepathcode(x) for x in sj_u[idx_n]['name']]
-            idxu2 = sj_u['strand']=='.'
-            sj_upn = sj_u[~idxu2]
-            self.logdebug('{0} unstranded assigned +/- with matching ends'.format(len(sj_upn)))
-            sj_up = sj_u[idxu2].copy()
-            sj_un = sj_u[idxu2].copy()
-        else:
-            sj_upn = None
-            sj_up = s0[idxu].copy()
-            sj_un = s0[idxu].copy()
+        if N.sum(idxu)>0:
+            # if unstranded junction share donor/acceptor sites with stranded one then assign that strand
+            sj_pn = s0[~idxu]
+            if len(sj_pn)>0:
+                tst2str = UT.df2dict(sj_pn, 'tst', 'strand')
+                ted2str = UT.df2dict(sj_pn, 'ted', 'strand')
+                sj_u = s0[idxu].copy()
+                sj_u['strand'] = [tst2str.get(x,y) for x,y in sj_u[['tst','strand']].values]
+                sj_u['strand'] = [ted2str.get(x,y) for x,y in sj_u[['ted','strand']].values]
+                idx_n = sj_u['strand']=='-'
+                sj_u.loc[idx_n, 'name'] = [reversepathcode(x) for x in sj_u[idx_n]['name']]
+                idxu2 = sj_u['strand']=='.'
+                sj_upn = sj_u[~idxu2]
+                self.logdebug('{0} unstranded assigned +/- with matching ends'.format(len(sj_upn)))
+                sj_up = sj_u[idxu2].copy()
+                sj_un = sj_u[idxu2].copy()
+            else:
+                sj_upn = None
+                sj_up = s0[idxu].copy()
+                sj_un = s0[idxu].copy()
 
-        sj_up['strand'] = '.+'
-        sj_un['name'] = [reversepathcode(x) for x in sj_un['name']]
-        sj_un['strand'] = '.-'
-        s1 = PD.concat([sj_pn, sj_upn, sj_up, sj_un], ignore_index=True)
+            sj_up['strand'] = '.+'
+            sj_un['name'] = [reversepathcode(x) for x in sj_un['name']]
+            sj_un['strand'] = '.-'
+            s1 = PD.concat([sj_pn, sj_upn, sj_up, sj_un], ignore_index=True)
+        else:
+            s1 = s0
         
         self.sjpaths0 = s1 # original unfiltered (just position restricted)
         sc1 = self.sjpaths0['sc1']
@@ -1657,12 +1691,13 @@ class LocalAssembler(object):
         bed['sc1'] = N.ceil(bed['ltcov']*100).astype(int)
         sm = {'+':Colors('R', cmax),
               '-':Colors('B', cmax),
-              '.':Colors('C', cmax)}
+              '.':Colors('G', cmax)}
         bed['sc2'] = [sm[s].RGB(x) for x,s in bed[['ltcov','strand']].values]
-        self.bed12 = bed
-        GGB.write_bed(bed, pre+'.paths.bed.gz',ncols=12)
+        self.bed12 = bed.sort_values(['chr','st','ed'])
+        GGB.write_bed(self.bed12, pre+'.paths.bed.gz',ncols=12)
         
     def process(self):
+        self.load_and_filter_sjpaths()
         if len(self.sjpaths)==0:
             return None
         # self.logdebug('finding exons...')
@@ -1907,7 +1942,7 @@ def drawspan2(la,st,ed,win=10000, figsize=(15,6), df2=None, df3=None, delta=500,
 ######### Chrom Assembler
 
 
-def bundle_assembler(bwpre, chrom, st, ed, dstpre):
+def bundle_assembler(bwpre, chrom, st, ed, dstpre, upperpathnum):
     bname = bundle2bname((chrom,st,ed))
     bsuf = '.{0}_{1}_{2}'.format(chrom,st,ed)
     csuf = '.{0}'.format(chrom)
@@ -1923,7 +1958,7 @@ def bundle_assembler(bwpre, chrom, st, ed, dstpre):
         return bname
     if all([os.path.exists(dstpre+x) for x in sufs]):
         return bname
-    la = LocalAssembler(bwpre, chrom, st, ed, dstpre)
+    la = LocalAssembler(bwpre, chrom, st, ed, dstpre, upperpathnum=upperpathnum)
     return la.process()
 
 def bname2bundle(bname):
@@ -2081,7 +2116,7 @@ def find_SE_chrom(bwpre, dstpre, genome, chrom, exstrand='+', minsizeth=200):
     return dstpath
 
 def find_SE(dstpre, chroms, exstrand='+', sestrand='.', 
-    mincovth=5, minsizeth=200, minsep=1000, cmax=9):
+    mincovth=5, minsizeth=200, minsep=1000, cmax=9, mergedist=200):
     # concatenate
     dstpath = dstpre+'.se0.txt.gz'
     if not os.path.exists(dstpath):
@@ -2094,16 +2129,17 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.',
     # concatenate 
     if not os.path.exists(dstpre+'.exdf.txt.gz'):
         concatenate_chroms(chroms, dstpre)
-    sedf = UT.read_pandas(dstpath, names=['chr','st','ed','ecov','len'])
+    secols = ['chr','st','ed','ecov','len']
+    sedf = UT.read_pandas(dstpath, names=secols)
     exdf = UT.read_pandas(dstpre+'.exdf.txt.gz', names=EXDFCOLS) 
     # gspans = UT.union_contiguous(paths)
     th = find_threshold(exdf['ecov'].values, sedf['ecov'].values, mincovth)
     se0 = sedf[(sedf['ecov']>th)&(sedf['len']>minsizeth)].copy()
     LOG.info('SE covth={0:.2f}, len(se0)={1}'.format(th, len(se0)))
-    se0['strand'] = sestrand
-    se0['name'] = [_pc(st,ed,sestrand,',') for st,ed in se0[['st','ed']].values ]
-    se0['kind'] = 's'
-    c = dstpre+'.se1.txt.gz'
+    # se0['strand'] = sestrand
+    # se0['name'] = [_pc(st,ed,sestrand,',') for st,ed in se0[['st','ed']].values ]
+    # se0['kind'] = 's'
+    # c = dstpre+'.se1.txt.gz'
     # UT.write_pandas(se0, c, 'h')
     # return (c, th, len(sedf), len(se0))
     # check irets in bundle workers?
@@ -2111,21 +2147,31 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.',
     a = dstpre+'.se0.bed'
     b = dstpre+'.espans.bed'
     # cols = ['chr','st','ed','ecov','strand']
-    UT.write_pandas(se0[EXDFCOLS], a, '')
+    se0 = se0[['chr','st','ed','ecov']].sort_values(['chr','st','ed'])
+    UT.write_pandas(se0, a, '')
     exdf['st0'] = exdf['st']-minsep
     exdf['ed0'] = exdf['ed']+minsep
     UT.write_pandas(exdf[['chr','st0','ed0']],b,'')
+    c0 = dstpre+'.sedf0.txt.gz'
+    BT.bedtoolintersect(a,b,c0,v=True)
+    # merge nearby 
     c = dstpre+'.sedf.txt.gz'
-    BT.bedtoolintersect(a,b,c,v=True)
-    se1 = UT.read_pandas(c, names=EXDFCOLS)
+    BT.bedtoolmerge(c0,c,d=mergedist,c=4,o='mean')
+    se1a = UT.read_pandas(c0,names=['chr','st','ed','ecov'])
+    se1 = UT.read_pandas(c, names=['chr','st','ed','ecov'])
     cbed = dstpre+'.se.bed.gz'
     GGB.write_bed(se1, cbed, ncols=3)
-    LOG.info('#SE = {0}'.format(len(se1)))
+    LOG.info('#SE = {0} (before merge {1})'.format(len(se1), len(se1a)))
     os.unlink(a)
     os.unlink(b)
     # merge exdf & se ==> update .exdf.txt.gz?
     # update .paths.txt.gz, .paths.bed.gz?
     bed = GGB.read_bed(dstpre+'.paths.bed.gz') # chr,st,ed,name,sc1,strand,sc2,tst,ted,#exons,esizes,estarts
+
+    # BED12
+    se1['strand'] = sestrand
+    se1['name'] = [_pc(st,ed,sestrand,',') for st,ed in se1[['st','ed']].values ]
+    se1['kind'] = 's'
     se1['ltcov'] = N.log2(se1['ecov']+2)
     se1['sc1'] = N.ceil(se1['ltcov']*100).astype(int)
     sm = {'+':Colors('R', cmax),
@@ -2145,6 +2191,7 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.',
         secovth=th, 
         num_se_candidates=len(sedf), 
         num_se0=len(se0), 
+        num_se1a=len(se1a),
         num_se1=len(se1))
     return dic
 
@@ -2204,13 +2251,14 @@ BUNDLEPARAMS = dict(
 class SampleAssembler(object):
 
     def __init__(self, bwpre, dstpre, genome, 
-                mingap=5e5, 
-                minbundlesize=10e6, 
+                mingap=1e5, 
+                minbundlesize=20e6, 
                 np=4, 
                 chroms=None, 
-                maxwaittime=360,
+                maxwaittime=600,
                 semincovth=5,
                 seminsizeth=50,
+                upperpathnum=3000,
                 ):
         self.bwpre = bwpre
         self.dstpre = dstpre
@@ -2223,6 +2271,7 @@ class SampleAssembler(object):
             self.chroms = UT.chroms(genome)
         self.semincovth = semincovth
         self.seminsizeth = seminsizeth
+        self.upperpathnum = upperpathnum
         self.sestrand = '+'
         self.maxwaittime = maxwaittime # if worker doesn't return within this time limit something is wrong
 
@@ -2252,7 +2301,8 @@ class SampleAssembler(object):
                         for c,st,ed in rslt:
                             print('put task##bundle_assembler {0}:{1}-{2}'.format(chrom,st,ed))
                             tname = 'bundle_assembler.{0}:{1}-{2}'.format(c,st,ed)
-                            args = (self.bwpre, c, st, ed, self.dstpre)
+                            # bwpre, chrom, st, ed, dstpre, upperpathnum
+                            args = (self.bwpre, c, st, ed, self.dstpre, self.upperpathnum)
                             task = TQ.Task(tname, bundle_assembler, args)
                             server.add_task(task)
                     if name.startswith('bundle_assembler.'):
