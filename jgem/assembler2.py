@@ -2159,6 +2159,11 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.',
     BT.bedtoolmerge(c0,c,d=mergedist,c=4,o='mean')
     se1a = UT.read_pandas(c0,names=['chr','st','ed','ecov'])
     se1 = UT.read_pandas(c, names=['chr','st','ed','ecov'])
+    se1['strand'] = sestrand
+    se1['name'] = [_pc(st,ed,sestrand,',') for st,ed in se1[['st','ed']].values ]
+    se1['kind'] = 's'
+    UT.write_pandas(se1[EXDFCOLS], c, '')
+
     cbed = dstpre+'.se.bed.gz'
     GGB.write_bed(se1, cbed, ncols=3)
     LOG.info('#SE = {0} (before merge {1})'.format(len(se1), len(se1a)))
@@ -2169,9 +2174,6 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.',
     bed = GGB.read_bed(dstpre+'.paths.bed.gz') # chr,st,ed,name,sc1,strand,sc2,tst,ted,#exons,esizes,estarts
 
     # BED12
-    se1['strand'] = sestrand
-    se1['name'] = [_pc(st,ed,sestrand,',') for st,ed in se1[['st','ed']].values ]
-    se1['kind'] = 's'
     se1['ltcov'] = N.log2(se1['ecov']+2)
     se1['sc1'] = N.ceil(se1['ltcov']*100).astype(int)
     sm = {'+':Colors('R', cmax),
