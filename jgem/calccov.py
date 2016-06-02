@@ -393,31 +393,31 @@ def calc_ecov(expath, cipath, bwpath, dstprefix, override=False, np=4):
     covcipath = dstprefix+'covci.txt.gz'
     ecovpath = dstprefix+'ecov.txt.gz'
 
-    # if UT.notstale([expath, cipath], covcipath, override):
-    #     cc = UT.read_pandas(covcipath)
-    # else:
-    #     if UT.notstale(expath, cipath, False): # you do not want to override ci
-    #         ci = UT.read_pandas(cipath, names=['chr','st','ed','name','id'])
-    #     else:
-    #         ex = UT.read_pandas(expath)
-    #         ci = UT.chopintervals(ex, cipath, idcol='_id')
-    #     cc = calc_cov_mp(ci, bwpath, covcipath, np=np)
-    ex = UT.read_pandas(expath)
-    if 'locus2' not in ex:
-        ex['locus2'] = UT.calc_locus_strand(ex)
-    if '_id' not in ex:
-        UT.set_ids(ex)
-    ex2 = ex.groupby('locus2').first().reset_index()
-    # maps: eid (_id) <=> locus2 
-    e2l = UT.df2dict(ex2, '_id', 'locus2')
     if UT.notstale([expath, cipath], covcipath, override):
         cc = UT.read_pandas(covcipath)
     else:
         if UT.notstale(expath, cipath, False): # you do not want to override ci
             ci = UT.read_pandas(cipath, names=['chr','st','ed','name','id'])
         else:
-            ci = UT.chopintervals(ex2, cipath, idcol='_id')
+            ex = UT.read_pandas(expath)
+            ci = UT.chopintervals(ex, cipath, idcol='_id')
         cc = calc_cov_mp(ci, bwpath, covcipath, np=np)
+    # ex = UT.read_pandas(expath)
+    # if 'locus2' not in ex:
+    #     ex['locus2'] = UT.calc_locus_strand(ex)
+    # if '_id' not in ex:
+    #     UT.set_ids(ex)
+    # e2l = UT.df2dict(ex, '_id', 'locus2')
+    # ex2 = ex.groupby('locus2').first().reset_index()
+    # # maps: eid (_id) <=> locus2 
+    # if UT.notstale([expath, cipath], covcipath, override):
+    #     cc = UT.read_pandas(covcipath)
+    # else:
+    #     if UT.notstale(expath, cipath, False): # you do not want to override ci
+    #         ci = UT.read_pandas(cipath, names=['chr','st','ed','name','id'])
+    #     else:
+    #         ci = UT.chopintervals(ex2, cipath, idcol='_id')
+    #     cc = calc_cov_mp(ci, bwpath, covcipath, np=np)
 
     # if override or (not os.path.exists(covcipath)):
     #     # calc covci
@@ -435,18 +435,20 @@ def calc_ecov(expath, cipath, bwpath, dstprefix, override=False, np=4):
     if 'eid' not in cc.columns:
         cc['eid'] = cc['name'].astype(str).apply(lambda x: [int(y) for y in x.split(',')])
         cc['name1'] = cc['eid']
-    # ccf = UT.flattendf(cc[['chr','st','ed','eid']], 'eid')
-    # ccfg = ccf.groupby('eid')
-    # df = ccfg[['chr']].first()
-    # df['st'] = ccfg['st'].min()
-    # df['ed'] = ccfg['ed'].max()
-    # df.reset_index(inplace=True)
-    e2cs = calc_ecov_mp(cc, None, np) # eid(_id) => cov
-    l2cs = {e2l[x]: e2cs[x] for x in e2cs} # locus2 => cov
-    ex['ecov'] = [l2cs[x] for x in ex['locus2']]
-    # df['ecov'] = [e2cs[x] for x in df['eid']]
-    UT.save_tsv_nidx_whead(ex[['_id','ecov']], ecovpath)
-    return ex
+    ccf = UT.flattendf(cc[['chr','st','ed','eid']], 'eid')
+    ccfg = ccf.groupby('eid')
+    df = ccfg[['chr']].first()
+    df['st'] = ccfg['st'].min()
+    df['ed'] = ccfg['ed'].max()
+    df.reset_index(inplace=True)
+    # e2cs = calc_ecov_mp(cc, None, np) # eid(_id) => cov
+    # l2cs = {e2l[x]: e2cs[x] for x in e2cs} # locus2 => cov
+    # ex['ecov'] = [l2cs[x] for x in ex['locus2']]
+    df['ecov'] = [e2cs[x] for x in df['eid']]
+    # UT.save_tsv_nidx_whead(ex[['_id','ecov']], ecovpath)
+    # return ex
+    UT.save_tsv_nidx_whead(df[['eid','ecov']], ecovpath)
+    return df
 
 # [TODO] only output _gidx, gcov
 def calc_gcov(expath, cipath, bwpath, dstprefix, override=False, np=4):
