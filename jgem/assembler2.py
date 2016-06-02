@@ -1909,6 +1909,8 @@ def bundle_assembler(bwpre, chrom, st, ed, dstpre):
         return bname
     if all([os.path.exists(dstpre+csuf+x) for x in sufs]):
         return bname
+    if all([os.path.exists(dstpre+x) for x in sufs]):
+        return bname
     la = LocalAssembler(bwpre, chrom, st, ed, dstpre)
     return la.process()
 
@@ -1970,9 +1972,12 @@ def concatenate_bundles(bundles, bundlestatus, chrom, dstpre):
                     files.append(srcpath)
                     with open(srcpath, 'rb') as src:
                         shutil.copyfileobj(src, dst)
+        else:
+            files+=['{0}.{1}_{2}_{3}.{4}'.format(dstpre, chrom, st, ed, suf) for chrom,st,ed in bundles]
     # cleanup
     for f in files:
-        os.unlink(f)
+        if os.path.exists(f):
+            os.unlink(f)
 
 def concatenate_chroms(chroms, dstpre):
     # concat results
@@ -1992,9 +1997,12 @@ def concatenate_chroms(chroms, dstpre):
                         files.append(srcpath)
                         with open(srcpath, 'rb') as src:
                             shutil.copyfileobj(src, dst)
+        else:
+            files+=['{0}.{1}.{2}'.format(dstpre, chrom, suf) for chrom in chroms]
     # cleanup
     for f in files:
-        os.unlink(f)
+        if os.path.exists(f):
+            os.unlink(f)
 
 
 def sample_assembler(bwpre, dstpre, genome, mingap=5e5, minbundlesize=10e6, np0=2, np1=2, chroms=None):
@@ -2230,7 +2238,7 @@ class SampleAssembler(object):
                         chrom = name.split('.')[1]
                         bundles[chrom] = rslt
                         for c,st,ed in rslt:
-                            print('put task##bundle_assembler {0}'.format(chrom))
+                            print('put task##bundle_assembler {0}:{1}-{2}'.format(chrom,st,ed))
                             tname = 'bundle_assembler.{0}:{1}-{2}'.format(c,st,ed)
                             args = (self.bwpre, c, st, ed, self.dstpre)
                             task = TQ.Task(tname, bundle_assembler, args)
