@@ -309,7 +309,7 @@ def assign_jids2(sjs, strand, sju):
 
 class GeneGraph(object):
     
-    def __init__(self, exons, sjpaths, strand, upperpathnum=10000):
+    def __init__(self, exons, sjpaths, strand, upperpathnum=5000):
         self.exs = exons#.copy()
         self.sjs = sjpaths#.copy()
         self.strand = strand
@@ -521,6 +521,11 @@ class GeneGraph(object):
         sjrth = 0.005
         while True:
             allpaths = self._find_all_paths_ex_1(sjs)
+            if len(allpaths)>1000:
+                chrom = sjs.iloc[0]['chr']
+                st = sjs['st'].min()
+                ed = sjs['ed'].max()
+                LOG.warning('#path>1000 ({0}) at {1}:{2}-{3}'.format(len(allpaths),chrom,st,ed))
             if len(allpaths)>self.upperpathnum:
                 LOG.warning('Too many paths ({0}). Possible repeats. Increasing stringency.'.format(len(allpaths)))
                 chrom = sjs.iloc[0]['chr']
@@ -886,7 +891,7 @@ class LocalAssembler(object):
                  usjratioth=1e-2,
                  covfactor=0.05, 
                  covth=0.1,
-                 upperpathnum=10000):
+                 upperpathnum=5000):
         self.bname = '{0}:{1}-{2}'.format(chrom,st,ed)
         self.bwpre = bwpre
         self.dstpre = dstpre
@@ -1345,7 +1350,7 @@ class LocalAssembler(object):
     def calculate_branchp(self, jids, eids):
         sj0 = self.sjdf
         sj = sj0.set_index('name').ix[jids].reset_index()
-        dsump = sj.groupby('dpos')['tcnt'].sum()
+        dsump = sj.groupby('dpos')['tcnt'].sum().astype(float)
         jdp = sj['tcnt'].values/dsump.ix[sj['dpos'].values].values
         j2p = dict(zip(sj['name'].values, jdp))
         # exon groupby acceptor
@@ -1353,7 +1358,7 @@ class LocalAssembler(object):
         ex = ex0.set_index('name').ix[eids].reset_index().copy()
         idxz = ex['ecov']==0
         ex.loc[idxz, 'ecov'] = 1e-6
-        asump = ex.groupby('apos')['ecov'].sum()
+        asump = ex.groupby('apos')['ecov'].sum().astype(float)
         edp = ex['ecov'].values/asump.ix[ex['apos'].values].values
         if (N.sum(N.isnan(edp))>0):
             self._cblcls = locals()
@@ -1377,7 +1382,7 @@ class LocalAssembler(object):
         ne2ecov = self._ne2ecov
         def cov0(s,e):
             # return N.sum(sja[s-o:e-o]+exa[s-o:e-o])/(e-s)
-            return N.sum(sja[s-o:e-o])/(e-s)
+            return N.mean(sja[s-o:e-o])
         def cov1s(s):
             return N.mean(exa[s-o-10:s-o])
         def cov1e(e):
@@ -1480,10 +1485,7 @@ class LocalAssembler(object):
         exa = self.arrs['ex'][strand]
         def cov(s,e):
             o = self.st
-            s0=s-o
-            e0=e-o
-            ex = exa[s0:e0]
-            return N.sum(ex)/(e-s)
+            return N.mean(exa[s-o:e-o]
 
         if len(lpos)>1: # left most up to tst [(lpos0,lpos1),(lpos1,lops2),...,(lpos(n-1),tst)]
             lcov0 = {} # cumulative sum
@@ -1493,7 +1495,7 @@ class LocalAssembler(object):
             for s,sprev in zip(lpos[1:],lpos[:-1]):
                 lcov[s] = max(0, lcov0[s]-lcov0[sprev])
             lcov[lpos[0]] = lcov0[lpos[0]]
-            lsum = N.sum([x for x in lcov.values()])
+            lsum = float(N.sum([x for x in lcov.values()]))
             if lsum==0:
                 lsum += 1.
             lp = {s:lcov[s]/lsum for s in lpos}
@@ -1507,7 +1509,7 @@ class LocalAssembler(object):
             for e,enext in zip(rpos[:-1],rpos[1:]):
                 rcov[e] = max(0, rcov0[e]-rcov0[enext])
             rcov[rpos[-1]] = rcov0[rpos[-1]]
-            rsum = N.sum([x for x in rcov.values()])
+            rsum = float(N.sum([x for x in rcov.values()]))
             if rsum==0:
                 rsum += 1.
             rp = {e:rcov[e]/rsum for e in rpos}
@@ -1591,7 +1593,7 @@ class LocalAssembler(object):
                 exa = self.arrs['ex'][strand]
                 #sja = self.arrs['sj'][strand]
                 def cov(s,e):
-                    return N.sum(exa[s-o:e-o])/(e-s)
+                    return N.mean(exa[s-o:e-o])
                 if ne>1:
                     ci = UT.chopintervals(es, idcol='tmpeid', sort=False)
                     ci['cov'] = [cov(s,e) for s,e in ci[['st','ed']].values]
@@ -1848,7 +1850,7 @@ def find_bundles(bwpre, genome, chroms=None, mingap=5e5, minbundlesize=10e6):
         sts,eds = find_gaps(bwpre, chrom, csize, mingap, minbundlesize)
         st = 0
         for gs,ge in zip(sts,eds):
-            mid = int((gs+ge)/2)
+            mid = int((gs+ge)/2.)
             if mid-st>minbundlesize:
                 bundles.append((chrom,st,mid))
                 st = mid
@@ -1936,7 +1938,7 @@ def chrom_assembler(bwpre, dstpre, genome, chrom, mingap=5e5, minbundlesize=10e6
     return '{0}.{1}'.format(dstpre,chrom)
 
 
-def concatenate_bundles(bundles, chrom, dstpre):
+def concatenate_bundles(bundles, bundlestatus, chrom, dstpre):
     # concat results
     sufs = ['exdf.txt.gz', 
            'sjdf.txt.gz',
@@ -1948,11 +1950,13 @@ def concatenate_bundles(bundles, chrom, dstpre):
         dstpath = '{0}.{1}.{2}'.format(dstpre, chrom, suf)
         with open(dstpath, 'wb') as dst:
             for chrom, st, ed in bundles:
+                bname = bundle2bname((chrom,st,ed))
+                if bundlestatus[bname] is None:
+                    continue
                 srcpath = '{0}.{1}_{2}_{3}.{4}'.format(dstpre, chrom, st, ed, suf)
-                if os.path.exists(srcpath):
-                    files.append(srcpath)
-                    with open(srcpath, 'rb') as src:
-                        shutil.copyfileobj(src, dst)
+                files.append(srcpath)
+                with open(srcpath, 'rb') as src:
+                    shutil.copyfileobj(src, dst)
     # cleanup
     for f in files:
         os.unlink(f)
@@ -2203,7 +2207,7 @@ class SampleAssembler(object):
                         if len(bundlestatus[chrom])==len(bundles[chrom]): # all done
                             print('concatenate chrom {0}'.format(chrom))
                             tname = 'concatenate_bundles.{0}'.format(chrom)
-                            args = (bundles[chrom], chrom, self.dstpre)
+                            args = (bundles[chrom], bundlestatus[chrom], chrom, self.dstpre)
                             task = TQ.Task(tname, concatenate_bundles, args)
                             server.add_task(task)
                     if name.startswith('concatenate_bundles.'):
