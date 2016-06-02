@@ -877,7 +877,7 @@ STRS = {'+':['+','.+'],
         '.':['.+','.-']}
 EXDFCOLS = ['chr','st','ed','strand','name','kind','ecov']
 SJDFCOLS = ['chr','st','ed','strand','name','kind','tcnt'  ]#,'donor','acceptor','dp','ap']
-PATHCOLS = ['chr','st','ed','name','strand','tst','ted','tcov0','tcov1','tcov']
+PATHCOLS = ['chr','st','ed','name','strand','tst','ted','tcov0','tcov1','tcov', 'tcov0a','tcov0b','tcov0c']
 
 class LocalAssembler(object):
     
