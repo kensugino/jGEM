@@ -26,6 +26,7 @@ import numpy as N
 
 from jgem import utils as UT
 from jgem import gtfgffbed as GGB
+from jgem import fasta as FA
 import jgem.cy.bw as cybw
 
 import inspect
