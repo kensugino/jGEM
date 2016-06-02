@@ -407,7 +407,7 @@ def calc_ecov(expath, cipath, bwpath, dstprefix, override=False, np=4):
         ex['locus2'] = UT.calc_locus_strand(ex)
     if '_id' not in ex:
         UT.set_ids(ex)
-    ex2 = ex.groupby('locus2').first()
+    ex2 = ex.groupby('locus2').first().reset_index()
     # maps: eid (_id) <=> locus2 
     e2l = UT.df2dict(ex2, '_id', 'locus2')
     if UT.notstale([expath, cipath], covcipath, override):
