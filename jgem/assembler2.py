@@ -891,7 +891,9 @@ class LocalAssembler(object):
                  usjratioth=1e-2,
                  covfactor=0.05, 
                  covth=0.1,
-                 upperpathnum=5000):
+                 upperpathnum=5000, # if num of paths larger than this increase stringency for sjs
+                 pathcheckth=300, # above this num of sjs check sc1(ucnt)==0 if >50% remove
+                 ):
         self.bname = '{0}:{1}-{2}'.format(chrom,st,ed)
         self.bwpre = bwpre
         self.dstpre = dstpre
@@ -1053,7 +1055,16 @@ class LocalAssembler(object):
         idx4 = (sjpaths['chr']==self.chrom)&(sjpaths['strand']==strand)
         #idx5 = sjpaths['sc1']>th
         idx = (idx0&idx1)|((idx2|idx3)&idx4) #&idx5)
-        sj = sjpaths[idx].copy()
+        sj = sjpaths[idx]
+        n0 = len(sj)
+        n1 = self.pathcheckth
+        if n0>n1:
+            n2 = N.sum(sj['sc1']==0)
+            if n2>100:
+                LOG.warning('num sj ({0}>{1}) removed non unique junctions({2})'.format(n0,n1,n2))
+                idx5 = sj['sc1']>0
+                sj = sj[idx5]
+        sj = sj.copy()
         return sj, ex
                
     def find_all_paths(self):
