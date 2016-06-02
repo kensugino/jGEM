@@ -911,6 +911,7 @@ class LocalAssembler(object):
         self.covfactor = covfactor
         self.covth = covth
         self.upperpathnum = upperpathnum
+        self.pathcheckth = pathcheckth
         self.sjexbw = sjexbw = SjExBigWigs(bwpre)      
         self.arrs = arrs = {}
         with sjexbw: # get bw arrays
