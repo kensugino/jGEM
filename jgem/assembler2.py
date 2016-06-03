@@ -526,6 +526,7 @@ class GeneGraph(object):
 
     def find_all_paths_ex(self, sjs):
         sjrth = 0.002
+        uth = sjs['sc1'].min()
         while True:
             try:
                 allpaths = self._find_all_paths_ex_1(sjs)
@@ -542,7 +543,7 @@ class GeneGraph(object):
                 edmax = sjs['ed'].max()
                 LOG.debug('location: {0}:{1}-{2}'.format(chrom,stmin,edmax))
 
-                uth = sjs['sc1'].min()
+                uth += 0.4
                 # sc2min = sjs['sc2'].min()
                 mcnt = sjs['sc2']-sjs['sc1'] # multi mappers
                 mth = max(0, mcnt.max()/2.)
