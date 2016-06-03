@@ -204,6 +204,8 @@ EF3 = EdgeFinder(-0.25, -0.5, 4.8, 0) # -0.25, -0.5, 4.5
 
 ####### Gene Graph ###########################################
 
+class PathNumUpperLimit(Exception):
+    pass
 
 def overlap(x,y):
     if x[-1]<y[0]:
@@ -400,7 +402,10 @@ class GeneGraph(object):
         if len(children)>0:
             rslt = set()
             for y in children:
-                for x in self.find_a_tree_ex(y, visited, allus):
+                subpaths = self.find_a_tree_ex(y, visited, allus)
+                if len(subpaths)>self.upperpathnum:
+                    raise PathNumUpperLimit
+                for x in subpaths:
                     npc = '{0},{1}'.format(pc,x)
                     rslt.add(npc)
                     if x in allus and unstranded:
@@ -520,31 +525,35 @@ class GeneGraph(object):
         return allpaths
 
     def find_all_paths_ex(self, sjs):
-        sjrth = 0.005
+        sjrth = 0.002
         while True:
-            allpaths = self._find_all_paths_ex_1(sjs)
-            if len(allpaths)>1000:
-                chrom = sjs.iloc[0]['chr']
-                st = sjs['st'].min()
-                ed = sjs['ed'].max()
-                LOG.warning('#path>1000 ({0}) at {1}:{2}-{3}'.format(len(allpaths),chrom,st,ed))
-            if len(allpaths)>self.upperpathnum:
+            try:
+                allpaths = self._find_all_paths_ex_1(sjs)
+                if len(allpaths)>1000:
+                    chrom = sjs.iloc[0]['chr']
+                    st = sjs['st'].min()
+                    ed = sjs['ed'].max()
+                    LOG.warning('#path>1000 ({0}) at {1}:{2}-{3}'.format(len(allpaths),chrom,st,ed))
+                break
+            except PathNumUpperLimit:
                 LOG.warning('Too many paths ({0}). Possible repeats. Increasing stringency.'.format(len(allpaths)))
                 chrom = sjs.iloc[0]['chr']
                 stmin = sjs['st'].min()
                 edmax = sjs['ed'].max()
                 LOG.debug('location: {0}:{1}-{2}'.format(chrom,stmin,edmax))
 
-                sc1min = sjs['sc1'].min()
-                sc2min = sjs['sc2'].min()
-                sjrth += 0.001
+                uth = sjs['sc1'].min()
+                # sc2min = sjs['sc2'].min()
+                mcnt = sjs['sc2']-sjs['sc2'] # multi mappers
+                mth = max(0, mcnt.max()-10)
+                sjrth += 0.0005
                 n0 = len(sjs)
-                sjs = sjs[(sjs['sc1']>sc1min)&(sjs['sc2']>sc2min)&(sjs['sjratio']>sjrth)].copy()
+                # ucnt threshold increases by 1, mcnt threshold decrease by 10, sjratio by 0.001
+                sjs = sjs[(sjs['sc1']>uth)&(mcnt<=mth)&(sjs['sjratio']>sjrth)].copy()
                 n1 = len(sjs)
                 LOG.debug('#sjs:{0}=>{1}, sc1min:{2}, sc2min:{3}, sjrth:{4}'.format(n0,n1,sc1min,sc2min,sjrth))
                 self.prep_ggraph(sjs)
-            else:
-                break
+
 
         allus = self.allus
         sjsi = sjs.set_index('sid')
