@@ -2076,6 +2076,21 @@ def concatenate_chroms(chroms, dstpre):
         if os.path.exists(f):
             os.unlink(f)
 
+def write_stats(dstpre, seinfo):
+    dic = {}
+    dic.update(seinfo)
+    exdf = UT.read_pandas(dstpre+'.exdf.txt.gz', names=EXDFCOLS)
+    dic['#me_exons'] = len(exdf)
+    sjdf = UT.read_pandas(dstpre+'.sjdf.txt.gz', names=SJDFCOLS)
+    dic['#junctions'] = len(sjdf)
+    paths = UT.read_pandas(dstpre+'.paths.txt.gz', names=PATHCOLS)
+    dic['#paths'] = len(paths)
+    fname = dstpre+'.stats.txt'
+    name = dstpre.split('/')[-1]
+    df = PD.DataFrame(dic, index=[name])
+    UT.write_pandas(df, fname, 'ih')
+    
+
 
 def sample_assembler(bwpre, dstpre, genome, mingap=5e5, minbundlesize=10e6, np0=2, np1=2, chroms=None):
     server = TQ.Server(np=np0)
@@ -2157,9 +2172,9 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.',
     secols = ['chr','st','ed','ecov','len']
     sedf = UT.read_pandas(dstpath, names=secols)
     exdf = UT.read_pandas(dstpre+'.exdf.txt.gz', names=EXDFCOLS) 
-    th = find_threshold(exdf['ecov'].values, sedf['ecov'].values, mincovth, dstpre)
-    # paths = UT.read_pandas(dstpre+'.paths.txt.gz', names=PATHCOLS)
-    # th = find_threshold(paths['tcov'].values, sedf['ecov'].values, mincovth, dstpre)
+    # th = find_threshold(exdf['ecov'].values, sedf['ecov'].values, mincovth, dstpre)
+    paths = UT.read_pandas(dstpre+'.paths.txt.gz', names=PATHCOLS)
+    th = find_threshold(paths['tcov'].values, sedf['ecov'].values, mincovth, dstpre)
     se0 = sedf[(sedf['ecov']>th)&(sedf['len']>minsizeth)].copy()  # use FPR 1%
 
     LOG.info('SE covth={0:.2f}, len(se0)={1}'.format(th, len(se0)))
@@ -2217,7 +2232,6 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.',
     bed1 = PD.concat([bed, se1], ignore_index=True)
     GGB.write_bed(bed1, dstpre+'.paths.withse.bed.gz', ncols=12)
     dic = dict(
-        sepath= c, 
         secovth=th, 
         num_se_candidates=len(sedf), 
         num_se_by_covth_and_size=len(se0), 
@@ -2435,6 +2449,11 @@ class SampleAssembler(object):
                             task = TQ.Task(tname, find_SE, args)
                             server.add_task(task)
                     if name== 'find_SE':
+                        tname = 'write_stats'
+                        args = (dstpre, rslts)
+                        task = TQ.Task(tname, write_stats, args)
+                        server.add_task(task)
+                    if name=='write_stats':
                         break
                         # tname = 'concatenate_chroms'
                         # args = (self.chroms, self.dstpre)
