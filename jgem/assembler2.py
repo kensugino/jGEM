@@ -1996,7 +1996,7 @@ def bundle2bname(b):
     return '{0}:{1}-{2}'.format(*b)
 
 def chrom_assembler(bwpre, dstpre, genome, chrom, mingap=5e5, minbundlesize=10e6, np=2):
-    bundles = find_bundles(bwpre, genome, dstpre, [chrom], mingap, minbundlesize)
+    bundles = find_bundles(bwpre, genome, dstpre, chrom, mingap, minbundlesize)
     print('{1}: #bundles: {0}'.format(len(bundles), chrom))
     server = TQ.Server(np=np)
     with server:
@@ -2312,7 +2312,7 @@ class SampleAssembler(object):
         with server:
             for chrom in self.chroms:
                 tname = 'find_bundle.{0}'.format(chrom)
-                args = (self.bwpre, self.genome, self.dstpre, [chrom], self.mingap, self.minbundlesize)
+                args = (self.bwpre, self.genome, self.dstpre, chrom, self.mingap, self.minbundlesize)
                 task = TQ.Task(tname,find_bundles, args)
                 server.add_task(task)
             while server.check_error(self.maxwaittime): # loop
