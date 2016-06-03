@@ -1679,32 +1679,7 @@ class LocalAssembler(object):
         # 2) unused sjpaths => bed12
         GGB.write_bed(self.unusedsj, pre+'.unused.sjpath.bed.gz', ncols=12)
         # 3) allpaths => gtf or bed12 tcov => sc2 rgb color
-        bed = self.tpaths.copy()
-        # strand .+,.-
-        idxun = bed['strand']=='.-'
-        bed.loc[idxun, 'name']= [reversepathcode(x) for x in bed[idxun]['name']]
-        bed = bed.groupby('name').first().reset_index()
-        idxu = bed['strand'].isin(['.+','.-'])
-        bed.loc[idxu, 'strand']='.'
-        # #exons, esizes, estarts
-        bed['exonsp'] = [[[int(z) for z in y.split(',')] for y in x.split('|')] for x in bed['name']]
-        bed['exonsn'] = [[y[::-1] for y in x][::-1] for x in bed['exonsp']]
-        idxp = bed['strand']!='-'
-        bed.loc[idxp, 'exons'] = bed[idxp]['exonsp']
-        bed.loc[~idxp, 'exons'] = bed[~idxp]['exonsn']
-        bed['#exons'] = [len(x) for x in bed['exons']]
-        estarts = [[str(y[0]-x[0][0]) for y in x] for x in bed['exons']]
-        esizes = [[str(y[1]-y[0]) for y in x] for x in bed['exons']]
-        bed['esizes'] = [','.join(x)+',' for x in esizes]
-        bed['estarts'] = [','.join(x)+',' for x in estarts]
-        # sc1, sc2
-        bed['ltcov'] = N.log2(bed['tcov']+2)
-        bed['sc1'] = N.ceil(bed['ltcov']*100).astype(int)
-        sm = {'+':Colors('R', cmax),
-              '-':Colors('B', cmax),
-              '.':Colors('G', cmax)}
-        bed['sc2'] = [sm[s].RGB(x) for x,s in bed[['ltcov','strand']].values]
-        self.bed12 = bed.sort_values(['chr','st','ed'])
+        self.bed12 = path2bed12(self.tpaths.copy(), cmax)
         GGB.write_bed(self.bed12, pre+'.paths.bed.gz',ncols=12)
         
     def process(self):
@@ -1869,6 +1844,34 @@ class LocalAssembler(object):
         ax.set_frame_on(False)
         return ax
 
+def path2bed12(paths, cmax):
+    bed = paths
+    # strand .+,.-
+    idxun = bed['strand']=='.-'
+    bed.loc[idxun, 'name']= [reversepathcode(x) for x in bed[idxun]['name']]
+    bed = bed.groupby('name').first().reset_index()
+    idxu = bed['strand'].isin(['.+','.-'])
+    bed.loc[idxu, 'strand']='.'
+    # #exons, esizes, estarts
+    bed['exonsp'] = [[[int(z) for z in y.split(',')] for y in x.split('|')] for x in bed['name']]
+    bed['exonsn'] = [[y[::-1] for y in x][::-1] for x in bed['exonsp']]
+    idxp = bed['strand']!='-'
+    bed.loc[idxp, 'exons'] = bed[idxp]['exonsp']
+    bed.loc[~idxp, 'exons'] = bed[~idxp]['exonsn']
+    bed['#exons'] = [len(x) for x in bed['exons']]
+    estarts = [[str(y[0]-x[0][0]) for y in x] for x in bed['exons']]
+    esizes = [[str(y[1]-y[0]) for y in x] for x in bed['exons']]
+    bed['esizes'] = [','.join(x)+',' for x in esizes]
+    bed['estarts'] = [','.join(x)+',' for x in estarts]
+    # sc1, sc2
+    bed['ltcov'] = N.log2(bed['tcov']+2)
+    bed['sc1'] = N.ceil(bed['ltcov']*100).astype(int)
+    sm = {'+':Colors('R', cmax),
+          '-':Colors('B', cmax),
+          '.':Colors('G', cmax)}
+    bed['sc2'] = [sm[s].RGB(x) for x,s in bed[['ltcov','strand']].values]
+    bed.sort_values(['chr','st','ed'], inplace=True)
+    return bed
 
 ####### Bundle Finder ###############################################################
     
@@ -2256,7 +2259,7 @@ def find_threshold(x0,x1,minth,dstpre,fdrth=0.5, fprth=0.01):
     h1,b1 = N.histogram(x1, bins=bins)
     # def find_best_xmid(h0,h1):
     deltas = []
-    for i in range(len(h0)-20):
+    for i in range(len(h0)-25):
         scale = float(N.sum(h1[i:]))/N.sum(h0[i:])
         h0s = h0*scale
         delta = N.mean(N.abs(h0s[i:]-h1[i:]))
@@ -2416,7 +2419,7 @@ class SampleAssembler(object):
                         chrom = name.split('.')[1]
                         bundles[chrom] = rslt
                         for c,st,ed in rslt:
-                            print('put task##bundle_assembler {0}:{1}-{2}'.format(chrom,st,ed))
+                            # print('put task##bundle_assembler {0}:{1}-{2}'.format(chrom,st,ed))
                             tname = 'bundle_assembler.{0}:{1}-{2}'.format(c,st,ed)
                             # bwpre, chrom, st, ed, dstpre, upperpathnum
                             args = (self.bwpre, c, st, ed, self.dstpre, self.upperpathnum)
@@ -2427,7 +2430,7 @@ class SampleAssembler(object):
                         chrom = bname.split(':')[0]
                         bundlestatus.setdefault(chrom,{})[bname] = rslt
                         if len(bundlestatus[chrom])==len(bundles[chrom]): # all done
-                            print('put task##concatenate_bundles {0}'.format(chrom))
+                            # print('put task##concatenate_bundles {0}'.format(chrom))
                             tname = 'concatenate_bundles.{0}'.format(chrom)
                             args = (bundles[chrom], bundlestatus[chrom], chrom, self.dstpre)
                             task = TQ.Task(tname, concatenate_bundles, args)
@@ -2436,7 +2439,7 @@ class SampleAssembler(object):
                         chrom = name.split('.')[1]
                         chromstatus[chrom] = rslt
                         # start SE finder for chrom
-                        print('put task##find_SE_chrom {0}'.format(chrom))
+                        # print('put task##find_SE_chrom {0}'.format(chrom))
                         tname = 'find_SE_chrom.{0}'.format(chrom)
                         # bwpre, dstpre, genome, chrom, exstrand='+', minsizeth
                         args = (self.bwpre, self.dstpre, self.genome, chrom, '+',self.seminsizeth)
@@ -2446,7 +2449,7 @@ class SampleAssembler(object):
                         chrom = name.split('.')[1]
                         find_se_chrom_status[chrom] = rslt
                         if len(find_se_chrom_status)==len(self.chroms):
-                            print('start SE finder')
+                            # print('start SE finder')
                             tname = 'find_SE'
                             # dstpre, chroms, exstrand='+', sestrand='.', mincovth=5, minsizeth
                             args = (self.dstpre, self.chroms, '+', '.', self.semincovth, self.seminsizeth)
@@ -2454,7 +2457,7 @@ class SampleAssembler(object):
                             server.add_task(task)
                     if name== 'find_SE':
                         tname = 'write_stats'
-                        args = (dstpre, rslts)
+                        args = (self.dstpre, rslts)
                         task = TQ.Task(tname, write_stats, args)
                         server.add_task(task)
                     if name=='write_stats':

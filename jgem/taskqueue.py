@@ -109,6 +109,7 @@ class Server(object):
             LOG.warninig('{0} already started'.format(self.name))
             
     def add_task(self, task):
+        print('#Task({0}) added'.format(task.name))
         self.task_queue.put(task)
         
     def get_result(self, block=True, timeout=None):
@@ -162,10 +163,11 @@ class Server(object):
                 elapsed = time.time()-wi['_stime']
             else:
                 elapsed = 0
-            if (elapsed>maxtime):
-                print('STOPPING SERVER: elapsed {0}sec in  {1}'.format(elapsed, wname))
-                self.stop()
-                return False
+            if maxtime is not None:
+                if (elapsed>maxtime):
+                    print('STOPPING SERVER: elapsed {0}sec in  {1}'.format(elapsed, wname))
+                    self.stop()
+                    return False
         return True
 
     def __enter__(self):
