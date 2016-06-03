@@ -1523,6 +1523,7 @@ class LocalAssembler(object):
         p.loc[idx, 'tcov0b'] = pg.set_index(['tst','ted']).ix[keys]['tcov1'].values
         p.loc[idx, 'tcov0c'] = pg.set_index(['tst','ted']).ix[keys]['tcov2'].values
         pg['tcov'] = pg[['tcov0','tcov1','tcov2']].mean(axis=1)
+        pg.loc[pg['tcov']<0,'tcov'] = 0 # shouldn't really happen
         p.loc[idx, 'tcov0'] = pg.set_index(['tst','ted']).ix[keys]['tcov'].values
         return pg[['chr','tst','ted','strand', 'tcov']]
         
@@ -2090,6 +2091,7 @@ def write_stats(dstpre, seinfo):
     fname = dstpre+'.stats.txt'
     name = dstpre.split('/')[-1]
     df = PD.DataFrame(dic, index=[name])
+    LOG.info('{0}:{1}'.format(name, dic))
     UT.write_pandas(df, fname, 'ih')
     
 
@@ -2242,8 +2244,8 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.',
     return dic
 
 def find_threshold(x0,x1,minth,dstpre,fdrth=0.5, fprth=0.01):
-    x0 = x0[~N.isnan(x0)]  # why exdf contains NaN?
-    x1 = x1[~N.isnan(x1)]
+    x0 = x0[(~N.isnan(x0))&(x0>0)]  # why exdf contains NaN?
+    x1 = x1[(~N.isnan(x1))&(x1>0)]
     x0 = N.log2(x0+1)
     x1 = N.log2(x1+1)
     xmax = min(x0.max(), x1.max())
