@@ -2080,11 +2080,13 @@ def write_stats(dstpre, seinfo):
     dic = {}
     dic.update(seinfo)
     exdf = UT.read_pandas(dstpre+'.exdf.txt.gz', names=EXDFCOLS)
-    dic['#me_exons'] = len(exdf)
+    dic['num_me_exons'] = len(exdf)
     sjdf = UT.read_pandas(dstpre+'.sjdf.txt.gz', names=SJDFCOLS)
-    dic['#junctions'] = len(sjdf)
+    dic['num_junctions'] = len(sjdf)
     paths = UT.read_pandas(dstpre+'.paths.txt.gz', names=PATHCOLS)
-    dic['#paths'] = len(paths)
+    dic['num_paths'] = len(paths)
+    unused = GGB.read_bed(dstpre+'.unused.sjpath.bed.gz')
+    dic['num_unused_junctions'] = len(unused)
     fname = dstpre+'.stats.txt'
     name = dstpre.split('/')[-1]
     df = PD.DataFrame(dic, index=[name])
