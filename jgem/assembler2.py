@@ -2312,7 +2312,7 @@ class SampleAssembler(object):
         with server:
             for chrom in self.chroms:
                 tname = 'find_bundle.{0}'.format(chrom)
-                args = (self.bwpre, self.genome, dstpre, [chrom], self.mingap, self.minbundlesize)
+                args = (self.bwpre, self.genome, self.dstpre, [chrom], self.mingap, self.minbundlesize)
                 task = TQ.Task(tname,find_bundles, args)
                 server.add_task(task)
             while server.check_error(self.maxwaittime): # loop
