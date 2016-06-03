@@ -2157,9 +2157,11 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.',
     secols = ['chr','st','ed','ecov','len']
     sedf = UT.read_pandas(dstpath, names=secols)
     exdf = UT.read_pandas(dstpre+'.exdf.txt.gz', names=EXDFCOLS) 
-    # gspans = UT.union_contiguous(paths)
-    th = find_threshold(exdf['ecov'].values, sedf['ecov'].values, mincovth)
-    se0 = sedf[(sedf['ecov']>th)&(sedf['len']>minsizeth)].copy()
+    th = find_threshold(exdf['ecov'].values, sedf['ecov'].values, mincovth, dstpre)
+    # paths = UT.read_pandas(dstpre+'.paths.txt.gz', names=PATHCOLS)
+    # th = find_threshold(paths['tcov'].values, sedf['ecov'].values, mincovth, dstpre)
+    se0 = sedf[(sedf['ecov']>th)&(sedf['len']>minsizeth)].copy()  # use FPR 1%
+
     LOG.info('SE covth={0:.2f}, len(se0)={1}'.format(th, len(se0)))
     # se0['strand'] = sestrand
     # se0['name'] = [_pc(st,ed,sestrand,',') for st,ed in se0[['st','ed']].values ]
@@ -2194,6 +2196,7 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.',
     LOG.info('#SE = {0} (before merge {1})'.format(len(se1), len(se1a)))
     os.unlink(a)
     os.unlink(b)
+    os.unlink(c0)
     # merge exdf & se ==> update .exdf.txt.gz?
     # update .paths.txt.gz, .paths.bed.gz?
     bed = GGB.read_bed(dstpre+'.paths.bed.gz') # chr,st,ed,name,sc1,strand,sc2,tst,ted,#exons,esizes,estarts
@@ -2217,17 +2220,86 @@ def find_SE(dstpre, chroms, exstrand='+', sestrand='.',
         sepath= c, 
         secovth=th, 
         num_se_candidates=len(sedf), 
-        num_se0=len(se0), 
-        num_se1a=len(se1a),
-        num_se1=len(se1))
+        num_se_by_covth_and_size=len(se0), 
+        num_se_not_near_exons=len(se1a),
+        num_se_merge_nearby=len(se1))
     return dic
 
-def find_threshold(x0,x1,minth):
+def find_threshold(x0,x1,minth,dstpre,fdrth=0.5, fprth=0.01):
     x0 = x0[~N.isnan(x0)]  # why exdf contains NaN?
     x1 = x1[~N.isnan(x1)]
     x0 = N.log2(x0+1)
     x1 = N.log2(x1+1)
-    xmax = max(x0.max(), x1.max())
+    xmax = min(x0.max(), x1.max())
+    xmin = max(x0.min(), x1.min())
+    delta = (xmax-xmin)/100.
+    bins=N.arange(xmin,xmax,delta)
+    h0,b0 = N.histogram(x0, bins=bins)
+    h1,b1 = N.histogram(x1, bins=bins)
+    # def find_best_xmid(h0,h1):
+    deltas = []
+    for i in range(len(h0)-20):
+        scale = float(N.sum(h1[i:]))/N.sum(h0[i:])
+        h0s = h0*scale
+        delta = N.mean(N.abs(h0s[i:]-h1[i:]))
+        deltas.append([delta, i, h0s, scale])
+    delta,posi,h0s,scale =sorted(deltas)[0]
+    cntf = h0s
+    cnto = h1
+    cp = N.sum(cntf)   # total positive
+    cn = N.sum(cnto)-cp # total negative (observed - positive)
+    if cn<0: # due to noise when almost perfect
+        th = minth
+    else:
+        fn = N.cumsum(cntf) # false negative (condition positive but < th)
+        tp = cp - fn # true positive (condition positive and >= th)
+        tn = N.cumsum(cnto) - fn  # true negative
+        tn[tn<0]=N.nan
+        fp = cn - tn
+        fp[fp<0]=N.nan
+        #tpr = tp/cp
+        fpr = fp/cn
+        p = N.sum(cnto)-N.cumsum(cnto) # declared positive
+        fdr = fp/p
+        fpr[N.isnan(fpr)]=0
+        idx = N.nonzero(fdr<=fdrth)[0]
+        if len(idx)==0: # not found
+            th_fdr = minth
+        else:
+            th_fdr = 2**(bins[N.min(idx)])-1
+        idx0 = N.nonzero(fpr<=fprth)[0]
+        if len(idx0)==0: # not found
+            th_fpr = minth
+        else:
+            th_fpr = 2**(bins[N.min(idx0)])-1
+    fname = dstpre+'.secovth.png'
+    title = dstpre.split('/')[-1]
+    plot_se_th(b0,h0s,h1,th_fpr,th_fdr,title,fname)
+    return th_fpr
+
+
+def plot_se_th(b0,h0s,h1,th0,th,title,fname=None):
+    fig,ax = P.subplots(1,1)
+    w = b0[1]-b0[0]
+    ax.bar(b0[:-1], h1, width=w, alpha=0.9,color='c', label='single-exon', lw=0)
+    ax.bar(b0[:-1], h0s, width=w, alpha=0.5, color='r', label='multi-exon', lw=0)
+    ax.set_yscale('log')
+    ax.axvline(N.log2(th+1), color='r', linestyle='--', label='FDR 50%')
+    ax.axvline(N.log2(th0+1), color='b', linestyle='--', label='FPR 1%')
+    ax.set_xlabel('log2(cov+1)')
+    ax.set_ylabel('count')
+    ax.set_title(title)
+    ax.legend()
+    if fname is not None:
+        fig.savefig(fname)
+    
+
+def find_threshold0(x0,x1,minth):
+    x0 = x0[~N.isnan(x0)]  # why exdf contains NaN?
+    x1 = x1[~N.isnan(x1)]
+    x0 = N.log2(x0+1)
+    x1 = N.log2(x1+1)
+    xmax = min(x0.max(), x1.max())
     xmin = max(x0.min(), x1.min())
     delta = (xmax-xmin)/25.
     bins=N.arange(xmin,xmax,delta)
@@ -2243,13 +2315,13 @@ def find_threshold(x0,x1,minth):
     for i in range(4,len(d0sdd)):
         if d0sdd[i-1]*d0sdd[i]<0:
             break
-    th = b0[1:][i+2]
-    if th<minth:
+    th = b0[1:][i]
+    if th<N.log2(minth+1):
         return minth
     if th>0.8*xmax:
         LOG.warning('find_threshold: threshold too large {0} returning 0.8*xmax {1}'.format(th,0.7*xmid))
-        return 0.8*xmax
-    return th
+        return 2**(0.8*xmax)-1
+    return 2**th-1
 
 
 def smooth( v, wsize):
