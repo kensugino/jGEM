@@ -1897,23 +1897,38 @@ def find_gaps(bwpre, chrom, csize, gsizeth=5e5, minbundlesize=10e6):
             eds += list(ged)
     return sts,eds
 
-def find_bundles(bwpre, genome, chroms=None, mingap=5e5, minbundlesize=10e6):
+def find_bundles(bwpre, genome, dstpre, chrom=None, mingap=5e5, minbundlesize=10e6):
     bundles = []
-    if chroms is None:
-        chroms = UT.chroms(genome)
+    if chrom is None:
+        chroms = UT.chroms(genome) # whole genome
+        fpath = dstpre+'.bundles.txt.gz'
+        if os.path.exists(fpath):
+            df = UT.read_pandas(fpath)
+            return df[['chr','st','ed']].values
+    else:
+        chroms = [chrom]
+        fpath = dstpre+'.{0}.bundles.txt.gz'.format(chrom)
+        if os.path.exists(fpath):
+            df = UT.read_pandas(fpath)
+            return df[['chr','st','ed']].values
     chromsizes = UT.df2dict(UT.chromdf(genome), 'chr', 'size')
     for chrom in chroms:
         print('checking {0}...'.format(chrom))
         csize = chromsizes[chrom]
         sts,eds = find_gaps(bwpre, chrom, csize, mingap, minbundlesize)
         st = 0
-        for gs,ge in zip(sts,eds):
-            mid = int((gs+ge)/2.)
-            if mid-st>minbundlesize:
-                bundles.append((chrom,st,mid))
-                st = mid
-        if ge<csize:
-            bundles.append((chrom,st,csize))
+        if len(sts)==0:
+            bundles.append((chrom,0,csize))
+        else:
+            for gs,ge in zip(sts,eds):
+                mid = int((gs+ge)/2.)
+                if mid-st>minbundlesize:
+                    bundles.append((chrom,st,mid))
+                    st = mid
+            if ge<csize:
+                bundles.append((chrom,st,csize))
+    df = PD.DataFrame(bundles, columns=['chr','st','ed'])
+    UT.write_pandas(df, fpath, 'h')
     return bundles
 
 
