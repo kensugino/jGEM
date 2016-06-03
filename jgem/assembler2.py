@@ -536,7 +536,7 @@ class GeneGraph(object):
                     LOG.warning('#path>1000 ({0}) at {1}:{2}-{3}'.format(len(allpaths),chrom,st,ed))
                 break
             except PathNumUpperLimit:
-                LOG.warning('Too many paths ({0}). Possible repeats. Increasing stringency.'.format(len(allpaths)))
+                LOG.warning('Too many paths (>{0}). Possible repeats. Increasing stringency.'.format(self.upperpathnum))
                 chrom = sjs.iloc[0]['chr']
                 stmin = sjs['st'].min()
                 edmax = sjs['ed'].max()
