@@ -54,12 +54,15 @@ class Worker(multiprocessing.Process):
                     self.task_queue.task_done()
                     break
                 print('{0}: starting {1}'.format(proc_name, next_task.name))
-                self.set_info(_stime=time.time(), status='running')
+                stime = time.time()
+                self.set_info(_stime=stime, status='running')
                 try:
                     answer = next_task()
+                    etime = time.time()
                     self.result_queue.put((next_task.name, answer))
-                    print('{0}: finished {1}'.format(proc_name, next_task.name))
-                    self.set_info(_etime=time.time(), status='waiting')
+                    elapsed = etime - stime
+                    print('{0}: finished {1} ({2} sec)'.format(proc_name, next_task.name, elapsed))
+                    self.set_info(_etime=etime, status='waiting', _stime=etime, elapsed=elapsed)
                 except Exception as e:
                     tb = traceback.format_exc()
                     print('{0} ({1}): error'.format(proc_name, next_task.name))
