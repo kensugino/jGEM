@@ -402,10 +402,7 @@ class GeneGraph(object):
         if len(children)>0:
             rslt = set()
             for y in children:
-                subpaths = self.find_a_tree_ex(y, visited, allus)
-                if len(subpaths)>self.upperpathnum:
-                    raise PathNumUpperLimit
-                for x in subpaths:
+                for x in self.find_a_tree_ex(y, visited, allus):
                     npc = '{0},{1}'.format(pc,x)
                     rslt.add(npc)
                     if x in allus and unstranded:
@@ -415,6 +412,8 @@ class GeneGraph(object):
             if unstranded:
                 allus[pc] = True
         visited[sid] = rslt
+        if len(rslt)>self.upperpathnum:
+            raise PathNumUpperLimit
         return rslt
     
     def find_all_paths0(self):
@@ -544,7 +543,7 @@ class GeneGraph(object):
 
                 uth = sjs['sc1'].min()
                 # sc2min = sjs['sc2'].min()
-                mcnt = sjs['sc2']-sjs['sc2'] # multi mappers
+                mcnt = sjs['sc2']-sjs['sc1'] # multi mappers
                 mth = max(0, mcnt.max()-10)
                 sjrth += 0.0005
                 n0 = len(sjs)
@@ -902,7 +901,7 @@ class LocalAssembler(object):
                  usjratioth=1e-2,
                  covfactor=0.05, 
                  covth=0.1,
-                 upperpathnum=5000, # if num of paths larger than this increase stringency for sjs
+                 upperpathnum=3000, # if num of paths larger than this increase stringency for sjs
                  pathcheckth=300, # above this num of sjs check sc1(ucnt)==0 if >50% remove
                  ):
         self.bname = '{0}:{1}-{2}'.format(chrom,st,ed)
