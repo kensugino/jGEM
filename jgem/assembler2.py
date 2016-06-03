@@ -515,7 +515,8 @@ class GeneGraph(object):
                 #print('processing rid {0}'.format(rid))
                 x = self.find_a_tree_ex(int(rid), visited, allus) # set of paths
                 allpaths.update(x)
-                #print('  subtree #{0}'.format(len(x)))
+                if len(allpaths)>self.upperpathnum:
+                    raise PathNumUpperLimit
             notused = sjs[~sjs['sid'].isin(visited)]
         
         # make for each path (tst,ted,pathcode) 
@@ -544,7 +545,7 @@ class GeneGraph(object):
                 uth = sjs['sc1'].min()
                 # sc2min = sjs['sc2'].min()
                 mcnt = sjs['sc2']-sjs['sc1'] # multi mappers
-                mth = max(0, mcnt.max()-10)
+                mth = max(0, mcnt.max()/2.)
                 sjrth += 0.0005
                 n0 = len(sjs)
                 # ucnt threshold increases by 1, mcnt threshold decrease by 10, sjratio by 0.001
