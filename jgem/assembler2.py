@@ -551,7 +551,7 @@ class GeneGraph(object):
                 # ucnt threshold increases by 1, mcnt threshold decrease by 10, sjratio by 0.001
                 sjs = sjs[(sjs['sc1']>uth)&(mcnt<=mth)&(sjs['sjratio']>sjrth)].copy()
                 n1 = len(sjs)
-                LOG.debug('#sjs:{0}=>{1}, sc1min:{2}, sc2min:{3}, sjrth:{4}'.format(n0,n1,sc1min,sc2min,sjrth))
+                LOG.debug('#sjs:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
                 self.prep_ggraph(sjs)
 
 
