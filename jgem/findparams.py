@@ -118,6 +118,14 @@ class ParamFinder(object):
         self.ex = ex = UT.read_pandas(self.refpre+'.ex.txt.gz')
         self.sj = sj = UT.read_pandas(self.refpre+'.sj.txt.gz')
         self.set_bws(bwpre)
+
+    def process(self, np=10):
+        self.extract_all()
+        for x in ['ne_i','ne_5','ne_3','e5i','e3i','e53']:
+            print('  #{0}:{1}'.format(x, len(getattr(self, x))))
+        self.calc_53_params(np=np)
+        self.calc_53gap_params(np=np)
+        self.calc_exon_params(np=np)
         
     def set_bws(self, bwpre):
         self.bwpre = bwpre
@@ -215,7 +223,7 @@ class ParamFinder(object):
     
     def calc_53_params(self, np=10):
         # get parameters
-        fname = self.bwpre+'.{0}.flux.txt.gz'.self.refcode
+        fname = self.bwpre+'.{0}.flux.txt.gz'.format(self.refcode)
         if os.path.exists(fname):
             D = UT.read_pandas(fname)
         else:
