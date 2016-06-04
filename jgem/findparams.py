@@ -119,7 +119,7 @@ class ParamFinder(object):
         self.sj = sj = UT.read_pandas(self.refpre+'.sj.txt.gz')
         self.set_bws(bwpre)
 
-    def process(self, sdiffth=0.5, np=10):
+    def process(self, sdiffth=1, np=10):
         self.extract_all()
         for x in ['ne_i','ne_5','ne_3','e5i','e3i','e53']:
             print('  #{0}:{1}'.format(x, len(getattr(self, x))))
@@ -262,9 +262,11 @@ class ParamFinder(object):
         ppath = self.bwpre+'.{0}.e53params.json'.format(self.refcode)
         self.write_params(ppath, lr, Y, Z, ['sdiff','smean'], {'sdiffth':sdiffth})
         # save scatter plots
-        spath = self.bwpre+'.{0}.e53params.png'.format(self.refcode)
         title = self.bwpre.split('/')[-1]
-        self.plot_sin_sout(dicb, D, Y, Z, sdiffth, spath, title)
+        spath = self.bwpre+'.{0}.e53params'.format(self.refcode)
+        self.plot_sin_sout(dicb, D, Y, Z, sdiffth, spath+'.0.png', title)
+        self.plot_sin_sout(dicb, D, Y, Z, sdiffth, spath+'.pdf', title, ptyp='pdf')
+        self.plot_sin_sout(dicb, D, Y, Z, sdiffth, spath+'.png', title, ptyp='png')
         return locals()
 
     def write_params(self, ppath, lr, Y, Z, cols, dic={}):
@@ -278,7 +280,7 @@ class ParamFinder(object):
             json.dump(params, fp)
 
 
-    def plot_sin_sout(self, dicb, D, Y, Z, sdiffth, spath=None, title='', alpha=0.1):
+    def plot_sin_sout(self, dicb, D, Y, Z, sdiffth, spath=None, title='', alpha=0.1, ptyp='both'):
         fig,axr = P.subplots(2,2,figsize=(8,8),sharex=True,sharey=True)
         P.subplots_adjust(hspace=0.1,wspace=0.1)
         def _plt(Dsub, c, ax, dosdiffth=False):
@@ -290,34 +292,36 @@ class ParamFinder(object):
                 x = x[idx]
                 y = y[idx]
             ax.plot(x,y,c,alpha=alpha, ms=4)
-        # 0,0 ne_i vs ne_5,ne_3
-        _plt(dicb['ne_i'], 'b.', axr[0][0])
-        _plt(dicb['ne_5'], 'r.', axr[0][0])
-        _plt(dicb['ne_3'], 'r.', axr[0][0])
-        axr[0][0].set_title('edge 53 exons')
-        # 0,1 ne_i vs e5i,e3i
-        _plt(dicb['ne_i'], 'b.', axr[0][1])
-        _plt(dicb['e5i'], 'r.', axr[0][1])
-        _plt(dicb['e3i'], 'r.', axr[0][1])
-        axr[0][1].set_title('internal 53 exons')
-        # 1,0 Y
-        _plt(D[Y==0], 'b.', axr[1][0])
-        _plt(D[Y==1], 'r.', axr[1][0], True)
-        axr[1][0].set_title('non zero subsets')
-        # 1,1 Z
-        _plt(D[Z==0], 'b.', axr[1][1])
-        _plt(D[Z==1], 'r.', axr[1][1], True)
-        axr[1][1].set_title('logistic regression')
+        if ptyp != 'pdf':
+            # 0,0 ne_i vs ne_5,ne_3
+            _plt(dicb['ne_i'], 'b.', axr[0][0])
+            _plt(dicb['ne_5'], 'r.', axr[0][0])
+            _plt(dicb['ne_3'], 'r.', axr[0][0])
+            # 0,1 ne_i vs e5i,e3i
+            _plt(dicb['ne_i'], 'b.', axr[0][1])
+            _plt(dicb['e5i'], 'r.', axr[0][1])
+            _plt(dicb['e3i'], 'r.', axr[0][1])
+            # 1,0 Y
+            _plt(D[Y==0], 'b.', axr[1][0])
+            _plt(D[Y==1], 'r.', axr[1][0], True)
+            # 1,1 Z
+            _plt(D[Z==0], 'b.', axr[1][1])
+            _plt(D[Z==1], 'r.', axr[1][1], True)
+        if ptype != 'png':
+            axr[0][0].set_title('edge 53 exons')
+            axr[0][1].set_title('internal 53 exons')
+            axr[1][0].set_title('non zero subsets')
+            axr[1][1].set_title('logistic regression')
+            axr[0][0].set_ylabel('log2(junction outflux)')
+            axr[1][0].set_ylabel('log2(junction outflux)')
+            axr[1][0].set_xlabel('log2(junction influx)')
+            axr[1][1].set_xlabel('log2(junction influx)')
+            fig.suptitle(title)
 
-        axr[0][0].set_ylabel('log2(junction outflux)')
-        axr[1][0].set_ylabel('log2(junction outflux)')
-        axr[1][0].set_xlabel('log2(junction influx)')
-        axr[1][1].set_xlabel('log2(junction influx)')
         vmax = N.floor(N.log2(max(D['sin'].max(),D['sout'].max())+1))-1
         axr[0][0].set_xlim(-1,vmax)
         axr[0][0].set_ylim(-1,vmax)
 
-        fig.suptitle(title)
         if spath is not None:
             fig.savefig(spath)
 
@@ -369,13 +373,15 @@ class ParamFinder(object):
         self.write_params(p3path, f['lr'], f['Y'], f['Z'], ['lsin','lgap'], {'th':gapth})
 
         # save scatter plots
-        spath = self.bwpre+'.{0}.gap53params.png'.format(self.refcode)
+        spath = self.bwpre+'.{0}.gap53params'.format(self.refcode)
         title = self.bwpre.split('/')[-1]
-        self.plot_gap53_fit(fit5_000, fit3_000, spath, title)
+        self.plot_gap53_fit(fit5_000, fit3_000, spath+'.0.png', title, ptyp='both')
+        self.plot_gap53_fit(fit5_000, fit3_000, spath+'.pdf', title, ptyp='pdf')
+        self.plot_gap53_fit(fit5_000, fit3_000, spath+'.png', title, ptyp='png')
 
         return locals()
 
-    def plot_gap53_fit(self, lcls5, lcls3, spath, title):
+    def plot_gap53_fit(self, lcls5, lcls3, spath, title, ptyp='both'):
         fig,axr = P.subplots(2,2,figsize=(8,8), sharex=True, sharey=True)
         P.subplots_adjust(hspace=0.1,wspace=0.1)
 
@@ -386,22 +392,25 @@ class ParamFinder(object):
             y0 = X0[:,1]
             x1 = X1[:,0]
             y1 = X1[:,1]
-            ax.plot(x0,y0,'r.', ms=5, alpha=0.1)
-            ax.plot(x1,y1,'b.', ms=5, alpha=0.1)
-            ax.set_title(title)
+            if ptyp != 'pdf':
+                ax.plot(x0,y0,'r.', ms=5, alpha=0.1)
+                ax.plot(x1,y1,'b.', ms=5, alpha=0.1)
+            if ptyp != 'png':
+                ax.set_title(title)
 
         _one(lcls5['Z'],lcls5['X'], axr[0][0],'5 predict')
         _one(lcls5['Y'],lcls5['X'], axr[0][1],'5 actual')
         _one(lcls3['Z'],lcls3['X'], axr[1][0],'3 predict')
         _one(lcls3['Y'],lcls3['X'], axr[1][1],'3 actual')
-        axr[1][0].set_xlabel('log2(junction influx)')
-        axr[0][0].set_ylabel('log2(gap size)')
-        axr[1][1].set_xlabel('log2(junction influx)')
-        axr[1][0].set_ylabel('log2(gap size)')
+        if ptyp != 'png':
+            axr[1][0].set_xlabel('log2(junction influx)')
+            axr[0][0].set_ylabel('log2(gap size)')
+            axr[1][1].set_xlabel('log2(junction influx)')
+            axr[1][0].set_ylabel('log2(gap size)')
+            fig.suptitle(title)
         xmax = N.floor(N.max(lcls3['X'][:,0])*0.9)
         axr[0][0].set_xlim(-1, xmax)
         axr[0][0].set_ylim(-1,14)
-        fig.suptitle(title)
 
         fig.savefig(spath)
         
@@ -440,13 +449,15 @@ class ParamFinder(object):
         ppath = self.bwpre+'.{0}.exonparams.json'.format(self.refcode)
         self.write_params(ppath, lr, Y, Z, ['lemax','lgap','llen'])
         # make fig
-        spath = self.bwpre+'.{0}.exonparams.png'.format(self.refcode)
+        spath = self.bwpre+'.{0}.exonparams'.format(self.refcode)
         title = self.bwpre.split('/')[-1]
-        self.plot_exon_fit(spath, title, X, Y, Z)
+        self.plot_exon_fit(spath+'.0.png', title, X, Y, Z, ptyp='both')
+        self.plot_exon_fit(spath+'.pdf', title, X, Y, Z, ptyp='pdf')
+        self.plot_exon_fit(spath+'.png', title, X, Y, Z, ptyp='png')
 
         return locals()
 
-    def plot_exon_fit(self, spath, title, X, Y, Z):
+    def plot_exon_fit(self, spath, title, X, Y, Z, ptyp='both'):
         fig,axr = P.subplots(2,2,figsize=(8,8), sharex=True, sharey=True)
         P.subplots_adjust(hspace=0.1,wspace=0.2)
 
@@ -459,24 +470,27 @@ class ParamFinder(object):
             pz0 = X[idx0,1]
             py1 = X[idx1,2] # llen
             py0 = X[idx0,2]
-            ax[0].plot(px1,pz1,'r.',ms=3,alpha=0.3)
-            ax[0].plot(px0,pz0,'b.',ms=3,alpha=0.3)
-            ax[1].plot(px1,py1,'r.',ms=3,alpha=0.3)
-            ax[1].plot(px0,py0,'b.',ms=3,alpha=0.3)
-            ax[0].set_title(t0)
-            ax[1].set_title(t1)
+            if ptyp != 'pdf':
+                ax[0].plot(px1,pz1,'r.',ms=3,alpha=0.3)
+                ax[0].plot(px0,pz0,'b.',ms=3,alpha=0.3)
+                ax[1].plot(px1,py1,'r.',ms=3,alpha=0.3)
+                ax[1].plot(px0,py0,'b.',ms=3,alpha=0.3)
+            if ptyp != 'png':
+                ax[0].set_title(t0)
+                ax[1].set_title(t1)
 
         _row(Y, 'actual log(gap)', 'actual log(len)', axr[0])
         _row(Z, 'fit log(gap)', 'fit log(len)', axr[1])
-        axr[1][0].set_xlabel('log2(ecov max)')
-        axr[1][1].set_xlabel('log2(ecov max)')
-        axr[0][0].set_ylabel('log10(len)')
-        axr[1][0].set_ylabel('log10(len)')
+        if ptyp != 'png':
+            axr[1][0].set_xlabel('log2(ecov max)')
+            axr[1][1].set_xlabel('log2(ecov max)')
+            axr[0][0].set_ylabel('log10(len)')
+            axr[1][0].set_ylabel('log10(len)')
+            fig.suptitle(title)
         xmax = N.floor(N.max(X[:,0])*0.9)
         axr[0][0].set_xlim(-1, xmax)
         axr[0][0].set_ylim(-1, 5)
         axr[1][0].set_ylim(-1, 5)
-        fig.suptitle(title)
         fig.savefig(spath)
         
 
