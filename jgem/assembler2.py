@@ -164,7 +164,7 @@ E53CM = LogisticClassifier(json=e53m_p, dstcol='e53')
 
 class EdgeFinder(object):
     
-    def __init__(self, json):
+    def __init__(self, json, maxsize=100000):
         a_lsin,a_lgap = json['coef']
         b0 = json['intercept']
         th = json['th']
@@ -175,6 +175,7 @@ class EdgeFinder(object):
         self.c0 = -b0/a_lgap
         self.c1 = -a_lsin/a_lgap
         self.th = th
+        self.maxsize = maxsize
         
     def find(self, sja, exa, direction):
         # sja1, exa1 : pos0=>pos+1(<), pos-1=>pos0(>)
@@ -215,6 +216,7 @@ class EdgeFinder(object):
                 if x[1]>gapth: # found
                     epos = x[0] # start offset pos
                     break
+            epos = min(epos, self.maxsize)
         else:
             # lsin = abs(sja[-1]-sja[-2])
             ein = N.mean(exa[-12:-1])
@@ -228,12 +230,13 @@ class EdgeFinder(object):
                 if x[1]>gapth:
                     epos = -x[0]+1
                     break
+            epos = max(epos, -self.maxsize)            
         return epos
         
 e5_p  = dict(coef=[-0.285,-0.81], intercept=5.6, th=0, zoom=1)
-EF5 = EdgeFinder(e5_p)
+EF5 = EdgeFinder(e5_p, maxsize=3000)
 e3_p = dict(coef=[-0.25,-0.51], intercept=4.6, th=0, zoom=1) # -0.25, -0.5, 4.5
-EF3 = EdgeFinder(e3_p) 
+EF3 = EdgeFinder(e3_p, maxsize=50000) 
 
 
 ####### Gene Graph ###########################################
