@@ -49,7 +49,7 @@ from jgem import taskqueue as TQ
 
 class SjExBigWigs(object):
     
-    def __init__(self, bwpre, sjbwpre=None):
+    def __init__(self, bwpre, sjbwpre=None, mixunstranded=True):
         if sjbwpre is None:
             sjbwpre = bwpre
         if type(bwpre)!=type([]):
@@ -58,21 +58,32 @@ class SjExBigWigs(object):
             sjbwpre = [sjbwpre]
         self.bwpre = bwpre
         self.sjbwpre = sjbwpre
+        self.mixunstranded = mixunstranded
         S2S = {'+':'.p','-':'.n','.':'.u','r+':'.rp','r-':'.rn','r.':'.ru'}
         bwp = {
             'ex': {s:[b+'.ex{0}.bw'.format(S2S[s]) for b in bwpre] for s in S2S},
             'sj': {s:[b+'.sj{0}.bw'.format(S2S[s]) for b in sjbwpre] for s in S2S},
         }
         self.bwpaths = bwpaths = {'ex':{},'sj':{}}
-        bwpaths['ex']['+'] = {'p':bwp['ex']['+']+bwp['ex']['.'],}
-        bwpaths['ex']['-'] = {'p':bwp['ex']['-']+bwp['ex']['.'],}
-        bwpaths['ex']['.'] = {'p':bwp['ex']['.'],}        
-        bwpaths['ex']['a'] = {'p':bwp['ex']['+']+bwp['ex']['-']+bwp['ex']['.'],}
-        bwpaths['sj']['+'] = {'p':bwp['sj']['+']+bwp['sj']['.'],}
-        bwpaths['sj']['-'] = {'p':bwp['sj']['-']+bwp['sj']['.'],}
-        bwpaths['sj']['.'] = {'p':bwp['sj']['.'],}
-        bwpaths['sj']['a'] = {'p':bwp['sj']['+']+bwp['sj']['-']+bwp['sj']['.'],}
-        
+        if mixunstranded:
+            bwpaths['ex']['+'] = {'p':bwp['ex']['+']+bwp['ex']['.'],}
+            bwpaths['ex']['-'] = {'p':bwp['ex']['-']+bwp['ex']['.'],}
+            bwpaths['ex']['.'] = {'p':bwp['ex']['.'],}        
+            bwpaths['ex']['a'] = {'p':bwp['ex']['+']+bwp['ex']['-']+bwp['ex']['.'],}
+            bwpaths['sj']['+'] = {'p':bwp['sj']['+']+bwp['sj']['.'],}
+            bwpaths['sj']['-'] = {'p':bwp['sj']['-']+bwp['sj']['.'],}
+            bwpaths['sj']['.'] = {'p':bwp['sj']['.'],}
+            bwpaths['sj']['a'] = {'p':bwp['sj']['+']+bwp['sj']['-']+bwp['sj']['.'],}
+        else:
+            bwpaths['ex']['+'] = {'p':bwp['ex']['+'],}
+            bwpaths['ex']['-'] = {'p':bwp['ex']['-'],}
+            bwpaths['ex']['.'] = {'p':bwp['ex']['.'],}        
+            bwpaths['ex']['a'] = {'p':bwp['ex']['+']+bwp['ex']['-'],}
+            bwpaths['sj']['+'] = {'p':bwp['sj']['+'],}
+            bwpaths['sj']['-'] = {'p':bwp['sj']['-'],}
+            bwpaths['sj']['.'] = {'p':bwp['sj']['.'],}
+            bwpaths['sj']['a'] = {'p':bwp['sj']['+']+bwp['sj']['-'],}
+
         # bwpaths['ex']['+'] = {'p':[bwp['ex']['+'],bwp['ex']['.']],
         #                       'n':[bwp['ex']['r+'],bwp['ex']['r.']]}
         # bwpaths['ex']['-'] = {'p':[bwp['ex']['-'],bwp['ex']['.']],
@@ -2025,7 +2036,7 @@ def sjpaths2tspan(sjpaths, cmax=9):
 ####### Bundle Finder ###############################################################
     
 def find_gaps(bwpre, chrom, csize, gsizeth=5e5, minbundlesize=10e6, sjbwpre=None, sjth=0):
-    sjexbw = SjExBigWigs(bwpre, sjbwpre)
+    sjexbw = SjExBigWigs(bwpre, sjbwpre, mixunstranded=False)
     sts = []
     eds = []
     bsize = 2*minbundlesize
