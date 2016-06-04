@@ -1101,6 +1101,8 @@ class LocalAssembler(object):
         
         self.sjpaths0 = s1 # original unfiltered (just position restricted)
         sc1 = self.sjpaths0['sc1']
+        if sself.sjpaths0.dtypes['sc2']=='O': # merged sjpath
+            self.sjpaths0['sc2'] = sc1
         sc2 = self.sjpaths0['sc2']
         idx1 = (sc1>=uth)|(sc2-sc1>=mth)
         self.sjpaths = sjpaths = self.sjpaths0[idx1].copy()
