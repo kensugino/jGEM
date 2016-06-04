@@ -2164,11 +2164,12 @@ def bundle_assembler(bwpre, chrom, st, ed, dstpre, upperpathnum, sjbwpre=None):
             '.paths.bed.gz',
             '.tspans.bed.gz',
             '.unused.sjpath.bed.gz']
-    if all([os.path.exists(dstpre+bsuf+x) for x in sufs]):
-        return bname
-    if all([os.path.exists(dstpre+csuf+x) for x in sufs]):
-        return bname
-    if all([os.path.exists(dstpre+x) for x in sufs]):
+    done = []
+    for x in sufs:
+        done.append(os.path.exists(dstpre+bsuf+x) | \
+                    os.path.exists(dstpre+csuf+x) | \
+                    os.path.exists(dstpre+x) )
+    if all(done):
         return bname
     la = LocalAssembler(bwpre, chrom, st, ed, dstpre, upperpathnum=upperpathnum, sjbwpre=sjbwpre)
     return la.process()
