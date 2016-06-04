@@ -110,11 +110,12 @@ class ParamFinder(object):
         refpre: pathprefix to ref (assume .ex.txt.gz, .sj.txt.gz)
 
     """
-    def __init__(self, refpre, bwpre, refcode, genome):
+    def __init__(self, refpre, bwpre, refcode, genome, zoom=1):
         self.refpre = refpre
         self.genome = genome
         self.bwpre = bwpre
         self.refcode = refcode
+        self.zoom = zoom # multiply this factor to zoom in to small values
         self.ex = ex = UT.read_pandas(self.refpre+'.ex.txt.gz')
         self.sj = sj = UT.read_pandas(self.refpre+'.sj.txt.gz')
         self.set_bws(bwpre)
@@ -227,6 +228,7 @@ class ParamFinder(object):
     def calc_53_params(self, sdiffth=1, np=10):
         # get parameters
         dic = {}
+        zoom = self.zoom
         for x in ['ne_i','ne_5','ne_3','e5i','e3i']:
             fpath = self.bwpre+'.{0}.{1}.flux.txt.gz'.format(self.refcode,x)
             if os.path.exists(fpath):
@@ -241,7 +243,7 @@ class ParamFinder(object):
         for x in ['ne_5','ne_3','e5i','e3i']:
             f = dic[x]
             f['kind'] = 1
-            idx0 = N.abs(N.log2(f['sin']+1)-N.log2(f['sout']+1))>sdiffth
+            idx0 = N.abs(N.log2(zoom*f['sin']+1)-N.log2(zoom*f['sout']+1))>sdiffth
             idx1 = (f['sdin']!=0)|(f['sdout']!=0) # should have either in or out
             idx = idx0 & idx1 
             FN0 += N.sum((~idx0)&idx1) # pre filtered positive
@@ -252,8 +254,8 @@ class ParamFinder(object):
         dicb['ne_i'] = f[idx]
         D = PD.concat(dicb.values(),ignore_index=True)
 
-        D['lsin'] = N.log2(D['sin']+1)
-        D['lsout'] = N.log2(D['sout']+1)
+        D['lsin'] = N.log2(zoom*D['sin']+1)
+        D['lsout'] = N.log2(zoom*D['sout']+1)
         D['sdiff'] = N.abs(D['lsin']-D['lsout'])
         D['smean'] = (D['lsin']+D['lsout'])/2.
         X = D[['sdiff','smean']].values
@@ -263,7 +265,7 @@ class ParamFinder(object):
         Z = lr.predict(X)
         # save fit coefficients
         ppath = self.bwpre+'.{0}.e53params.json'.format(self.refcode)
-        self.write_params(ppath, lr, Y, Z, ['sdiff','smean'], {'sdiffth':sdiffth}, FN0=FN0)
+        self.write_params(ppath, lr, Y, Z, ['sdiff','smean'], {'sdiffth':sdiffth, 'zoom':zoom}, FN0=FN0)
         # save scatter plots
         title = self.bwpre.split('/')[-1]
         spath = self.bwpre+'.{0}.e53params'.format(self.refcode)
@@ -287,10 +289,11 @@ class ParamFinder(object):
     def plot_sin_sout(self, dicb, D, Y, Z, sdiffth, spath=None, title='', alpha=0.1, ptyp='both'):
         fig,axr = P.subplots(2,2,figsize=(8,8),sharex=True,sharey=True)
         P.subplots_adjust(hspace=0.1,wspace=0.1)
+        zoom = self.zoom
         def _plt(Dsub, c, ax, dosdiffth=False):
             # Dsub = D[K==k]
-            x = N.log2(Dsub['sin']+1)
-            y = N.log2(Dsub['sout']+1)
+            x = N.log2(zoom*Dsub['sin']+1)
+            y = N.log2(zoom*Dsub['sout']+1)
             if dosdiffth:
                 idx = N.abs(x-y)>sdiffth
                 x = x[idx]
@@ -322,7 +325,7 @@ class ParamFinder(object):
             axr[1][1].set_xlabel('log2(junction influx)')
             fig.suptitle(title)
 
-        vmax = N.floor(N.log2(max(D['sin'].max(),D['sout'].max())+1))-1
+        vmax = N.floor(N.log2(zoom*max(D['sin'].max(),D['sout'].max())+1))-1
         axr[0][0].set_xlim(-1,vmax)
         axr[0][0].set_ylim(-1,vmax)
 
@@ -331,6 +334,7 @@ class ParamFinder(object):
 
 
     def calc_53gap_params(self, gapth=0, np=10):
+        zoom = self.zoom
         d5path = self.bwpre+'.{0}.gap5params.txt.gz'.format(self.refcode)
         d3path = self.bwpre+'.{0}.gap3params.txt.gz'.format(self.refcode)
         if os.path.exists(d5path):
@@ -354,7 +358,7 @@ class ParamFinder(object):
             da['kind'] = 1
             db['kind'] = 0
             D = PD.concat([da,db],ignore_index=True)
-            D[lrx] = N.log2(D[rx]+1)
+            D[lrx] = N.log2(zoom*D[rx]+1)
             D['lgap'] = N.log2(D['gap']+1)
             X = D[[lrx,'lgap']].values
             Y = D['kind'].values
@@ -375,10 +379,10 @@ class ParamFinder(object):
         # save coefs
         p5path = self.bwpre+'.{0}.gap5params.json'.format(self.refcode)
         f = fit5_000
-        self.write_params(p5path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':gapth})
+        self.write_params(p5path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':gapth,'zoom':zoom})
         p3path = self.bwpre+'.{0}.gap3params.json'.format(self.refcode)
         f = fit3_000
-        self.write_params(p3path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':gapth})
+        self.write_params(p3path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':gapth,'zoom':zoom})
 
         # save scatter plots
         spath = self.bwpre+'.{0}.gap53params'.format(self.refcode)
@@ -445,7 +449,7 @@ class ParamFinder(object):
         D = PD.concat([nei[cols], e53[cols]],ignore_index=True)
         D['llen'] = N.log10((D['len']))
         D['lgap'] = N.log10(D['gap005']+1)
-        D['lemax'] = N.log2(D['emax']+1)
+        D['lemax'] = N.log2(zoom*D['emax']+1)
         D1 = D[(D['emax']>0)&(D['sdIn']!=0)&(D['sdOut']!=0)]
         print(len(D), len(D1))
         X = D1[['lemax', 'lgap','llen']].values
@@ -455,7 +459,7 @@ class ParamFinder(object):
         Z = lr.predict(X)    
         # write json
         ppath = self.bwpre+'.{0}.exonparams.json'.format(self.refcode)
-        self.write_params(ppath, lr, Y, Z, ['lemax','lgap','llen'])
+        self.write_params(ppath, lr, Y, Z, ['lemax','lgap','llen'], {'zoom':zoom})
         # make fig
         spath = self.bwpre+'.{0}.exonparams'.format(self.refcode)
         title = self.bwpre.split('/')[-1]

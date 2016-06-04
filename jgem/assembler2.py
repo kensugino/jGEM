@@ -153,6 +153,7 @@ class EdgeFinder(object):
         a_lsin,a_lgap = json['coef']
         b0 = json['intercept']
         th = json['th']
+        self.zoom = zoom = json['zoom']
         self.a_lsin = a_lsin
         self.a_lgap = a_lgap
         self.b0 = b0
@@ -175,6 +176,7 @@ class EdgeFinder(object):
         #         i1 = i2
         #     if i0!=i1:
         #         yield (i0, i1-i0+1)
+        zoom = self.zoom
         def _find_gap_from_idx(idx):
             if len(idx)==0:
                 return []
@@ -186,11 +188,12 @@ class EdgeFinder(object):
             return zip(idxst, gsize)
         if direction=='>':
             # lsin = abs(sja[1]-sja[0])
-            lsin = N.mean(exa[1:11])
-            gapth = 2**(c0+c1*lsin)-1
+            ein = N.mean(exa[1:11])
+            lein = N.log2(zoom*ein+1)
+            gapth = 2**(c0+c1*lein)-1
             #print('gapth={0:.2f}, lsin={1:.2f}'.format(gapth, lsin))
             # pos => pos0, find position where lgap > gapth
-            idx = N.nonzero(exa[1:]<=th*lsin)[0]
+            idx = N.nonzero(exa[1:]<=th*lein)[0]
             #print(idx)
             epos = len(exa)-1 # all the way to the end
             for x in _find_gap_from_idx(idx):
@@ -199,11 +202,12 @@ class EdgeFinder(object):
                     break
         else:
             # lsin = abs(sja[-1]-sja[-2])
-            lsin = N.mean(exa[-12:-1])
-            gapth = 2**(c0+c1*lsin)-1
+            ein = N.mean(exa[-12:-1])
+            lein = N.log2(zoom*ein+1)
+            gapth = 2**(c0+c1*lein)-1
             #print('gapth={0:.2f}, lsin={1:.2f}'.format(gapth, lsin))
             # pos0 <= pos, going opposite way
-            idx = N.nonzero(exa[:-1][::-1]<=th*lsin)[0]
+            idx = N.nonzero(exa[:-1][::-1]<=th*lein)[0]
             epos = -len(exa)
             for x in _find_gap_from_idx(idx):
                 if x[1]>gapth:
@@ -665,6 +669,7 @@ def detect_exons(sjpaths, offset, sja, exa, covfactor=0.05, classifier=INTG):
     # gaps = find_np_pairs(tmp, xd)
     gaps1 = find_np_pairs(tmp)
     gaps = sorted(set(gaps0+gaps1))
+    zoom = classifier.json['zoom']
     def _gen_params():
         #find_maxgap = cyas2.find_maxgap
         for st,ed in gaps:
@@ -674,7 +679,7 @@ def detect_exons(sjpaths, offset, sja, exa, covfactor=0.05, classifier=INTG):
                 print(st,ed)
             emax = exsub.max()
             th = emax*covfactor
-            lemax = N.log2(emax+1)
+            lemax = N.log2(zoom*emax+1)
             lgap = N.log10(find_maxgap2(exsub, th)+1)
             llen = N.log10(ed-st+1)
             sdmax = max(xd[st-1],xd[ed-1])
@@ -725,10 +730,11 @@ def find_genespan(st0, ed0, gaps, th=1):
     return df
     
 def detect_53(sja, exa, strand, classifier=E53C):
+    zoom = classifier.json['zoom']
     if strand=='+':
-        x = N.log2(sja+1)
+        x = N.log2(zoom*sja+1)
     else:
-        x = N.log2(sja[::-1]+1)
+        x = N.log2(zoom*sja[::-1]+1)
     xd = (x[1:]-x[:-1])
     xm = (x[1:]+x[:-1])/2.
     # idxp = N.nonzero(xd>0)[0] # source
