@@ -237,11 +237,14 @@ class ParamFinder(object):
                 dic[x] = self.calc_flux_mp(df, np=np)
                 UT.write_pandas(dic[x], fpath,'h')
         dicb = {}
+        FN0 = 0
         for x in ['ne_5','ne_3','e5i','e3i']:
             f = dic[x]
             f['kind'] = 1
-            idx = N.abs(N.log2(f['sin']+1)-N.log2(f['sout']+1))>sdiffth
-            idx = idx & (f['sdin']!=0)|(f['sdout']!=0) # should have either in or out
+            idx0 = N.abs(N.log2(f['sin']+1)-N.log2(f['sout']+1))>sdiffth
+            idx1 = (f['sdin']!=0)|(f['sdout']!=0) # should have either in or out
+            idx = idx0 & idx1 
+            FN0 += N.sum((~idx0)&idx1) # pre filtered positive
             dicb[x] = f[idx]
         f = dic['ne_i']
         f['kind'] = 0
@@ -260,7 +263,7 @@ class ParamFinder(object):
         Z = lr.predict(X)
         # save fit coefficients
         ppath = self.bwpre+'.{0}.e53params.json'.format(self.refcode)
-        self.write_params(ppath, lr, Y, Z, ['sdiff','smean'], {'sdiffth':sdiffth})
+        self.write_params(ppath, lr, Y, Z, ['sdiff','smean'], {'sdiffth':sdiffth}, FN0=FN0)
         # save scatter plots
         title = self.bwpre.split('/')[-1]
         spath = self.bwpre+'.{0}.e53params'.format(self.refcode)
@@ -269,13 +272,14 @@ class ParamFinder(object):
         self.plot_sin_sout(dicb, D, Y, Z, sdiffth, spath+'.png', title, ptyp='png')
         return locals()
 
-    def write_params(self, ppath, lr, Y, Z, cols, dic={}):
-        sen,spe = calc_sensitivity_specificity(Y,Z)
+    def write_params(self, ppath, lr, Y, Z, cols, dic={},FN0=0):
+        cssdic = calc_sensitivity_specificity(Y,Z,FN0)
         b1 = list(lr.coef_[0])
         b0 = lr.intercept_[0]
         print('b1={0}, b0={1}'.format(b1,b0))
-        params = dict(cols=cols,coef=b1,intercept=b0,sensitivity=sen, specificity=spe)
+        params = dict(cols=cols,coef=b1,intercept=b0)
         params.update(dic)
+        params.update(cssdic)
         with open(ppath,'w') as fp:
             json.dump(params, fp)
 
@@ -665,19 +669,17 @@ class ParamFinder(object):
         ax.set_title('emin')
     
     
-def calc_sensitivity_specificity(Y,Z):
+def calc_sensitivity_specificity(Y,Z,FN0=0):
     print('mismatch:{0}/{1}'.format(N.sum(Y!=Z), len(Y)))
-    num53 = N.sum(Y==1)
-    numi = N.sum(Y==0)
-    num53tp = N.sum((Y==1)&(Z==1))
-    num53fn = N.sum((Y==1)&(Z==0))
-    num53fp = N.sum((Y==0)&(Z==1))
-    num53tn = N.sum((Y==0)&(Z==0))
-    print('TP({0}),FN({1}),TN({2}),FP({3})'.format(num53tp, num53fn, num53tn, num53fp))
-    sensitivity = float(num53tp)/(num53tp+num53fn)
-    specificity = 1.-float(num53fp)/(num53fp+num53tn)
+    TP = N.sum((Y==1)&(Z==1))
+    FN = N.sum((Y==1)&(Z==0)) + FN0
+    FP = N.sum((Y==0)&(Z==1))
+    TN = N.sum((Y==0)&(Z==0))
+    print('TP({0}),FN({1}),TN({2}),FP({3}),FN0({4})'.format(TP, FN, TN, FP, FN0))
+    sensitivity = float(TP)/(TP+FN)
+    specificity = 1.-float(FP)/(FP+TN)
     print('sensitivity={0:.3f}, specificity={1:.3f}'.format(sensitivity, specificity))
-    return sensitivity, specificity
+    return locals()
 
 
 
