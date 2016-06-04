@@ -202,6 +202,7 @@ class EdgeFinder(object):
 EF5 = EdgeFinder(-0.2, -0.8, 5.4, 0)
 EF3 = EdgeFinder(-0.25, -0.5, 4.8, 0) # -0.25, -0.5, 4.5
 
+
 ####### Gene Graph ###########################################
 
 class PathNumUpperLimit(Exception):
@@ -317,7 +318,8 @@ class GeneGraph(object):
         self.exs = exons#.copy()
         self.sjs = sjpaths#.copy()
         self.strand = strand
-        self.upperpathnum = upperpathnum
+        self.upperpathnum0 = upperpathnum
+        self.upperpathnum = max(len(sjpaths), upperpathnum)
 
     def prep_gstree(self, sjs):
         # decompose into unitary junctions, make GSTree
@@ -946,6 +948,28 @@ class LocalAssembler(object):
     def logdebug(self, msg):
         self._log(msg, 'debug')
         
+    def load_classifiers(self, pathpre):
+        # pathpre: bwpre+'.{refcode}'
+        with open(pahtpre+'.exonparams.json','r') as fp:
+            self.exonparams = ep = json.load(fp)
+        self.intg = LogisticClassifier(b0=ep['intercept'], b1=ep['coef'], cols=ep['cols'], dstcol='exon')
+        
+        with open(pahtpre+'.e53params.json','r') as fp:
+            self.e53params = e5p = json.load(fp)    
+        self.e53c = LogisticClassifier(b0=e5p['intercept'], b1=e5p['coef'], cols=e5p['cols'], dstcol='e53')
+
+        with open(pahtpre+'.gap5params.json','r') as fp:
+            self.gap5params = g5p = json.load(fp)        
+        a_lsin,a_lgap = g5p['coef']
+        b0 = g5p['intercept']
+        self.ef5 = EdgeFinder(a_lsin,a_lgap,b0,0)
+
+        with open(pahtpre+'.gap3params.json','r') as fp:
+            self.gap3params = g3p = json.load(fp)        
+        a_lsin,a_lgap = g3p['coef']
+        b0 = g3p['intercept']
+        self.ef3 = EdgeFinder(a_lsin,a_lgap,b0,0)
+
     def _read_sjpaths(self):
         sjpaths0 = self._sjpaths
         if sjpaths0 is not None:

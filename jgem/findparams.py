@@ -19,6 +19,7 @@ from itertools import repeat
 import logging
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
+import json
 
 # 3rd party imports
 import pandas as PD
@@ -33,6 +34,7 @@ from jgem import gtfgffbed as GGB
 
 from jgem.bigwig import BWObj #, BWs 
 
+from sklearn.linear_model import LogisticRegression
 
 def find_maxgap(arr, emin, emax, th, win, gapmode):
     if (emin>th):
@@ -108,9 +110,11 @@ class ParamFinder(object):
         refpre: pathprefix to ref (assume .ex.txt.gz, .sj.txt.gz)
 
     """
-    def __init__(self, refpre, bwpre, genome):
+    def __init__(self, refpre, bwpre, refcode, genome):
         self.refpre = refpre
         self.genome = genome
+        self.bwpre = bwpre
+        self.refcode = refcode
         self.ex = ex = UT.read_pandas(self.refpre+'.ex.txt.gz')
         self.sj = sj = UT.read_pandas(self.refpre+'.sj.txt.gz')
         self.set_bws(bwpre)
@@ -209,25 +213,32 @@ class ParamFinder(object):
         df['len'] = df['ed']-df['st']
         return df
     
-    def calc_all_flux_mp(self, np=10):
-        dic = {}
-        for x in ['ne_i','ne_5','ne_3','e5i','e3i']:
-            df = getattr(self, x)
-            print('calculating {0}...'.format(x))
-            dic[x] = self.calc_flux_mp(df, np=np)
-        dicb = {}
-        for x in ['ne_5','ne_3','e5i','e3i']:
-            f = dic[x]
-            f['kind'] = 1
-            idx = N.abs(N.log2(f['sin']+1)-N.log2(f['sout']+1))>1
-            idx = idx & (f['sdin']!=0)|(f['sdout']!=0) # should have either in or out
-            dicb[x] = f[idx]
-        f = dic['ne_i']
-        f['kind'] = 0
-        idx = (f['ecovmax']>1)&((f['sdin']!=0)&(f['sdout']!=0)) # should have both in&out
-        dicb['ne_i'] = f[idx]
+    def calc_53_params(self, np=10):
+        # get parameters
+        fname = self.bwpre+'.{0}.flux.txt.gz'.self.refcode
+        if os.path.exists(fname):
+            D = UT.read_pandas(fname)
+        else:
+            dic = {}
+            for x in ['ne_i','ne_5','ne_3','e5i','e3i']:
+                df = getattr(self, x)
+                print('calculating {0}...'.format(x))
+                dic[x] = self.calc_flux_mp(df, np=np)
+                UT.write_pandas(self.bwpre+'.{0}.{1}.flux.txt.gz'.format(self.refcode,x),'h')
+            dicb = {}
+            for x in ['ne_5','ne_3','e5i','e3i']:
+                f = dic[x]
+                f['kind'] = 1
+                idx = N.abs(N.log2(f['sin']+1)-N.log2(f['sout']+1))>1
+                idx = idx & (f['sdin']!=0)|(f['sdout']!=0) # should have either in or out
+                dicb[x] = f[idx]
+            f = dic['ne_i']
+            f['kind'] = 0
+            idx = (f['ecovmax']>1)&((f['sdin']!=0)&(f['sdout']!=0)) # should have both in&out
+            dicb['ne_i'] = f[idx]
+            D = PD.concat(dicb.values(),ignore_index=True)
+            UT.write_pandas(D, fname, 'h')
 
-        D = PD.concat(dicb.values(),ignore_index=True)
         D['lsin'] = N.log2(D['sin']+1)
         D['lsout'] = N.log2(D['sout']+1)
         D['sdiff'] = N.abs(D['lsin']-D['lsout'])
@@ -237,11 +248,79 @@ class ParamFinder(object):
         lr = LogisticRegression()
         lr.fit(X,Y)
         Z = lr.predict(X)
+        # save fit coefficients
+        ppath = self.bwpre+'.{0}.e53params.json'.format(self.refcode)
+        self.write_params(ppath, lr, Y, Z, ['sdiff','smean'])
+        # save scatter plots
+        spath = self.bwpre+'.{0}.e53params.png'.format(self.refcode)
+        title = self.bwpre.split('/')[-1]
+        self.plot_sin_sout(dicb, D, Y, Z, spath, title)
         return locals()
 
-    def calc_all_53gap_mp(self, np=14):
-        d5 = self.calc_params_mp(self.ne_5, win=8192, np=np, gapmode='53', direction='<')
-        d3 = self.calc_params_mp(self.ne_3, win=8192, np=np, gapmode='53', direction='>')
+    def write_params(self, ppath, lr, Y, Z, cols):
+        sen,spe = calc_sensitivity_specificity(Y,Z)
+        b1 = list(lr.coef_[0])
+        b0 = lr.intercept_[0]
+        print('b1={0}, b0={1}'.format(b1,b0))
+        params = dict(cols=cols,coef=b1,intercept=b0,sensitivity=sen, specificity=spe)
+        with open(ppath,'w') as fp:
+            json.dump(params, fp)
+
+
+    def plot_sin_sout(self, dicb, D, Y, Z, spath=None, title='', alpha=0.1):
+        fig,axr = P.subplots(2,2,figsize=(8,8),sharex=True,sharey=True)
+        P.subplots_adjust(hspace=0.1,wspace=0.1)
+        def _plt(Dsub, c, ax):
+            # Dsub = D[K==k]
+            x = N.log2(Dsub['sin']+1)
+            y = N.log2(Dsub['sout']+1)
+            ax.plot(x,y,c,alpha=alpha, ms=4)
+        # 0,0 ne_i vs ne_5,ne_3
+        _plt(dicb['ne_i'], 'b.', axr[0][0])
+        _plt(dicb['ne_5'], 'r.', axr[0][0])
+        _plt(dicb['ne_3'], 'r.', axr[0][0])
+        axr[0][0].set_title('edge 53 exons')
+        # 0,1 ne_i vs e5i,e3i
+        _plt(dicb['ne_i'], 'b.', axr[0][1])
+        _plt(dicb['e5i'], 'r.', axr[0][1])
+        _plt(dicb['e3i'], 'r.', axr[0][1])
+        axr[0][1].set_title('internal 53 exons')
+        # 1,0 Y
+        _plt(D[Y==0], 'b.', axr[1][0])
+        _plt(D[Y==1], 'r.', axr[1][0])
+        axr[1][0].set_title('non zero subsets')
+        # 1,1 Z
+        _plt(D[Z==0], 'b.', axr[1][1])
+        _plt(D[Z==1], 'r.', axr[1][1])
+        axr[1][1].set_title('logistic regression')
+
+        axr[0][0].set_ylabel('log2(junction outflux)')
+        axr[1][0].set_ylabel('log2(junction outflux)')
+        axr[1][0].set_xlabel('log2(junction influx)')
+        axr[1][1].set_xlabel('log2(junction influx)')
+        vmax = N.floor(N.log2(max(D['sin'].max(),D['sout'].max())+1))-1
+        axr[0][0].set_xlim(-1,vmax)
+        axr[0][0].set_ylim(-1,vmax)
+
+        fig.suptitle(title)
+        if spath is not None:
+            fig.savefig(spath)
+
+
+    def calc_53gap_params(self, np=10):
+        d5path = self.bwpre+'.{0}.gap5params.txt.gz'.format(self.refcode)
+        d3path = self.bwpre+'.{0}.gap3params.txt.gz'.format(self.refcode)
+        if os.path.exists(d5path):
+            d5 = UT.read_pandas(d5path)
+        else:
+            d5 = self.calc_params_mp(self.ne_5, win=8192, np=np, gapmode='53', direction='<')
+            UT.write_pandas(d5, d5path, 'h')
+        if os.path.exists(d3path):
+            d3 = UT.read_pandas(d3path)
+        else:
+            d3 = self.calc_params_mp(self.ne_3, win=8192, np=np, gapmode='53', direction='>')
+            UT.write_pandas(d3, d3path, 'h')
+
         i5 = (d5['sOut']>0)&(d5['emax']>0)
         i3 = (d3['sIn']>0)&(d3['emax']>0)
         d50 = d5[i5]
@@ -260,16 +339,130 @@ class ParamFinder(object):
             lr.fit(X,Y)
             Z = lr.predict(X)
             return locals()
-        fit5_005 = _fitone(d50,'sOut','gap005','gapIn')
-        fit5_002 = _fitone(d50,'sOut','gap002','gapIn')
+        # fit5_005 = _fitone(d50,'sOut','gap005','gapIn')
+        # fit5_002 = _fitone(d50,'sOut','gap002','gapIn')
         fit5_000 = _fitone(d50,'sOut','gap000','gapIn')
-        fit3_005 = _fitone(d30,'sIn', 'gap005','gapOut')
-        fit3_002 = _fitone(d30,'sIn', 'gap002','gapOut')
+        # fit3_005 = _fitone(d30,'sIn', 'gap005','gapOut')
+        # fit3_002 = _fitone(d30,'sIn', 'gap002','gapOut')
         fit3_000 = _fitone(d30,'sIn', 'gap000','gapOut')
+        # save coefs
+        p5path = self.bwpre+'.{0}.gap5params.json'.format(self.refcode)
+        f = fit5_000
+        self.write_params(p5path, f['lr'], f['Y'], f['Z'], ['lsin','lgap'])
+        p3path = self.bwpre+'.{0}.gap3params.json'.format(self.refcode)
+        f = fit3_000
+        self.write_params(p3path, f['lr'], f['Y'], f['Z'], ['lsin','lgap'])
+
+        # save scatter plots
+        spath = self.bwpre+'.{0}.gap53params.png'.format(self.refcode)
+        title = self.bwpre.split('/')[-1]
+        self.plot_gap53_fit(fit5_000, fit3_000, spath, title)
+
         return locals()
+
+    def plot_gap53_fit(self, lcls5, lcls3, spath, title):
+        fig,axr = P.subplots(2,2,figsize=(8,8), sharex=True, sharey=True)
+        P.subplots_adjust(hspace=0.1,wspace=0.1)
+
+        def _one(W,X,ax,title):
+            X0 = X[W==0]
+            X1 = X[W==1]
+            x0 = X0[:,0]
+            y0 = X0[:,1]
+            x1 = X1[:,0]
+            y1 = X1[:,1]
+            ax.plot(x0,y0,'r.', ms=5, alpha=0.1)
+            ax.plot(x1,y1,'b.', ms=5, alpha=0.1)
+            ax.set_title(title)
+
+        _one(lcls5['Z'],lcls5['X'], axr[0][0],'5 predict')
+        _one(lcls5['Y'],lcls5['X'], axr[0][1],'5 actual')
+        _one(lcls3['Z'],lcls3['X'], axr[1][0],'3 predict')
+        _one(lcls3['Y'],lcls3['X'], axr[1][1],'3 actual')
+        axr[1][0].set_xlabel('log2(junction influx)')
+        axr[0][0].set_ylabel('log2(gap size)')
+        axr[1][1].set_xlabel('log2(junction influx)')
+        axr[1][0].set_ylabel('log2(gap size)')
+        axr[0][0].set_xlim(-1, 6)
+        axr[0][0].set_ylim(-1,14)
+        fig.suptitle(title)
+
+        fig.savefig(spath)
         
+    def calc_exon_params(self, np=10):
+        # get params
+        neipath = self.bwpre+'.{0}.nei.params.txt.gz'.format(self.refcode)
+        e53path = self.bwpre+'.{0}.e53.params.txt.gz'.format(self.refcode)
+        if os.path.exists(neipath):
+            nei = UT.read_pandas(neipath)
+        else:
+            nei = self.calc_params_mp(self.ne_i, np=np, gapmode='i') # ~ 1min
+            UT.write_pandas(nei, neipath, 'h')
+        if os.path.exists(e53path):
+            e53 = UT.read_pandas(e53path)
+        else:
+            e53 = self.calc_params_mp(self.e53, np=np, gapmode='i') # ~ 10min don't do long ones stupid
+            UT.write_pandas(e53, e53path, 'h')
+        # logistic fit
+        cols =  ['chr', 'st', 'ed', 'gap005', 'emax', 'emin', 'sIn', 'sOut', 'locus', 'kind','len', 'sdIn','sdOut']
+        nei['kind'] = 1
+        e53['kind'] = 0
+        nei['len'] = nei['ed'] - nei['st']
+        e53['len'] = e53['ed'] - e53['st']
+        D = PD.concat([nei[cols], e53[cols]],ignore_index=True)
+        D['llen'] = N.log10((D['len']))
+        D['lgap'] = N.log10(D['gap005']+1)
+        D['lemax'] = N.log2(D['emax']+1)
+        D1 = D[(D['emax']>0)&(D['sdIn']!=0)&(D['sdOut']!=0)]
+        print(len(D), len(D1))
+        X = D1[['lemax', 'lgap','llen']].values
+        Y = D1['kind'].values
+        lr = LogisticRegression()
+        lr.fit(X,Y)
+        Z = lr.predict(X)    
+        # write json
+        ppath = self.bwpre+'.{0}.exonparams.json'.format(self.refcode)
+        self.write_params(ppath, lr, Y, Z, ['lemax','lgap','llen'])
+        # make fig
+        spath = self.bwpre+'.{0}.exonparams.png'.format(self.refcode)
+        title = self.bwpre.split('/')[-1]
+        self.plot_exon_fit(spath, title, X, Y, Z)
+
+        return locals()
+
+    def plot_exon_fit(self, spath, title, X, Y, Z):
+        fig,axr = P.subplots(2,2,figsize=(8,8), sharex=True, sharey=True)
+        P.subplots_adjust(hspace=0.1,wspace=0.2)
+
+        def _row(W,t0,t1,ax):
+            idx0 = W==0
+            idx1 = W==1
+            px1 = X[idx1,0] # lemax
+            px0 = X[idx0,0]
+            pz1 = X[idx1,1] # lgap
+            pz0 = X[idx0,1]
+            py1 = X[idx1,2] # llen
+            py0 = X[idx0,2]
+            ax[0].plot(px1,pz1,'r.',ms=3,alpha=0.3)
+            ax[0].plot(px0,pz0,'b.',ms=3,alpha=0.3)
+            ax[1].plot(px1,py1,'r.',ms=3,alpha=0.3)
+            ax[1].plot(px0,py0,'b.',ms=3,alpha=0.3)
+            ax[0].set_title(t0)
+            ax[1].set_title(t1)
+
+        _row(Y, 'actual log(gap)', 'actual log(len)', axr[0])
+        _row(Z, 'fit log(gap)', 'fit log(len)', axr[1])
+        axr[1][0].set_xlabel('log2(ecov max)')
+        axr[1][1].set_xlabel('log2(ecov max)')
+        axr[0][0].set_ylabel('log10(len)')
+        axr[1][0].set_ylabel('log10(len)')
+        axr[0][0].set_xlim(-1, 6)
+        axr[0][0].set_ylim(-1, 5)
+        axr[1][0].set_ylim(-1, 5)
+        fig.suptitle(title)
+        fig.savefig(spath)
         
-        
+
     def extract_53_pair(self):
         # between genes
         ex = self.ex
@@ -320,7 +513,7 @@ class ParamFinder(object):
         sdf['locus'] = UT.calc_locus(sdf)
         sdf['len'] = sdf['ed']-sdf['st']
         maxexonsize = self.ne_i['len'].max()
-        sdf = sdf[(sdf['len']>20)&(sdf['len']<2*maxexonsize)]
+        sdf = sdf[(sdf['len']>20)&(sdf['len']<max(2*maxexonsize, 20000))]
         UT.write_pandas(sdf, tmpprefix+'.e53pair.bed.gz')
         sdf.index.name='_id'
         
@@ -441,7 +634,23 @@ class ParamFinder(object):
         ax.set_title('emin')
     
     
+def calc_sensitivity_specificity(Y,Z):
+    print('mismatch:{0}/{1}'.format(N.sum(Y!=Z), len(Y)))
+    num53 = N.sum(Y==1)
+    numi = N.sum(Y==0)
+    num53tp = N.sum((Y==1)&(Z==1))
+    num53fn = N.sum((Y==1)&(Z==0))
+    num53fp = N.sum((Y==0)&(Z==1))
+    num53tn = N.sum((Y==0)&(Z==0))
+    print('TP({0}),FN({1}),TN({2}),FP({3})'.format(num53tp, num53fn, num53tn, num53fp))
+    sensitivity = float(num53tp)/(num53tp+num53fn)
+    specificity = 1.-float(num53fp)/(num53fp+num53tn)
+    print('sensitivity={0:.3f}, specificity={1:.3f}'.format(sensitivity, specificity))
+    return sensitivity, specificity
 
+
+
+    
 def make_bws(bwp):
     # .ex.p.bw, .ex.n.bw, .ex.u.bw, .sj.p.bw, .sj.n.bw, .sj.u.bw
     bws = {'ex':{},'sj':{}}
