@@ -1549,7 +1549,7 @@ class LocalAssembler(object):
             # return N.sum(sja[s-o:e-o]+exa[s-o:e-o])/(e-s)
             return N.mean(sja[s-o:e-o])
         def cov1s(s):
-            s0 = max(0, s-0-10)
+            s0 = max(0, s-o-10)
             s1 = max(s0+1,s-o)
             return N.mean(exa[s0:s1])
         def cov1e(e):
