@@ -1049,7 +1049,7 @@ class LocalAssembler(object):
             if len(sj0)>0:
                 name0 = sj0.iloc[0]['name']
                 if len(name0.split('|'))<len(name0.split(',')):
-                    sj0['name'] = [x.split(',')[1:-1] for x in sj0['name']]
+                    sj0['name'] = [','.join(x.split(',')[1:-1]) for x in sj0['name']]
             return sj0
 
         # list of bwpres, load and merge
@@ -1061,7 +1061,7 @@ class LocalAssembler(object):
             if len(sj0)>0:
                 name0 = sj0.iloc[0]['name']
                 if len(name0.split('|'))<len(name0.split(',')):
-                    sj0['name'] = [x.split(',')[1:-1] for x in sj0['name']]            
+                    sj0['name'] = [','.join(x.split(',')[1:-1]) for x in sj0['name']]            
             sjps.append(sj0)
         sjp = PD.concat(sjps, ignore_index=True)
         sjg = sjp.groupby(['chr','name'])
