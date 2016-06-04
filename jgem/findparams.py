@@ -670,7 +670,8 @@ class ParamFinder(object):
     
     
 def calc_sensitivity_specificity(Y,Z,FN0=0):
-    print('mismatch:{0}/{1}'.format(N.sum(Y!=Z), len(Y)))
+    mismatch=N.sum(Y!=Z)
+    print('mismatch:{0}/{1}'.format(mismatch, len(Y)))
     TP = N.sum((Y==1)&(Z==1))
     FN = N.sum((Y==1)&(Z==0)) + FN0
     FP = N.sum((Y==0)&(Z==1))
@@ -679,7 +680,8 @@ def calc_sensitivity_specificity(Y,Z,FN0=0):
     sensitivity = float(TP)/(TP+FN)
     specificity = 1.-float(FP)/(FP+TN)
     print('sensitivity={0:.3f}, specificity={1:.3f}'.format(sensitivity, specificity))
-    return locals()
+    return dict(TP=TP,FN=FN,FP=FP,TN=TN,FN0=FN0,
+        sensitivity=sensitivity,specificity=specificity,mismatch=mismatch)
 
 
 
