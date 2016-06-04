@@ -348,15 +348,15 @@ class ParamFinder(object):
         i3 = (d3['sIn']>0)&(d3['emax']>0)
         d50 = d5[i5]
         d30 = d3[i3]
-        def _fitone(d0, x, y1, y2):
-            da = d0[[x,y1]].copy().rename(columns={y1:'gap',x:'sin'})
-            db = d0[[x,y2]].copy().rename(columns={y2:'gap',x:'sin'})
+        def _fitone(d0, x, y1, y2, rx='sin',lrx='lsin'):
+            da = d0[[x,y1]].copy().rename(columns={y1:'gap',x:rx})
+            db = d0[[x,y2]].copy().rename(columns={y2:'gap',x:rx})
             da['kind'] = 1
             db['kind'] = 0
             D = PD.concat([da,db],ignore_index=True)
-            D['lsin'] = N.log2(D['sin']+1)
+            D[lrx] = N.log2(D[rx]+1)
             D['lgap'] = N.log2(D['gap']+1)
-            X = D[['lsin','lgap']].values
+            X = D[[lrx,'lgap']].values
             Y = D['kind'].values
             lr = LogisticRegression()
             lr.fit(X,Y)
@@ -364,17 +364,21 @@ class ParamFinder(object):
             return locals()
         # fit5_005 = _fitone(d50,'sOut','gap005','gapIn')
         # fit5_002 = _fitone(d50,'sOut','gap002','gapIn')
-        fit5_000 = _fitone(d50,'sOut','gap000','gapIn')
         # fit3_005 = _fitone(d30,'sIn', 'gap005','gapOut')
         # fit3_002 = _fitone(d30,'sIn', 'gap002','gapOut')
-        fit3_000 = _fitone(d30,'sIn', 'gap000','gapOut')
+        # fit5_000 = _fitone(d50,'sOut','gap000','gapIn')
+        # fit3_000 = _fitone(d30,'sIn', 'gap000','gapOut')
+        rx,lrx = 'ein','lein'
+        fit5_000 = _fitone(d50,'eOut','gap000','gapIn', 'ein', 'lein')
+        fit3_000 = _fitone(d30,'eIn', 'gap000','gapOut' 'ein', 'lein')
+
         # save coefs
         p5path = self.bwpre+'.{0}.gap5params.json'.format(self.refcode)
         f = fit5_000
-        self.write_params(p5path, f['lr'], f['Y'], f['Z'], ['lsin','lgap'], {'th':gapth})
+        self.write_params(p5path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':gapth})
         p3path = self.bwpre+'.{0}.gap3params.json'.format(self.refcode)
         f = fit3_000
-        self.write_params(p3path, f['lr'], f['Y'], f['Z'], ['lsin','lgap'], {'th':gapth})
+        self.write_params(p3path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':gapth})
 
         # save scatter plots
         spath = self.bwpre+'.{0}.gap53params'.format(self.refcode)

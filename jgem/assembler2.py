@@ -185,7 +185,8 @@ class EdgeFinder(object):
             gsize = idxed - idxst + 1
             return zip(idxst, gsize)
         if direction=='>':
-            lsin = abs(sja[1]-sja[0])
+            # lsin = abs(sja[1]-sja[0])
+            lsin = N.mean(exa[1:11])
             gapth = 2**(c0+c1*lsin)-1
             #print('gapth={0:.2f}, lsin={1:.2f}'.format(gapth, lsin))
             # pos => pos0, find position where lgap > gapth
@@ -197,7 +198,8 @@ class EdgeFinder(object):
                     epos = x[0] # start offset pos
                     break
         else:
-            lsin = abs(sja[-1]-sja[-2])
+            # lsin = abs(sja[-1]-sja[-2])
+            lsin = N.mean(exa[-12:-1])
             gapth = 2**(c0+c1*lsin)-1
             #print('gapth={0:.2f}, lsin={1:.2f}'.format(gapth, lsin))
             # pos0 <= pos, going opposite way
@@ -1979,7 +1981,37 @@ def path2tspan(paths, cmax=9, covfld='tcov0'):
     bed.sort_values(['chr','st','ed'], inplace=True)
     return bed    
 
+def sjpaths2tspan(sjpaths, cmax=9):
+    # bed12
+    bed = sjpaths
+    # #exons, esizes, estarts
+    bed['exonsp'] = [[[int(z) for z in y.split(',')] for y in x.split('|')] for x in bed['name']]
+    bed['exonsn'] = [[y[::-1] for y in x][::-1] for x in bed['exonsp']]
+    idxp = bed['strand']!='-'
+    bed.loc[idxp, 'exons'] = bed[idxp]['exonsp']
+    bed.loc[~idxp, 'exons'] = bed[~idxp]['exonsn']
 
+    bg = sjpaths.groupby(['tst','ted'])
+    bedg = bg.first()
+    bedg['exons'] = bg['exons'].apply(lambda g: sorted(set([tuple(x) for y in g for x in y])))
+    bedg['st'] = bg['st'].min()
+    bedg['ed'] = bg['ed'].max()
+    bedg['sc1'] = bg['sc1'].max()
+    bed = bedg.reset_index()
+    
+    bed['#exons'] = [len(x) for x in bed['exons']]
+    estarts = [[str(y[0]-x[0][0]) for y in x] for x in bed['exons']]
+    esizes = [[str(y[1]-y[0]) for y in x] for x in bed['exons']]
+    bed['esizes'] = [','.join(x)+',' for x in esizes]
+    bed['estarts'] = [','.join(x)+',' for x in estarts]
+    bed['ltcov'] = N.log2(bed['sc1']+2)
+    sm = {'+':Colors('R', cmax),
+          '-':Colors('B', cmax),
+          '.':Colors('G', cmax)}
+    bed['sc2'] = [sm[s].RGB(x) for x,s in bed[['ltcov','strand']].values]
+    bed.sort_values(['chr','st','ed'], inplace=True)
+    return bed
+    
 
 ####### Bundle Finder ###############################################################
     
