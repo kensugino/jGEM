@@ -307,7 +307,7 @@ class ParamFinder(object):
             # 1,1 Z
             _plt(D[Z==0], 'b.', axr[1][1])
             _plt(D[Z==1], 'r.', axr[1][1], True)
-        if ptype != 'png':
+        if ptyp != 'png':
             axr[0][0].set_title('edge 53 exons')
             axr[0][1].set_title('internal 53 exons')
             axr[1][0].set_title('non zero subsets')
