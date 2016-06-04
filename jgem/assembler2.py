@@ -1748,7 +1748,7 @@ class LocalAssembler(object):
         o = self.st
         if len(ex)==0:
             return
-        # ex['ecov'] = N.nan
+        ex['ecov'] = N.nan
         for strand in ['+','-']:
             ps = paths[paths['strand'].isin(STRS[strand])]
             if len(ps)==0:
