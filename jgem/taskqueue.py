@@ -20,6 +20,8 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
 
+import numpy as N
+
 # c.f. http://stackoverflow.com/questions/19924104/python-multiprocessing-handling-child-errors-in-parent
 
 class Worker(multiprocessing.Process):
