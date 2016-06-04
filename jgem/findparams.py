@@ -324,6 +324,9 @@ class ParamFinder(object):
             axr[1][0].set_xlabel('log2(junction influx)')
             axr[1][1].set_xlabel('log2(junction influx)')
             fig.suptitle(title)
+        else:
+            axr[0][0].set_xticks([])
+            axr[0][0].set_yticks([])            
 
         vmax = N.floor(N.log2(zoom*max(D['sin'].max(),D['sout'].max())+1))-1
         axr[0][0].set_xlim(-1,vmax)
@@ -415,11 +418,14 @@ class ParamFinder(object):
         _one(lcls3['Z'],lcls3['X'], axr[1][0],'3 predict')
         _one(lcls3['Y'],lcls3['X'], axr[1][1],'3 actual')
         if ptyp != 'png':
-            axr[1][0].set_xlabel('log2(junction influx)')
+            axr[1][0].set_xlabel('log2(ecov in)')
             axr[0][0].set_ylabel('log2(gap size)')
-            axr[1][1].set_xlabel('log2(junction influx)')
+            axr[1][1].set_xlabel('log2(ecov in)')
             axr[1][0].set_ylabel('log2(gap size)')
             fig.suptitle(title)
+        else:
+            axr[0][0].set_xticks([])
+            axr[0][0].set_yticks([])
         xmax = N.floor(N.max(lcls3['X'][:,0])*0.9)
         axr[0][0].set_xlim(-1, xmax)
         axr[0][0].set_ylim(-1,14)
@@ -500,6 +506,9 @@ class ParamFinder(object):
             axr[0][0].set_ylabel('log10(len)')
             axr[1][0].set_ylabel('log10(len)')
             fig.suptitle(title)
+        else:
+            axr[0][0].set_xticks([])
+            axr[0][0].set_yticks([])
         xmax = N.floor(N.max(X[:,0])*0.9)
         axr[0][0].set_xlim(-1, xmax)
         axr[0][0].set_ylim(-1, 5)
