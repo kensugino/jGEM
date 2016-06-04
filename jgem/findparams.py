@@ -673,14 +673,16 @@ def calc_sensitivity_specificity(Y,Z,FN0=0):
     mismatch=N.sum(Y!=Z)
     print('mismatch:{0}/{1}'.format(mismatch, len(Y)))
     TP = N.sum((Y==1)&(Z==1))
-    FN = N.sum((Y==1)&(Z==0)) + FN0
+    FN1 = N.sum((Y==1)&(Z==0))
+    FN = FN1 + FN0
     FP = N.sum((Y==0)&(Z==1))
     TN = N.sum((Y==0)&(Z==0))
-    print('TP({0}),FN({1}),TN({2}),FP({3}),FN0({4})'.format(TP, FN, TN, FP, FN0))
-    sensitivity = float(TP)/(TP+FN)
+    print('TP({0}),FN({1}),TN({2}),FP({3}),FN0({4}),FN1({5})'.format(TP, FN, TN, FP, FN0,FN1))
+    sensitivity0 = float(TP)/(TP+FN)
+    sensitivity = float(TP)/(TP+FN1)
     specificity = 1.-float(FP)/(FP+TN)
     print('sensitivity={0:.3f}, specificity={1:.3f}'.format(sensitivity, specificity))
-    return dict(TP=TP,FN=FN,FP=FP,TN=TN,FN0=FN0,
+    return dict(TP=TP,FN=FN,FP=FP,TN=TN,FN0=FN0,FN1=FN1,sensitivity0=sensitivity0,
         sensitivity=sensitivity,specificity=specificity,mismatch=mismatch)
 
 
