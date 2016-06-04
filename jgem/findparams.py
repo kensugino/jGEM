@@ -119,12 +119,12 @@ class ParamFinder(object):
         self.sj = sj = UT.read_pandas(self.refpre+'.sj.txt.gz')
         self.set_bws(bwpre)
 
-    def process(self, np=10):
+    def process(self, sdiffth=0.5, np=10):
         self.extract_all()
         for x in ['ne_i','ne_5','ne_3','e5i','e3i','e53']:
             print('  #{0}:{1}'.format(x, len(getattr(self, x))))
-        self.calc_53_params(np=np)
-        self.calc_53gap_params(np=np)
+        self.calc_53_params(sdiffth=sdiffth, np=np)
+        self.calc_53gap_params(gapth=0, np=np)
         self.calc_exon_params(np=np)
         
     def set_bws(self, bwpre):
@@ -221,24 +221,27 @@ class ParamFinder(object):
         df['len'] = df['ed']-df['st']
         return df
     
-    def calc_53_params(self, np=10):
+    def calc_53_params(self, sdiffth=1, np=10):
         # get parameters
-        fname = self.bwpre+'.{0}.flux.txt.gz'.format(self.refcode)
+        fname = self.bwpre+'.{0}.sdiffth({1}).flux.txt.gz'.format(self.refcode,sdiffth)
         if os.path.exists(fname):
             D = UT.read_pandas(fname)
         else:
             dic = {}
             for x in ['ne_i','ne_5','ne_3','e5i','e3i']:
-                df = getattr(self, x)
-                print('calculating {0}...'.format(x))
-                dic[x] = self.calc_flux_mp(df, np=np)
                 fpath = self.bwpre+'.{0}.{1}.flux.txt.gz'.format(self.refcode,x)
-                UT.write_pandas(dic[x], fpath,'h')
+                if os.path.exists(fpath):
+                    dic[x] = UT.read_pandas(fpath)
+                else:
+                    df = getattr(self, x)
+                    print('calculating {0}...'.format(x))
+                    dic[x] = self.calc_flux_mp(df, np=np)
+                    UT.write_pandas(dic[x], fpath,'h')
             dicb = {}
             for x in ['ne_5','ne_3','e5i','e3i']:
                 f = dic[x]
                 f['kind'] = 1
-                idx = N.abs(N.log2(f['sin']+1)-N.log2(f['sout']+1))>1
+                idx = N.abs(N.log2(f['sin']+1)-N.log2(f['sout']+1))>sdiffth
                 idx = idx & (f['sdin']!=0)|(f['sdout']!=0) # should have either in or out
                 dicb[x] = f[idx]
             f = dic['ne_i']
@@ -259,30 +262,35 @@ class ParamFinder(object):
         Z = lr.predict(X)
         # save fit coefficients
         ppath = self.bwpre+'.{0}.e53params.json'.format(self.refcode)
-        self.write_params(ppath, lr, Y, Z, ['sdiff','smean'])
+        self.write_params(ppath, lr, Y, Z, ['sdiff','smean'], {'sdiffth':sdiffth})
         # save scatter plots
         spath = self.bwpre+'.{0}.e53params.png'.format(self.refcode)
         title = self.bwpre.split('/')[-1]
-        self.plot_sin_sout(dicb, D, Y, Z, spath, title)
+        self.plot_sin_sout(dicb, D, Y, Z, sdiffth, spath, title)
         return locals()
 
-    def write_params(self, ppath, lr, Y, Z, cols):
+    def write_params(self, ppath, lr, Y, Z, cols, dic={}):
         sen,spe = calc_sensitivity_specificity(Y,Z)
         b1 = list(lr.coef_[0])
         b0 = lr.intercept_[0]
         print('b1={0}, b0={1}'.format(b1,b0))
         params = dict(cols=cols,coef=b1,intercept=b0,sensitivity=sen, specificity=spe)
+        params.update(dic)
         with open(ppath,'w') as fp:
             json.dump(params, fp)
 
 
-    def plot_sin_sout(self, dicb, D, Y, Z, spath=None, title='', alpha=0.1):
+    def plot_sin_sout(self, dicb, D, Y, Z, sdiffth, spath=None, title='', alpha=0.1):
         fig,axr = P.subplots(2,2,figsize=(8,8),sharex=True,sharey=True)
         P.subplots_adjust(hspace=0.1,wspace=0.1)
-        def _plt(Dsub, c, ax):
+        def _plt(Dsub, c, ax, dosdiffth=False):
             # Dsub = D[K==k]
             x = N.log2(Dsub['sin']+1)
             y = N.log2(Dsub['sout']+1)
+            if dosdiffth:
+                idx = N.abs(x-y)>sdiffth
+                x = x[idx]
+                y = y[idx]
             ax.plot(x,y,c,alpha=alpha, ms=4)
         # 0,0 ne_i vs ne_5,ne_3
         _plt(dicb['ne_i'], 'b.', axr[0][0])
@@ -296,11 +304,11 @@ class ParamFinder(object):
         axr[0][1].set_title('internal 53 exons')
         # 1,0 Y
         _plt(D[Y==0], 'b.', axr[1][0])
-        _plt(D[Y==1], 'r.', axr[1][0])
+        _plt(D[Y==1], 'r.', axr[1][0], True)
         axr[1][0].set_title('non zero subsets')
         # 1,1 Z
         _plt(D[Z==0], 'b.', axr[1][1])
-        _plt(D[Z==1], 'r.', axr[1][1])
+        _plt(D[Z==1], 'r.', axr[1][1], True)
         axr[1][1].set_title('logistic regression')
 
         axr[0][0].set_ylabel('log2(junction outflux)')
@@ -316,7 +324,7 @@ class ParamFinder(object):
             fig.savefig(spath)
 
 
-    def calc_53gap_params(self, np=10):
+    def calc_53gap_params(self, gapth=0, np=10):
         d5path = self.bwpre+'.{0}.gap5params.txt.gz'.format(self.refcode)
         d3path = self.bwpre+'.{0}.gap3params.txt.gz'.format(self.refcode)
         if os.path.exists(d5path):
@@ -357,10 +365,10 @@ class ParamFinder(object):
         # save coefs
         p5path = self.bwpre+'.{0}.gap5params.json'.format(self.refcode)
         f = fit5_000
-        self.write_params(p5path, f['lr'], f['Y'], f['Z'], ['lsin','lgap'])
+        self.write_params(p5path, f['lr'], f['Y'], f['Z'], ['lsin','lgap'], {'th':gapth})
         p3path = self.bwpre+'.{0}.gap3params.json'.format(self.refcode)
         f = fit3_000
-        self.write_params(p3path, f['lr'], f['Y'], f['Z'], ['lsin','lgap'])
+        self.write_params(p3path, f['lr'], f['Y'], f['Z'], ['lsin','lgap'], {'th':gapth})
 
         # save scatter plots
         spath = self.bwpre+'.{0}.gap53params.png'.format(self.refcode)
@@ -392,7 +400,8 @@ class ParamFinder(object):
         axr[0][0].set_ylabel('log2(gap size)')
         axr[1][1].set_xlabel('log2(junction influx)')
         axr[1][0].set_ylabel('log2(gap size)')
-        axr[0][0].set_xlim(-1, 6)
+        xmax = N.floor(N.max(X[:,0])*0.9)
+        axr[0][0].set_xlim(-1, xmax)
         axr[0][0].set_ylim(-1,14)
         fig.suptitle(title)
 
@@ -465,7 +474,8 @@ class ParamFinder(object):
         axr[1][1].set_xlabel('log2(ecov max)')
         axr[0][0].set_ylabel('log10(len)')
         axr[1][0].set_ylabel('log10(len)')
-        axr[0][0].set_xlim(-1, 6)
+        xmax = N.floor(N.max(X[:,0])*0.9)
+        axr[0][0].set_xlim(-1, xmax)
         axr[0][0].set_ylim(-1, 5)
         axr[1][0].set_ylim(-1, 5)
         fig.suptitle(title)
