@@ -2122,31 +2122,43 @@ def find_bundles(bwpre, genome, dstpre, chrom=None, mingap=5e5, minbundlesize=10
 ########## convenience 
 
 def drawspan(la,st,ed,strand,win=10000, figsize=(15,6), df2=None, df3=None, delta=500, 
-    df2cov='sc2', df3cov='tcov'):
+    df2cov='sc2', df3cov='tcov', maxdisp=None):
     fig, axr = P.subplots(3,1,figsize=figsize,sharex=True)
     P.subplots_adjust(hspace=0)
     la.draw_covs(st,ed,strand, ax=axr[0], win=win)
     if df2 is not None:
+        if maxdisp is not None:
+            df2 = df2.sort_values(df2cov,ascending=False).iloc[:maxdisp]
         la.draw_path(df2, st,ed,strand, ax=axr[1], covfld=df2cov, win=win, delta=delta)
     if df3 is not None:
+        if maxdisp is not None:
+            df3 = df3.sort_values(df2cov,ascending=False).iloc[:maxdisp]
         la.draw_path(df3, st,ed,strand, ax=axr[2], win=win, delta=delta, covfld=df3cov)
 
 def drawspan2(la,st,ed,win=10000, figsize=(15,6), df2=None, df3=None, delta=500,
-    df2cov='sc2', df3cov='tcov'):
+    df2cov='sc2', df3cov='tcov', maxdisp=None):
     o = la.st
     fig, axr = P.subplots(6,1,figsize=figsize,sharex=True)
     P.subplots_adjust(hspace=0)
     strand = '+'
     la.draw_covs(st,ed,strand, ax=axr[0], win=win)
     if df2 is not None:
+        if maxdisp is not None:
+            df2 = df2.sort_values(df2cov,ascending=False).iloc[:maxdisp]
         la.draw_path(df2, st,ed,strand, ax=axr[1], covfld=df2cov, win=win, delta=delta)
     if df3 is not None:
+        if maxdisp is not None:
+            df3 = df3.sort_values(df2cov,ascending=False).iloc[:maxdisp]
         la.draw_path(df3, st,ed,strand, ax=axr[2], win=win, delta=delta, covfld=df3cov)
     strand = '-'
     la.draw_covs(st,ed,strand, ax=axr[3], win=win)
     if df2 is not None:
+        if maxdisp is not None:
+            df2 = df2.sort_values(df2cov,ascending=False).iloc[:maxdisp]
         la.draw_path(df2, st,ed,strand, ax=axr[4], covfld=df2cov, win=win, delta=delta)
     if df3 is not None:
+        if maxdisp is not None:
+            df3 = df3.sort_values(df2cov,ascending=False).iloc[:maxdisp]
         la.draw_path(df3, st,ed,strand, ax=axr[5], win=win, delta=delta, covfld=df3cov)
 
 
