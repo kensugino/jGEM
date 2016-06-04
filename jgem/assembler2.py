@@ -1555,9 +1555,11 @@ class LocalAssembler(object):
         def cov1e(e):
             return N.mean(exa[e-o:e-o+10])
         def cov2s(s):
-            return sja[s-o]-sja[s-o-1]
+            s0 = max(0, s-o-1)
+            return sja[s-o]-sja[s0]
         def cov2e(e):
-            return sja[e-o]-sja[e-o-1]
+            e0 = max(0, e-o-1)
+            return sja[e-o]-sja[e0]
         # if strand in ['+','.+']:
         #     def cov(s,e):
         #         return sja[s-o]
