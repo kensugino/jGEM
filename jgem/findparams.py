@@ -123,8 +123,11 @@ class ParamFinder(object):
         self.extract_all()
         for x in ['ne_i','ne_5','ne_3','e5i','e3i','e53']:
             print('  #{0}:{1}'.format(x, len(getattr(self, x))))
+        print('###### 53 params ########')
         self.calc_53_params(sdiffth=sdiffth, np=np)
+        print('###### 53gap params ########')
         self.calc_53gap_params(gapth=0, np=np)
+        print('###### exon params ########')
         self.calc_exon_params(np=np)
         
     def set_bws(self, bwpre):
