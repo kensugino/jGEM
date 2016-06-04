@@ -232,7 +232,8 @@ class ParamFinder(object):
                 df = getattr(self, x)
                 print('calculating {0}...'.format(x))
                 dic[x] = self.calc_flux_mp(df, np=np)
-                UT.write_pandas(self.bwpre+'.{0}.{1}.flux.txt.gz'.format(self.refcode,x),'h')
+                fpath = self.bwpre+'.{0}.{1}.flux.txt.gz'.format(self.refcode,x)
+                UT.write_pandas(dic[x], fpath,'h')
             dicb = {}
             for x in ['ne_5','ne_3','e5i','e3i']:
                 f = dic[x]
