@@ -2140,6 +2140,7 @@ def bundle_assembler(bwpre, chrom, st, ed, dstpre, upperpathnum, sjbwpre=None):
             '.sjdf.txt.gz',
             '.paths.txt.gz',
             '.paths.bed.gz',
+            '.tspans.bed.gz',
             '.unused.sjpath.bed.gz']
     if all([os.path.exists(dstpre+bsuf+x) for x in sufs]):
         return bname
@@ -2194,20 +2195,23 @@ def concatenate_bundles(bundles, bundlestatus, chrom, dstpre):
            'sjdf.txt.gz',
            'paths.txt.gz',
            'paths.bed.gz',
+           'tspans.bed.gz',
            'unused.sjpath.bed.gz']
     files = []
     for suf in sufs:
         dstpath = '{0}.{1}.{2}'.format(dstpre, chrom, suf)
-        if not os.path.exists(dstpath):
-            with open(dstpath, 'wb') as dst:
-                for chrom, st, ed in bundles:
-                    bname = bundle2bname((chrom,st,ed))
-                    if bundlestatus[bname] is None:
-                        continue
-                    srcpath = '{0}.{1}_{2}_{3}.{4}'.format(dstpre, chrom, st, ed, suf)
-                    files.append(srcpath)
-                    with open(srcpath, 'rb') as src:
-                        shutil.copyfileobj(src, dst)
+        dstpath2 = '{0}.{1}'.format(dstpre, suf)
+        if not os.path.exists(dstpath2):
+            if not os.path.exists(dstpath):
+                with open(dstpath, 'wb') as dst:
+                    for chrom, st, ed in bundles:
+                        bname = bundle2bname((chrom,st,ed))
+                        if bundlestatus[bname] is None:
+                            continue
+                        srcpath = '{0}.{1}_{2}_{3}.{4}'.format(dstpre, chrom, st, ed, suf)
+                        files.append(srcpath)
+                        with open(srcpath, 'rb') as src:
+                            shutil.copyfileobj(src, dst)
         else:
             files+=['{0}.{1}_{2}_{3}.{4}'.format(dstpre, chrom, st, ed, suf) for chrom,st,ed in bundles]
     # cleanup
