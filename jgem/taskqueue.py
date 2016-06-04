@@ -61,7 +61,7 @@ class Worker(multiprocessing.Process):
                     etime = time.time()
                     self.result_queue.put((next_task.name, answer))
                     elapsed = etime - stime
-                    print('{0}: finished {1} ({2} sec)'.format(proc_name, next_task.name, elapsed))
+                    print('{0}: finished {1} ({2:.3} sec)'.format(proc_name, next_task.name, elapsed))
                     self.set_info(_etime=etime, status='waiting', _stime=etime, elapsed=elapsed)
                 except Exception as e:
                     tb = traceback.format_exc()
