@@ -131,19 +131,22 @@ class LogisticClassifier(object):
 # for intergenic        
 itg_p = dict(coef = N.array([ -0.40,  -4.72, 0.86]),
            intercept = 11.8638183,
-           cols = ['lemax','lgap','llen'])
+           cols = ['lemax','lgap','llen'],
+           zoom = 1)
 INTG = LogisticClassifier(json=itg_p, dstcol='exon')
 
 e53_p = dict(coef = N.array([2.51, -0.77]),
              intercept= -2.7,
              cols = ['sdiff','smean'],
-             sdiffth= 1)
+             sdiffth= 1,
+             zoom = 1)
 E53C = LogisticClassifier(json=e53_p, dstcol='e53')
 
 e53m_p = dict(coef = N.array([1.542, -0.368]),
               intercept = -0.329,
               cols = ['sdiff','smean'],
-             sdiffth= 0.5)
+             sdiffth= 0.5,
+             zoom = 1)
 E53CM = LogisticClassifier(json=e53m_p, dstcol='e53')
 
 
@@ -215,9 +218,9 @@ class EdgeFinder(object):
                     break
         return epos
         
-e5_p  = dict(coef=[-0.2,-0.8], intercept=5.4, th=0)
+e5_p  = dict(coef=[-0.2,-0.8], intercept=5.4, th=0, zoom=1)
 EF5 = EdgeFinder(e5_p)
-e3_p = dict(coef=[-0.25,-0.5], intercept=4.8, th=0) # -0.25, -0.5, 4.5
+e3_p = dict(coef=[-0.25,-0.5], intercept=4.8, th=0, zoom=1) # -0.25, -0.5, 4.5
 EF3 = EdgeFinder(e3_p) 
 
 
