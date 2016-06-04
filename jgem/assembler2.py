@@ -1748,7 +1748,7 @@ class LocalAssembler(object):
         o = self.st
         if len(ex)==0:
             return
-        ex['ecov'] = N.nan
+        # ex['ecov'] = N.nan
         for strand in ['+','-']:
             ps = paths[paths['strand'].isin(STRS[strand])]
             if len(ps)==0:
@@ -1775,8 +1775,8 @@ class LocalAssembler(object):
                 elif ne==1:
                     s,e = es.iloc[0][['st','ed']]
                     ex.loc[idx,'ecov'] = cov(s,e)
-        idxnan = ex['ecov'].isnull()
-        ex.loc[idxnan,'ecov'] = [cov(s,e) for s,e in ex[idxnan][['st','ed']].values]
+        # idxnan = ex['ecov'].isnull()
+        # ex.loc[idxnan,'ecov'] = [cov(s,e) for s,e in ex[idxnan][['st','ed']].values]
         self._ne2ecov = UT.df2dict(ex, 'name', 'ecov')
         
     def write(self, cmax=9):
