@@ -370,7 +370,7 @@ class ParamFinder(object):
         # fit3_000 = _fitone(d30,'sIn', 'gap000','gapOut')
         rx,lrx = 'ein','lein'
         fit5_000 = _fitone(d50,'eOut','gap000','gapIn', 'ein', 'lein')
-        fit3_000 = _fitone(d30,'eIn', 'gap000','gapOut' 'ein', 'lein')
+        fit3_000 = _fitone(d30,'eIn', 'gap000','gapOut', 'ein', 'lein')
 
         # save coefs
         p5path = self.bwpre+'.{0}.gap5params.json'.format(self.refcode)
