@@ -427,6 +427,7 @@ class ParamFinder(object):
         fig.savefig(spath)
         
     def calc_exon_params(self, np=10):
+        zoom = self.zoom
         # get params
         neipath = self.bwpre+'.{0}.nei.params.txt.gz'.format(self.refcode)
         e53path = self.bwpre+'.{0}.e53.params.txt.gz'.format(self.refcode)
