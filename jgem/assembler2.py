@@ -949,8 +949,8 @@ class LocalAssembler(object):
         self.dstpre = dstpre
         self.refcode = refcode # for classifier
         self.chrom = chrom
-        self.st = st
-        self.ed = ed
+        self.st = int(st)
+        self.ed = int(ed)
         self.uth = uth
         self.mth = mth
         self.sjratioth = sjratioth
@@ -1038,21 +1038,37 @@ class LocalAssembler(object):
 
         chrom,st,ed = self.chrom,self.st,self.ed
         if UT.isstring(self.bwpre):
-            sj = GGB.read_bed(self.bwpre+'.sjpath.bed.gz')
+            chrpath = self.bwpre+'.sjpath.{0}.bed.gz'.format(chrom) # separated chrom file exists?
+            if os.path.exists(chrpath):
+                sj = GGB.read_bed(chrpath)
+            else:
+                sj = GGB.read_bed(self.bwpre+'.sjpath.bed.gz')
             idx0 = (sj['chr']==chrom)&(sj['tst']>=st)&(sj['ted']<=ed)        
-            return sj[idx0].copy()
+            sj0 = sj[idx0].copy()
+            # merged sjpath has 53exon in pathcode => remove
+            if len(sj0)>0:
+                name0 = sj0.iloc[0]['name']
+                if len(name0.split('|'))<len(name0.split(',')):
+                    sj0['name'] = [x.split(',')[1:-1] for x in sj0['name']]
+            return sj0
+
         # list of bwpres, load and merge
         sjps0 = [GGB.read_bed(b+'.sjpath.bed.gz') for b in self.bwpre]
         sjps = []
         for sj in sjps0:
             idx0 = (sj['chr']==chrom)&(sj['tst']>=st)&(sj['ted']<=ed)        
-            sjps.append(sj[idx0].copy())
+            sj0 = sj[idx0].copy()
+            if len(sj0)>0:
+                name0 = sj0.iloc[0]['name']
+                if len(name0.split('|'))<len(name0.split(',')):
+                    sj0['name'] = [x.split(',')[1:-1] for x in sj0['name']]            
+            sjps.append(sj0)
         sjp = PD.concat(sjps, ignore_index=True)
         sjg = sjp.groupby(['chr','name'])
         sj = sjg.first()
         # chr,st,ed,name,sc1,strand,tst,ted,sc2,#exons,esizes,estarts
-        sj['st'] = sjg['st'].min()
-        sj['ed'] = sjg['ed'].max()
+        sj['st'] = sjg['st'].min().astype(int)
+        sj['ed'] = sjg['ed'].max().astype(int)
         sj['sc1'] = sjg['sc1'].sum()
         sj['sc2'] = sjg['sc2'].sum()
         self._sjps = sjps 
@@ -1111,7 +1127,9 @@ class LocalAssembler(object):
             sjaa = self.sjexbw.bws['sj']['a'].get(chrom, st, ed)
             exaa = self.sjexbw.bws['ex']['a'].get(chrom, st, ed)
         a = sjaa+exaa # all of the coverages
-        o = self.st
+        o = int(self.st)
+        for f in ['st','ed','tst','ted']:
+            sjpaths[f] = sjpaths[f].astype(int)
         sjpaths['sjratio'] = N.array([x/N.min(a[s-o:e-o]) for x,s,e in sjpaths[['sc2','tst','ted']].values])
         n0 = len(sjpaths)
         idxpn = (sjpaths['strand'].isin(['+','-']))&(sjpaths['sjratio']>sjratioth)
@@ -1843,10 +1861,12 @@ class LocalAssembler(object):
         e53p = self.e53pos[strand]
         t5 = e53p[(e53p['kind']=='5')&(e53p['pos']>s0)&(e53p['pos']<e0)]
         t3 = e53p[(e53p['kind']=='3')&(e53p['pos']>s0)&(e53p['pos']<e0)]
-        i5p = t5['pos'].values-s0
-        i3p = t3['pos'].values-s0
-        ax.plot(i5p, y0[i5p], 'm^')
-        ax.plot(i3p, y0[i3p], 'mv')
+        i5p = N.array(t5['pos'].values-s0, dtype=N.int64)
+        i3p = N.array(t3['pos'].values-s0, dtype=N.int64)
+        if len(i5p)>0:
+            ax.plot(i5p, y0[i5p], 'm^')
+        if len(i3p)>0:
+            ax.plot(i3p, y0[i3p], 'mv')
         # exons
         ex = self.exons[strand]
         ex = ex[(ex['ost']>s0)&(ex['oed']<e0)]
