@@ -226,33 +226,28 @@ class ParamFinder(object):
     
     def calc_53_params(self, sdiffth=1, np=10):
         # get parameters
-        fname = self.bwpre+'.{0}.sdiffth({1}).flux.txt.gz'.format(self.refcode,sdiffth)
-        if os.path.exists(fname):
-            D = UT.read_pandas(fname)
-        else:
-            dic = {}
-            for x in ['ne_i','ne_5','ne_3','e5i','e3i']:
-                fpath = self.bwpre+'.{0}.{1}.flux.txt.gz'.format(self.refcode,x)
-                if os.path.exists(fpath):
-                    dic[x] = UT.read_pandas(fpath)
-                else:
-                    df = getattr(self, x)
-                    print('calculating {0}...'.format(x))
-                    dic[x] = self.calc_flux_mp(df, np=np)
-                    UT.write_pandas(dic[x], fpath,'h')
-            dicb = {}
-            for x in ['ne_5','ne_3','e5i','e3i']:
-                f = dic[x]
-                f['kind'] = 1
-                idx = N.abs(N.log2(f['sin']+1)-N.log2(f['sout']+1))>sdiffth
-                idx = idx & (f['sdin']!=0)|(f['sdout']!=0) # should have either in or out
-                dicb[x] = f[idx]
-            f = dic['ne_i']
-            f['kind'] = 0
-            idx = (f['ecovmax']>1)&((f['sdin']!=0)&(f['sdout']!=0)) # should have both in&out
-            dicb['ne_i'] = f[idx]
-            D = PD.concat(dicb.values(),ignore_index=True)
-            UT.write_pandas(D, fname, 'h')
+        dic = {}
+        for x in ['ne_i','ne_5','ne_3','e5i','e3i']:
+            fpath = self.bwpre+'.{0}.{1}.flux.txt.gz'.format(self.refcode,x)
+            if os.path.exists(fpath):
+                dic[x] = UT.read_pandas(fpath)
+            else:
+                df = getattr(self, x)
+                print('calculating {0}...'.format(x))
+                dic[x] = self.calc_flux_mp(df, np=np)
+                UT.write_pandas(dic[x], fpath,'h')
+        dicb = {}
+        for x in ['ne_5','ne_3','e5i','e3i']:
+            f = dic[x]
+            f['kind'] = 1
+            idx = N.abs(N.log2(f['sin']+1)-N.log2(f['sout']+1))>sdiffth
+            idx = idx & (f['sdin']!=0)|(f['sdout']!=0) # should have either in or out
+            dicb[x] = f[idx]
+        f = dic['ne_i']
+        f['kind'] = 0
+        idx = (f['ecovmax']>1)&((f['sdin']!=0)&(f['sdout']!=0)) # should have both in&out
+        dicb['ne_i'] = f[idx]
+        D = PD.concat(dicb.values(),ignore_index=True)
 
         D['lsin'] = N.log2(D['sin']+1)
         D['lsout'] = N.log2(D['sout']+1)
