@@ -2021,8 +2021,8 @@ def sjpaths2tspan(sjpaths, cmax=9):
 
 ####### Bundle Finder ###############################################################
     
-def find_gaps(bwpre, chrom, csize, gsizeth=5e5, minbundlesize=10e6):
-    sjexbw = SjExBigWigs(bwpre)
+def find_gaps(bwpre, chrom, csize, gsizeth=5e5, minbundlesize=10e6, sjbwpre=None, sjth=0):
+    sjexbw = SjExBigWigs(bwpre, sjbwpre)
     sts = []
     eds = []
     bsize = 2*minbundlesize
@@ -2033,7 +2033,7 @@ def find_gaps(bwpre, chrom, csize, gsizeth=5e5, minbundlesize=10e6):
             ed = min((i+1)*bsize, csize)
             arr = sjexbw.bws['sj']['+'].get(chrom,st,ed)
             arr += sjexbw.bws['sj']['-'].get(chrom,st,ed)
-            idx = N.nonzero(arr<=0)[0]
+            idx = N.nonzero(arr<=sjth)[0]
             if len(idx)==0:
                 continue
             dif = idx[1:]-idx[:-1] # if continuous dif==1
@@ -2047,7 +2047,7 @@ def find_gaps(bwpre, chrom, csize, gsizeth=5e5, minbundlesize=10e6):
             eds += list(ged)
     return sts,eds
 
-def find_bundles(bwpre, genome, dstpre, chrom=None, mingap=5e5, minbundlesize=10e6):
+def find_bundles(bwpre, genome, dstpre, chrom=None, mingap=5e5, minbundlesize=10e6, sjbwpre=None, sjth=0):
     bundles = []
     if chrom is None:
         chroms = UT.chroms(genome) # whole genome
@@ -2065,7 +2065,7 @@ def find_bundles(bwpre, genome, dstpre, chrom=None, mingap=5e5, minbundlesize=10
     for chrom in chroms:
         print('checking {0}...'.format(chrom))
         csize = chromsizes[chrom]
-        sts,eds = find_gaps(bwpre, chrom, csize, mingap, minbundlesize)
+        sts,eds = find_gaps(bwpre, chrom, csize, mingap, minbundlesize,sjbwpre,sjth)
         st = 0
         if len(sts)==0:
             bundles.append((chrom,0,csize))
@@ -2117,7 +2117,7 @@ def drawspan2(la,st,ed,win=10000, figsize=(15,6), df2=None, df3=None, delta=500,
 ######### Chrom Assembler
 
 
-def bundle_assembler(bwpre, chrom, st, ed, dstpre, upperpathnum):
+def bundle_assembler(bwpre, chrom, st, ed, dstpre, upperpathnum, sjbwpre=None):
     bname = bundle2bname((chrom,st,ed))
     bsuf = '.{0}_{1}_{2}'.format(chrom,st,ed)
     csuf = '.{0}'.format(chrom)
@@ -2133,7 +2133,7 @@ def bundle_assembler(bwpre, chrom, st, ed, dstpre, upperpathnum):
         return bname
     if all([os.path.exists(dstpre+x) for x in sufs]):
         return bname
-    la = LocalAssembler(bwpre, chrom, st, ed, dstpre, upperpathnum=upperpathnum)
+    la = LocalAssembler(bwpre, chrom, st, ed, dstpre, upperpathnum=upperpathnum, sjbwpre=sjbwpre)
     return la.process()
 
 def bname2bundle(bname):
@@ -2517,6 +2517,8 @@ BUNDLEPARAMS = dict(
 class SampleAssembler(object):
 
     def __init__(self, bwpre, dstpre, genome, 
+                sjbwpre=None,
+                sjth=0,
                 mingap=1e5, 
                 minbundlesize=20e6, 
                 np=4, 
@@ -2527,6 +2529,8 @@ class SampleAssembler(object):
                 upperpathnum=3000,
                 ):
         self.bwpre = bwpre
+        self.sjbwpre = sjbwpre
+        self.sjth = sjth
         self.dstpre = dstpre
         self.genome = genome
         self.mingap = mingap
@@ -2551,7 +2555,8 @@ class SampleAssembler(object):
         with server:
             for chrom in self.chroms:
                 tname = 'find_bundle.{0}'.format(chrom)
-                args = (self.bwpre, self.genome, self.dstpre, chrom, self.mingap, self.minbundlesize)
+                args = (self.bwpre, self.genome, self.dstpre, chrom, self.mingap, 
+                        self.minbundlesize, self.sjbwpre, self.sjth)
                 task = TQ.Task(tname,find_bundles, args)
                 server.add_task(task)
             while server.check_error(self.maxwaittime): # loop
@@ -2568,7 +2573,7 @@ class SampleAssembler(object):
                             # print('put task##bundle_assembler {0}:{1}-{2}'.format(chrom,st,ed))
                             tname = 'bundle_assembler.{0}:{1}-{2}'.format(c,st,ed)
                             # bwpre, chrom, st, ed, dstpre, upperpathnum
-                            args = (self.bwpre, c, st, ed, self.dstpre, self.upperpathnum)
+                            args = (self.bwpre, c, st, ed, self.dstpre, self.upperpathnum, self.sjbwpre)
                             task = TQ.Task(tname, bundle_assembler, args)
                             server.add_task(task)
                     if name.startswith('bundle_assembler.'):
