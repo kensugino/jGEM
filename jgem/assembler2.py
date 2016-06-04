@@ -49,14 +49,19 @@ from jgem import taskqueue as TQ
 
 class SjExBigWigs(object):
     
-    def __init__(self, bwpre):
+    def __init__(self, bwpre, sjbwpre=None):
+        if sjbwpre is None:
+            sjbwpre = bwpre
         if type(bwpre)!=type([]):
             bwpre = [bwpre]
+        if type(sjbwpre)!=type([]):
+            sjbwpre = [sjbwpre]
         self.bwpre = bwpre
+        self.sjbwpre = sjbwpre
         S2S = {'+':'.p','-':'.n','.':'.u','r+':'.rp','r-':'.rn','r.':'.ru'}
         bwp = {
             'ex': {s:[b+'.ex{0}.bw'.format(S2S[s]) for b in bwpre] for s in S2S},
-            'sj': {s:[b+'.sj{0}.bw'.format(S2S[s]) for b in bwpre] for s in S2S},
+            'sj': {s:[b+'.sj{0}.bw'.format(S2S[s]) for b in sjbwpre] for s in S2S},
         }
         self.bwpaths = bwpaths = {'ex':{},'sj':{}}
         bwpaths['ex']['+'] = {'p':bwp['ex']['+']+bwp['ex']['.'],}
@@ -124,15 +129,15 @@ class LogisticClassifier(object):
         
 
 # for intergenic        
-itg_p = dict(coef = N.array([ -0.4777153 ,  -4.76267948, 0.86996683]),
+itg_p = dict(coef = N.array([ -0.40,  -4.72, 0.86]),
            intercept = 11.8638183,
            cols = ['lemax','lgap','llen'])
 INTG = LogisticClassifier(json=itg_p, dstcol='exon')
 
-e53_p = dict(coef = N.array([2.0, -0.72]),
-             intercept= -1.45,
+e53_p = dict(coef = N.array([2.51, -0.77]),
+             intercept= -2.7,
              cols = ['sdiff','smean'],
-             sdiffth= 0.5)
+             sdiffth= 1)
 E53C = LogisticClassifier(json=e53_p, dstcol='e53')
 
 e53m_p = dict(coef = N.array([1.542, -0.368]),
@@ -904,10 +909,8 @@ PATHCOLS = ['chr','st','ed','name','strand','tst','ted','tcov0','tcov1','tcov', 
 class LocalAssembler(object):
     
     def __init__(self, bwpre, chrom, st, ed, dstpre, 
-                 intg=INTG, 
-                 e53c=E53C, 
-                 ef5=EF5, 
-                 ef3=EF3,
+                 sjbwpre=None,
+                 refcode=None,
                  sjpaths=None, 
                  uth=1, 
                  mth=3, 
@@ -920,11 +923,9 @@ class LocalAssembler(object):
                  ):
         self.bname = '{0}:{1}-{2}'.format(chrom,st,ed)
         self.bwpre = bwpre
+        self.sjbwpre = sjbwpre
         self.dstpre = dstpre
-        self.intg = intg
-        self.e53c = e53c
-        self.ef5 = ef5
-        self.ef3 = ef3
+        self.refcode = refcode # for classifier
         self.chrom = chrom
         self.st = st
         self.ed = ed
@@ -936,7 +937,7 @@ class LocalAssembler(object):
         self.covth = covth
         self.upperpathnum = upperpathnum
         self.pathcheckth = pathcheckth
-        self.sjexbw = sjexbw = SjExBigWigs(bwpre)      
+        self.sjexbw = sjexbw = SjExBigWigs(bwpre, sjbwpre)
         self.arrs = arrs = {}
         with sjexbw: # get bw arrays
             for k in ['ex','sj']:
@@ -944,6 +945,7 @@ class LocalAssembler(object):
                 for s in ['+','-']:
                     arrs[k][s] = sjexbw.bws[k][s].get(chrom, st, ed)
         self._sjpaths=sjpaths
+        self.load_classifiers()
         # self.load_and_filter_sjpaths(sjpaths) # => move to process
 
     def __str__(self):
@@ -958,23 +960,54 @@ class LocalAssembler(object):
     def logdebug(self, msg):
         self._log(msg, 'debug')
         
-    def load_classifiers(self, pathpre):
+    def load_classifiers(self):
+        refcode = self.refcode
+        if refcode is None: # load default
+            self.intg=INTG
+            self.e53c=E53C 
+            self.ef5=EF5 
+            self.ef3=EF3
+            return
+
+        # pathpre  from bwpre, sjbwpre
         # pathpre: bwpre+'.{refcode}'
-        with open(pahtpre+'.exonparams.json','r') as fp:
-            self.exonparams = ep = json.load(fp)
-        self.intg = LogisticClassifier(json=ep, dstcol='exon')
-        
-        with open(pahtpre+'.e53params.json','r') as fp:
-            self.e53params = e5p = json.load(fp)    
-        self.e53c = LogisticClassifier(json=e5p, dstcol='e53')
+        pathpre = self.bwpre+'.'+refcode
+        path = pahtpre+'.exonparams.json'
+        if os.path.exists(path):
+            with open(path,'r') as fp:
+                self.exonparams = ep = json.load(fp)
+            self.intg = LogisticClassifier(json=ep, dstcol='exon')        
+        else:
+            LOG.warning('{0} does not exists, reverting to default'.format(path))
+            self.intg = INTG
 
-        with open(pahtpre+'.gap5params.json','r') as fp:
-            self.gap5params = g5p = json.load(fp)        
-        self.ef5 = EdgeFinder(g5p)
+        path = pahtpre+'.gap5params.json'
+        if os.path.exists(path):        
+            with open(path,'r') as fp:
+                self.gap5params = g5p = json.load(fp)        
+            self.ef5 = EdgeFinder(g5p)
+        else:
+            LOG.warning('{0} does not exists, reverting to default'.format(path))
+            self.ef5 = EF5 
+        path = pahtpre+'.gap3params.json'   
+        if os.path.exists(path):        
+            with open(path,'r') as fp:
+                self.gap3params = g3p = json.load(fp)        
+            self.ef3 = EdgeFinder(g3p)
+        else:
+            LOG.warning('{0} does not exists, reverting to default'.format(path))
+            self.ef3 = EF3 
 
-        with open(pahtpre+'.gap3params.json','r') as fp:
-            self.gap3params = g3p = json.load(fp)        
-        self.ef3 = EdgeFinder(g3p)
+        if self.sjbwpre is not None:
+            pathpre = self.sjbwpre+'.'+refcode
+        path = pahtpre+'.e53params.json'
+        if os.path.exists(path):                
+            with open(path,'r') as fp:
+                self.e53params = e5p = json.load(fp)    
+            self.e53c = LogisticClassifier(json=e5p, dstcol='e53')
+        else:
+            LOG.warning('{0} does not exists, reverting to default'.format(path))
+            self.e53c = E53C
 
     def _read_sjpaths(self):
         sjpaths0 = self._sjpaths
@@ -1925,6 +1958,8 @@ def path2tspan(paths, cmax=9, covfld='tcov0'):
     bg = bed.groupby(['tst','ted'])
     bedg = bg.first()
     bedg['exons'] = bg['exons'].apply(lambda g: sorted(set([tuple(x) for y in g for x in y])))
+    bedg['st'] = bg['st'].min()
+    bedg['ed'] = bg['ed'].max()
     bed = bedg.reset_index()
     ######################################
 
