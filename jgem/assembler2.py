@@ -21,6 +21,7 @@ from itertools import repeat
 import logging
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
+import json
 
 # 3rd party imports
 import pandas as PD
