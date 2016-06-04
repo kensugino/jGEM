@@ -1549,7 +1549,9 @@ class LocalAssembler(object):
             # return N.sum(sja[s-o:e-o]+exa[s-o:e-o])/(e-s)
             return N.mean(sja[s-o:e-o])
         def cov1s(s):
-            return N.mean(exa[s-o-10:s-o])
+            s0 = max(0, s-0-10)
+            s1 = max(s0+1,s-o)
+            return N.mean(exa[s0:s1])
         def cov1e(e):
             return N.mean(exa[e-o:e-o+10])
         def cov2s(s):
@@ -1740,7 +1742,10 @@ class LocalAssembler(object):
                                 self.tcov_by_branchp(st2,ed2,tst1,ted1,strand2,tcov2)
                 # trim paths
                 trimmed += find_set(paths, sjs, chrom, st, ed, s, th)
-        self.tpaths = PD.concat(trimmed, ignore_index=True)
+        if len(trimmed)>0:
+            self.tpaths = PD.concat(trimmed, ignore_index=True)
+        else:
+            self.tpaths = UT.make_empty_df(paths.columns)
         
     def calculate_ecovs(self):
         paths = self.paths
