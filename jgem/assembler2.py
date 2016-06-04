@@ -1040,13 +1040,13 @@ class LocalAssembler(object):
         if UT.isstring(self.bwpre):
             sj = GGB.read_bed(self.bwpre+'.sjpath.bed.gz')
             idx0 = (sj['chr']==chrom)&(sj['tst']>=st)&(sj['ted']<=ed)        
-            return sj[idx0]
+            return sj[idx0].copy()
         # list of bwpres, load and merge
         sjps0 = [GGB.read_bed(b+'.sjpath.bed.gz') for b in self.bwpre]
         sjps = []
         for sj in sjps0:
             idx0 = (sj['chr']==chrom)&(sj['tst']>=st)&(sj['ted']<=ed)        
-            sjps.append(sj[idx0])
+            sjps.append(sj[idx0].copy())
         sjp = PD.concat(sjps, ignore_index=True)
         sjg = sjp.groupby(['chr','name'])
         sj = sjg.first()
@@ -1101,7 +1101,7 @@ class LocalAssembler(object):
         
         self.sjpaths0 = s1 # original unfiltered (just position restricted)
         sc1 = self.sjpaths0['sc1']
-        if sself.sjpaths0.dtypes['sc2']=='O': # merged sjpath
+        if self.sjpaths0.dtypes['sc2']=='O': # merged sjpath
             self.sjpaths0['sc2'] = sc1
         sc2 = self.sjpaths0['sc2']
         idx1 = (sc1>=uth)|(sc2-sc1>=mth)
