@@ -108,10 +108,11 @@ class SjExBigWigs(object):
 
 class LogisticClassifier(object):
     
-    def __init__(self, b0, bs, cols, dstcol):
-        self.b0 = b0
-        self.bs = N.array(bs)
-        self.cols = cols
+    def __init__(self, json, dstcol):
+        self.json = json
+        self.b0 = json['intercept'] #b0
+        self.bs = N.array(json['coef']) #bs
+        self.cols = json['cols']
         self.dstcol = dstcol
         
     def classify(self, df):
@@ -123,25 +124,30 @@ class LogisticClassifier(object):
         
 
 # for intergenic        
-itg_b1 = N.array([ -0.4777153 ,  -4.76267948, 0.86996683])
-itg_b0 = 11.8638183
-itg_cols = ['lemax','lgap','llen']
+itg_p = dict(coef = N.array([ -0.4777153 ,  -4.76267948, 0.86996683]),
+           intercept = 11.8638183,
+           cols = ['lemax','lgap','llen'])
+INTG = LogisticClassifier(json=itg_p, dstcol='exon')
 
-INTG = LogisticClassifier(b0=itg_b0, bs=itg_b1, cols=itg_cols, dstcol='exon')
+e53_p = dict(coef = N.array([2.0, -0.72]),
+             intercept= -1.45,
+             cols = ['sdiff','smean'],
+             sdiffth= 0.5)
+E53C = LogisticClassifier(json=e53_p, dstcol='e53')
 
-e53_b1 = N.array([2.0, -0.72])
-e53_b0 = -1.45
-e53_cols = ['sdiff','smean']
-E53C = LogisticClassifier(b0=e53_b0, bs=e53_b1, cols=e53_cols, dstcol='e53')
-
-e53m_b1 = N.array([1.542, -0.368])
-e53m_b0 = -0.329
-E53CM = LogisticClassifier(b0=e53m_b0, bs=e53m_b1, cols=e53_cols, dstcol='e53')
+e53m_p = dict(coef = N.array([1.542, -0.368]),
+              intercept = -0.329,
+              cols = ['sdiff','smean'],
+             sdiffth= 0.5)
+E53CM = LogisticClassifier(json=e53m_p, dstcol='e53')
 
 
 class EdgeFinder(object):
     
-    def __init__(self, a_lsin, a_lgap, b0, th):
+    def __init__(self, json):
+        a_lsin,a_lgap = json['coef']
+        b0 = json['intercept']
+        th = json['th']
         self.a_lsin = a_lsin
         self.a_lgap = a_lgap
         self.b0 = b0
@@ -198,9 +204,10 @@ class EdgeFinder(object):
                     break
         return epos
         
-    
-EF5 = EdgeFinder(-0.2, -0.8, 5.4, 0)
-EF3 = EdgeFinder(-0.25, -0.5, 4.8, 0) # -0.25, -0.5, 4.5
+e5_p  = dict(coef=[-0.2,-0.8], intercept=5.4, th=0)
+EF5 = EdgeFinder(e5_p)
+e3_p = dict(coef=[-0.25,-0.5], intercept=4.8, th=0) # -0.25, -0.5, 4.5
+EF3 = EdgeFinder(e3_p) 
 
 
 ####### Gene Graph ###########################################
@@ -717,8 +724,11 @@ def detect_53(sja, exa, strand, classifier=E53C):
         x = N.log2(sja[::-1]+1)
     xd = (x[1:]-x[:-1])
     xm = (x[1:]+x[:-1])/2.
-    idxp = N.nonzero(xd>0)[0] # source
-    idxn = N.nonzero(xd<0)[0] # sink
+    # idxp = N.nonzero(xd>0)[0] # source
+    # idxn = N.nonzero(xd<0)[0] # sink
+    sdiffth = classifier.json['sdiffth']
+    idxp = N.nonzero(xd>sdiffth)[0] # source
+    idxn = N.nonzero(xd<-sdiffth)[0] # sink
     # pos, sdiff, smean, kind
     n = len(x)
     if strand=='+':
@@ -952,23 +962,19 @@ class LocalAssembler(object):
         # pathpre: bwpre+'.{refcode}'
         with open(pahtpre+'.exonparams.json','r') as fp:
             self.exonparams = ep = json.load(fp)
-        self.intg = LogisticClassifier(b0=ep['intercept'], b1=ep['coef'], cols=ep['cols'], dstcol='exon')
+        self.intg = LogisticClassifier(json=ep, dstcol='exon')
         
         with open(pahtpre+'.e53params.json','r') as fp:
             self.e53params = e5p = json.load(fp)    
-        self.e53c = LogisticClassifier(b0=e5p['intercept'], b1=e5p['coef'], cols=e5p['cols'], dstcol='e53')
+        self.e53c = LogisticClassifier(json=e5p, dstcol='e53')
 
         with open(pahtpre+'.gap5params.json','r') as fp:
             self.gap5params = g5p = json.load(fp)        
-        a_lsin,a_lgap = g5p['coef']
-        b0 = g5p['intercept']
-        self.ef5 = EdgeFinder(a_lsin,a_lgap,b0,0)
+        self.ef5 = EdgeFinder(g5p)
 
         with open(pahtpre+'.gap3params.json','r') as fp:
             self.gap3params = g3p = json.load(fp)        
-        a_lsin,a_lgap = g3p['coef']
-        b0 = g3p['intercept']
-        self.ef3 = EdgeFinder(a_lsin,a_lgap,b0,0)
+        self.ef3 = EdgeFinder(g3p)
 
     def _read_sjpaths(self):
         sjpaths0 = self._sjpaths
@@ -1703,8 +1709,10 @@ class LocalAssembler(object):
         # 2) unused sjpaths => bed12
         GGB.write_bed(self.unusedsj, pre+'.unused.sjpath.bed.gz', ncols=12)
         # 3) allpaths => gtf or bed12 tcov => sc2 rgb color
-        self.bed12 = path2bed12(self.tpaths.copy(), cmax)
+        self.bed12 = path2bed12(self.tpaths.copy(), cmax, 'tcov')
         GGB.write_bed(self.bed12, pre+'.paths.bed.gz',ncols=12)
+        self.tspan = path2tspan(self.tpaths.copy(), cmax, 'tcov0')
+        GGB.write_bed(self.tspan, pre+'.tspans.bed.gz',ncols=12)
         
     def process(self):
         self.load_and_filter_sjpaths()
@@ -1868,7 +1876,7 @@ class LocalAssembler(object):
         ax.set_frame_on(False)
         return ax
 
-def path2bed12(paths, cmax):
+def path2bed12(paths, cmax=9, covfld='tcov'):
     bed = paths
     # strand .+,.-
     idxun = bed['strand']=='.-'
@@ -1888,14 +1896,55 @@ def path2bed12(paths, cmax):
     bed['esizes'] = [','.join(x)+',' for x in esizes]
     bed['estarts'] = [','.join(x)+',' for x in estarts]
     # sc1, sc2
-    bed['ltcov'] = N.log2(bed['tcov']+2)
-    bed['sc1'] = N.ceil(bed['ltcov']*100).astype(int)
+    bed['ltcov'] = N.log2(bed[covfld]+2)
+    # bed['sc1'] = N.ceil(bed['ltcov']*100).astype(int)
+    bed['sc1'] = bed[covfld]
     sm = {'+':Colors('R', cmax),
           '-':Colors('B', cmax),
           '.':Colors('G', cmax)}
     bed['sc2'] = [sm[s].RGB(x) for x,s in bed[['ltcov','strand']].values]
     bed.sort_values(['chr','st','ed'], inplace=True)
     return bed
+
+def path2tspan(paths, cmax=9, covfld='tcov0'):
+    bed = paths
+    # strand .+,.-
+    idxun = bed['strand']=='.-'
+    bed.loc[idxun, 'name']= [reversepathcode(x) for x in bed[idxun]['name']]
+    bed = bed.groupby('name').first().reset_index()
+    idxu = bed['strand'].isin(['.+','.-'])
+    bed.loc[idxu, 'strand']='.'
+    # #exons, esizes, estarts
+    bed['exonsp'] = [[[int(z) for z in y.split(',')] for y in x.split('|')] for x in bed['name']]
+    bed['exonsn'] = [[y[::-1] for y in x][::-1] for x in bed['exonsp']]
+    idxp = bed['strand']!='-'
+    bed.loc[idxp, 'exons'] = bed[idxp]['exonsp']
+    bed.loc[~idxp, 'exons'] = bed[~idxp]['exonsn']
+
+    # group same (tst,ted) ##############
+    bg = bed.groupby(['tst','ted'])
+    bedg = bg.first()
+    bedg['exons'] = bg['exons'].apply(lambda g: sorted(set([tuple(x) for y in g for x in y])))
+    bed = bedg.reset_index()
+    ######################################
+
+    bed['#exons'] = [len(x) for x in bed['exons']]
+    estarts = [[str(y[0]-x[0][0]) for y in x] for x in bed['exons']]
+    esizes = [[str(y[1]-y[0]) for y in x] for x in bed['exons']]
+    bed['esizes'] = [','.join(x)+',' for x in esizes]
+    bed['estarts'] = [','.join(x)+',' for x in estarts]
+    # sc1, sc2
+    bed['ltcov'] = N.log2(bed[covfld]+2)
+    # bed['sc1'] = N.ceil(bed['ltcov']*100).astype(int)
+    bed['sc1'] = bed[covfld]
+    sm = {'+':Colors('R', cmax),
+          '-':Colors('B', cmax),
+          '.':Colors('G', cmax)}
+    bed['sc2'] = [sm[s].RGB(x) for x,s in bed[['ltcov','strand']].values]
+    bed.sort_values(['chr','st','ed'], inplace=True)
+    return bed    
+
+
 
 ####### Bundle Finder ###############################################################
     
