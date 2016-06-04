@@ -267,9 +267,9 @@ class ParamFinder(object):
         # save scatter plots
         title = self.bwpre.split('/')[-1]
         spath = self.bwpre+'.{0}.e53params'.format(self.refcode)
-        self.plot_sin_sout(dicb, D, Y, Z, sdiffth, spath+'.0.png', title)
-        self.plot_sin_sout(dicb, D, Y, Z, sdiffth, spath+'.pdf', title, ptyp='pdf')
-        self.plot_sin_sout(dicb, D, Y, Z, sdiffth, spath+'.png', title, ptyp='png')
+        self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.0.png', title)
+        self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.pdf', title, ptyp='pdf')
+        self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.png', title, ptyp='png')
         return locals()
 
     def write_params(self, ppath, lr, Y, Z, cols, dic={},FN0=0):
