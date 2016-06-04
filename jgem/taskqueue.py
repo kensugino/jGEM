@@ -31,6 +31,7 @@ class Worker(multiprocessing.Process):
         self.task_queue = task_queue
         self.result_queue = result_queue
         self.winfo[self.index] = {'status':'ready'}
+        self.durs = []
         
     def set_info(self, **kw):
         d = self.winfo[self.index]
@@ -49,7 +50,10 @@ class Worker(multiprocessing.Process):
                 next_task = self.task_queue.get(timeout=10)                
                 if next_task is None:
                     # Poison pill means shutdown
-                    print('{0}: Exiting (through shutdown)'.format(proc_name))
+                    maxdur = N.max(self.durs)
+                    mindur = N.mean(self.durs)
+                    numrun = len(self.durs)
+                    print('{0}: Exiting (through shutdown) maxdur({1:.2f}) avgdur({2:.2f}) run({3})'.format(proc_name, maxdur, avgdur,numrun))
                     self.set_info(status='exit')
                     self.task_queue.task_done()
                     break
@@ -62,7 +66,9 @@ class Worker(multiprocessing.Process):
                     self.result_queue.put((next_task.name, answer))
                     elapsed = etime - stime
                     print('{0}: finished {1} ({2:.3} sec)'.format(proc_name, next_task.name, elapsed))
-                    self.set_info(_etime=etime, status='waiting', _stime=etime, elapsed=elapsed)
+                    self.durs.append(elapsed)
+                    self.set_info(_etime=etime, status='waiting', _stime=etime, elapsed=elapsed,
+                        maxdur=N.max(self.durs), mindur=N.min(self.durs), avgdur=N.mean(self.durs))
                 except Exception as e:
                     tb = traceback.format_exc()
                     print('{0} ({1}): error'.format(proc_name, next_task.name))
