@@ -229,9 +229,9 @@ class EdgeFinder(object):
                     break
         return epos
         
-e5_p  = dict(coef=[-0.2,-0.8], intercept=5.4, th=0, zoom=1)
+e5_p  = dict(coef=[-0.285,-0.81], intercept=5.6, th=0, zoom=1)
 EF5 = EdgeFinder(e5_p)
-e3_p = dict(coef=[-0.25,-0.5], intercept=4.8, th=0, zoom=1) # -0.25, -0.5, 4.5
+e3_p = dict(coef=[-0.25,-0.51], intercept=4.6, th=0, zoom=1) # -0.25, -0.5, 4.5
 EF3 = EdgeFinder(e3_p) 
 
 
