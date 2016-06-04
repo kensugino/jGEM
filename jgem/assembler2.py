@@ -2247,6 +2247,7 @@ def concatenate_chroms(chroms, dstpre):
            'sjdf.txt.gz',
            'paths.txt.gz',
            'paths.bed.gz',
+           'tspans.bed.gz',
            'unused.sjpath.bed.gz']
     files = []
     for suf in sufs:
