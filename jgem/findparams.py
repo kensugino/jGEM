@@ -403,7 +403,7 @@ class ParamFinder(object):
         axr[0][0].set_ylabel('log2(gap size)')
         axr[1][1].set_xlabel('log2(junction influx)')
         axr[1][0].set_ylabel('log2(gap size)')
-        xmax = N.floor(N.max(X[:,0])*0.9)
+        xmax = N.floor(N.max(lcls3['X'][:,0])*0.9)
         axr[0][0].set_xlim(-1, xmax)
         axr[0][0].set_ylim(-1,14)
         fig.suptitle(title)
