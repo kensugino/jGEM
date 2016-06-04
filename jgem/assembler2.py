@@ -2622,7 +2622,7 @@ class SampleAssembler(object):
                             server.add_task(task)
                     if name== 'find_SE':
                         tname = 'write_stats'
-                        args = (self.dstpre, rslts)
+                        args = (self.dstpre, rslt)
                         task = TQ.Task(tname, write_stats, args)
                         server.add_task(task)
                     if name=='write_stats':
