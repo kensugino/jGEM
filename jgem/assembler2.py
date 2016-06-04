@@ -994,7 +994,7 @@ class LocalAssembler(object):
         # pathpre  from bwpre, sjbwpre
         # pathpre: bwpre+'.{refcode}'
         pathpre = self.bwpre+'.'+refcode
-        path = pahtpre+'.exonparams.json'
+        path = pathpre+'.exonparams.json'
         if os.path.exists(path):
             with open(path,'r') as fp:
                 self.exonparams = ep = json.load(fp)
@@ -1003,7 +1003,7 @@ class LocalAssembler(object):
             LOG.warning('{0} does not exists, reverting to default'.format(path))
             self.intg = INTG
 
-        path = pahtpre+'.gap5params.json'
+        path = pathpre+'.gap5params.json'
         if os.path.exists(path):        
             with open(path,'r') as fp:
                 self.gap5params = g5p = json.load(fp)        
@@ -1011,7 +1011,7 @@ class LocalAssembler(object):
         else:
             LOG.warning('{0} does not exists, reverting to default'.format(path))
             self.ef5 = EF5 
-        path = pahtpre+'.gap3params.json'   
+        path = pathpre+'.gap3params.json'   
         if os.path.exists(path):        
             with open(path,'r') as fp:
                 self.gap3params = g3p = json.load(fp)        
@@ -1022,7 +1022,7 @@ class LocalAssembler(object):
 
         if self.sjbwpre is not None:
             pathpre = self.sjbwpre+'.'+refcode
-        path = pahtpre+'.e53params.json'
+        path = pathpre+'.e53params.json'
         if os.path.exists(path):                
             with open(path,'r') as fp:
                 self.e53params = e5p = json.load(fp)    
