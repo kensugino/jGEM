@@ -251,6 +251,7 @@ def prep_sjpath_chr(j2pres, libsizes, dstpre, chrom):
         df['tcov'] = df['tcov']/float(n)
     df.loc[idxp,'name'] = ['{0},{1},{2}'.format(s,p,e) for s,p,e in df[idxp][['st','pc','ed']].values]
     df.loc[~idxp,'name'] = ['{2},{1},{0}'.format(s,p,e) for s,p,e in df[~idxp][['st','pc','ed']].values]
+    df = df.groupby('pc').first() # get rid of unstranded duplicates
     cmax = 9+N.log2(N.mean(scales))
     bed = A2.path2bed12(df, cmax)
     # reset sc1 to tcov (from log2(tcov+2)*100)
@@ -303,4 +304,99 @@ def prep_sjpath(dstpre, chroms):
     # for f in files: # keep separate chr files 
     #     os.unlink(f)
     return dstpath
+
+
+
+SJFILTERPARAMS = dict(
+    th_detected=1,
+    th_maxcnt=1,
+    th_maxoverhang=18,
+    th_minedgeexon=18,
+    th_sjratio2=1e-3,
+)
+class SJFilter(object):
+
+    def __init__(self, bwsjpre, statspath, genome, np=10, *kw):
+        self.bwsjpre = bwsjpre
+        self.statspath = statspath
+        self.genome = genome
+        self.np = np
+        self.params = SJFILTERPARAMS.copy()
+        self.params.update(kw)
+
+    def __call__(self):
+        chroms = UT.chroms(self.genome)
+        csizedic = UT.df2dict(UT.chromdf(self.genome), 'chr', 'size')
+        args = []
+        for c in chroms:
+            csize = csizedic[c]
+            args.append((self.bwsjpre, self.statspath, c, csize, self.params))
+        rslts = UT.process_mp(filter_sj, args, np=self.np, doreduce=False)
+
+        dstpath = self.bwsjpre+'.sjpath.filtered.bed.gz'
+        with open(dstpath,'wb') as dst:
+            for c in chroms:
+                srcpath =  self.bwsjpre+'.sjpath.{0}.filtered.bed.gz'.format(c)
+                with open(srcpath, 'rb') as src:
+                    shutil.copyfileobj(src, dst)
+
+def locus2pc(l):
+    chrom,sted,strand = l.split(':')
+    st,ed = sted.split('-')
+    st = str(int(st)-1)
+    if strand in ['+','.']:
+        return  '|'.join([st,ed])
+    return '|'.join([ed,st])
+
+def filter_sj(bwsjpre, statspath, chrom, csize, params):
+    # read in junction stats
+    stats = UT.read_pandas(statspath)
+    if 'chr' not in stats:
+        stats['chr'] = [x.split(':')[0] for x in stats['locus']]
+    if '#detected' in stats:
+        stats.rename(columns={'#detected':'detected'}, inplace=True)
+    stats = stats[stats['chr']==chrom].copy()
+    if 'pc' not in stats:
+        stats['pc'] = [locus2pc(x) for x in stats['locus']]
+    flds = ['detected','maxcnt','maxoverhang']
+    dics = {f: UT.df2dict(stats, 'pc', f) for f in flds}
+    # read sjpath
+    fpath_chr =  bwsjpre+'.sjpath.{0}.bed.gz'.format(chrom)
+    dstpath = bwsjpre+'.sjpath.{0}.filtered.bed.gz'.format(chrom)
+    if os.path.exists(fpath_chr):
+        sj = GGB.read_bed(fpath_chr)
+    else:
+        fpath = bwsjpre+'.sjpath.bed.gz'
+        sj = GGB.read_bed(fpath)
+        sj = sj[sj['chr']==chrom].copy()
+    name0 = sj.iloc[0]['name']
+    if len(name0.split('|'))<len(name0.split(',')): # exons attached?
+        sj['name'] = [','.join(x.split(',')[1:-1]) for x in sj['name']]
+    # filter unstranded
+    sj = sj[sj['strand'].isin(['+','-'])] 
+    # filter with stats
+    for f in flds:
+        sj[f] = [N.min([dics[f].get(x,0) for x in y.split(',')]) for y in sj['name']]
+        sj = sj[sj[f]>params['th_'+f]].copy() # filter 
+    # edge exon size    
+    sj['eflen'] = [int(x.split(',')[0]) for x in sj['esizes']]
+    sj['ellen'] = [int(x.split(',')[-2]) for x in sj['esizes']]    
+    eth = params['th_minedgeexon']
+    sj = sj[(sj['eflen']>eth)&(sj['ellen']>eth)].copy()
+    # calculate sjratio, sjratio2
+    sjexbw = A2.SjExBigWigs(bwsjpre, mixunstranded=False)
+    for s in ['+','-']:
+        idx = sj['strand']==s
+        with sjexbw:
+            sa = sjexbw.bws['sj'][s].get(chrom,0,csize)
+            ea = sjexbw.bws['ex'][s].get(chrom,0,csize)
+        a = sa+ea
+        sj.loc[idx,'sjratio2'] = [x/N.mean(a[int(s):int(e)]) for x,s,e in sj[idx][['sc1','tst','ted']].values]
+    sj = sj[sj['sjratio2']>params['th_sjratio2']]
+    GGB.write_bed(sj, dstpath, ncols=12)
+
+
+
+
+
 

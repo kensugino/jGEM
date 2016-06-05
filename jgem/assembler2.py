@@ -165,6 +165,7 @@ E53CM = LogisticClassifier(json=e53m_p, dstcol='e53')
 class EdgeFinder(object):
     
     def __init__(self, json, maxsize=100000):
+        self.json=json
         a_lsin,a_lgap = json['coef']
         b0 = json['intercept']
         th = json['th']
@@ -938,6 +939,7 @@ class LocalAssembler(object):
                  sjbwpre=None,
                  refcode='gen9',
                  sjpaths=None, 
+                 discardunstranded=False,
                  uth=1, 
                  mth=3, 
                  sjratioth=2e-3, 
@@ -951,6 +953,7 @@ class LocalAssembler(object):
         self.bwpre = bwpre
         self.sjbwpre = sjbwpre
         self.dstpre = dstpre
+        self.discardunstranded = discardunstranded
         self.refcode = refcode # for classifier
         self.chrom = chrom
         self.st = int(st)
@@ -963,7 +966,8 @@ class LocalAssembler(object):
         self.covth = covth
         self.upperpathnum = upperpathnum
         self.pathcheckth = pathcheckth
-        self.sjexbw = sjexbw = SjExBigWigs(bwpre, sjbwpre)
+        mixunstranded = not discardunstranded
+        self.sjexbw = sjexbw = SjExBigWigs(bwpre, sjbwpre, mixunstranded=mixunstranded)
         self.arrs = arrs = {}
         with sjexbw: # get bw arrays
             for k in ['ex','sj']:
@@ -1042,11 +1046,15 @@ class LocalAssembler(object):
 
         chrom,st,ed = self.chrom,self.st,self.ed
         if UT.isstring(self.bwpre):
-            chrpath = self.bwpre+'.sjpath.{0}.bed.gz'.format(chrom) # separated chrom file exists?
-            if os.path.exists(chrpath):
-                sj = GGB.read_bed(chrpath)
+            chrfiltered = self.bwpre+'.sjpath.{0}.filtered.bed.gz'.format(chrom)
+            if os.path.exists(chrfiltered):
+                sj = GGB.read_bed(chrfiltered)
             else:
-                sj = GGB.read_bed(self.bwpre+'.sjpath.bed.gz')
+                chrpath = self.bwpre+'.sjpath.{0}.bed.gz'.format(chrom) # separated chrom file exists?
+                if os.path.exists(chrpath):
+                    sj = GGB.read_bed(chrpath)
+                else:
+                    sj = GGB.read_bed(self.bwpre+'.sjpath.bed.gz')
             idx0 = (sj['chr']==chrom)&(sj['tst']>=st)&(sj['ted']<=ed)        
             sj0 = sj[idx0].copy()
             # merged sjpath has 53exon in pathcode => remove
@@ -1091,34 +1099,37 @@ class LocalAssembler(object):
         #s0 = sjpaths0[idx0]
         self._sjpaths0 = s0 = sjpaths0
         idxu = s0['strand']=='.' # unstranded => duplicates into '.+','.-'
-        if N.sum(idxu)>0:
-            # if unstranded junction share donor/acceptor sites with stranded one then assign that strand
-            sj_pn = s0[~idxu]
-            if len(sj_pn)>0:
-                tst2str = UT.df2dict(sj_pn, 'tst', 'strand')
-                ted2str = UT.df2dict(sj_pn, 'ted', 'strand')
-                sj_u = s0[idxu].copy()
-                sj_u['strand'] = [tst2str.get(x,y) for x,y in sj_u[['tst','strand']].values]
-                sj_u['strand'] = [ted2str.get(x,y) for x,y in sj_u[['ted','strand']].values]
-                idx_n = sj_u['strand']=='-'
-                sj_u.loc[idx_n, 'name'] = [reversepathcode(x) for x in sj_u[idx_n]['name']]
-                idxu2 = sj_u['strand']=='.'
-                sj_upn = sj_u[~idxu2]
-                self.logdebug('{0} unstranded assigned +/- with matching ends'.format(len(sj_upn)))
-                sj_up = sj_u[idxu2].copy()
-                sj_un = sj_u[idxu2].copy()
-            else:
-                sj_upn = None
-                sj_up = s0[idxu].copy()
-                sj_un = s0[idxu].copy()
-
-            sj_up['strand'] = '.+'
-            sj_un['name'] = [reversepathcode(x) for x in sj_un['name']]
-            sj_un['strand'] = '.-'
-            s1 = PD.concat([sj_pn, sj_upn, sj_up, sj_un], ignore_index=True)
+        if self.discardunstranded:
+            s1 = s0[~idxu].copy()
         else:
-            s1 = s0
-        
+            if N.sum(idxu)>0:
+                # if unstranded junction share donor/acceptor sites with stranded one then assign that strand
+                sj_pn = s0[~idxu]
+                if len(sj_pn)>0:
+                    tst2str = UT.df2dict(sj_pn, 'tst', 'strand')
+                    ted2str = UT.df2dict(sj_pn, 'ted', 'strand')
+                    sj_u = s0[idxu].copy()
+                    sj_u['strand'] = [tst2str.get(x,y) for x,y in sj_u[['tst','strand']].values]
+                    sj_u['strand'] = [ted2str.get(x,y) for x,y in sj_u[['ted','strand']].values]
+                    idx_n = sj_u['strand']=='-'
+                    sj_u.loc[idx_n, 'name'] = [reversepathcode(x) for x in sj_u[idx_n]['name']]
+                    idxu2 = sj_u['strand']=='.'
+                    sj_upn = sj_u[~idxu2]
+                    self.logdebug('{0} unstranded assigned +/- with matching ends'.format(len(sj_upn)))
+                    sj_up = sj_u[idxu2].copy()
+                    sj_un = sj_u[idxu2].copy()
+                else:
+                    sj_upn = None
+                    sj_up = s0[idxu].copy()
+                    sj_un = s0[idxu].copy()
+
+                sj_up['strand'] = '.+'
+                sj_un['name'] = [reversepathcode(x) for x in sj_un['name']]
+                sj_un['strand'] = '.-'
+                s1 = PD.concat([sj_pn, sj_upn, sj_up, sj_un], ignore_index=True)
+            else:
+                s1 = s0
+            
         self.sjpaths0 = s1 # original unfiltered (just position restricted)
         sc1 = self.sjpaths0['sc1']
         if self.sjpaths0.dtypes['sc2']=='O': # merged sjpath
@@ -1132,9 +1143,9 @@ class LocalAssembler(object):
             exaa = self.sjexbw.bws['ex']['a'].get(chrom, st, ed)
         a = sjaa+exaa # all of the coverages
         o = int(self.st)
-        for f in ['st','ed','tst','ted']:
-            sjpaths[f] = sjpaths[f].astype(int)
-        sjpaths['sjratio'] = N.array([x/N.min(a[s-o:e-o]) for x,s,e in sjpaths[['sc2','tst','ted']].values])
+        # sjpaths['minscov'] = [N.min(a[s-o:e-o]) for s,e in sjpaths[['tst','ted']].values]]
+        sjpaths['sjratio'] = [x/N.min(a[int(s-o):int(e-o)]) for x,s,e in sjpaths[['sc2','tst','ted']].values]
+        # .values => dtype float matrix => s,e float
         n0 = len(sjpaths)
         idxpn = (sjpaths['strand'].isin(['+','-']))&(sjpaths['sjratio']>sjratioth)
         idxu = (sjpaths['strand'].isin(['.+','.-']))&(sjpaths['sjratio']>usjratioth)
@@ -2040,7 +2051,7 @@ def path2tspan(paths, cmax=9, covfld='tcov0'):
     bed.sort_values(['chr','st','ed'], inplace=True)
     return bed    
 
-def sjpaths2tspan(sjpaths, cmax=9, strip53=False):
+def sjpaths2tspan(sjpaths, cmax=9, strip53=False, sc2color=True):
     # bed12
     bed = sjpaths
     # #exons, esizes, estarts
@@ -2055,7 +2066,7 @@ def sjpaths2tspan(sjpaths, cmax=9, strip53=False):
     bedg['exons'] = bg['exons'].apply(lambda g: sorted(set([tuple(x) for y in g for x in y])))
     bedg['st'] = bg['st'].min()
     bedg['ed'] = bg['ed'].max()
-    bedg['sc1'] = bg['sc1'].max()
+    bedg['sc1'] = bg['sc1'].sum()
     bed = bedg.reset_index()
     
     bed['#exons'] = [len(x) for x in bed['exons']]
@@ -2063,16 +2074,19 @@ def sjpaths2tspan(sjpaths, cmax=9, strip53=False):
     esizes = [[str(y[1]-y[0]) for y in x] for x in bed['exons']]
     bed['esizes'] = [','.join(x)+',' for x in esizes]
     bed['estarts'] = [','.join(x)+',' for x in estarts]
-    bed['ltcov'] = N.log2(bed['sc1']+2)
-    sm = {'+':Colors('R', cmax),
-          '-':Colors('B', cmax),
-          '.':Colors('G', cmax)}
-    bed['sc2'] = [sm[s].RGB(x) for x,s in bed[['ltcov','strand']].values]
+    if sc2color:
+        bed['ltcov'] = N.log2(bed['sc1']+2)
+        sm = {'+':Colors('R', cmax),
+              '-':Colors('B', cmax),
+              '.':Colors('G', cmax)}
+        bed['sc2'] = [sm[s].RGB(x) for x,s in bed[['ltcov','strand']].values]
+    else:
+        bed['sc2'] = bed['sc1']
     if strip53:
         bed['name'] = [','.join(x.split(',')[1:-1]) for x in bed['name']]
     bed.sort_values(['chr','st','ed'], inplace=True)
     return bed
-    
+
 
 ####### Bundle Finder ###############################################################
     
