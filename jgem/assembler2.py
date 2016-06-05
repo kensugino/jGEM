@@ -1794,7 +1794,8 @@ class LocalAssembler(object):
         scols = SJDFCOLS #['chr','st','ed','strand','name','kind','tcnt'  ]#,'donor','acceptor','dp','ap']
         UT.write_pandas(self.sjdf[scols], pre+'.sjdf.txt.gz', '')
         pcols = PATHCOLS #['chr','st','ed','name','strand','tst','ted','tcov0','tcov1','tcov']
-        UT.write_pandas(self.tpaths[pcols], pre+'.paths.txt.gz', '')
+        if len(self.tpaths)>0:
+            UT.write_pandas(self.tpaths[pcols], pre+'.paths.txt.gz', '')
         # 2) unused sjpaths => bed12
         GGB.write_bed(self.unusedsj, pre+'.unused.sjpath.bed.gz', ncols=12)
         # 3) allpaths => gtf or bed12 tcov => sc2 rgb color
@@ -1832,7 +1833,9 @@ class LocalAssembler(object):
         # self.logdebug('writing results...')
         self.write()
         self.loginfo('finished assembling, {0} paths found'.format(len(self.bed12)))
-        return self.bname
+        if len(self.tpaths)>0:
+            return self.bname
+        return None
         
     #def extract_se_candidates(self):
     #    pass
@@ -2255,9 +2258,12 @@ def concatenate_bundles(bundles, bundlestatus, chrom, dstpre):
                 with open(dstpath, 'wb') as dst:
                     for chrom, st, ed in bundles:
                         bname = bundle2bname((chrom,st,ed))
-                        if bundlestatus[bname] is None:
-                            continue
                         srcpath = '{0}.{1}_{2}_{3}.{4}'.format(dstpre, chrom, st, ed, suf)
+                        if not os.path.exists(srcpath):
+                            if bundlestatus[bname] is None:
+                                continue
+                            else:
+                                raise RuntimeError('{0} does not exists'.format(srcpath))
                         files.append(srcpath)
                         with open(srcpath, 'rb') as src:
                             shutil.copyfileobj(src, dst)
