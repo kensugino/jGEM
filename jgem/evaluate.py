@@ -797,4 +797,29 @@ class EvalMatch(object):
 
 
 
+def plot_elen_vs_tlen_gtf(gtf, ax=None, ms=1, alpha=0.1, title=''):
+    gtf['tlen'] = gtf['ed']-gtf['st']
+    tr = gtf[gtf['typ']=='transcript'][['transcript_id','tlen']].copy().set_index('transcript_id')
+    exons = gtf[gtf['typ']=='exon']
+    tr['elen'] = exons.groupby('transcript_id')['tlen'].sum()
+    return _plot_evt(tr,ax,ms,alpha,title)
+
+def _plot_evt(df,ax=None, ms=1, alpha=0.1, title=''):
+    if ax is None:
+        fig,ax = P.subplots(1,1,figsize=(4,4))
+    x = N.log10(df['tlen'])
+    y = N.log10(df['elen'])
+    ax.set_xlabel('log10(tlen)')
+    ax.set_ylabel('log10(elen)')
+    ax.set_title(title)
+    ax.plot(x,y,'.',ms=ms,alpha=alpha)
+    ax.set_xlim([2,6.5])
+    ax.set_ylim([1,5.5])
+    ax.locator_params(nbins=5)
+    return ax
+
+def plot_elen_vs_tlen_bed12(bed, ax=None, ms=1, alpha=0.1, title=''):
+    bed['tlen'] = bed['ed']-bed['st']
+    bed['elen'] = bed['esizes'].apply(lambda x: N.sum([int(y) for y in x.split(',')[:-1]]))
+    return _plot_evt(bed,ax,ms,alpha,title)
 

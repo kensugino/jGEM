@@ -120,14 +120,14 @@ class ParamFinder(object):
         self.sj = sj = UT.read_pandas(self.refpre+'.sj.txt.gz')
         self.set_bws(bwpre)
 
-    def process(self, sdiffth=1, gapth=0, np=10):
+    def process(self, sdiffth=1, covfactor=0, np=10):
         self.extract_all()
         for x in ['ne_i','ne_5','ne_3','e5i','e3i','e53']:
             print('  #{0}:{1}'.format(x, len(getattr(self, x))))
         print('###### 53 params ########')
         self.calc_53_params(sdiffth=sdiffth, np=np)
         print('###### 53gap params ########')
-        self.calc_53gap_params(gapth=gapth, np=np)
+        self.calc_53gap_params(covfactor=covfactor, np=np)
         print('###### exon params ########')
         self.calc_exon_params(np=np)
         

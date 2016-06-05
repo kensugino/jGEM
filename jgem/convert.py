@@ -24,6 +24,7 @@ from jgem import utils as UT
 from jgem import gtfgffbed as GGB
 from jgem import graph as GP
 
+from jgem import assembler2 as A2
 
 # GTF <=> EX,SJ    ######################################################################
 
