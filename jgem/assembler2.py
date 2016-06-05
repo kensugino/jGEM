@@ -2484,7 +2484,8 @@ def find_threshold(x0,x1,minth,dstpre,fdrth=0.5, fprth=0.01):
     cp = N.sum(cntf)   # total positive
     cn = N.sum(cnto)-cp # total negative (observed - positive)
     if cn<0: # due to noise when almost perfect
-        th = minth
+        th_fpr = minth
+        th_fdr = minth
     else:
         fn = N.cumsum(cntf) # false negative (condition positive but < th)
         tp = cp - fn # true positive (condition positive and >= th)
