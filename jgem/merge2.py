@@ -148,11 +148,11 @@ def prep_exwig_chr(j2pres, libsizes, dstpre, chrom, csize):
     if all([os.path.exists(wigpaths[s]) for s in ss]):
         return wigpaths
     if libsizes is None:
-    	n = 1
-    	scales = N.ones(len(j2pres))
+        n = 1
+        scales = N.ones(len(j2pres))
     else:
-	    n = len(j2pres)
-	    scales = [1e6/float(x) for x in libsizes]
+        n = len(j2pres)
+        scales = [1e6/float(x) for x in libsizes]
     for pre,scale in zip(j2pres, scales):
         exdf = UT.read_pandas(pre+'.exdf.txt.gz',names=A2.EXDFCOLS)
         exdf = exdf[exdf['chr']==chrom]
@@ -167,8 +167,8 @@ def prep_exwig_chr(j2pres, libsizes, dstpre, chrom, csize):
             for st,ed,ecov in sesub[['st','ed','ecov']].values:
                 a[s][st:ed] += ecov*scale
     for s in ['p','n','u']:
-	    if libsizes is not None:
-    	    a[s] /= float(n) # average
+        if libsizes is not None:
+            a[s] /= float(n) # average
         cybw.array2wiggle_chr64(a[s], chrom,  wigpaths[s], 'w')
     return wigpaths  
 
@@ -184,11 +184,11 @@ def prep_sjwig_chr(j2pres, libsizes, dstpre, chrom, csize):
     if all([os.path.exists(wigpaths[s]) for s in ss]):
         return wigpaths
     if libsizes is None:
-    	n = 1
-    	scales = N.ones(len(j2pres))
+        n = 1
+        scales = N.ones(len(j2pres))
     else:
-	    n = len(j2pres)
-	    scales = [1e6/float(x) for x in libsizes]
+        n = len(j2pres)
+        scales = [1e6/float(x) for x in libsizes]
     for pre,scale in zip(j2pres, scales):
         sjdf = UT.read_pandas(pre+'.sjdf.txt.gz',names=A2.SJDFCOLS)
         sjdf = sjdf[sjdf['chr']==chrom]
@@ -197,8 +197,8 @@ def prep_sjwig_chr(j2pres, libsizes, dstpre, chrom, csize):
             for st,ed,tcnt in sjsub[['st','ed','tcnt']].values:
                 a[s][st:ed] += tcnt*scale
     for s in ['p','n','u']:
-	    if libsizes is not None:
-	        a[s] /= float(n) # average
+        if libsizes is not None:
+            a[s] /= float(n) # average
         cybw.array2wiggle_chr64(a[s], chrom,  wigpaths[s], 'w')
     return wigpaths    
 
@@ -222,11 +222,11 @@ def prep_sjpath_chr(j2pres, libsizes, dstpre, chrom):
     cols = ['st','ed','name','strand','tst','ted','tcov']
 
     if libsizes is None:
-    	n = 1
-    	scales = N.ones(len(j2pres))
+        n = 1
+        scales = N.ones(len(j2pres))
     else:
-	    n = len(j2pres)
-	    scales = [1e6/float(x) for x in libsizes]
+        n = len(j2pres)
+        scales = [1e6/float(x) for x in libsizes]
     for pre,scale in zip(j2pres, scales):
         paths = UT.read_pandas(pre+'.paths.txt.gz', names=A2.PATHCOLS)
         paths = paths[paths['chr']==chrom]
@@ -248,7 +248,7 @@ def prep_sjpath_chr(j2pres, libsizes, dstpre, chrom):
     df['pc'] = df['name'].copy()
     idxp = df['strand'].isin(['+','.+'])
     if libsizes is not None:
-    	df['tcov'] = df['tcov']/float(n)
+        df['tcov'] = df['tcov']/float(n)
     df.loc[idxp,'name'] = ['{0},{1},{2}'.format(s,p,e) for s,p,e in df[idxp][['st','pc','ed']].values]
     df.loc[~idxp,'name'] = ['{2},{1},{0}'.format(s,p,e) for s,p,e in df[~idxp][['st','pc','ed']].values]
     cmax = 9+N.log2(N.mean(scales))
