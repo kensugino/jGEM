@@ -440,22 +440,22 @@ class ParamFinder(object):
         if os.path.exists(neipath):
             nei = UT.read_pandas(neipath)
         else:
-            nei = self.calc_params_mp(self.ne_i, np=np, gapmode='i') # ~ 1min
+            nei = self.calc_params_mp(self.ne_i, np=np, gapmode='i',covfactor=0.05) # ~ 1min
             UT.write_pandas(nei, neipath, 'h')
         if os.path.exists(e53path):
             e53 = UT.read_pandas(e53path)
         else:
-            e53 = self.calc_params_mp(self.e53, np=np, gapmode='i') # ~ 10min don't do long ones stupid
+            e53 = self.calc_params_mp(self.e53, np=np, gapmode='i',covfactor=0.05) # ~ 10min don't do long ones stupid
             UT.write_pandas(e53, e53path, 'h')
         # logistic fit
-        cols =  ['chr', 'st', 'ed', 'gap005', 'emax', 'emin', 'sIn', 'sOut', 'locus', 'kind','len', 'sdIn','sdOut']
+        cols =  ['chr', 'st', 'ed', 'gap', 'emax', 'emin', 'sIn', 'sOut', 'locus', 'kind','len', 'sdIn','sdOut']
         nei['kind'] = 1
         e53['kind'] = 0
         nei['len'] = nei['ed'] - nei['st']
         e53['len'] = e53['ed'] - e53['st']
         D = PD.concat([nei[cols], e53[cols]],ignore_index=True)
         D['llen'] = N.log10((D['len']))
-        D['lgap'] = N.log10(D['gap005']+1)
+        D['lgap'] = N.log10(D['gap']+1)
         D['lemax'] = N.log2(zoom*D['emax']+1)
         D1 = D[(D['emax']>0)&(D['sdIn']!=0)&(D['sdOut']!=0)]
         print(len(D), len(D1))
@@ -466,7 +466,7 @@ class ParamFinder(object):
         Z = lr.predict(X)    
         # write json
         ppath = self.bwpre+'.{0}.exonparams.json'.format(self.refcode)
-        self.write_params(ppath, lr, Y, Z, ['lemax','lgap','llen'], {'zoom':zoom})
+        self.write_params(ppath, lr, Y, Z, ['lemax','lgap','llen'], {'zoom':zoom, 'th':covfactor})
         # make fig
         spath = self.bwpre+'.{0}.exonparams'.format(self.refcode)
         title = self.bwpre.split('/')[-1]
