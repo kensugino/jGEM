@@ -471,8 +471,8 @@ class LocalEstimator(A2.LocalAssembler):
         # 2) UTR difference
         # 3) within 5-3 group by tree branch prob
         paths = self.paths
-        for s in ['+','-']:
-            ps = paths[paths['strand'].isin(A2.STRS[s])]
+        for s in ['+','-','.']:
+            ps = paths[paths['strand']==s]
             if len(ps)==0:
                 continue
             for chrom,st,ed in UT.union_contiguous(ps[['chr','st','ed']],returndf=False):
