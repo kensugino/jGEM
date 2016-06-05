@@ -836,7 +836,7 @@ def unionregion(df, sfld='st', efld='ed'):
     recs = [x for x in _gen()]
     return recs
     
-def fill_gap(sja, sj, exons, strand):
+def fill_gap(sja, sj, exons, strand, offset):
     sjac = sja.copy()
     # need to fill exons inside the path as well
     if strand =='+':
@@ -849,7 +849,9 @@ def fill_gap(sja, sj, exons, strand):
                                 for x in y.split('|')[1:-1]]))
 
     for st,ed in steds: # this way both 5' and 3' positions will be correct
-        sjac[st:ed] = min(sjac[st-1],sjac[ed+1])
+        ost = st-offset
+        oed = ed-offset
+        sjac[ost:oed] = min(sjac[ost-1],sjac[oed+1])
 
     if len(exons)==0:
         return sjac
@@ -1183,7 +1185,7 @@ class LocalAssembler(object):
             df = detect_exons(sj, self.st, sja, exa, covfactor, classifier=self.intg)
             self.exons[s] = df[df['exon']==True].copy()            
             self.gaps[s] = df
-            self.filled[s] = fill_gap(sja, sj, self.exons[s], s)
+            self.filled[s] = fill_gap(sja, sj, self.exons[s], s, self.st)
             self.gspans[s] = self._get_spans(s)
 
     
