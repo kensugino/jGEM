@@ -466,7 +466,7 @@ class ParamFinder(object):
         Z = lr.predict(X)    
         # write json
         ppath = self.bwpre+'.{0}.exonparams.json'.format(self.refcode)
-        self.write_params(ppath, lr, Y, Z, ['lemax','lgap','llen'], {'zoom':zoom, 'th':covfactor})
+        self.write_params(ppath, lr, Y, Z, ['lemax','lgap','llen'], {'zoom':zoom, 'th':0.05})
         # make fig
         spath = self.bwpre+'.{0}.exonparams'.format(self.refcode)
         title = self.bwpre.split('/')[-1]
