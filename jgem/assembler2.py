@@ -1418,6 +1418,7 @@ class LocalAssembler(object):
         return dfs
         
     def organize(self):
+        # [TODO] this part slow => optimize
         # dataframes for 
         # 1) exons 
         # 2) junctions
@@ -1870,7 +1871,7 @@ class LocalAssembler(object):
     #def extract_se_candidates(self):
     #    pass
         
-    def draw_covs(self, st, ed, strand, win=10000, ax=None):
+    def draw_covs(self, st, ed, strand, win=500, ax=None):
         offset = self.st
         s0 = st-win-offset
         e0 = ed+win-offset
@@ -1936,7 +1937,7 @@ class LocalAssembler(object):
         return ax
         
 
-    def draw_path(self, pathdf, st, ed, strand, covfld='tcov',win=10000, ax=None, delta=500):
+    def draw_path(self, pathdf, st, ed, strand, covfld='tcov',win=500, ax=None, delta=500):
         offste = self.st
         st0 = st-win
         ed0 = ed+win
@@ -2543,12 +2544,12 @@ def find_threshold(x0,x1,minth,dstpre,fdrth=0.5, fprth=0.01):
         if len(idx)==0: # not found
             th_fdr = minth
         else:
-            th_fdr = 2**(bins[N.min(idx)])-1
+            th_fdr = 2**(bins[N.min(idx[idx>10])])-1
         idx0 = N.nonzero(fpr<=fprth)[0]
         if len(idx0)==0: # not found
             th_fpr = minth
         else:
-            th_fpr = 2**(bins[N.min(idx0)])-1
+            th_fpr = 2**(bins[N.min(idx0[idx0>10])])-1
     fname = dstpre+'.secovth.pdf'
     title = dstpre.split('/')[-1]
     plot_se_th(b0,h0s,h1,th_fpr,th_fdr,title,fname)
