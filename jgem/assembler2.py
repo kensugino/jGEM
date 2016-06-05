@@ -583,14 +583,14 @@ class GeneGraph(object):
                 edmax = sjs['ed'].max()
                 LOG.debug('location: {0}:{1}-{2}'.format(chrom,stmin,edmax))
 
-                uth += 0.4
+                uth += 0.2
                 # sc2min = sjs['sc2'].min()
                 mcnt = sjs['sc2']-sjs['sc1'] # multi mappers
-                mth = max(0, mcnt.max()/2.)
-                sjrth += 0.0005
+                mth = max(0, mcnt.max()-5)
+                sjrth += 0.01
                 n0 = len(sjs)
-                # ucnt threshold increases by 1, mcnt threshold decrease by 10, sjratio by 0.001
-                sjs = sjs[(sjs['sc1']>uth)&(mcnt<=mth)&(sjs['sjratio']>sjrth)].copy()
+                # ucnt threshold increases by 1, mcnt threshold decrease by 10, sjratio by 0.005
+                sjs = sjs[(sjs['sc1']>uth)&(mcnt<=mth)&(sjs['sjratio2']>sjrth)].copy()
                 n1 = len(sjs)
                 LOG.debug('#sjs:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
                 self.prep_ggraph(sjs)
@@ -959,12 +959,12 @@ class LocalAssembler(object):
                  discardunstranded=False,
                  uth=1, 
                  mth=3, 
-                 sjratioth=2e-3, 
+                 sjratioth=1e-3, 
                  usjratioth=1e-2,
                  #covfactor=0.05, 
                  covth=0.1,
-                 upperpathnum=3000, # if num of paths larger than this increase stringency for sjs
-                 pathcheckth=300, # above this num of sjs check sc1(ucnt)==0 if >50% remove
+                 upperpathnum=2000, # if num of paths larger than this increase stringency for sjs
+                 pathcheckth=200, # above this num of sjs check sc1(ucnt)==0 if >50% remove
                  ):
         self.bname = '{0}:{1}-{2}'.format(chrom,st,ed)
         self.bwpre = bwpre
@@ -1163,10 +1163,11 @@ class LocalAssembler(object):
         o = int(self.st)
         # sjpaths['minscov'] = [N.min(a[s-o:e-o]) for s,e in sjpaths[['tst','ted']].values]]
         sjpaths['sjratio'] = [x/N.min(a[int(s-o):int(e-o)]) for x,s,e in sjpaths[['sc2','tst','ted']].values]
+        sjpaths['sjratio2'] = [x/N.mean(a[int(s-o):int(e-o)]) for x,s,e in sjpaths[['sc1','tst','ted']].values]
         # .values => dtype float matrix => s,e float
         n0 = len(sjpaths)
-        idxpn = (sjpaths['strand'].isin(['+','-']))&(sjpaths['sjratio']>sjratioth)
-        idxu = (sjpaths['strand'].isin(['.+','.-']))&(sjpaths['sjratio']>usjratioth)
+        idxpn = (sjpaths['strand'].isin(['+','-']))&(sjpaths['sjratio2']>sjratioth)
+        idxu = (sjpaths['strand'].isin(['.+','.-']))&(sjpaths['sjratio2']>usjratioth)
         self.sjpaths = sjpaths[idxpn|idxu].copy()
         n1 = len(self.sjpaths)
         self.loginfo('sjratio filter: {0}=>{1}'.format(n0,n1))
@@ -1837,29 +1838,29 @@ class LocalAssembler(object):
         self.load_and_filter_sjpaths()
         if len(self.sjpaths)==0:
             return None
-        # self.logdebug('finding exons...')
+        self.logdebug('finding exons...')
         self.find_exons()
 
         # self.logdebug('finding 53 positions...')
         self.find_53()
 
-        # self.logdebug('finding paths...')
+        self.logdebug('finding paths...')
         self.find_all_paths()
         self.decompose_paths()
 
-        # self.logdebug('finding 53 exons...')
+        self.logdebug('finding 53 exons...')
         self.find_53exons()
 
-        # self.logdebug('making dataframes...')
+        self.logdebug('making dataframes...')
         self.organize()
 
-        # self.logdebug('calculating covrages...')
+        self.logdebug('calculating covrages...')
         self.calculate_ecovs()
         self.calculate_scovs()
         self.estimate_abundance()
 
         #self.extract_se_candidates()
-        # self.logdebug('writing results...')
+        self.logdebug('writing results...')
         self.write()
         self.loginfo('finished assembling, {0} paths found'.format(len(self.tpaths)))
         if len(self.tpaths)>0:
@@ -2608,7 +2609,7 @@ def smooth( v, wsize):
 LAPARAMS = dict(
     uth=1, 
     mth=3, 
-    sjratioth=2e-3, 
+    sjratioth=1e-3, 
     usjratioth=1e-2,
     covfactor=0.05, 
     covth=0.1,
