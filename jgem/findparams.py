@@ -777,13 +777,13 @@ def calc_params_chr(exdf, bwp, win=300, siz=10,  direction='>', gapmode='i', cov
                                      maxl,minl,gapl,posl, 
                                      maxr,minr,gapr,posr, 
                                      exl10,sjl10,sdifl,
-                                     exr10,sjr10,sdifr, gap] #+[gaps[x] for x in cfs])
+                                     exr10,sjr10,sdifr, gap]) #+[gaps[x] for x in cfs])
                     else:
                         recs.append([_id,exmax,exmin,
                                      maxr,minr,gapr,posr, 
                                      maxl,minl,gapl,posl, 
                                      exr10,sjr10,sdifr,
-                                     exl10,sjl10,sdifl, gap] #+[gaps[x] for x in cfs])
+                                     exl10,sjl10,sdifl, gap]) #+[gaps[x] for x in cfs])
     return recs
 
 def calc_flux_chr(exdf, bwp):
