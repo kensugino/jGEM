@@ -442,13 +442,13 @@ class LocalEstimator(A2.LocalAssembler):
                 if st>ed:
                     st,ed = ed,st
                 if (st,ed,strand) not in sted:
-                    yield (chrom,st,ed,strand,x,'5')
+                    yield (chrom,st,ed,strand,tmp[0],'5')
                     sted.add((st,ed,strand))
                 st,ed = [int(y) for y in tmp[-1].split(',')]
                 if st>ed:
                     st,ed = ed,st
                 if (st,ed,strand) not in sted:
-                    yield (chrom,st,ed,strand,x,'3')
+                    yield (chrom,st,ed,strand,tmp[-1],'3')
                     sted.add((st,ed,strand))
                 # internal
                 for x in tmp[1:-1]:
