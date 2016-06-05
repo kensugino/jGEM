@@ -209,9 +209,9 @@ class Comparator(object):
         self.sj_tgt = stgt = self.cn_tgt.model('sj') #UT.read_pandas(self.p1.sj)
         self.sj_ref = sref = self.cn_ref.model('sj') #UT.read_pandas(self.p2.sj)
         if 'locus' not in stgt.columns:
-            stgt['locus'] = GGB.calc_locus_strand(stgt)
+            stgt['locus'] = UT.calc_locus_strand(stgt)
         if 'locus' not in sref.columns:
-            sref['locus'] = GGB.calc_locus_strand(sref)
+            sref['locus'] = UT.calc_locus_strand(sref)
         l2c = dict([(x,'k.me') for x in sref['locus']])
         rcode = self.cn_ref.code
         setfld = 'etcode_'+rcode
