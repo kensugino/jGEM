@@ -144,6 +144,7 @@ class LogisticClassifier(object):
 itg_p = dict(coef = N.array([ -0.40,  -4.72, 0.86]),
            intercept = 11.8638183,
            cols = ['lemax','lgap','llen'],
+           th = 0.05,
            zoom = 1)
 INTG = LogisticClassifier(json=itg_p, dstcol='exon')
 
@@ -672,7 +673,7 @@ class Colors(object):
 ####### Local Assembler ###############################################################
 
 
-def detect_exons(sjpaths, offset, sja, exa, covfactor=0.05, classifier=INTG):
+def detect_exons(sjpaths, offset, sja, exa, classifier=INTG):
     x = N.log2(sja+1)
     xd = (x[1:]-x[:-1])
     # use sjpaths to get donor/acceptor positions
@@ -689,6 +690,7 @@ def detect_exons(sjpaths, offset, sja, exa, covfactor=0.05, classifier=INTG):
     gaps1 = find_np_pairs(tmp)
     gaps = sorted(set(gaps0+gaps1))
     zoom = classifier.json['zoom']
+    covfactor = classifier.json['th']
     def _gen_params():
         #find_maxgap = cyas2.find_maxgap
         for st,ed in gaps:
@@ -959,7 +961,7 @@ class LocalAssembler(object):
                  mth=3, 
                  sjratioth=2e-3, 
                  usjratioth=1e-2,
-                 covfactor=0.05, 
+                 #covfactor=0.05, 
                  covth=0.1,
                  upperpathnum=3000, # if num of paths larger than this increase stringency for sjs
                  pathcheckth=300, # above this num of sjs check sc1(ucnt)==0 if >50% remove
@@ -977,7 +979,7 @@ class LocalAssembler(object):
         self.mth = mth
         self.sjratioth = sjratioth
         self.usjratioth = usjratioth
-        self.covfactor = covfactor
+        #self.covfactor = covfactor
         self.covth = covth
         self.upperpathnum = upperpathnum
         self.pathcheckth = pathcheckth
@@ -1171,7 +1173,7 @@ class LocalAssembler(object):
 
         
     def find_exons(self):
-        covfactor=self.covfactor
+        #covfactor=self.covfactor
         arrs = self.arrs
         self.filled  = {}
         self.exons  = {}
@@ -1182,7 +1184,7 @@ class LocalAssembler(object):
             sja = arrs['sj'][s]
             exa = arrs['ex'][s]
             sj = sjs[sjs['strand'].isin(STRS[s])]
-            df = detect_exons(sj, self.st, sja, exa, covfactor, classifier=self.intg)
+            df = detect_exons(sj, self.st, sja, exa, classifier=self.intg)
             self.exons[s] = df[df['exon']==True].copy()            
             self.gaps[s] = df
             self.filled[s] = fill_gap(sja, sj, self.exons[s], s, self.st)
