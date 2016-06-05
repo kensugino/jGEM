@@ -164,7 +164,7 @@ E53CM = LogisticClassifier(json=e53m_p, dstcol='e53')
 
 class EdgeFinder(object):
     
-    def __init__(self, json, maxsize=100000):
+    def __init__(self, json):
         self.json=json
         a_lsin,a_lgap = json['coef']
         b0 = json['intercept']
@@ -176,7 +176,7 @@ class EdgeFinder(object):
         self.c0 = -b0/a_lgap
         self.c1 = -a_lsin/a_lgap
         self.th = th
-        self.maxsize = maxsize
+        self.maxsize = json['maxsize']
         
     def find(self, sja, exa, direction):
         # sja1, exa1 : pos0=>pos+1(<), pos-1=>pos0(>)
@@ -210,7 +210,7 @@ class EdgeFinder(object):
             gapth = 2**(c0+c1*lein)-1
             #print('gapth={0:.2f}, lsin={1:.2f}'.format(gapth, lsin))
             # pos => pos0, find position where lgap > gapth
-            idx = N.nonzero(exa[1:]<=th*lein)[0]
+            idx = N.nonzero(exa[1:]<=th*ein)[0]
             #print(idx)
             epos = len(exa)-1 # all the way to the end
             for x in _find_gap_from_idx(idx):
@@ -225,7 +225,7 @@ class EdgeFinder(object):
             gapth = 2**(c0+c1*lein)-1
             #print('gapth={0:.2f}, lsin={1:.2f}'.format(gapth, lsin))
             # pos0 <= pos, going opposite way
-            idx = N.nonzero(exa[:-1][::-1]<=th*lein)[0]
+            idx = N.nonzero(exa[:-1][::-1]<=th*ein)[0]
             epos = -len(exa)
             for x in _find_gap_from_idx(idx):
                 if x[1]>gapth:
@@ -234,10 +234,10 @@ class EdgeFinder(object):
             epos = max(epos, -self.maxsize)            
         return epos
         
-e5_p  = dict(coef=[-0.285,-0.81], intercept=5.6, th=0, zoom=1)
-EF5 = EdgeFinder(e5_p, maxsize=3000)
-e3_p = dict(coef=[-0.25,-0.51], intercept=4.6, th=0, zoom=1) # -0.25, -0.5, 4.5
-EF3 = EdgeFinder(e3_p, maxsize=50000) 
+e5_p  = dict(coef=[-0.285,-0.81], intercept=5.6, th=0, zoom=1, maxsize=3000)
+EF5 = EdgeFinder(e5_p)
+e3_p = dict(coef=[-0.25,-0.51], intercept=4.6, th=0, zoom=1, maxsize=25000) # -0.25, -0.5, 4.5
+EF3 = EdgeFinder(e3_p) 
 
 
 ####### Gene Graph ###########################################

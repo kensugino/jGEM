@@ -337,19 +337,19 @@ class ParamFinder(object):
             fig.savefig(spath)
 
 
-    def calc_53gap_params(self, gapth=0, np=10):
+    def calc_53gap_params(self, covfactor=0, np=10):
         zoom = self.zoom
-        d5path = self.bwpre+'.{0}.gap5params.txt.gz'.format(self.refcode)
-        d3path = self.bwpre+'.{0}.gap3params.txt.gz'.format(self.refcode)
+        d5path = self.bwpre+'.{0}.{1}.gap5params.txt.gz'.format(self.refcode, covfactor)
+        d3path = self.bwpre+'.{0}.{1}.gap3params.txt.gz'.format(self.refcode, covfactor)
         if os.path.exists(d5path):
             d5 = UT.read_pandas(d5path)
         else:
-            d5 = self.calc_params_mp(self.ne_5, win=8192, np=np, gapmode='53', direction='<')
+            d5 = self.calc_params_mp(self.ne_5, win=8192, np=np, gapmode='53', direction='<', covfactor=covfactor)
             UT.write_pandas(d5, d5path, 'h')
         if os.path.exists(d3path):
             d3 = UT.read_pandas(d3path)
         else:
-            d3 = self.calc_params_mp(self.ne_3, win=8192, np=np, gapmode='53', direction='>')
+            d3 = self.calc_params_mp(self.ne_3, win=8192, np=np, gapmode='53', direction='>', covfactor=covfactor)
             UT.write_pandas(d3, d3path, 'h')
 
         i5 = (d5['sOut']>0)&(d5['emax']>0)
@@ -370,25 +370,21 @@ class ParamFinder(object):
             lr.fit(X,Y)
             Z = lr.predict(X)
             return locals()
-        if gapth == 0:
-            fit5 = _fitone(d50,'eOut','gap000','gapIn', 'ein', 'lein')
-            fit3 = _fitone(d30,'eIn', 'gap000','gapOut', 'ein', 'lein')
-        elif gapth == 0.02:
-            fit5 = _fitone(d50,'eOut','gap002','gapIn', 'ein', 'lein')
-            fit3 = _fitone(d30,'eIn', 'gap002','gapOut', 'ein', 'lein')
-        else:
-            fit5 = _fitone(d50,'eOut','gap005','gapIn', 'ein', 'lein')
-            fit3 = _fitone(d30,'eIn', 'gap005','gapOut', 'ein', 'lein')
+        fit5 = _fitone(d50,'eOut','gap','gapIn', 'ein', 'lein')
+        fit3 = _fitone(d30,'eIn', 'gap','gapOut', 'ein', 'lein')
+
+        # max exon size
+        m5 = N.max(self.ne_5['len'])
+        m3 = N.max(self.ne_3['len'])
 
         rx,lrx = 'ein','lein'
-
         # save coefs
         p5path = self.bwpre+'.{0}.gap5params.json'.format(self.refcode)
         f = fit5
-        self.write_params(p5path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':gapth,'zoom':zoom})
+        self.write_params(p5path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':covfactor,'zoom':zoom, 'maxsize':m5})
         p3path = self.bwpre+'.{0}.gap3params.json'.format(self.refcode)
         f = fit3
-        self.write_params(p3path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':gapth,'zoom':zoom})
+        self.write_params(p3path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':covfactor,'zoom':zoom, 'maxsize':m3})
 
         # save scatter plots
         spath = self.bwpre+'.{0}.gap53params'.format(self.refcode)
@@ -577,13 +573,13 @@ class ParamFinder(object):
         
         self.e53 = sdf.reset_index()
 
-    def calc_params_mp(self, beddf,  win=600, siz=10, direction='>', gapmode='53', np=10):
+    def calc_params_mp(self, beddf,  win=600, siz=10, direction='>', gapmode='53', np=10, covfactor=0):
         chroms = UT.chroms(self.genome)
         args = []
         for c in chroms:
             bedc = beddf[beddf['chr']==c]
             if len(bedc)>0:
-                args.append((bedc, self.bwpaths.copy(), win, siz, direction, gapmode))
+                args.append((bedc, self.bwpaths.copy(), win, siz, direction, gapmode, covfactor))
         rslts = UT.process_mp(calc_params_chr, args, np=np, doreduce=True)
         df = PD.DataFrame(rslts, columns=CALCPARAMCOLS)
         exdfi = beddf.set_index('_id').ix[df['_id'].values]
@@ -726,10 +722,10 @@ CALCPARAMCOLS = ['_id','emax','emin',
             'emaxIn','eminIn','gapIn','gposIn',
             'emaxOut','eminOut','gapOut','gposOut',
             'eIn','sIn','sdIn',
-            'eOut','sOut','sdOut',
-            'gap000', 'gap001', 'gap002','gap005']#,'gap010','gap015','gap020']
+            'eOut','sOut','sdOut','gap']
+            # 'gap000', 'gap001', 'gap002','gap005']#,'gap010','gap015','gap020']
 
-def calc_params_chr(exdf, bwp, win=300, siz=10,  direction='>', gapmode='i'):
+def calc_params_chr(exdf, bwp, win=300, siz=10,  direction='>', gapmode='i', covfactor=0):
     bws = make_bws(bwp)
     ebw = bws['ex']
     sbw = bws['sj']
@@ -759,14 +755,17 @@ def calc_params_chr(exdf, bwp, win=300, siz=10,  direction='>', gapmode='i'):
                     exmax = N.max(a1[stpos:edpos])
                     exmin = N.min(a1[stpos:edpos])
                     #gapth = sjl10*covfactor if strand=='+' else sjr10*covfactor
-                    gaps = {}
-                    cfs = [0,0.01,0.02,0.05]#,0.1,0.15,0.2]:
-                    for covfactor in cfs:
+                    if gapmode=='i':
                         gapth = exmax*covfactor
-                        if ((direction=='>')&(strand=='+'))|((direction!='>')&(strand=='-')):
-                            gaps[covfactor] = find_maxgap(a1[stpos:edpos],exmin, exmax, gapth, win, gapmode)
+                    else:
+                        if direction=='>':
+                            gapth = exl10*covfactor
                         else:
-                            gaps[covfactor] = find_maxgap(a1[stpos:edpos][::-1],exmin, exmax, gapth, win, gapmode)
+                            gapth = exr10*covfactor
+                    if ((direction=='>')&(strand=='+'))|((direction!='>')&(strand=='-')):
+                        gap = find_maxgap(a1[stpos:edpos],exmin, exmax, gapth, win, gapmode)
+                    else:
+                        gap = find_maxgap(a1[stpos:edpos][::-1],exmin, exmax, gapth, win, gapmode)
                     maxl = N.max(a1[:stpos])
                     maxr = N.max(a1[edpos:])
                     minl = N.min(a1[:stpos])
@@ -778,13 +777,13 @@ def calc_params_chr(exdf, bwp, win=300, siz=10,  direction='>', gapmode='i'):
                                      maxl,minl,gapl,posl, 
                                      maxr,minr,gapr,posr, 
                                      exl10,sjl10,sdifl,
-                                     exr10,sjr10,sdifr]+[gaps[x] for x in cfs])
+                                     exr10,sjr10,sdifr, gap] #+[gaps[x] for x in cfs])
                     else:
                         recs.append([_id,exmax,exmin,
                                      maxr,minr,gapr,posr, 
                                      maxl,minl,gapl,posl, 
                                      exr10,sjr10,sdifr,
-                                     exl10,sjl10,sdifl]+[gaps[x] for x in cfs])
+                                     exl10,sjl10,sdifl, gap] #+[gaps[x] for x in cfs])
     return recs
 
 def calc_flux_chr(exdf, bwp):
