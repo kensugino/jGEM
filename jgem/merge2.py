@@ -425,7 +425,7 @@ class LocalEstimator(A2.LocalAssembler):
         # allpaths name = e5,e5d|a,d|a,...,d|e3a,e3
         def _sgen():
             sted = set()
-            for p in ap['name'].values:
+            for p,strand in ap[['name','strand']].values:
                 for x in p.split(',')[1:-1]:
                     st,ed = [int(y) for y in x.split('|')]
                     if st>ed:
@@ -435,7 +435,7 @@ class LocalEstimator(A2.LocalAssembler):
                         sted.add((st,ed,strand))
         def _egen():
             sted = set()
-            for p in ap['name'].values:
+            for p,strand in ap[['name','strand']].values:
                 tmp = p.split('|')
                 # 53
                 st,ed = [int(y) for y in tmp[0].split(',')]
@@ -540,9 +540,10 @@ def concatenate_bundles(bundles, dstpre):
             os.unlink(f)
 
 
-def estimatecovs(bed12path, bwpre, dstpre, np=6):
+def estimatecovs(bed12path, bwpre, dstpre, genome, np=6):
     bed = GGB.read_bed(bed12path)
     chroms = bed['chr'].unique()
+    csizedic = UT.df2dict(UT.chromdf(genome), 'chr', 'size')
     bundles = []
     for strand in ['+','-','.']:
         for chrom in chroms:
@@ -555,14 +556,14 @@ def estimatecovs(bed12path, bwpre, dstpre, np=6):
             for i in range(nb):
                 sti = 1000*i
                 edi = min(1000*(i+1), len(uc)-1)
-                st = uc.iloc[sti]['st'] - 100
-                ed = uc.iloc[edi]['ed'] + 100
+                st = max(uc.iloc[sti]['st'] - 100, 0)
+                ed = min(uc.iloc[edi]['ed'] + 100, csizedic[chrom])
                 args.append([bed12path, bwpre, chrom, st, ed, dstpre])
                 bundles.append((chrom,st,ed))
 
     rslts = UT.process_mp(bundle_estimator, args, np=np, doreduce=False)
     concatenate_bundles(bundles, dstpre)
-    
+
 
 
 
