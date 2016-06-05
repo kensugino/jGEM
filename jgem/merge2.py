@@ -373,7 +373,7 @@ def filter_sj(bwsjpre, statspath, chrom, csize, params):
     if len(name0.split('|'))<len(name0.split(',')): # exons attached?
         sj['name'] = [','.join(x.split(',')[1:-1]) for x in sj['name']]
     # filter unstranded
-    sj = sj[sj['strand'].isin(['+','-'])] 
+    sj = sj[sj['strand'].isin(['+','-'])].copy()
     # filter with stats
     for f in flds:
         sj[f] = [N.min([dics[f].get(x,0) for x in y.split(',')]) for y in sj['name']]
@@ -397,6 +397,172 @@ def filter_sj(bwsjpre, statspath, chrom, csize, params):
 
 
 
+
+class LocalEstimator(A2.LocalAssembler):
+
+    def __init__(self, bed12path, bwpre, chrom, st, ed, dstpre):
+        self.bed12path = bed12path
+        A2.LocalAssembler.__init__(self, bwpre, chrom, st, ed, dstpre, refcode=None)
+        bed12 = GGB.read_bed(bed12path)
+        idx = (bed12['chr']==chrom)&(bed12['tst']>=st)&(bed12['ted']<=ed)
+        self.paths = bed12[idx].copy()
+        sj = GGB.read_bed(bwpre+'.sjpath.bed.gz')
+        idx0 = (sj['chr']==chrom)&(sj['tst']>=st)&(sj['ted']<=ed)        
+        self.sjpaths0 = sj[idx0].copy()        
+
+    def process(self):
+        self.make_sjexdf()
+        self.calculate_ecovs()
+        self.calculate_scovs()
+        self.estimate_abundance()
+        self.write()
+
+    def make_sjexdf(self):
+        ap = self.paths
+        dfs = []
+        dfe = []
+        chrom = self.chrom
+        # allpaths name = e5,e5d|a,d|a,...,d|e3a,e3
+        def _sgen():
+            sted = set()
+            for p in ap['name'].values:
+                for x in p.split(',')[1:-1]:
+                    st,ed = [int(y) for y in x.split('|')]
+                    if st>ed:
+                        st,ed = ed,st
+                    if (st,ed,strand) not in sted:
+                        yield (chrom,st,ed,strand,x,'j')
+                        sted.add((st,ed,strand))
+        def _egen():
+            sted = set()
+            for p in ap['name'].values:
+                tmp = p.split('|')
+                # 53
+                st,ed = [int(y) for y in tmp[0].split(',')]
+                if st>ed:
+                    st,ed = ed,st
+                if (st,ed,strand) not in sted:
+                    yield (chrom,st,ed,strand,x,'5')
+                    sted.add((st,ed,strand))
+                st,ed = [int(y) for y in tmp[-1].split(',')]
+                if st>ed:
+                    st,ed = ed,st
+                if (st,ed,strand) not in sted:
+                    yield (chrom,st,ed,strand,x,'3')
+                    sted.add((st,ed,strand))
+                # internal
+                for x in tmp[1:-1]:
+                    st,ed = [int(y) for y in x.split(',')]
+                    if st>ed:
+                        st,ed = ed,st
+                    if (st,ed,strand) not in sted:
+                        yield (chrom,st,ed,strand,x,'i')
+                        sted.add((st,ed,strand))
+        cols = ['chr','st','ed','strand','name','kind']
+        sjdf = PD.DataFrame([x for x in _sgen()], columns=cols)
+        exdf = PD.DataFrame([x for x in _egen()], columns=cols)
+        A2.set_ad_pos(sjdf, 'sj')
+        A2.set_ad_pos(exdf, 'ex')
+        self.sjdf = sjdf
+        self.exdf = exdf
+        
+    def estimate_abundance(self):
+        # 1) 5-3 group by NNLS
+        # 2) UTR difference
+        # 3) within 5-3 group by tree branch prob
+        paths = self.paths
+        for s in ['+','-']:
+            ps = paths[paths['strand'].isin(A2.STRS[s])]
+            if len(ps)==0:
+                continue
+            for chrom,st,ed in UT.union_contiguous(ps[['chr','st','ed']],returndf=False):
+                pg1 = self.tcov_by_nnls(st,ed,s)
+                if pg1 is not None:
+                    for chrom,tst1,ted1,strand1,tcov1 in pg1.values:
+                        pg2 = self.tcov_by_utr(tst1,ted1,strand1,tcov1)
+                        if pg2 is not None:
+                            for chrom,st2,ed2,strand2,tcov2 in pg2.values:
+                                self.tcov_by_branchp(st2,ed2,tst1,ted1,strand2,tcov2)        
+
+    def write(self):
+        pre = self.dstpre+'.{0}_{1}_{2}'.format(self.chrom,self.st,self.ed)
+        # 1) exon, junctions, allpaths => csv (no header <= to concatenate bundles)
+        ecols = EXDFCOLS #['chr','st','ed','strand','name','kind','ecov']
+        UT.write_pandas(self.exdf[ecols], pre+'.covs.exdf.txt.gz', '')
+        scols = SJDFCOLS #['chr','st','ed','strand','name','kind','tcnt'  ]#,'donor','acceptor','dp','ap']
+        UT.write_pandas(self.sjdf[scols], pre+'.covs.sjdf.txt.gz', '')
+        pcols = PATHCOLS #['chr','st','ed','name','strand','tst','ted','tcov0','tcov1','tcov']
+        UT.write_pandas(self.paths[pcols], pre+'.covs.paths.txt.gz', '')
+
+
+
+def bundle_estimator(bed12path, bwpre, chrom, st, ed, dstpre):
+    bname = A2.bundle2bname((chrom,st,ed))
+    bsuf = '.{0}_{1}_{2}'.format(chrom,st,ed)
+    csuf = '.{0}'.format(chrom)
+    sufs = ['.covs.exdf.txt.gz',
+            '.covs.sjdf.txt.gz',
+            '.covs.paths.txt.gz',
+            ]
+    done = []
+    for x in sufs:
+        done.append(os.path.exists(dstpre+bsuf+x) | \
+                    os.path.exists(dstpre+csuf+x) | \
+                    os.path.exists(dstpre+x) )
+    if all(done):
+        LOG.info('bunle {0} already done, skipping'.format(bname))
+        return bname
+    LOG.info('processing bunle {0}'.format(bname))
+    la = LocalEstimator(bed12path, bwpre, chrom, st, ed, dstpre)
+    return la.process()    
+
+def concatenate_bundles(bundles, dstpre):
+    # concat results
+    sufs = ['covs.exdf.txt.gz', 
+           'covs.sjdf.txt.gz',
+           'covs.paths.txt.gz',]
+    files = []
+    for suf in sufs:
+        dstpath = '{0}.{1}'.format(dstpre, suf)
+        if not os.path.exists(dstpath):
+            with open(dstpath, 'wb') as dst:
+                for chrom, st, ed in bundles:
+                    bname = A2.bundle2bname((chrom,st,ed))
+                    srcpath = '{0}.{1}_{2}_{3}.{4}'.format(dstpre, chrom, st, ed, suf)
+                    files.append(srcpath)
+                    with open(srcpath, 'rb') as src:
+                        shutil.copyfileobj(src, dst)
+        else:
+            files+=['{0}.{1}_{2}_{3}.{4}'.format(dstpre, chrom, st, ed, suf) for chrom,st,ed in bundles]
+    # cleanup
+    for f in files:
+        if os.path.exists(f):
+            os.unlink(f)
+
+
+def estimatecovs(bed12path, bwpre, dstpre, np=6):
+    bed = GGB.read_bed(bed12path)
+    chroms = bed['chr'].unique()
+    bundles = []
+    for strand in ['+','-','.']:
+        for chrom in chroms:
+            sub = bed[(bed['chr']==chrom)&(bed['strand']==strand)]
+            uc = UT.union_contiguous(sub[['chr','st','ed']], returndf=True)
+            # total about 30K=> make batch of ~1000
+            n = len(uc)
+            nb = int(N.ceil(n/1000.))
+            args = []
+            for i in range(nb):
+                sti = 1000*i
+                edi = min(1000*(i+1), len(uc)-1)
+                st = uc.iloc[sti]['st'] - 100
+                ed = uc.iloc[edi]['ed'] + 100
+                args.append([bed12path, bwpre, chrom, st, ed, dstpre])
+                bundles.append((chrom,st,ed))
+
+    rslts = UT.process_mp(bundle_estimator, args, np=np, doreduce=False)
+    concatenate_bundles(bundles, dstpre)
+    
 
 
 
