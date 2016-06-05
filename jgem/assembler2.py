@@ -959,7 +959,7 @@ class LocalAssembler(object):
                  discardunstranded=False,
                  uth=1, 
                  mth=3, 
-                 sjratioth=1e-3, 
+                 sjratioth=2e-3, 
                  usjratioth=1e-2,
                  #covfactor=0.05, 
                  covth=0.1,
