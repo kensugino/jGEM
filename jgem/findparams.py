@@ -393,9 +393,9 @@ class ParamFinder(object):
         # save scatter plots
         spath = self.bwpre+'.{0}.gap53params'.format(self.refcode)
         title = self.bwpre.split('/')[-1]
-        self.plot_gap53_fit(fit5_000, fit3_000, spath+'.0.png', title, ptyp='both')
-        self.plot_gap53_fit(fit5_000, fit3_000, spath+'.pdf', title, ptyp='pdf')
-        self.plot_gap53_fit(fit5_000, fit3_000, spath+'.png', title, ptyp='png')
+        self.plot_gap53_fit(fit5, fit3, spath+'.0.png', title, ptyp='both')
+        self.plot_gap53_fit(fit5, fit3, spath+'.pdf', title, ptyp='pdf')
+        self.plot_gap53_fit(fit5, fit3, spath+'.png', title, ptyp='png')
 
         return locals()
 
