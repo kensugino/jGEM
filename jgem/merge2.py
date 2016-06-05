@@ -497,7 +497,7 @@ class LocalEstimator(A2.LocalAssembler):
         # write colored bed12 for tcov > th
         tgt = self.paths[self.paths['tcov']>=self.tcovth].copy()
         self.bed12 = A2.path2bed12(tgt, cmax=9, covfld='tcov')
-        GB.write_bed(self.bed12, pre+'.covs.paths.bed.gz',ncols=12)
+        GGB.write_bed(self.bed12, pre+'.covs.paths.bed.gz',ncols=12)
 
 def bundle_estimator(bed12path, bwpre, chrom, st, ed, dstpre, tcovth):
     bname = A2.bundle2bname((chrom,st,ed))
