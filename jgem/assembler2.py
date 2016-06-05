@@ -936,7 +936,7 @@ class LocalAssembler(object):
     
     def __init__(self, bwpre, chrom, st, ed, dstpre, 
                  sjbwpre=None,
-                 refcode=None,
+                 refcode='gen9',
                  sjpaths=None, 
                  uth=1, 
                  mth=3, 
@@ -2182,7 +2182,7 @@ def drawspan2(la,st,ed,win=10000, figsize=(15,6), df2=None, df3=None, delta=500,
 ######### Chrom Assembler
 
 
-def bundle_assembler(bwpre, chrom, st, ed, dstpre, upperpathnum, sjbwpre=None):
+def bundle_assembler(bwpre, chrom, st, ed, dstpre, upperpathnum, sjbwpre=None, refcode='gen9'):
     bname = bundle2bname((chrom,st,ed))
     bsuf = '.{0}_{1}_{2}'.format(chrom,st,ed)
     csuf = '.{0}'.format(chrom)
@@ -2200,7 +2200,7 @@ def bundle_assembler(bwpre, chrom, st, ed, dstpre, upperpathnum, sjbwpre=None):
                     os.path.exists(dstpre+x) )
     if all(done):
         return bname
-    la = LocalAssembler(bwpre, chrom, st, ed, dstpre, upperpathnum=upperpathnum, sjbwpre=sjbwpre)
+    la = LocalAssembler(bwpre, chrom, st, ed, dstpre, upperpathnum=upperpathnum, sjbwpre=sjbwpre, refcode=refcode)
     return la.process()
 
 def bname2bundle(bname):
@@ -2514,7 +2514,7 @@ def find_threshold(x0,x1,minth,dstpre,fdrth=0.5, fprth=0.01):
             th_fpr = minth
         else:
             th_fpr = 2**(bins[N.min(idx0)])-1
-    fname = dstpre+'.secovth.png'
+    fname = dstpre+'.secovth.pdf'
     title = dstpre.split('/')[-1]
     plot_se_th(b0,h0s,h1,th_fpr,th_fdr,title,fname)
     return th_fpr
@@ -2593,6 +2593,7 @@ class SampleAssembler(object):
 
     def __init__(self, bwpre, dstpre, genome, 
                 sjbwpre=None,
+                refcode='gen9',
                 sjth=0,
                 mingap=1e5, 
                 minbundlesize=20e6, 
@@ -2605,6 +2606,7 @@ class SampleAssembler(object):
                 ):
         self.bwpre = bwpre
         self.sjbwpre = sjbwpre
+        self.refcode = refcode
         self.sjth = sjth
         self.dstpre = dstpre
         self.genome = genome
@@ -2648,7 +2650,7 @@ class SampleAssembler(object):
                             # print('put task##bundle_assembler {0}:{1}-{2}'.format(chrom,st,ed))
                             tname = 'bundle_assembler.{0}:{1}-{2}'.format(c,st,ed)
                             # bwpre, chrom, st, ed, dstpre, upperpathnum
-                            args = (self.bwpre, c, st, ed, self.dstpre, self.upperpathnum, self.sjbwpre)
+                            args = (self.bwpre, c, st, ed, self.dstpre, self.upperpathnum, self.sjbwpre, self.refcode)
                             task = TQ.Task(tname, bundle_assembler, args)
                             server.add_task(task)
                     if name.startswith('bundle_assembler.'):
