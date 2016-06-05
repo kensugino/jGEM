@@ -1832,7 +1832,7 @@ class LocalAssembler(object):
         #self.extract_se_candidates()
         # self.logdebug('writing results...')
         self.write()
-        self.loginfo('finished assembling, {0} paths found'.format(len(self.bed12)))
+        self.loginfo('finished assembling, {0} paths found'.format(len(self.tpaths)))
         if len(self.tpaths)>0:
             return self.bname
         return None
