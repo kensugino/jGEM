@@ -1005,7 +1005,8 @@ class LocalAssembler(object):
         
     def load_classifiers(self):
         refcode = self.refcode
-        if refcode is None: # load default
+        # [TODO] how to specify classifiers when assembling replicates?
+        if (refcode is None) or (not UT.isstring(self.bwpre)): # load default
             self.intg=INTG
             self.e53c=E53C 
             self.ef5=EF5 
