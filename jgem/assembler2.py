@@ -841,11 +841,11 @@ def fill_gap(sja, sj, exons, strand):
     # need to fill exons inside the path as well
     if strand =='+':
         steds = sorted(set([tuple([int(z) for z in x.split(',')])  \
-                                for y in la.sjpaths['name'] 
+                                for y in sj['name'] 
                                 for x in y.split('|')[1:-1]]))
     else:
         steds = sorted(set([tuple([int(z) for z in x.split(',')][::-1])  \
-                                for y in la.sjpaths['name'] 
+                                for y in sj['name'] 
                                 for x in y.split('|')[1:-1]]))
 
     for st,ed in steds: # this way both 5' and 3' positions will be correct
