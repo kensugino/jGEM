@@ -2040,7 +2040,7 @@ def path2tspan(paths, cmax=9, covfld='tcov0'):
     bed.sort_values(['chr','st','ed'], inplace=True)
     return bed    
 
-def sjpaths2tspan(sjpaths, cmax=9):
+def sjpaths2tspan(sjpaths, cmax=9, strip53=False):
     # bed12
     bed = sjpaths
     # #exons, esizes, estarts
@@ -2068,6 +2068,8 @@ def sjpaths2tspan(sjpaths, cmax=9):
           '-':Colors('B', cmax),
           '.':Colors('G', cmax)}
     bed['sc2'] = [sm[s].RGB(x) for x,s in bed[['ltcov','strand']].values]
+    if strip53:
+        bed['name'] = [','.join(x.split(',')[1:-1]) for x in bed['name']]
     bed.sort_values(['chr','st','ed'], inplace=True)
     return bed
     
