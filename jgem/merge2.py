@@ -506,7 +506,7 @@ class LocalEstimator(A2.LocalAssembler):
         self.bed12 = A2.path2bed12(tgt, cmax=9, covfld='tcov')
         GGB.write_bed(self.bed12, pre+'.covs.paths.bed.gz',ncols=12)
 
-def bundle_estimator(bed12path, bwpre, chrom, st, ed, dstpre, tcovth):
+def bundle_estimator(modelpre, bwpre, chrom, st, ed, dstpre, tcovth):
     bname = A2.bundle2bname((chrom,st,ed))
     bsuf = '.{0}_{1}_{2}'.format(chrom,st,ed)
     csuf = '.{0}'.format(chrom)
@@ -524,7 +524,7 @@ def bundle_estimator(bed12path, bwpre, chrom, st, ed, dstpre, tcovth):
         LOG.info('bunle {0} already done, skipping'.format(bname))
         return bname
     LOG.info('processing bunle {0}'.format(bname))
-    la = LocalEstimator(bed12path, bwpre, chrom, st, ed, dstpre, tcovth)
+    la = LocalEstimator(modelpre, bwpre, chrom, st, ed, dstpre, tcovth)
     return la.process()    
 
 def concatenate_bundles(bundles, dstpre):
@@ -553,8 +553,8 @@ def concatenate_bundles(bundles, dstpre):
             os.unlink(f)
 
 
-def estimatecovs(bed12path, bwpre, dstpre, genome, tcovth=1, np=6):
-    bed = GGB.read_bed(bed12path)
+def estimatecovs(modelpre, bwpre, dstpre, genome, tcovth=1, np=6):
+    bed = GGB.read_bed(modelpre+'.paths.withse.bed.gz')
     chroms = bed['chr'].unique()
     csizedic = UT.df2dict(UT.chromdf(genome), 'chr', 'size')
     bundles = []
@@ -570,7 +570,7 @@ def estimatecovs(bed12path, bwpre, dstpre, genome, tcovth=1, np=6):
             edi = min(1000*(i+1), len(uc)-1)
             st = max(uc.iloc[sti]['st'] - 100, 0)
             ed = min(uc.iloc[edi]['ed'] + 100, csizedic[chrom])
-            args.append([bed12path, bwpre, chrom, st, ed, dstpre, tcovth])
+            args.append([modelpre, bwpre, chrom, st, ed, dstpre, tcovth])
             bundles.append((chrom,st,ed))
 
     rslts = UT.process_mp(bundle_estimator, args, np=np, doreduce=False)
