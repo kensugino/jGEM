@@ -417,6 +417,8 @@ class LocalEstimator(A2.LocalAssembler):
         self.sjdf = sjdf[idx].copy()
         idx = (exdf['chr']==chrom)&(exdf['st']>=st)&(exdf['ed']<=ed)
         self.exdf = exdf[idx].copy()
+        A2.set_ad_pos(self.sjdf, 'sj')
+        A2.set_ad_pos(self.exdf, 'ex')
 
     def process(self):
         # self.make_sjexdf()
