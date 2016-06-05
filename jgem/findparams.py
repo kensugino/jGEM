@@ -498,8 +498,10 @@ class ParamFinder(object):
                 ax[0].set_title(t0)
                 ax[1].set_title(t1)
             else:
-                ax.set_xticks([])
-                ax.set_yticks([])            
+                ax[0].set_xticks([])
+                ax[0].set_yticks([])            
+                ax[1].set_xticks([])
+                ax[1].set_yticks([])            
                 
 
         _row(Y, 'actual log(gap)', 'actual log(len)', axr[0])
