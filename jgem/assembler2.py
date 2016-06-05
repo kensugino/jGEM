@@ -945,7 +945,7 @@ DFLD = {'ex':{'+':'ed','-':'st','.':'ed'},
         'sj':{'+':'st','-':'ed','.':'st'}}
 STRS = {'+':['+','.+'],
         '-':['-','.-'],
-        '.':['.+','.-']}
+        '.':['.+','.-','.']}
 EXDFCOLS = ['chr','st','ed','strand','name','kind','ecov']
 SJDFCOLS = ['chr','st','ed','strand','name','kind','tcnt'  ]#,'donor','acceptor','dp','ap']
 PATHCOLS = ['chr','st','ed','name','strand','tst','ted','tcov0','tcov1','tcov', 'tcov0a','tcov0b','tcov0c']
@@ -1545,7 +1545,9 @@ class LocalAssembler(object):
 
     def calculate_branchp(self, jids, eids):
         sj0 = self.sjdf
-        sj = sj0.set_index('name').ix[jids].reset_index()
+        sj = sj0.set_index('name').ix[jids].reset_index().copy()
+        idxz = sj['tcnt']==0
+        sj.loc[idxz,'tcnt'] = 1e-6
         dsump = sj.groupby('dpos')['tcnt'].sum().astype(float)
         jdp = sj['tcnt'].values/dsump.ix[sj['dpos'].values].values
         j2p = dict(zip(sj['name'].values, jdp))
