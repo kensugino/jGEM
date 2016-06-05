@@ -487,11 +487,11 @@ class LocalEstimator(A2.LocalAssembler):
     def write(self):
         pre = self.dstpre+'.{0}_{1}_{2}'.format(self.chrom,self.st,self.ed)
         # 1) exon, junctions, allpaths => csv (no header <= to concatenate bundles)
-        ecols = EXDFCOLS #['chr','st','ed','strand','name','kind','ecov']
+        ecols = A2.EXDFCOLS #['chr','st','ed','strand','name','kind','ecov']
         UT.write_pandas(self.exdf[ecols], pre+'.covs.exdf.txt.gz', '')
-        scols = SJDFCOLS #['chr','st','ed','strand','name','kind','tcnt'  ]#,'donor','acceptor','dp','ap']
+        scols = A2.SJDFCOLS #['chr','st','ed','strand','name','kind','tcnt'  ]#,'donor','acceptor','dp','ap']
         UT.write_pandas(self.sjdf[scols], pre+'.covs.sjdf.txt.gz', '')
-        pcols = PATHCOLS #['chr','st','ed','name','strand','tst','ted','tcov0','tcov1','tcov']
+        pcols = A2.PATHCOLS #['chr','st','ed','name','strand','tst','ted','tcov0','tcov1','tcov']
         UT.write_pandas(self.paths[pcols], pre+'.covs.paths.txt.gz', '')
 
 
