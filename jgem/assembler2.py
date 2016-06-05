@@ -943,8 +943,8 @@ AFLD = {'ex':{'+':'st','-':'ed','.':'st'},
         'sj':{'+':'ed','-':'st','.':'ed'}}
 DFLD = {'ex':{'+':'ed','-':'st','.':'ed'},
         'sj':{'+':'st','-':'ed','.':'st'}}
-STRS = {'+':['+','.+'],
-        '-':['-','.-'],
+STRS = {'+':['+','.+','.'],
+        '-':['-','.-','.'],
         '.':['.+','.-','.']}
 EXDFCOLS = ['chr','st','ed','strand','name','kind','ecov']
 SJDFCOLS = ['chr','st','ed','strand','name','kind','tcnt'  ]#,'donor','acceptor','dp','ap']
