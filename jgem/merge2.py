@@ -400,8 +400,9 @@ def filter_sj(bwsjpre, statspath, chrom, csize, params):
 
 class LocalEstimator(A2.LocalAssembler):
 
-    def __init__(self, bed12path, bwpre, chrom, st, ed, dstpre):
+    def __init__(self, bed12path, bwpre, chrom, st, ed, dstpre, tcovth):
         self.bed12path = bed12path
+        self.tcovth = tcovth
         A2.LocalAssembler.__init__(self, bwpre, chrom, st, ed, dstpre, refcode=None)
         bed12 = GGB.read_bed(bed12path)
         idx = (bed12['chr']==chrom)&(bed12['tst']>=st)&(bed12['ted']<=ed)
@@ -493,16 +494,19 @@ class LocalEstimator(A2.LocalAssembler):
         UT.write_pandas(self.sjdf[scols], pre+'.covs.sjdf.txt.gz', '')
         pcols = A2.PATHCOLS #['chr','st','ed','name','strand','tst','ted','tcov0','tcov1','tcov']
         UT.write_pandas(self.paths[pcols], pre+'.covs.paths.txt.gz', '')
+        # write colored bed12 for tcov > th
+        tgt = self.paths[self.paths['tcov']>=self.tcovth].copy()
+        self.bed12 = A2.path2bed12(tgt, cmax=9, covfld='tcov')
+        GB.write_bed(self.bed12, pre+'.covs.paths.bed.gz',ncols=12)
 
-
-
-def bundle_estimator(bed12path, bwpre, chrom, st, ed, dstpre):
+def bundle_estimator(bed12path, bwpre, chrom, st, ed, dstpre, tcovth):
     bname = A2.bundle2bname((chrom,st,ed))
     bsuf = '.{0}_{1}_{2}'.format(chrom,st,ed)
     csuf = '.{0}'.format(chrom)
     sufs = ['.covs.exdf.txt.gz',
             '.covs.sjdf.txt.gz',
             '.covs.paths.txt.gz',
+            '.covs.paths.bed.gz',
             ]
     done = []
     for x in sufs:
@@ -513,14 +517,16 @@ def bundle_estimator(bed12path, bwpre, chrom, st, ed, dstpre):
         LOG.info('bunle {0} already done, skipping'.format(bname))
         return bname
     LOG.info('processing bunle {0}'.format(bname))
-    la = LocalEstimator(bed12path, bwpre, chrom, st, ed, dstpre)
+    la = LocalEstimator(bed12path, bwpre, chrom, st, ed, dstpre, tcovth)
     return la.process()    
 
 def concatenate_bundles(bundles, dstpre):
     # concat results
     sufs = ['covs.exdf.txt.gz', 
            'covs.sjdf.txt.gz',
-           'covs.paths.txt.gz',]
+           'covs.paths.txt.gz',
+           'covs.paths.bed.gz',
+           ]
     files = []
     for suf in sufs:
         dstpath = '{0}.{1}'.format(dstpre, suf)
@@ -540,7 +546,7 @@ def concatenate_bundles(bundles, dstpre):
             os.unlink(f)
 
 
-def estimatecovs(bed12path, bwpre, dstpre, genome, np=6):
+def estimatecovs(bed12path, bwpre, dstpre, genome, tcovth=1, np=6):
     bed = GGB.read_bed(bed12path)
     chroms = bed['chr'].unique()
     csizedic = UT.df2dict(UT.chromdf(genome), 'chr', 'size')
@@ -558,7 +564,7 @@ def estimatecovs(bed12path, bwpre, dstpre, genome, np=6):
                 edi = min(1000*(i+1), len(uc)-1)
                 st = max(uc.iloc[sti]['st'] - 100, 0)
                 ed = min(uc.iloc[edi]['ed'] + 100, csizedic[chrom])
-                args.append([bed12path, bwpre, chrom, st, ed, dstpre])
+                args.append([bed12path, bwpre, chrom, st, ed, dstpre, tcovth])
                 bundles.append((chrom,st,ed))
 
     rslts = UT.process_mp(bundle_estimator, args, np=np, doreduce=False)
