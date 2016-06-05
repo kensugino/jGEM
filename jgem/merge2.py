@@ -551,23 +551,23 @@ def estimatecovs(bed12path, bwpre, dstpre, genome, tcovth=1, np=6):
     chroms = bed['chr'].unique()
     csizedic = UT.df2dict(UT.chromdf(genome), 'chr', 'size')
     bundles = []
-    for strand in ['+','-','.']:
-        for chrom in chroms:
-            sub = bed[(bed['chr']==chrom)&(bed['strand']==strand)]
-            uc = UT.union_contiguous(sub[['chr','st','ed']], returndf=True)
-            # total about 30K=> make batch of ~1000
-            n = len(uc)
-            nb = int(N.ceil(n/1000.))
-            args = []
-            for i in range(nb):
-                sti = 1000*i
-                edi = min(1000*(i+1), len(uc)-1)
-                st = max(uc.iloc[sti]['st'] - 100, 0)
-                ed = min(uc.iloc[edi]['ed'] + 100, csizedic[chrom])
-                args.append([bed12path, bwpre, chrom, st, ed, dstpre, tcovth])
-                bundles.append((chrom,st,ed))
+    args = []
+    for chrom in chroms:
+        sub = bed[(bed['chr']==chrom)]
+        uc = UT.union_contiguous(sub[['chr','st','ed']], returndf=True)
+        # total about 30K=> make batch of ~1000
+        n = len(uc)
+        nb = int(N.ceil(n/1000.))
+        for i in range(nb):
+            sti = 1000*i
+            edi = min(1000*(i+1), len(uc)-1)
+            st = max(uc.iloc[sti]['st'] - 100, 0)
+            ed = min(uc.iloc[edi]['ed'] + 100, csizedic[chrom])
+            args.append([bed12path, bwpre, chrom, st, ed, dstpre, tcovth])
+            bundles.append((chrom,st,ed))
 
     rslts = UT.process_mp(bundle_estimator, args, np=np, doreduce=False)
+
     concatenate_bundles(bundles, dstpre)
 
 
