@@ -299,6 +299,10 @@ class ParamFinder(object):
                 x = x[idx]
                 y = y[idx]
             ax.plot(x,y,c,alpha=alpha, ms=4)
+            if ptyp=='png':
+                ax.set_xticks([])
+                ax.set_yticks([])            
+
         if ptyp != 'pdf':
             # 0,0 ne_i vs ne_5,ne_3
             _plt(dicb['ne_i'], 'b.', axr[0][0])
@@ -324,9 +328,6 @@ class ParamFinder(object):
             axr[1][0].set_xlabel('log2(junction influx)')
             axr[1][1].set_xlabel('log2(junction influx)')
             fig.suptitle(title)
-        else:
-            axr[0][0].set_xticks([])
-            axr[0][0].set_yticks([])            
 
         vmax = N.floor(N.log2(zoom*max(D['sin'].max(),D['sout'].max())+1))-1
         axr[0][0].set_xlim(-1,vmax)
@@ -412,6 +413,10 @@ class ParamFinder(object):
                 ax.plot(x1,y1,'b.', ms=5, alpha=0.1)
             if ptyp != 'png':
                 ax.set_title(title)
+            else:
+                ax.set_xticks([])
+                ax.set_yticks([])
+
 
         _one(lcls5['Z'],lcls5['X'], axr[0][0],'5 predict')
         _one(lcls5['Y'],lcls5['X'], axr[0][1],'5 actual')
@@ -423,9 +428,6 @@ class ParamFinder(object):
             axr[1][1].set_xlabel('log2(ecov in)')
             axr[1][0].set_ylabel('log2(gap size)')
             fig.suptitle(title)
-        else:
-            axr[0][0].set_xticks([])
-            axr[0][0].set_yticks([])
         xmax = N.floor(N.max(lcls3['X'][:,0])*0.9)
         axr[0][0].set_xlim(-1, xmax)
         axr[0][0].set_ylim(-1,14)
@@ -497,6 +499,10 @@ class ParamFinder(object):
             if ptyp != 'png':
                 ax[0].set_title(t0)
                 ax[1].set_title(t1)
+            else:
+                ax.set_xticks([])
+                ax.set_yticks([])            
+                
 
         _row(Y, 'actual log(gap)', 'actual log(len)', axr[0])
         _row(Z, 'fit log(gap)', 'fit log(len)', axr[1])
@@ -506,9 +512,6 @@ class ParamFinder(object):
             axr[0][0].set_ylabel('log10(len)')
             axr[1][0].set_ylabel('log10(len)')
             fig.suptitle(title)
-        else:
-            axr[0][0].set_xticks([])
-            axr[0][0].set_yticks([])
         xmax = N.floor(N.max(X[:,0])*0.9)
         axr[0][0].set_xlim(-1, xmax)
         axr[0][0].set_ylim(-1, 5)
