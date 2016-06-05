@@ -1796,13 +1796,13 @@ class LocalAssembler(object):
         pcols = PATHCOLS #['chr','st','ed','name','strand','tst','ted','tcov0','tcov1','tcov']
         if len(self.tpaths)>0:
             UT.write_pandas(self.tpaths[pcols], pre+'.paths.txt.gz', '')
-        # 2) unused sjpaths => bed12
-        GGB.write_bed(self.unusedsj, pre+'.unused.sjpath.bed.gz', ncols=12)
-        # 3) allpaths => gtf or bed12 tcov => sc2 rgb color
-        self.bed12 = path2bed12(self.tpaths.copy(), cmax, 'tcov')
-        GGB.write_bed(self.bed12, pre+'.paths.bed.gz',ncols=12)
-        self.tspan = path2tspan(self.tpaths.copy(), cmax, 'tcov0')
-        GGB.write_bed(self.tspan, pre+'.tspans.bed.gz',ncols=12)
+            # 2) unused sjpaths => bed12
+            GGB.write_bed(self.unusedsj, pre+'.unused.sjpath.bed.gz', ncols=12)
+            # 3) allpaths => gtf or bed12 tcov => sc2 rgb color
+            self.bed12 = path2bed12(self.tpaths.copy(), cmax, 'tcov')
+            GGB.write_bed(self.bed12, pre+'.paths.bed.gz',ncols=12)
+            self.tspan = path2tspan(self.tpaths.copy(), cmax, 'tcov0')
+            GGB.write_bed(self.tspan, pre+'.tspans.bed.gz',ncols=12)
         
     def process(self):
         self.load_and_filter_sjpaths()
