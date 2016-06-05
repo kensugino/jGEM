@@ -400,19 +400,26 @@ def filter_sj(bwsjpre, statspath, chrom, csize, params):
 
 class LocalEstimator(A2.LocalAssembler):
 
-    def __init__(self, bed12path, bwpre, chrom, st, ed, dstpre, tcovth):
-        self.bed12path = bed12path
+    def __init__(self, modelpre, bwpre, chrom, st, ed, dstpre, tcovth):
+        self.modelpre = modelpre
         self.tcovth = tcovth
         A2.LocalAssembler.__init__(self, bwpre, chrom, st, ed, dstpre, refcode=None)
-        bed12 = GGB.read_bed(bed12path)
+        bed12 = GGB.read_bed(modelpre+'.paths.withse.bed.gz')
         idx = (bed12['chr']==chrom)&(bed12['tst']>=st)&(bed12['ted']<=ed)
         self.paths = bed12[idx].copy()
         sj = GGB.read_bed(bwpre+'.sjpath.bed.gz')
         idx0 = (sj['chr']==chrom)&(sj['tst']>=st)&(sj['ted']<=ed)        
         self.sjpaths0 = sj[idx0].copy()        
+        # load exdf, sjdf
+        sjdf = UT.read_pandas(modelpre+'.sjdf.txt.gz', names=A2.SJDFCOLS)
+        exdf = UT.read_pandas(modelpre+'.exdf.txt.gz', names=A2.EXDFCOLS)
+        idx = (sjdf['chr']==chrom)&(sjdf['st']>=st)&(sjdf['ed']<=ed)
+        self.sjdf = sjdf[idx].copy()
+        idx = (exdf['chr']==chrom)&(exdf['st']>=st)&(exdf['ed']<=ed)
+        self.exdf = exdf[idx].copy()
 
     def process(self):
-        self.make_sjexdf()
+        # self.make_sjexdf()
         self.calculate_ecovs()
         self.calculate_scovs()
         self.estimate_abundance()
