@@ -370,22 +370,24 @@ class ParamFinder(object):
             lr.fit(X,Y)
             Z = lr.predict(X)
             return locals()
-        # fit5_005 = _fitone(d50,'sOut','gap005','gapIn')
-        # fit5_002 = _fitone(d50,'sOut','gap002','gapIn')
-        # fit3_005 = _fitone(d30,'sIn', 'gap005','gapOut')
-        # fit3_002 = _fitone(d30,'sIn', 'gap002','gapOut')
-        # fit5_000 = _fitone(d50,'sOut','gap000','gapIn')
-        # fit3_000 = _fitone(d30,'sIn', 'gap000','gapOut')
+        if gapth == 0:
+            fit5 = _fitone(d50,'eOut','gap000','gapIn', 'ein', 'lein')
+            fit3 = _fitone(d30,'eIn', 'gap000','gapOut', 'ein', 'lein')
+        elif gapth == 0.02:
+            fit5 = _fitone(d50,'eOut','gap002','gapIn', 'ein', 'lein')
+            fit3 = _fitone(d30,'eIn', 'gap002','gapOut', 'ein', 'lein')
+        else:
+            fit5 = _fitone(d50,'eOut','gap005','gapIn', 'ein', 'lein')
+            fit3 = _fitone(d30,'eIn', 'gap005','gapOut', 'ein', 'lein')
+
         rx,lrx = 'ein','lein'
-        fit5_000 = _fitone(d50,'eOut','gap000','gapIn', 'ein', 'lein')
-        fit3_000 = _fitone(d30,'eIn', 'gap000','gapOut', 'ein', 'lein')
 
         # save coefs
         p5path = self.bwpre+'.{0}.gap5params.json'.format(self.refcode)
-        f = fit5_000
+        f = fit5
         self.write_params(p5path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':gapth,'zoom':zoom})
         p3path = self.bwpre+'.{0}.gap3params.json'.format(self.refcode)
-        f = fit3_000
+        f = fit3
         self.write_params(p3path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':gapth,'zoom':zoom})
 
         # save scatter plots
