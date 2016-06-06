@@ -70,8 +70,8 @@ class RmskFilter(object):
                 ci = UT.chopintervals(ex, sjexpre+'.ci.txt.gz')
             else:
                 ci = UT.read_pandas(sjexpre+'.ci.txt.gz')
-            UT.set_glen_tlen(ex,ci,gidx='_gidx')
-            UT.write_pandas(sjexpre+'.ex.txt.gz')
+            UT.set_glen_tlen(self.ex,ci,gidx='_gidx')
+            UT.write_pandas(self.ex, sjexpre+'.ex.txt.gz', 'h')
         uexpath = sjexpre+'.unionex.txt.gz'        
         if os.path.exists(uexpath):
             self.uex = UT.read_pandas(uexpath)
