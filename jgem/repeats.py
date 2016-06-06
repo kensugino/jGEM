@@ -97,8 +97,6 @@ class RmskFilter(object):
 
     def _make_gbed(self, ex, sj, ugb, datacode='', gname='gname'):
         # rep%
-        if 'glen' not in ugb:
-
         gr = ugb.groupby('_gidx')
         gb2 = gr[['chr',gname,'tlen','glen']].first()
         gb2['#repbp'] = gr['#repbp'].sum()
