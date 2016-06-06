@@ -27,7 +27,7 @@ from jgem import filenames as FN
 from jgem import bedtools as BT
 from jgem import gtfgffbed as GGB
 
-
+from jgem import assembler2 as A2
 
 
 RMSKPARAMS = dict(
@@ -65,6 +65,13 @@ class RmskFilter(object):
 
         self.ex = UT.read_pandas(sjexpre+'.ex.txt.gz')
         self.sj = UT.read_pandas(sjexpre+'.sj.txt.gz')
+        if 'glen' not in self.ex or 'tlen' not in self.ex:
+            if not os.path.exists(sjexpre+'.ci.txt.gz'):
+                ci = UT.chopintervals(ex, sjexpre+'.ci.txt.gz')
+            else:
+                ci = UT.read_pandas(sjexpre+'.ci.txt.gz')
+            UT.set_glen_tlen(ex,ci,gidx='_gidx')
+            UT.write_pandas(sjexpre+'.ex.txt.gz')
         uexpath = sjexpre+'.unionex.txt.gz'        
         if os.path.exists(uexpath):
             self.uex = UT.read_pandas(uexpath)
@@ -90,6 +97,8 @@ class RmskFilter(object):
 
     def _make_gbed(self, ex, sj, ugb, datacode='', gname='gname'):
         # rep%
+        if 'glen' not in ugb:
+
         gr = ugb.groupby('_gidx')
         gb2 = gr[['chr',gname,'tlen','glen']].first()
         gb2['#repbp'] = gr['#repbp'].sum()
@@ -382,4 +391,20 @@ def rmskviz2bed7(df):
     df = PD.DataFrame(rows, columns=cols1)
     return df
                     
-                    
+         
+
+
+class RmskFilter2(object):
+
+    def __init__(self, j2pre, code, chromdir, rmskviz, dstpre, **kw):
+        self.j2pre = j2pre
+        self.fnobj = FN.FileNamesBase(prefix)
+        self.chromdir = chromdir
+        self.rmskviz = rmskviz
+        self.gfc = FA.GenomeFASTAChroms(chromdir)
+
+        self.params = RMSKPARAMS.copy()
+        self.params.update(kw)
+
+        # get exons from paths
+        self.paths = paths = UT.read_pandas(j2pre+'.paths.txt.gz', names=A2.PATHCOLS)

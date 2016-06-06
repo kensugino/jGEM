@@ -1611,8 +1611,13 @@ class LocalAssembler(object):
             mat = N.zeros((nc,ne))
             for i,n1 in enumerate(ci['name1'].values):# fill in rows
                 N.put(mat[i], N.array(n1), 1)
-            ecov,err = nnls(mat, ci['cov'].values)
-            pg['tcov0'] = ecov
+            try:
+                ecov,err = nnls(mat, ci['cov'].values)
+                pg['tcov0'] = ecov
+            except:
+                # too much iteration?
+                LOG.warning('!!!!!! Exception in NNLS (tcov_by_nnls) @{0}:{1}-{2}, setting to zero !!!!!!!!!'.format(self.chrom, s, e))
+                pg['tcov0'] = 0
             pg.rename(columns={'st':'tst','ed':'ted'}, inplace=True)
         else:
             s,e = pg.iloc[0][['tst','ted']]
@@ -1810,8 +1815,12 @@ class LocalAssembler(object):
                     mat = N.zeros((nc,ne))
                     for i,n1 in enumerate(ci['name1'].values):# fill in rows
                         N.put(mat[i], N.array(n1), 1)
-                    ecov,err = nnls(mat, ci['cov'].values)
-                    ex.loc[idx,'ecov'] = ecov
+                    try:
+                        ecov,err = nnls(mat, ci['cov'].values)
+                        ex.loc[idx,'ecov'] = ecov
+                    except:
+                        LOG.warning('!!!!!! Exception in NNLS (calculate_ecov) @{0}:{1}-{2}, setting to mean !!!!!!!!!'.format(self.chrom, st, ed))
+                        ex.loc[idx,'ecov'] = cov(st,ed)
                 elif ne==1:
                     s,e = es.iloc[0][['st','ed']]
                     ex.loc[idx,'ecov'] = cov(s,e)
