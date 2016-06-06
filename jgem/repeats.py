@@ -121,12 +121,16 @@ class RmskFilter(object):
         egr = ex.groupby('_gidx')
         gb2['#exons'] = egr.size()
         gb2['avgecov'] = egr['ecov'+dc].mean()
-        gb2['gcov'] = egr['gcov'+dc].first() 
+        if 'gcov' in egr:
+            gb2['gcov'] = egr['gcov'+dc].first() 
 
         sgr = sj.groupby('_gidx')
-        gb2['ucnt'] = sgr['ucnt'+dc].sum()
-        gb2['mcnt'] = sgr['mcnt'+dc].sum()
-        gb2['minjcnt'] = sgr['mcnt'+dc].min()
+        if 'ucnt' in sgr and 'mcnt' in sgr:
+            gb2['ucnt'] = sgr['ucnt'+dc].sum()
+            gb2['mcnt'] = sgr['mcnt'+dc].sum()
+            gb2['minjcnt'] = sgr['mcnt'+dc].min()
+        elif 'tcnt' in sgr:
+            gb2['tcnt'] = sgr['tcnt'+dc].sum()
         gb2['#junc'] = sgr.size()
         # gb2['lscore'] = N.log10(gb2['tlen']) - N.log10(gb2['glen']) + 2
         # gb2['jscore'] = N.log10(gb2['ucnt']) - N.log10(gb2['mcnt']) - 1.5    
