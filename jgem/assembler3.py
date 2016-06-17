@@ -1802,6 +1802,7 @@ class PathGenerator(object):
         vmax = self.gexdf['tcov0'].max()
         delta = vmax/5.
         vmin = vmax - delta
+        raisecnt = 0
         while vmax>0:
             try:
                 l = [x.get_paths_range(vmin,vmax) for x in self.pg53s]
@@ -1818,52 +1819,80 @@ class PathGenerator(object):
                 vmax = vmin
                 vmin = max(0, vmax - delta)
             except PathNumUpperLimit:
+                raisecnt += 1
+                if (raisecnt>1)&(vmax<0.01):
+                    raise TrimSJ
                 vmin0 = vmin
                 vmin = (vmax+vmin)/2.
                 print('PathNumUpperLimit, increase vmin {0}=>{1}'.format(vmin0, vmin))
 
     def select_paths(self, tcovth):
         sjp = self.sjpaths
-        nsj = len(sjp)
-        # print('nsj', nsj)
-        z = N.zeros(nsj)
-        # sjnames = [','.join(x.split(',')[1:-1]) for x in sjp['name'].values]
-        sjnames = sjp['name'].values
-        # print(sjnames)
         npos = PATHCOLS.index('name')
         tpos = PATHCOLS.index('tcov')
-        paths = []
-        cscore = 0
-        th = self.upperpathnum*10
-        for p in self.paths_from_highest_cov():
-            # print('*** check one ***')
-            if p[tpos]>tcovth:
-                paths.append(p)
-                for i,sjn in enumerate(sjnames):
-                    if z[i]==0:
-                        z[i] += (sjn in p[npos])
-                cscore = N.sum(z>0)
-                # if cscore==nsj:
-                #     print('all covered break 1', cscore, nsj, z)
-                #     break
-            else:
-                if cscore==nsj: # all sjpaths covered
-                    # print('all covered break 2', cscore, nsj, z)
-                    break
-                else:
+        th = self.upperpathnum*5
+        def _select(sjnames):
+            paths = []
+            nsj = len(sjnames)
+            z = N.zeros(nsj)
+            cscore = 0
+            for p in self.paths_from_highest_cov():
+                # print('*** check one ***')
+                if p[tpos]>tcovth:
+                    paths.append(p)
                     for i,sjn in enumerate(sjnames):
                         if z[i]==0:
                             z[i] += (sjn in p[npos])
-                    cscore1 = N.sum(z>0)
-                    if cscore1>cscore:
-                        paths.append(p)
-                        cscore = cscore1
-            # print('cscore', cscore, nsj, z)
-            if len(paths)>th:
-                tcov = paths[-1][tpos]
-                txt = '#path (0}>{1} terminate path enumeration. score:{2}/{3} tcov:{4}'
-                LOG.warning(txt.format(len(paths),th,cscore,nsj,tcov))
+                    cscore = N.sum(z>0)
+                    # if cscore==nsj:
+                    #     print('all covered break 1', cscore, nsj, z)
+                    #     break
+                else:
+                    if cscore==nsj: # all sjpaths covered
+                        # print('all covered break 2', cscore, nsj, z)
+                        break
+                    else:
+                        for i,sjn in enumerate(sjnames):
+                            if z[i]==0:
+                                z[i] += (sjn in p[npos])
+                        cscore1 = N.sum(z>0)
+                        if cscore1>cscore:
+                            paths.append(p)
+                            cscore = cscore1
+                # print('cscore', cscore, nsj, z)
+                if len(paths)>th:
+                    tcov = paths[-1][tpos]
+                    txt = '#path (0}>{1} terminate path enumeration. score:{2}/{3} tcov:{4}'
+                    LOG.warning(txt.format(len(paths),th,cscore,nsj,tcov))
+                    break
+            return paths
+
+        # sjnames = [','.join(x.split(',')[1:-1]) for x in sjp['name'].values]
+        sjnames = sjp['name'].values
+        sjrth = 0.002
+        uth = sjp['sc1'].min()
+        
+        while True:
+            try:
+                paths = _select(sjnames)
                 break
+            except TrimSJ: # remove sj to cover
+                chrom = sjp.iloc[0]['chr']
+                stmin = sjp['st'].min()
+                edmax = sjp['ed'].max()
+                location = '{0}:{1}-{2}'.format(chrom,stmin,edmax)
+                LOG.warning('Too many low cov paths. Possible repeats. Increasing stringency. {0}'.format(location))
+                
+                uth += 0.2
+                mcnt = sjp['sc2']-sjp['sc1'] # multi mappers
+                mth = max(0, mcnt.max()-5)
+                sjrth += 0.01
+                n0 = len(sjp)
+                sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio2']>sjrth)].copy()
+                n1 = len(sjp)
+                LOG.debug('#sjp:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
+                sjnames = sjp['name'].values
+
         return PD.DataFrame(paths, columns=PATHCOLS)
 
 class PathGenerator53(object):
@@ -1956,6 +1985,9 @@ class PathGenerator53(object):
         return recs, pmax0, pmin0
 
 class PathNumUpperLimit(Exception):
+    pass
+
+class TrimSJ(Exception):
     pass
 
 
