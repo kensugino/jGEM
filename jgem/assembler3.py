@@ -765,7 +765,7 @@ LAPARAMS = dict(
      usjratioth=1e-2,
      #covfactor=0.05, 
      tcovth=1,
-     upperpathnum=500, # if num of paths larger than this increase stringency for sjs
+     upperpathnum=2000, # if num of paths larger than this increase stringency for sjs
      pathcheckth=100, # above this num of sjs check sc1(ucnt)==0 if >50% remove
      pathcheckratio=0.2, # ratio of ucnt==0 if above this remove these
      use_ef2=False, # whether to use slope edge detector
@@ -1824,13 +1824,13 @@ class PathGenerator(object):
                     raise TrimSJ
                 vmin0 = vmin
                 vmin = (vmax+vmin)/2.
-                print('PathNumUpperLimit, increase vmin {0}=>{1}'.format(vmin0, vmin))
+                print('PathNumUpperLimit, increase vmin {0}=>{1}, vmax {2}'.format(vmin0, vmin, vmax))
 
     def select_paths(self, tcovth):
         sjp = self.sjpaths
         npos = PATHCOLS.index('name')
         tpos = PATHCOLS.index('tcov')
-        th = self.upperpathnum*5
+        th = self.upperpathnum*3
         def _select(sjnames):
             paths = []
             nsj = len(sjnames)
