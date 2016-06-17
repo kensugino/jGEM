@@ -1820,7 +1820,7 @@ class PathGenerator(object):
                 vmin = max(0, vmax - delta)
             except PathNumUpperLimit:
                 raisecnt += 1
-                if (raisecnt>1)&(vmax<0.01):
+                if (raisecnt>3)&(vmax<0.001):
                     raise TrimSJ
                 vmin0 = vmin
                 vmin = (vmax+vmin)/2.
@@ -1871,7 +1871,7 @@ class PathGenerator(object):
         sjnames = sjp['name'].values
         sjrth = 0.002
         uth = sjp['sc1'].min()
-        
+        upperpathnum = self.upperpathnum
         while True:
             try:
                 paths = _select(sjnames)
@@ -1883,15 +1883,23 @@ class PathGenerator(object):
                 location = '{0}:{1}-{2}'.format(chrom,stmin,edmax)
                 LOG.warning('Too many low cov paths. Possible repeats. Increasing stringency. {0}'.format(location))
                 
-                uth += 1
+                uth += 0.5
                 mcnt = sjp['sc2']-sjp['sc1'] # multi mappers
                 mth = max(0, mcnt.max()-5)
-                sjrth += 0.01
+                sjrth += 0.02
                 n0 = len(sjp)
                 sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio2']>sjrth)].copy()
                 n1 = len(sjp)
                 LOG.debug('#sjp:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
                 sjnames = sjp['name'].values
+                upperpathnum = 2*upperpathnum
+                gsjdf = self.gsjdf
+                allnames = '$'.join(sjp['name'].values)
+                idx = [x in allnames for x in gsjdf['name']]
+                self._gsjdf = gsjdf[idx]
+                # remake gg
+                self._gg = gg = GeneGraph(self._gsjdf,self.gexdf,self.strand)
+                self.pg53s = [PathGenerator53(x,gg,self.gexdf,self.gsjdf, upperpathnum) for i,x in self.e5s.iterrows()]
 
         return PD.DataFrame(paths, columns=PATHCOLS)
 
