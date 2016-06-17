@@ -765,7 +765,7 @@ LAPARAMS = dict(
      usjratioth=1e-2,
      #covfactor=0.05, 
      tcovth=1,
-     upperpathnum=2000, # if num of paths larger than this increase stringency for sjs
+     upperpathnum=1000, # if num of paths larger than this increase stringency for sjs
      pathcheckth=100, # above this num of sjs check sc1(ucnt)==0 if >50% remove
      pathcheckratio=0.2, # ratio of ucnt==0 if above this remove these
      use_ef2=False, # whether to use slope edge detector
@@ -1896,9 +1896,9 @@ class PathGenerator(object):
                 gsjdf = self.gsjdf
                 allnames = '$'.join(sjp['name'].values)
                 idx = [x in allnames for x in gsjdf['name']]
-                self._gsjdf = gsjdf[idx]
+                self._gsjdf = gsjdf[idx].copy()
                 # remake gg
-                self._gg = gg = GeneGraph(self._gsjdf,self.gexdf,self.strand)
+                self._gg = gg = GeneGraph(self._gsjdf,self.gexdf.copy(),self.strand, setids=False)
                 self.pg53s = [PathGenerator53(x,gg,self.gexdf,self.gsjdf, upperpathnum) for i,x in self.e5s.iterrows()]
 
         return PD.DataFrame(paths, columns=PATHCOLS)
@@ -2111,20 +2111,21 @@ def sjpaths2tspan(sjpaths, cmax=9, strip53=False, sc2color=True):
 
 class GeneGraph(object):
 
-    def __init__(self, sjs, exs, strand, depth=500):
+    def __init__(self, sjs, exs, strand, depth=500, setids=True):
         self.sjs = sjs #= sjs[sjs['strand'].isin(STRS[strand])].copy()
         self.exs = exs #= exs[exs['strand'].isin(STRS[strand])].copy()
         self.strand = strand
         self.depth = depth
 
-        if '+' in strand:
-            exs.sort_values(['st','ed'], inplace=True)
-            sjs.sort_values(['st','ed'], inplace=True)
-        else:
-            exs.sort_values(['ed','st'], inplace=True, ascending=False)
-            sjs.sort_values(['ed','st'], inplace=True, ascending=False)
-        exs['eid'] = N.arange(1,len(exs)+1)
-        sjs['sid'] = N.arange(1,len(sjs)+1)
+        if setids:
+            if '+' in strand:
+                exs.sort_values(['st','ed'], inplace=True)
+                sjs.sort_values(['st','ed'], inplace=True)
+            else:
+                exs.sort_values(['ed','st'], inplace=True, ascending=False)
+                sjs.sort_values(['ed','st'], inplace=True, ascending=False)
+            exs['eid'] = N.arange(1,len(exs)+1)
+            sjs['sid'] = N.arange(1,len(sjs)+1)
 
         if strand=='+':
             sjs['apos'] = sjs['ed']
