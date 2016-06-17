@@ -2386,7 +2386,7 @@ def bundle_assembler(bwpre, chrom, st, ed, dstpre, laparams={}, sjbwpre=None, re
     la = LocalAssembler(bwpre, chrom, st, ed, dstpre, 
         classifierpre=classifierpre,
         sjbwpre=sjbwpre, 
-        **laparams, 
+        **laparams
         )
     return la.process()
 
