@@ -2286,6 +2286,8 @@ class GeneGraph(object):
                 else:
                     st = rec3['ed']
                     ed = rec5['st']
+                if st>ed:
+                    st,ed=ed,st # rare case (single exon e5id==e3id)
                 id53 = '{0}:{1}-{2}:{3}'.format(chrom,st,ed,self.strand)
                 dfe['id53'] = id53
                 dfj['id53'] = id53
