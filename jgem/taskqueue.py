@@ -93,7 +93,7 @@ class Task(object):
         self.name = name
 
     def __call__(self):
-        return self.func(*self.args)
+        return self.func(*self.args, **self.kwargs)
         
 class Server(object):
     

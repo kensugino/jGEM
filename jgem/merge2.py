@@ -131,7 +131,7 @@ class PrepBWSJ(object):
                         padone=True
                     if exdone&sjdone&padone:
                         break
-            print('Exit Loope')
+            print('Exit Loop')
         print('Done')
                         
 

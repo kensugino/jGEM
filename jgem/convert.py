@@ -25,6 +25,7 @@ from jgem import gtfgffbed as GGB
 from jgem import graph as GP
 
 from jgem import assembler2 as A2
+from jgem import assembler3 as A3
 
 # GTF <=> EX,SJ    ######################################################################
 
@@ -56,6 +57,34 @@ def as2exsj(dstpre, np=7):
     UT.write_pandas(sj, dstpre+'.sj.txt.gz', 'h')
     ci = UT.chopintervals(ex, dstpre+'.ci.txt.gz')
     return sj, ex
+
+def as3exsj(dstpre, np=7):
+    ex = UT.read_pandas(dstpre+'.exdf.txt.gz', names=A3.EXDFCOLS)
+    sj = UT.read_pandas(dstpre+'.sjdf.txt.gz', names=A3.SJDFCOLS)
+    se = UT.read_pandas(dstpre+'.sedf.txt.gz', names=A3.EXDFCOLS)
+    paths = UT.read_pandas(dstpre+'.paths.txt.gz', names=A3.PATHCOLS)
+    #ex.loc[ex['strand'].isin(['.+','.-']),'strand'] = '.'
+    #sj.loc[sj['strand'].isin(['.+','.-']),'strand'] = '.'
+    sj['st'] = sj['st']+1 
+    cols = A3.EXDFCOLS
+    ex = PD.concat([ex[cols],se[cols]],ignore_index=True)
+    UT.set_info(sj,ex)
+    UT.set_exon_category(sj, ex)
+
+    # find genes (connected components) set '_gidx'
+    graphpre = dstpre+str(uuid.uuid4())+'_'
+    prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
+    genes = GP.find_genes4(sj,ex,
+        filepre=prefix,
+        np=np,
+        override=False,
+        separatese=True)
+    ex.loc[ex['kind']=='3','cat'] = '3'
+    ex.loc[ex['kind']=='5','cat'] = '5'
+    UT.write_pandas(ex, dstpre+'.ex.txt.gz', 'h')
+    UT.write_pandas(sj, dstpre+'.sj.txt.gz', 'h')
+    ci = UT.chopintervals(ex, dstpre+'.ci.txt.gz')
+    return sj, ex    
 
 def gtf2exonsj(gtf, np=12, graphpre=None):
     """Extract exons and sj from GTF
