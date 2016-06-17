@@ -2384,7 +2384,10 @@ def bundle_assembler(bwpre, chrom, st, ed, dstpre, laparams={}, sjbwpre=None, re
     if all(done):
         return bname
 
-    classifierpre = bwpre+'.'+refcode
+    if UT.isstring(bwpre):
+        classifierpre = bwpre+'.'+refcode
+    else:
+        classifierpre = None
     la = LocalAssembler(bwpre, chrom, st, ed, dstpre, 
         classifierpre=classifierpre,
         sjbwpre=sjbwpre, 
