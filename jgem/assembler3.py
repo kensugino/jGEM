@@ -765,7 +765,7 @@ LAPARAMS = dict(
      usjratioth=1e-2,
      #covfactor=0.05, 
      tcovth=1,
-     upperpathnum=100, # if num of paths larger than this increase stringency for sjs
+     upperpathnum=500, # if num of paths larger than this increase stringency for sjs
      pathcheckth=100, # above this num of sjs check sc1(ucnt)==0 if >50% remove
      pathcheckratio=0.2, # ratio of ucnt==0 if above this remove these
      use_ef2=False, # whether to use slope edge detector
@@ -1422,7 +1422,7 @@ class LocalAssembler(object):
             e0 = max(0, e-o-1)
             return sja[e-o]-sja[e0]     
 
-        pg = spanexs.groupby('id53').first().sort_values(['tst','ted'])[['chr','tst','ted']]
+        self._pg = pg = spanexs.groupby('id53').first().sort_values(['tst','ted'])[['chr','tst','ted']]
         ne = len(pg)
         if ne>1:
             pg.rename(columns={'tst':'st','ted':'ed'}, inplace=True)
