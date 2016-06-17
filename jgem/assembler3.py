@@ -938,7 +938,12 @@ class LocalAssembler(object):
             if len(sj0)>0:
                 name0 = sj0.iloc[0]['name']
                 if len(name0.split('|'))<len(name0.split(',')):
+                    sj0['pathcode'] = sj0['name']
                     sj0['name'] = [','.join(x.split(',')[1:-1]) for x in sj0['name']]            
+                else:
+                    idxp = sj0['strand'].isin(['+','.'])
+                    sj0.loc[idxp,'pathcode'] = ['{0},{1},{2}'.format(st,n,ed) for st,n,ed in sj0[idxp][['st','name','ed']].values]
+                    sj0.loc[~idxp,'pathcode'] = ['{2},{1},{0}'.format(st,n,ed) for st,n,ed in sj0[~idxp][['st','name','ed']].values]                
             sjps.append(sj0)
         sjp = PD.concat(sjps, ignore_index=True)
         sjg = sjp.groupby(['chr','name'])
