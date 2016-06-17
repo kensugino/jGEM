@@ -1883,7 +1883,7 @@ class PathGenerator(object):
                 location = '{0}:{1}-{2}'.format(chrom,stmin,edmax)
                 LOG.warning('Too many low cov paths. Possible repeats. Increasing stringency. {0}'.format(location))
                 
-                uth += 0.2
+                uth += 1
                 mcnt = sjp['sc2']-sjp['sc1'] # multi mappers
                 mth = max(0, mcnt.max()-5)
                 sjrth += 0.01
