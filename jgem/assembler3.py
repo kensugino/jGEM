@@ -191,6 +191,8 @@ class GapEdgeFinder(object):
         self.c1 = -a_lsin/a_lgap
         self.th = th
         self.maxsize = json['maxsize']
+        self.maxgap = json.get('maxgap',600)
+        self.minecov = json.get('minecov',1)
         
     def find(self, sja, exa, direction):
         # sja1, exa1 : pos0=>pos+1(<), pos-1=>pos0(>)
@@ -221,10 +223,10 @@ class GapEdgeFinder(object):
             # lsin = abs(sja[1]-sja[0])
             ein = N.mean(exa[1:11])
             lein = N.log2(zoom*ein+1)
-            gapth = 2**(c0+c1*lein)-1
+            gapth = min(self.maxgap, 2**(c0+c1*lein)-1)
             #print('gapth={0:.2f}, lsin={1:.2f}'.format(gapth, lsin))
             # pos => pos0, find position where lgap > gapth
-            idx = N.nonzero(exa[1:]<=th*ein)[0]
+            idx = N.nonzero(exa[1:]<=th*max(self.minecov,ein))[0]
             #print(idx)
             epos = len(exa)-1 # all the way to the end
             for x in _find_gap_from_idx(idx):
@@ -236,10 +238,10 @@ class GapEdgeFinder(object):
             # lsin = abs(sja[-1]-sja[-2])
             ein = N.mean(exa[-12:-1])
             lein = N.log2(zoom*ein+1)
-            gapth = 2**(c0+c1*lein)-1
+            gapth = min(self.maxgap, 2**(c0+c1*lein)-1)
             #print('gapth={0:.2f}, lsin={1:.2f}'.format(gapth, lsin))
             # pos0 <= pos, going opposite way
-            idx = N.nonzero(exa[:-1][::-1]<=th*ein)[0]
+            idx = N.nonzero(exa[:-1][::-1]<=th*max(self.minecov,ein))[0]
             epos = -len(exa)
             for x in _find_gap_from_idx(idx):
                 if x[1]>gapth:
@@ -248,9 +250,9 @@ class GapEdgeFinder(object):
             epos = max(epos, -self.maxsize)            
         return epos
         
-EF5JSON = dict(coef=[-0.285,-0.81], intercept=5.6, th=0, zoom=1, maxsize=3000)
+EF5JSON = dict(coef=[-0.285,-0.81], intercept=5.6, th=0, zoom=1, maxsize=3000, maxgap=300)
 # EF5 = EdgeFinder(EF5JSON)
-EF3JSON = dict(coef=[-0.25,-0.51], intercept=4.5, th=0, zoom=1, maxsize=20000) # -0.25, -0.5, 4.5
+EF3JSON = dict(coef=[-0.25,-0.51], intercept=4.5, th=0, zoom=1, maxsize=20000, maxgap=600) # -0.25, -0.5, 4.5
 # EF3 = EdgeFinder(EF3JSON) 
 
 class EdgeFinder(object):
@@ -774,7 +776,7 @@ LAPARAMS = dict(
      maxexonsize=30000, 
      edgedelta=10,
      minsearchsize=500,
-     use_sja_for_exon_detection=True
+     use_sja_for_exon_detection=False
 )
 
 class LocalAssembler(object):
@@ -1674,7 +1676,7 @@ class LocalAssembler(object):
             ax.plot([tst-st0,ted-st0],[ymid,ymid],ls=ls, color=cl)
             yrange = (ymid-h/2., h)
             tmp = pc.split(',')
-            try:# without 5',3' exons
+            if len(tmp[0].split('|'))==2:
                 # pathcode = dpos0|apos1,dpos1|apos2,...dpos(n-1)|aposn
                 tst = int(tmp[0].split('|')[0])
                 ted = int(tmp[-1].split('|')[1])
@@ -1682,11 +1684,16 @@ class LocalAssembler(object):
                     tmppc = str(tst-esiz)+','+pc+','+str(ted+esiz)
                 else:
                     tmppc = str(tst+esiz)+','+pc+','+str(ted-esiz)                
-            except:# with 5',3' exons
+            else:# with 5',3' exons
                 # pathcode = 5pos,dpos0|apos1,dpos1|apos2,...dpos(n-1)|aposn,3pos
-                tst = int(tmp[1].split('|')[0])
-                ted = int(tmp[-2].split('|')[1])
-                tmppc = pc
+                try:
+                    tst = int(tmp[1].split('|')[0])
+                    ted = int(tmp[-2].split('|')[1])
+                    tmppc = pc
+                except:
+                    tst = int(tmp[0])
+                    ted = int(tmp[1])
+                    tmppc = pc
             if tst<ted:
                 exons = [[int(x) for x in y.split(',')] for y in tmppc.split('|')]
             else:
