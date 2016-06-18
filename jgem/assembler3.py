@@ -864,6 +864,7 @@ class LocalAssembler(object):
 
         path = pathpre+'.exonparams.json'
         if os.path.exists(path):
+            LOG.info('loading INTG from {0}'.format(path))
             with open(path,'r') as fp:
                 self.exonparams = ep = json.load(fp)
             self.intg = LogisticClassifier(json=ep, dstcol='exon')        
@@ -873,6 +874,7 @@ class LocalAssembler(object):
 
         path = pathpre+'.gap5params.json'
         if os.path.exists(path):        
+            LOG.info('loading EF5 from {0}'.format(path))
             with open(path,'r') as fp:
                 self.gap5params = g5p = json.load(fp)        
             self.ef5 = EdgeFinder(g5p,self.params['use_ef2'])
@@ -881,6 +883,7 @@ class LocalAssembler(object):
             self.ef5 = EdgeFinder(EF5JSON, self.params['use_ef2']) 
         path = pathpre+'.gap3params.json'   
         if os.path.exists(path):        
+            LOG.info('loading EF3 from {0}'.format(path))
             with open(path,'r') as fp:
                 self.gap3params = g3p = json.load(fp)        
             self.ef3 = EdgeFinder(g3p,self.params['use_ef2'])
@@ -892,6 +895,7 @@ class LocalAssembler(object):
             pathpre = self.sjbwpre+'.'+refcode
         path = pathpre+'.e53params.json'
         if os.path.exists(path):                
+            LOG.info('loading E53 from {0}'.format(path))
             with open(path,'r') as fp:
                 self.e53params = e5p = json.load(fp)    
             self.e53c = LogisticClassifier(json=e5p, dstcol='e53')
@@ -1923,12 +1927,11 @@ class PathGenerator(object):
                 sjnames = sjp['name'].values
                 upperpathnum = int(1.5*upperpathnum)
                 gsjdf = self.gsjdf
-                allnames = '$'.join(sjp['name'].values)
-                idx = [x in allnames for x in gsjdf['name']]
-                self._gsjdf = gsjdf[idx].copy()
+                self._gsjdf = gsjdf[gsjdf['name'].isin(sids)].copy()
                 LOG.debug('gsjdf {0}=>{1} #sids {2}=>{3}'.format(len(gsjdf), len(self._gsjdf), len(sids0), len(sids)))
                 # remake gg
-                self._gg = gg = self.gg.restrict(sids)
+                jids = list(set(self._gsjdf['sid'].values))
+                self._gg = gg = self.gg.restrict(jids)
                 LOG.debug('gg.ede {0}=>{1}'.format(len(self.gg.ede),len(gg.ede)))
                 # self._gg = gg = GeneGraph(self._gsjdf,self.gexdf.copy(),self.strand, setids=False)
                 self.pg53s = [PathGenerator53(x,gg,self.gexdf,self.gsjdf, upperpathnum) for i,x in self.e5s.iterrows()]
