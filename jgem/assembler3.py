@@ -1547,7 +1547,7 @@ class LocalAssembler(object):
         self.usedsj = sjpaths0[idxused]
         GGB.write_bed(self.unusedsj, pre+'.unused.sjpath.bed.gz', ncols=12)
 
-    def draw_covs(self, st, ed, strand, win=500, ax=None, h0=20):
+    def draw_covs(self, st, ed, strand, win=500, ax=None, logcov=False):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=(15,3))
         offset = self.st
@@ -1556,24 +1556,34 @@ class LocalAssembler(object):
         sjap0 = self.arrs['sj'][strand][s0:e0]
         exap0 = self.arrs['ex'][strand][s0:e0]
         sjap1 = self.filled[strand][s0:e0]
-        y0 = N.log2(sjap1+1)
-        ax.plot(y0, 'r-', alpha=0.8)
         #ax.plot(N.log2(sjap0+1), 'r--')
         ipx = set(N.nonzero(exap0>0)[0])
         n = len(exap0)
         ipx.update([x+1 for x in ipx if x<n-1])
         ipx.update([x-1 for x in ipx if x>1])
         ipx = sorted(ipx)
-        ax.fill_between(ipx, 0, N.log2(exap0[ipx]+1), facecolor='m', alpha=0.3)
+        if logcov:
+            y0 = N.log2(sjap1+1)
+            ax.plot(y0, 'r-', alpha=0.8)
+            ec =  N.log2(exap0[ipx]+1)
+            ax.fill_between(ipx, 0, ec, facecolor='m', alpha=0.3)
+            h0 = N.ceil(N.max(y0)*1.1)
+        else:
+            y0 = sjap1
+            ax.plot(y0, 'r-', alpha=0.8)
+            ec =  exap0[ipx]
+            ax.fill_between(ipx, 0, ec, facecolor='m', alpha=0.3)
+            h0 = N.ceil(N.max(y0)*1.1)
+        hu = h0/20
         # gspan
         gspan = self._get_spans(strand)
         for i, (s1,e1) in enumerate(gspan):
             if (e1-offset>s0)&(s1-offset<e0):
                 # print('gspan {0}:{1}-{2}'.format(i,s1,e1))
                 gx1,gx2 = s1-s0-offset,e1-s0-offset
-                ax.plot([gx1,gx2],[h0+2,h0+2], 'c')
+                ax.plot([gx1,gx2],[h0+2*hu,h0+2*hu], 'c')
                 gx0 = max(min((gx1+gx2)/2., e0-s0), 0)
-                ax.text(gx0, h0-2, '{0}'.format(i))
+                ax.text(gx0, h0-2*hu, '{0}'.format(i))
         # 53
         e53p = self.e53pos[strand]
         t5 = e53p[(e53p['kind']=='5')&(e53p['pos']>s0)&(e53p['pos']<e0)]
@@ -1588,8 +1598,8 @@ class LocalAssembler(object):
         # exons
         ex = self.exons[strand]
         ex = ex[(ex['ost']>s0)&(ex['oed']<e0)]
-        ymid = h0+5
-        h = 2
+        ymid = h0+5*hu
+        h = 2*hu
         yrange = (ymid-h/2., h)
         xranges = [(x-s0,y-x) for x,y in ex[['ost','oed']].values]
         cargs = dict(facecolor='k', edgecolor='k')#, linewidth=0.2)
@@ -1599,16 +1609,16 @@ class LocalAssembler(object):
         # exdfi, e53df
         def _plt_ex(ex, ymid, c, h=2, alpha=0.3):
             ex = ex[(ex['st']<ed)&(ex['ed']>st)&(ex['strand'].isin(STRS[strand]))]
-            yrange = (ymid-h/2., h)
+            yrange = (ymid-h*hu/2., h*hu)
             xranges = [(x-s0-offset,y-x) for x,y in ex[['st','ed']].values]
             cargs = dict(facecolor=c, edgecolor=c, alpha=alpha)#, linewidth=0.2)
             bbhc = BrokenBarHCollection(xranges, yrange, **cargs)
             ax.add_collection(bbhc)
         if hasattr(self, 'exdfi'):
-            _plt_ex(self.exdfi, h0+2, 'g')
+            _plt_ex(self.exdfi, h0+2*hu, 'g')
         if hasattr(self, 'e53fixed'):
-            _plt_ex(self.e53fixed[self.e53fixed['kind']=='5'], h0+2, 'r')
-            _plt_ex(self.e53fixed[self.e53fixed['kind']=='3'], h0+2, 'b')
+            _plt_ex(self.e53fixed[self.e53fixed['kind']=='5'], h0+2*hu, 'r')
+            _plt_ex(self.e53fixed[self.e53fixed['kind']=='3'], h0+2*hu, 'b')
         if hasattr(self, 'e53df'):
             e = self.e53df
             _plt_ex(e[(e['kind']=='5')&(e['origin']=='path')], h0, 'r', 1)
@@ -1617,12 +1627,12 @@ class LocalAssembler(object):
             _plt_ex(e[(e['kind']=='3')&(e['origin']=='flow')], h0, 'c', 1)
 
         ax.set_xlim(0,e0-s0)
-        ax.set_ylim(-2,h0+12)
-        ax.set_yticks([0,5,9])
+        ax.set_ylim(-2,h0+12*hu)
+        # ax.set_yticks([0,5,9])
         ax.set_xticks([])
         txt = '{0}:{1}-{2}:{3}'.format(self.chrom, st-win, ed+win, strand)
         print(txt)
-        ax.text(0,h0+7, txt)
+        ax.text(0,h0+7*hu, txt)
         ax.set_frame_on(False)        
         return ax
         
