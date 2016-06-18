@@ -346,11 +346,11 @@ class SlopeEdgeFinder(object):
                 if l3==0:# nothing detected, last resort
                     eds1 = self.detect_rise2(v)
                     l4 = len(eds1)
-        if self.verbose:
-            LOG.debug('drop({0}), rise({1}), low({2}), min({3}), rise2({4})'.format(l0,l1,l2,l3,l4))
         if len(eds1)>0:
             eds1 = self.trim(v,sm,eds1)
-        eds = eds0+eds1  
+        if self.verbose:
+            LOG.debug('drop({0}), rise({1}), low({2}), min({3}), rise2({4})'.format(l0,l1,l2,l3,l4))
+        eds = eds0[:2]+eds1[:1]
         if len(eds)==0:
             eds = [olen]
         eds = self._aggregate(olen,eds)
@@ -2379,10 +2379,12 @@ class GeneGraph(object):
         e3ids, e2leaves = self.get_53groups(e5id)
         aposs = gexs[gexs['eid'].isin(e3ids)]['apos'].unique()
         for apos in aposs:
-            e3ids = gexs[(gexs['apos']==apos)&(gexs['kind']=='3')]['eid'].values
-            e3id = e3ids[0]
+            e3ids2 = gexs[(gexs['apos']==apos)&(gexs['kind']=='3')]['eid'].values
+            if len(e3ids2)==0:
+                continue
+            e3id = e3ids2[0]
             eids = [x for x in e2leaves if e3id in e2leaves[x]]
-            eids = list(set(eids + list(e3ids)+list(e5ids)))
+            eids = list(set(eids + list(e3ids2)+list(e5ids)))
             sids = j2[(j2['eid1'].isin(eids))&(j2['eid2'].isin(eids))]['sid'].values
             dfe = gexs[gexs['eid'].isin(eids)].copy()
             dfj = gsjs[gsjs['sid'].isin(sids)].copy()
