@@ -1702,32 +1702,32 @@ class LocalAssembler(object):
         ax.set_frame_on(False)
         return ax
 
-    def drawspan2(self,st,ed,strand,df2, win=500, figsize=(15,6),  delta=500, df2cov='sc2', maxdisp=None, h0=20):
+    def drawspan2(self,st,ed,strand,df2, win=500, figsize=(15,6),  delta=500, df2cov='sc2', maxdisp=None):
         fig, axr = P.subplots(2,1,figsize=figsize,sharex=True)
         P.subplots_adjust(hspace=0)
-        self.draw_covs(st,ed,strand, ax=axr[0], win=win, h0=h0)
+        self.draw_covs(st,ed,strand, ax=axr[0], win=win)
         if maxdisp is not None:
             df2 = df2.sort_values(df2cov,ascending=False).iloc[:maxdisp]
         self.draw_path(df2, st,ed,strand, ax=axr[1], covfld=df2cov, win=win, delta=delta)
 
-    def drawspan2pn(self,st,ed,df2, win=500, figsize=(15,6),  delta=500, df2cov='sc2', maxdisp=None, h0=20):
+    def drawspan2pn(self,st,ed,df2, win=500, figsize=(15,6),  delta=500, df2cov='sc2', maxdisp=None):
         fig, axr = P.subplots(4,1,figsize=figsize,sharex=True)
         P.subplots_adjust(hspace=0)
 
         if maxdisp is not None:
             df2 = df2.sort_values(df2cov,ascending=False).iloc[:maxdisp]
 
-        self.draw_covs(st,ed,'+', ax=axr[0], win=win, h0=h0)
+        self.draw_covs(st,ed,'+', ax=axr[0], win=win)
         self.draw_path(df2, st,ed,'+', ax=axr[1], covfld=df2cov, win=win, delta=delta)
 
-        self.draw_covs(st,ed,'-', ax=axr[2], win=win, h0=h0)
+        self.draw_covs(st,ed,'-', ax=axr[2], win=win)
         self.draw_path(df2, st,ed,'-', ax=axr[3], covfld=df2cov, win=win, delta=delta)
 
     def drawspan3(self,st,ed,strand,df2,df3,win=500, figsize=(15,9), delta=500, 
-        df2cov='sc2', df3cov='tcov', maxdisp=None, h0=20):
+        df2cov='sc2', df3cov='tcov', maxdisp=None):
         fig, axr = P.subplots(3,1,figsize=figsize,sharex=True)
         P.subplots_adjust(hspace=0)
-        self.draw_covs(st,ed,strand, ax=axr[0], win=win, h0=h0)
+        self.draw_covs(st,ed,strand, ax=axr[0], win=win)
         if maxdisp is not None:
             df2 = df2.sort_values(df2cov,ascending=False).iloc[:maxdisp]
         self.draw_path(df2, st,ed,strand, ax=axr[1], covfld=df2cov, win=win, delta=delta)
@@ -1736,12 +1736,12 @@ class LocalAssembler(object):
         self.draw_path(df3, st,ed,strand, ax=axr[2], win=win, delta=delta, covfld=df3cov)
 
     def drawspan3pn(la,st,ed,win=10000, figsize=(15,6), df2=None, df3=None, delta=500,
-        df2cov='sc2', df3cov='tcov', maxdisp=None, h0=20):
+        df2cov='sc2', df3cov='tcov', maxdisp=None):
         o = la.st
         fig, axr = P.subplots(6,1,figsize=figsize,sharex=True)
         P.subplots_adjust(hspace=0)
         strand = '+'
-        la.draw_covs(st,ed,strand, ax=axr[0], win=win, h0=h0)
+        la.draw_covs(st,ed,strand, ax=axr[0], win=win)
         if df2 is not None:
             if maxdisp is not None:
                 df2 = df2.sort_values(df2cov,ascending=False).iloc[:maxdisp]
@@ -1751,7 +1751,7 @@ class LocalAssembler(object):
                 df3 = df3.sort_values(df2cov,ascending=False).iloc[:maxdisp]
             la.draw_path(df3, st,ed,strand, ax=axr[2], win=win, delta=delta, covfld=df3cov)
         strand = '-'
-        la.draw_covs(st,ed,strand, ax=axr[3], win=win, h0=h0)
+        la.draw_covs(st,ed,strand, ax=axr[3], win=win)
         if df2 is not None:
             if maxdisp is not None:
                 df2 = df2.sort_values(df2cov,ascending=False).iloc[:maxdisp]
