@@ -930,6 +930,7 @@ class LocalAssembler(object):
             return 
 
         # list of bwpres, load and merge
+        LOG.info('loading multiple({0}) sjpaths...'.format(len(self.bwpre)))
         sjps0 = [GGB.read_bed(b+'.sjpath.bed.gz') for b in self.bwpre]
         sjps = []
         for sj in sjps0:
@@ -945,9 +946,13 @@ class LocalAssembler(object):
                     sj0.loc[idxp,'pathcode'] = ['{0},{1},{2}'.format(st,n,ed) for st,n,ed in sj0[idxp][['st','name','ed']].values]
                     sj0.loc[~idxp,'pathcode'] = ['{2},{1},{0}'.format(st,n,ed) for st,n,ed in sj0[~idxp][['st','name','ed']].values]                
             sjps.append(sj0)
+            LOG.debug('#sj0:{0}'.format(len(sj0)))
         sjp = PD.concat(sjps, ignore_index=True)
+        n0 = len(sjp)
         sjg = sjp.groupby(['chr','name'])
         sj = sjg.first()
+        n1 = len(sj)
+        LOG.debug('#sj0(concat):{0}=>{1}'.format(n0,n1))
         # chr,st,ed,name,sc1,strand,tst,ted,sc2,#exons,esizes,estarts
         sj['st'] = sjg['st'].min().astype(int)
         sj['ed'] = sjg['ed'].max().astype(int)
@@ -1512,7 +1517,7 @@ class LocalAssembler(object):
             ecols = EXDFCOLS +['gid','id5','id53','tst','ted','pa','pd','tcov0','tcov0a','tcov0b','tcov0c']
             UT.write_pandas(self.exdf2[ecols], pre+'.exdf2.txt.gz', '')
         if self.sjdf2 is not None:    
-            scols = SJDFCOLS +['gid','id5','id53','tst','ted','p','tcov0','tcov0a','tcov0b','tcov0c']
+            scols = SJDFCOLS +['gid','id5','id53','tst','ted','p','tcov0','tcov0a','tcov0b','tcov0c']   
             UT.write_pandas(self.sjdf2[scols], pre+'.sjdf2.txt.gz', '')
         if len(self.paths)>0:
             pcols = PATHCOLS #['chr','st','ed','name','strand','tst','ted','tcov', 'tcov0','tcov0a,b,c']
