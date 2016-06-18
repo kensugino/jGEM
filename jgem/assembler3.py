@@ -2374,8 +2374,8 @@ class GeneGraph(object):
             id53 = '{0}:{1}-{2}:{3}'.format(chrom,st,ed,self.strand)
             dfe['id53'] = id53
             dfj['id53'] = id53
-            dfe['_e5id'] = ','.join(e5ids)
-            dfe['_e3id'] = ','.join(e3ids)
+            dfe['_e5id'] = ','.join([str[x] for x in e5ids])
+            dfe['_e3id'] = ','.join([str[x] for x in e3ids])
             dfe['tst'] = st
             dfe['ted'] = ed
             dfj['tst'] = st
