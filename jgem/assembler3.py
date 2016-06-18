@@ -2351,7 +2351,7 @@ class GeneGraph(object):
         e5ids = ex5s['eid'].values
         dpos = ex5s.iloc[0]['dpos']
         j2 = self.j2
-        e5id = ex5ids[0]
+        e5id = e5ids[0]
         e3ids, e2leaves = self.get_53groups(e5id)
         aposs = gexs[gexs['eid'].isin(e3ids)]['apos'].unique()
         for apos in aposs:
