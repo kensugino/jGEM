@@ -1073,7 +1073,7 @@ class LocalAssembler(object):
                         if st>ed:
                             st,ed = ed,st
                         if (st,ed,strand[-1]) not in sted:
-                            yield (chrom,st,ed,strand,x,'j')
+                            yield (chrom,int(st),int(ed),strand,x,'j')
                             sted.add((st,ed,strand[-1]))
         def _egen1(): # internal exons from sjpaths
             sted = set()
@@ -1084,7 +1084,7 @@ class LocalAssembler(object):
                         if st>ed:
                             st,ed = ed,st
                         if (st,ed,strand[-1]) not in sted:
-                            yield (chrom,st,ed,strand,x,'i')
+                            yield (chrom,int(st),int(ed),strand,x,'i')
                             sted.add((st,ed,strand[-1]))
         cols = ['chr','st','ed','strand','name','kind']
         sjdf = PD.DataFrame([x for x in _sgen()], columns=cols)
@@ -1098,7 +1098,7 @@ class LocalAssembler(object):
                     st = ost+o
                     ed = oed+o
                     if (st,ed,strand) not in sted:
-                        yield (chrom,st,ed,strand,_pc(st,ed,strand,','),'i')
+                        yield (chrom,int(st),int(ed),strand,_pc(st,ed,strand,','),'i')
                         sted.add((st,ed,strand))
         exdfi2 = PD.DataFrame([x for x in _egen2()], columns=cols)
         exdfi = PD.concat([exdfi1, exdfi2], ignore_index=True)
@@ -1122,7 +1122,7 @@ class LocalAssembler(object):
                     if (dpos, strand[-1]) not in adpos:
                         if (dpos not in d2len) or (N.abs(apos-dpos)>(d2len[dpos]+delta)):
                             # print('dpos', strand, dpos, pc)
-                            yield (chrom,st,ed,strand,e5,'5')
+                            yield (chrom,int(st),int(ed),strand,e5,'5')
                             adpos.add((dpos,strand[-1]))
                     e3 = tmp[-1]
                     apos,dpos = [int(y) for y in e3.split(',')]
@@ -1130,7 +1130,7 @@ class LocalAssembler(object):
                     if (apos, strand[-1]) not in adpos:
                         if (apos not in a2len) or (N.abs(apos-dpos)>(a2len[apos]+delta)):
                             # print('apos', strand,apos, pc)
-                            yield (chrom,st,ed,strand,e3,'3')
+                            yield (chrom,int(st),int(ed),strand,e3,'3')
                             adpos.add((apos,strand[-1]))
         e53df1 = PD.DataFrame([x for x in _e53gen1()], columns=cols)
         e53df1['origin'] = 'path'
@@ -1144,10 +1144,10 @@ class LocalAssembler(object):
                     pos1 = pos+o
                     if k=='5':
                         if (pos1,strand,k) not in e5set:
-                            yield (chrom,pos1,pos1,strand,_pc(pos1,pos1,strand,','),k)
+                            yield (chrom,int(pos1),int(pos1),strand,_pc(pos1,pos1,strand,','),k)
                     else:
                         if (pos1,strand,k) not in e3set:
-                            yield (chrom,pos1,pos1,strand,_pc(pos1,pos1,strand,','),k)
+                            yield (chrom,int(pos1),int(pos1),strand,_pc(pos1,pos1,strand,','),k)
 
         e53df2 = PD.DataFrame([x for x in _e53gen2()], columns=cols)
         e53df2['origin'] = 'flow'
@@ -1207,14 +1207,15 @@ class LocalAssembler(object):
         # direction <
         # find exons between pos0=>pos, subtract sja corresponding to further
         # edge of the exon (at position st)
-        o = self.st
+        pos,pos0 = int(pos), int(pos0)
+        o = int(self.st)
         if direction=='<':
             sja1 = sja[pos0-1:pos+1].copy() # index offset by 1
             exa1 = exa[pos0:pos+1].copy()
             ex = exs[(exs['st']>=pos0+o)&(exs['ed']<pos+1+o)]
             for st,ed in ex[['st','ed']].values:
-                st0 = st-o-pos0
-                ed0 = ed-o-pos0
+                st0 = int(st-o-pos0)
+                ed0 = int(ed-o-pos0)
                 exa1[st0:ed0] = exa1[st0:ed0]-(sja1[st0]-sja1[st0+1]) # st0-1 but array itself is offset by 1
             return sja1[1:], exa1 # same length
         # direction >
@@ -1224,8 +1225,8 @@ class LocalAssembler(object):
         exa1 = exa[pos-1:pos0].copy()
         ex = exs[(exs['st']>=pos-1+o)&(exs['ed']<pos0+o)] # don't include = for ed
         for st,ed in ex[['st','ed']].values:
-            st0 = st-o-pos+1
-            ed0 = ed-o-pos+1
+            st0 = int(st-o-pos+1)
+            ed0 = int(ed-o-pos+1)
             exa1[st0:ed0] = exa1[st0:ed0]-(sja1[ed0+1]-sja1[ed0])
         return sja1[:len(exa1)], exa1 # same length
 
@@ -2195,9 +2196,6 @@ class GeneGraph(object):
             # exon|acceptor => junc
             self.eaj = eaj = _dic('eid2','sid')
         except:
-            print(exs)
-            print(sjs)
-            print(j2)
             print(j2.groupby('eid1')['eid2'].apply(lambda x: [int(y) for y in set(x) if not N.isnan(y)]))
             raise
 
