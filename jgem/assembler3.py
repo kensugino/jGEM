@@ -12,6 +12,7 @@ import subprocess
 import multiprocessing
 import gzip
 import os
+import copy
 import time
 import shutil
 from functools import reduce
@@ -1421,7 +1422,7 @@ class LocalAssembler(object):
         return PD.concat(paths, ignore_index=True)
 
     def calc_span_tcov(self, spansjs, spanexs, strand):
-        o = self.st
+        o = int(self.st)
         exa = self.arrs['ex'][strand]
         sja = self.arrs['sj'][strand]
         # ne2ecov = self._ne2ecov
@@ -1446,7 +1447,7 @@ class LocalAssembler(object):
             pg.rename(columns={'tst':'st','ted':'ed'}, inplace=True)
             pg['eid'] = N.arange(len(pg))
             ci = UT.chopintervals(pg, idcol='eid')
-            ci['cov'] = [cov0(s,e) for s,e in ci[['st','ed']].values]
+            ci['cov'] = [cov0(int(s),int(e)) for s,e in ci[['st','ed']].values]
             ci['name1'] = ci['name'].astype(str).apply(lambda x: [int(y) for y in x.split(',')])    
             nc = len(ci)
             mat = N.zeros((nc,ne))
@@ -1469,7 +1470,7 @@ class LocalAssembler(object):
             eds = sorted(set(pg['ted'].values))
             nst,ned = len(sts),len(eds)
             mat = N.array([(pg['tst']==x).values for x in sts]+[(pg['ted']==x).values for x in eds], dtype=float)
-            c = N.array([cov1s(x) for x in sts]+[cov1e(x) for x in eds])
+            c = N.array([cov1s(int(x)) for x in sts]+[cov1e(int(x)) for x in eds])
             # enforce flux conservation: scale up 5'
             stsum = N.sum(c[:nst])
             edsum = N.sum(c[nst:])
@@ -1481,7 +1482,7 @@ class LocalAssembler(object):
             pg['tcov0b'] = ecov
 
             mat = N.array([(pg['tst']==x).values for x in sts]+[-1*(pg['ted']==x).values for x in eds], dtype=float)
-            c = N.array([cov2s(x) for x in sts]+[cov2e(x) for x in eds])
+            c = N.array([cov2s(int(x)) for x in sts]+[cov2e(int(x)) for x in eds])
             # enforce flux conservation: scale up 5'
             stsum = N.sum(c[:nst])
             edsum = N.sum(c[nst:])
@@ -1493,8 +1494,8 @@ class LocalAssembler(object):
             pg['tcov0c'] = ecov
         else:
             s,e = pg.iloc[0][['tst','ted']]
-            pg['tcov0b'] = (cov1s(s)+cov1e(e))/2.
-            pg['tcov0c'] = (cov2s(s)-cov2e(e))/2.
+            pg['tcov0b'] = (cov1s(int(s))+cov1e(int(e)))/2.
+            pg['tcov0c'] = (cov2s(int(s))-cov2e(int(e)))/2.
 
         pg['tcov0'] = pg[['tcov0a','tcov0b','tcov0c']].mean(axis=1)
         pg.loc[pg['tcov0']<0,'tcov0'] = 0 # shouldn't really happen
@@ -1851,7 +1852,7 @@ class PathGenerator(object):
         sjp = self.sjpaths
         npos = PATHCOLS.index('name')
         tpos = PATHCOLS.index('tcov')
-        th = self.upperpathnum*3
+        th = self.upperpathnum*5
         def _select(sjnames):
             paths = []
             nsj = len(sjnames)
@@ -1881,6 +1882,8 @@ class PathGenerator(object):
                             paths.append(p)
                             cscore = cscore1
                 # print('cscore', cscore, nsj, z)
+                if len(paths)>th:
+                    raise TrimSJ
                 if len(paths)>th:
                     tcov = paths[-1][tpos]
                     txt = '#path {0}>{1} terminate path enumeration. score:{2}/{3} tcov:{4}'
@@ -1913,14 +1916,18 @@ class PathGenerator(object):
                 n1 = len(sjp)
                 LOG.debug('#sjp:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
                 sjnames = sjp['name'].values
-                upperpathnum = 2*upperpathnum
+                upperpathnum = int(1.5*upperpathnum)
                 gsjdf = self.gsjdf
                 allnames = '$'.join(sjp['name'].values)
                 idx = [x in allnames for x in gsjdf['name']]
                 self._gsjdf = gsjdf[idx].copy()
                 # remake gg
-                self._gg = gg = GeneGraph(self._gsjdf,self.gexdf.copy(),self.strand, setids=False)
-                self.pg53s = [PathGenerator53(x,gg,self.gexdf,self.gsjdf, upperpathnum) for i,x in self.e5s.iterrows()]
+                try:
+                    self._gg = gg = self.gg.restrict(self._gsjdf, self.gexdf)
+                    # self._gg = gg = GeneGraph(self._gsjdf,self.gexdf.copy(),self.strand, setids=False)
+                    self.pg53s = [PathGenerator53(x,gg,self.gexdf,self.gsjdf, upperpathnum) for i,x in self.e5s.iterrows()]
+                except:
+                    pass
 
         return PD.DataFrame(paths, columns=PATHCOLS)
 
@@ -2167,8 +2174,11 @@ class GeneGraph(object):
         j1 = PD.merge(etbl1, stbl, how='outer', on='dpos', sort=False)
         j2 = PD.merge(j1, etbl2, how='outer', on='apos', sort=False)
         self.j2 = j2
+        self.make_dics()
+
+    def make_dics(self):
         def _dic(f1,f2):
-            t = j2.groupby(f1)[f2].apply(lambda x: [int(y) for y in set(x) if not N.isnan(y)])
+            t = self.j2.groupby(f1)[f2].apply(lambda x: [int(y) for y in set(x) if not N.isnan(y)])
             return dict(zip(t.index.values, t.values))
         try:
             # exon|donor => junc => acceptor|exon
@@ -2190,6 +2200,16 @@ class GeneGraph(object):
             print(j2)
             print(j2.groupby('eid1')['eid2'].apply(lambda x: [int(y) for y in set(x) if not N.isnan(y)]))
             raise
+
+    def restrict(self, gsjdf, gexdf):
+        c = copy.copy(self)
+        jids = gsjdf['sid'].values
+        eids = gexdf['eid'].values
+        j2 = c.j2
+        c.j2 = j2[(j2['eid1'].isin(eids))&(j2['sid'].isin(jids))&(j2['eid2'].isin(eids))]
+        c.make_dics()
+        return c
+
     def connected_nr(self, eid):
         to_visit = [eid]
         exx = set()
