@@ -2185,7 +2185,7 @@ class GeneGraph(object):
         self.ede = ede = _dic('eid1','eid2')
         # exon|acceptor <= junc <= donor|exon
         self.eae = eae = _dic('eid2','eid1')
-        self.e2e = {e:set(ede.get(e,[])+eae.get(e,[])) for e in exs['eid']}
+        self.e2e = {e:set(ede.get(e,[])+eae.get(e,[])) for e in self.exs['eid']}
         # junc => acceptor|exon                       
         self.jae = jae = _dic('sid','eid2')
         # junc <= donor|exon
