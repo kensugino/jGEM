@@ -2181,23 +2181,19 @@ class GeneGraph(object):
         def _dic(f1,f2):
             t = self.j2.groupby(f1)[f2].apply(lambda x: [int(y) for y in set(x) if not N.isnan(y)])
             return dict(zip(t.index.values, t.values))
-        try:
-            # exon|donor => junc => acceptor|exon
-            self.ede = ede = _dic('eid1','eid2')
-            # exon|acceptor <= junc <= donor|exon
-            self.eae = eae = _dic('eid2','eid1')
-            self.e2e = {e:set(ede.get(e,[])+eae.get(e,[])) for e in exs['eid']}
-            # junc => acceptor|exon                       
-            self.jae = jae = _dic('sid','eid2')
-            # junc <= donor|exon
-            self.jde = jde = _dic('sid','eid1')
-            # exon|donor => junc
-            self.edj = edj = _dic('eid1','sid')
-            # exon|acceptor => junc
-            self.eaj = eaj = _dic('eid2','sid')
-        except:
-            print(j2.groupby('eid1')['eid2'].apply(lambda x: [int(y) for y in set(x) if not N.isnan(y)]))
-            raise
+        # exon|donor => junc => acceptor|exon
+        self.ede = ede = _dic('eid1','eid2')
+        # exon|acceptor <= junc <= donor|exon
+        self.eae = eae = _dic('eid2','eid1')
+        self.e2e = {e:set(ede.get(e,[])+eae.get(e,[])) for e in exs['eid']}
+        # junc => acceptor|exon                       
+        self.jae = jae = _dic('sid','eid2')
+        # junc <= donor|exon
+        self.jde = jde = _dic('sid','eid1')
+        # exon|donor => junc
+        self.edj = edj = _dic('eid1','sid')
+        # exon|acceptor => junc
+        self.eaj = eaj = _dic('eid2','sid')
 
     def restrict(self, gsjdf, gexdf):
         c = copy.copy(self)
