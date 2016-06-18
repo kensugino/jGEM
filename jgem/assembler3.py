@@ -1378,7 +1378,7 @@ class LocalAssembler(object):
                     exs.append(spanexdf)
                     paths.append(spanpathdf)
                 cnt += 1
-        if (len(sjs)>0) and (len(exs)>0) and (len(pathsdf)>0):
+        if (len(sjs)>0) and (len(exs)>0) and (len(paths)>0):
             sjsdf = PD.concat(sjs, ignore_index=True)
             exsdf = PD.concat(exs, ignore_index=True)
             pathsdf = PD.concat(paths, ignore_index=True)
