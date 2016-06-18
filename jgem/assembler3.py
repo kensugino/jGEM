@@ -2308,7 +2308,7 @@ class GeneGraph(object):
 
     def find_5groups(self, gsjs, gexs):
         g5s = []
-        ex5s = gexs[gexs['kind']=='5'].groupby('dpos').first()
+        ex5s = gexs[gexs['kind']=='5'].groupby('dpos').first().reset_index()
         for e5id0,dpos in ex5s[['eid','dpos']].values:
             e5ids = gexs[(gexs['dpos']==dpos)&(gexs['kind']=='5')]['eid'].values
             eids, sids = self.get_tree(e5id0)
@@ -2355,7 +2355,7 @@ class GeneGraph(object):
         e3ids, e2leaves = self.get_53groups(e5id)
         aposs = gexs[gexs['eid'].isin(e3ids)]['apos'].unique()
         for apos in aposs:
-            e3ids = gexs[(gexs['apos']==apos)&(gexs['kind']=='3')]
+            e3ids = gexs[(gexs['apos']==apos)&(gexs['kind']=='3')]['eid'].values
             e3id = e3ids[0]
             eids = [x for x in e2leaves if e3id in e2leaves[x]]
             eids = list(set(eids + list(e3ids)+list(e5ids)))
