@@ -1521,10 +1521,12 @@ class LocalAssembler(object):
             GGB.write_bed(self.bed12, pre+'.paths.bed.gz',ncols=12)
             self.tspan = path2tspan(self.paths.copy(), cmax, 'tcov0')
             GGB.write_bed(self.tspan, pre+'.tspans.bed.gz',ncols=12)
+            allpathcode = '$'.join(self.paths['name'].values)
+        else:
+            allpathcode = ''
 
         # 2) unused sjpaths => bed12
         sjpaths0 = self._sjpaths0
-        allpathcode = '$'.join(self.paths['name'].values)
         idxused = N.array([y in allpathcode for y in sjpaths0['name']])
         self.unusedsj = sjpaths0[~idxused]         
         self.usedsj = sjpaths0[idxused]
