@@ -232,6 +232,8 @@ def prep_sjpath_chr(j2pres, libsizes, dstpre, chrom):
         paths = paths[paths['chr']==chrom]
         for st,ed,name,s,tst,ted,tcov in paths[cols].values:
             pc = ','.join(name.split(',')[1:-1]) # trim 53exons => intron chain
+            if pc=='':
+                continue # ignore no junction path
             pc2st[pc] = min(st, pc2st.get(pc,st))
             pc2ed[pc] = max(ed, pc2ed.get(pc,ed))
             pc2tst[pc] = tst
