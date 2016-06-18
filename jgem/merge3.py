@@ -154,13 +154,13 @@ def prep_exwig_chr(j2pres, libsizes, dstpre, chrom, csize):
         n = len(j2pres)
         scales = [1e6/float(x) for x in libsizes]
     for pre,scale in zip(j2pres, scales):
-        exdf = UT.read_pandas(pre+'.exdf.txt.gz',names=A2.EXDFCOLS)
+        exdf = UT.read_pandas(pre+'.exdf.txt.gz',names=A3.EXDFCOLS)
         exdf = exdf[exdf['chr']==chrom]
         for s in ss:
             exsub = exdf[exdf['strand'].isin(s2s[s])]
             for st,ed,ecov in exsub[['st','ed','ecov']].values:
                 a[s][st:ed] += ecov*scale
-        sedf = UT.read_pandas(pre+'.sedf.txt.gz',names=A2.EXDFCOLS)
+        sedf = UT.read_pandas(pre+'.sedf.txt.gz',names=A3.EXDFCOLS)
         sedf = sedf[sedf['chr']==chrom]
         for s in ss:
             sesub = sedf[sedf['strand'].isin(s2s[s])]
@@ -190,7 +190,7 @@ def prep_sjwig_chr(j2pres, libsizes, dstpre, chrom, csize):
         n = len(j2pres)
         scales = [1e6/float(x) for x in libsizes]
     for pre,scale in zip(j2pres, scales):
-        sjdf = UT.read_pandas(pre+'.sjdf.txt.gz',names=A2.SJDFCOLS)
+        sjdf = UT.read_pandas(pre+'.sjdf.txt.gz',names=A3.SJDFCOLS)
         sjdf = sjdf[sjdf['chr']==chrom]
         for s in ss:
             sjsub = sjdf[sjdf['strand'].isin(s2s[s])]
@@ -228,7 +228,7 @@ def prep_sjpath_chr(j2pres, libsizes, dstpre, chrom):
         n = len(j2pres)
         scales = [1e6/float(x) for x in libsizes]
     for pre,scale in zip(j2pres, scales):
-        paths = UT.read_pandas(pre+'.paths.txt.gz', names=A2.PATHCOLS)
+        paths = UT.read_pandas(pre+'.paths.txt.gz', names=A3.PATHCOLS)
         paths = paths[paths['chr']==chrom]
         for st,ed,name,s,tst,ted,tcov in paths[cols].values:
             pc = ','.join(name.split(',')[1:-1]) # trim 53exons => intron chain
@@ -253,7 +253,7 @@ def prep_sjpath_chr(j2pres, libsizes, dstpre, chrom):
     df.loc[~idxp,'name'] = ['{2},{1},{0}'.format(s,p,e) for s,p,e in df[~idxp][['st','pc','ed']].values]
     df = df.groupby('pc').first() # get rid of unstranded duplicates
     cmax = 9+N.log2(N.mean(scales))
-    bed = A2.path2bed12(df, cmax)
+    bed = A3.path2bed12(df, cmax)
     # reset sc1 to tcov (from log2(tcov+2)*100)
     bed['sc1'] = bed['tcov']
     GGB.write_bed(bed, path, ncols=12)
@@ -384,7 +384,7 @@ def filter_sj(bwsjpre, statspath, chrom, csize, params):
     eth = params['th_minedgeexon']
     sj = sj[(sj['eflen']>eth)&(sj['ellen']>eth)].copy()
     # calculate sjratio, sjratio2
-    sjexbw = A2.SjExBigWigs(bwsjpre, mixunstranded=False)
+    sjexbw = A3.SjExBigWigs(bwsjpre, mixunstranded=False)
     for s in ['+','-']:
         idx = sj['strand']==s
         with sjexbw:
@@ -432,7 +432,7 @@ class LocalEstimator(A3.LocalAssembler):
         # 3) within 5-3 group by tree branch prob
         paths = self.paths
         for s in ['+','-']:
-            ps = paths[paths['strand'].isin(A2.STRS[s])]
+            ps = paths[paths['strand'].isin(A3.STRS[s])]
             if len(ps)==0:
                 continue
             for chrom,st,ed in UT.union_contiguous(ps[['chr','st','ed']],returndf=False):
@@ -447,19 +447,19 @@ class LocalEstimator(A3.LocalAssembler):
     def write(self):
         pre = self.dstpre+'.{0}_{1}_{2}'.format(self.chrom,self.st,self.ed)
         # 1) exon, junctions, allpaths => csv (no header <= to concatenate bundles)
-        ecols = A2.EXDFCOLS #['chr','st','ed','strand','name','kind','ecov']
+        ecols = A3.EXDFCOLS #['chr','st','ed','strand','name','kind','ecov']
         UT.write_pandas(self.exdf[ecols], pre+'.covs.exdf.txt.gz', '')
-        scols = A2.SJDFCOLS #['chr','st','ed','strand','name','kind','tcnt'  ]#,'donor','acceptor','dp','ap']
+        scols = A3.SJDFCOLS #['chr','st','ed','strand','name','kind','tcnt'  ]#,'donor','acceptor','dp','ap']
         UT.write_pandas(self.sjdf[scols], pre+'.covs.sjdf.txt.gz', '')
-        pcols = A2.PATHCOLS #['chr','st','ed','name','strand','tst','ted','tcov0','tcov1','tcov']
+        pcols = A3.PATHCOLS #['chr','st','ed','name','strand','tst','ted','tcov0','tcov1','tcov']
         UT.write_pandas(self.paths[pcols], pre+'.covs.paths.txt.gz', '')
         # write colored bed12 for tcov > th
         tgt = self.paths[self.paths['tcov']>=self.tcovth].copy()
-        self.bed12 = A2.path2bed12(tgt, cmax=9, covfld='tcov')
+        self.bed12 = A3.path2bed12(tgt, cmax=9, covfld='tcov')
         GGB.write_bed(self.bed12, pre+'.covs.paths.bed.gz',ncols=12)
 
 def bundle_estimator(modelpre, bwpre, chrom, st, ed, dstpre, tcovth):
-    bname = A2.bundle2bname((chrom,st,ed))
+    bname = A3.bundle2bname((chrom,st,ed))
     bsuf = '.{0}_{1}_{2}'.format(chrom,st,ed)
     csuf = '.{0}'.format(chrom)
     sufs = ['.covs.exdf.txt.gz',
@@ -492,7 +492,7 @@ def concatenate_bundles(bundles, dstpre):
         if not os.path.exists(dstpath):
             with open(dstpath, 'wb') as dst:
                 for chrom, st, ed in bundles:
-                    bname = A2.bundle2bname((chrom,st,ed))
+                    bname = A3.bundle2bname((chrom,st,ed))
                     srcpath = '{0}.{1}_{2}_{3}.{4}'.format(dstpre, chrom, st, ed, suf)
                     files.append(srcpath)
                     with open(srcpath, 'rb') as src:
