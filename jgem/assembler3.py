@@ -833,7 +833,7 @@ class LocalAssembler(object):
         self.write()
 
         self.loginfo('finished assembling, {0} paths found'.format(len(self.paths)))
-        if self.paths is not None:
+        if len(self.paths)>0:
             return self.bname
         return None
 
@@ -1388,7 +1388,7 @@ class LocalAssembler(object):
         else:
             self.sjdf2 = None
             self.exdf2 = None
-            self.paths = None
+            self.paths = []
 
 
     def calc_53branchp(self, gg, sj, ex):
@@ -1514,7 +1514,7 @@ class LocalAssembler(object):
         if self.sjdf2 is not None:    
             scols = SJDFCOLS +['gid','id5','id53','tst','ted','p','tcov0','tcov0a','tcov0b','tcov0c']
             UT.write_pandas(self.sjdf2[scols], pre+'.sjdf2.txt.gz', '')
-        if self.paths is not None:
+        if len(self.paths)>0:
             pcols = PATHCOLS #['chr','st','ed','name','strand','tst','ted','tcov', 'tcov0','tcov0a,b,c']
             UT.write_pandas(self.paths[pcols], pre+'.paths.txt.gz', '')
             self.bed12 = path2bed12(self.paths.copy(), cmax, 'tcov')
