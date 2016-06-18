@@ -759,7 +759,7 @@ PATHCOLS = ['chr','st','ed','name','strand','tst','ted','tcov','tcov0','tcov0a',
 LAPARAMS = dict(
      refcode='gen9',
      discardunstranded=False,
-     uth=1, 
+     uth=0, 
      mth=3, 
      sjratioth=2e-3, 
      usjratioth=1e-2,
@@ -1366,7 +1366,7 @@ class LocalAssembler(object):
                     for gsj5,gex5 in sjexs5:
                         sjexs53 = gg.find_53groups(gsj5,gex5)
                         for gsj53,gex53 in sjexs53:
-                            self.calc_53branchp(gg, gsj53,gex53)
+                            self.calc_53branchp(gsj53,gex53)
                             spansjs.append(gsj53)
                             spanexs.append(gex53)
                 if len(spansjs)>0 and len(spanexs)>0:
@@ -1391,7 +1391,7 @@ class LocalAssembler(object):
             self.paths = []
 
 
-    def calc_53branchp(self, gg, sj, ex):
+    def calc_53branchp(self, sj, ex):
         dsump = sj.groupby('dpos')['tcnt'].sum().astype(float)
         sj['p'] = jdp = sj['tcnt'].values/(dsump.ix[sj['dpos'].values].values)
         # j2p = dict(zip(sj['name'].values, jdp))
