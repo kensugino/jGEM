@@ -250,9 +250,9 @@ class GapEdgeFinder(object):
             epos = max(epos, -self.maxsize)            
         return epos
         
-EF5JSON = dict(coef=[-0.285,-0.81], intercept=5.6, th=0, zoom=1, maxsize=3000, maxgap=300)
+EF5JSON = dict(coef=[-0.285,-0.81], intercept=5.6, th=0.01, zoom=1, maxsize=3000, maxgap=300)
 # EF5 = EdgeFinder(EF5JSON)
-EF3JSON = dict(coef=[-0.25,-0.51], intercept=4.5, th=0, zoom=1, maxsize=20000, maxgap=600) # -0.25, -0.5, 4.5
+EF3JSON = dict(coef=[-0.25,-0.51], intercept=4.5, th=0.01, zoom=1, maxsize=20000, maxgap=600) # -0.25, -0.5, 4.5
 # EF3 = EdgeFinder(EF3JSON) 
 
 class EdgeFinder(object):
@@ -595,7 +595,7 @@ def detect_exons(sjpaths, offset, sja, exa, classifier=INTG, usesja=True):
         #find_maxgap = cyas2.find_maxgap
         for st,ed in gaps:
             # lemax, lgap, llen
-            exsub = exa[st:ed]
+            exsub = exa[int(st):int(ed)]
             if len(exsub)==0:
                 print(st,ed)
             emax = exsub.max()
@@ -603,7 +603,7 @@ def detect_exons(sjpaths, offset, sja, exa, classifier=INTG, usesja=True):
             lemax = N.log2(zoom*emax+1)
             lgap = N.log10(find_maxgap2(exsub, th)+1)
             llen = N.log10(ed-st+1)
-            sdmax = max(xd[st-1],xd[ed-1])
+            sdmax = max(xd[int(st)-1],xd[int(ed)-1])
             mp = float(N.sum(exsub>th))/len(exsub)
             yield (st,ed,lemax,lgap,llen,sdmax,mp)
     cols = ['ost','oed','lemax','lgap','llen','sdmax','mp']
@@ -626,7 +626,7 @@ def find_np_pairs(tmp, maxsize=20000):
                         break
                     if (y[1]=='p')&(y[0]>x[0]):
                         x[2],y[2]=1,1
-                        yield (x[0],y[0])
+                        yield (int(x[0]),int(y[0]))
                         break
         for j in range(n):
             y = tmp[j]
@@ -637,7 +637,7 @@ def find_np_pairs(tmp, maxsize=20000):
                         break
                     if (x[1]=='n')&(x[0]<y[0]):
                         x[2],y[2]=1,1
-                        yield (x[0],y[0])
+                        yield (int(x[0]),int(y[0]))
                         break
     return [x for x in _gen_sted()]
 
@@ -700,6 +700,7 @@ def fill_gap(sja, sj, exons, strand, offset):
     # return sjac
     # above only 5' positions are correct (3' are offset by exon length)
     for st,ed in gaps1: # this way both 5' and 3' positions will be correct
+        st,ed = int(st),int(ed)
         sjac[st:ed] = min(sjac[st-1],sjac[ed+1])
     return sjac
     
