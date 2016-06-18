@@ -2540,6 +2540,8 @@ def concatenate_chroms(chroms, dstpre):
     # concat results
     sufs = ['exdf.txt.gz', 
            'sjdf.txt.gz',
+           'exdf2.txt.gz', 
+           'sjdf2.txt.gz',
            'paths.txt.gz',
            'paths.bed.gz',
            'tspans.bed.gz',
