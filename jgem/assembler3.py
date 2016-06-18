@@ -1940,16 +1940,21 @@ class PathGenerator(object):
                 n1 = len(sjp)
                 LOG.debug('#sjp:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
                 sjnames = sjp['name'].values
-                upperpathnum = int(1.5*upperpathnum)
+                upperpathnum = 2*upperpathnum
                 gsjdf = self.gsjdf
                 self._gsjdf = gsjdf[gsjdf['name'].isin(sids)].copy()
                 LOG.debug('gsjdf {0}=>{1} #sids {2}=>{3}'.format(len(gsjdf), len(self._gsjdf), len(sids0), len(sids)))
                 # remake gg
                 jids = list(set(self._gsjdf['sid'].values))
                 self._gg = gg = self.gg.restrict(jids)
-                LOG.debug('gg.ede {0}=>{1}'.format(len(self.gg.ede),len(gg.ede)))
-                # self._gg = gg = GeneGraph(self._gsjdf,self.gexdf.copy(),self.strand, setids=False)
-                self.pg53s = [PathGenerator53(x,gg,self.gexdf,self.gsjdf, upperpathnum) for i,x in self.e5s.iterrows()]
+                gexdf = self.gexdf
+                n0 = len(gexdf['eid'].unique())
+                eids = set(gg.edj.keys()+gg.eaj.keys())
+                n1=len(eids)
+                self._gexdf = gexdf[gexdf['eid'].isin(eids)].copy()
+                LOG.debug('gg.ede {0}=>{1} #eids {2}=>{3}'.format(len(self.gg.ede),len(gg.ede), n0,n1))
+                e5s  = self._gexdf[self._gexdf['kind']=='5']
+                self.pg53s = [PathGenerator53(x,gg,self._gexdf,self._gsjdf, upperpathnum) for i,x in e5s.iterrows()]
 
         return PD.DataFrame(paths, columns=PATHCOLS)
 
