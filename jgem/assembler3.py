@@ -1597,11 +1597,11 @@ class LocalAssembler(object):
         ax.add_collection(bbhc)
 
         # exdfi, e53df
-        def _plt_ex(ex, ymid, c, h=2):
+        def _plt_ex(ex, ymid, c, h=2, alpha=0.3):
             ex = ex[(ex['st']<ed)&(ex['ed']>st)&(ex['strand'].isin(STRS[strand]))]
             yrange = (ymid-h/2., h)
             xranges = [(x-s0-offset,y-x) for x,y in ex[['st','ed']].values]
-            cargs = dict(facecolor=c, edgecolor=c)#, linewidth=0.2)
+            cargs = dict(facecolor=c, edgecolor=c, alpha=alpha)#, linewidth=0.2)
             bbhc = BrokenBarHCollection(xranges, yrange, **cargs)
             ax.add_collection(bbhc)
         if hasattr(self, 'exdfi'):
