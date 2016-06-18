@@ -1420,7 +1420,7 @@ class LocalAssembler(object):
         for gid in spanexdf['gid'].unique():
             gexdf = spanexdf[spanexdf['gid']==gid]
             gsjdf = spansjdf[spansjdf['gid']==gid]
-            pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, self.sjpaths, self.params['upperpathnum'])
+            self._pg = pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, self.sjpaths, self.params['upperpathnum'])
             paths.append(pg.select_paths(self.params['tcovth']))
         return PD.concat(paths, ignore_index=True)
 
@@ -1915,7 +1915,9 @@ class PathGenerator(object):
                 mth = max(0, mcnt.max()-5)
                 sjrth += 0.02
                 n0 = len(sjp)
+                sids0 = list(set([y for x in sjp['name'] for y in x.split(',')]))
                 sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio2']>sjrth)].copy()
+                sids = list(set([y for x in sjp['name'] for y in x.split(',')]))
                 n1 = len(sjp)
                 LOG.debug('#sjp:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
                 sjnames = sjp['name'].values
@@ -1924,9 +1926,9 @@ class PathGenerator(object):
                 allnames = '$'.join(sjp['name'].values)
                 idx = [x in allnames for x in gsjdf['name']]
                 self._gsjdf = gsjdf[idx].copy()
-                LOG.debug('gsjdf {0}=>{1}'.format(len(gsjdf), len(self._gsjdf)))
+                LOG.debug('gsjdf {0}=>{1} #sids {2}=>{3}'.format(len(gsjdf), len(self._gsjdf), len(sids0), len(sids)))
                 # remake gg
-                self._gg = gg = self.gg.restrict(self._gsjdf, self.gexdf)
+                self._gg = gg = self.gg.restrict(sids)
                 LOG.debug('gg.ede {0}=>{1}'.format(len(self.gg.ede),len(gg.ede)))
                 # self._gg = gg = GeneGraph(self._gsjdf,self.gexdf.copy(),self.strand, setids=False)
                 self.pg53s = [PathGenerator53(x,gg,self.gexdf,self.gsjdf, upperpathnum) for i,x in self.e5s.iterrows()]
@@ -2196,12 +2198,9 @@ class GeneGraph(object):
         # exon|acceptor => junc
         self.eaj = eaj = _dic('eid2','sid')
 
-    def restrict(self, gsjdf, gexdf):
+    def restrict(self, sids):
         c = copy.copy(self)
-        jids = gsjdf['sid'].values
-        eids = gexdf['eid'].values
-        j2 = c.j2
-        c.j2 = j2[(j2['eid1'].isin(eids))&(j2['sid'].isin(jids))&(j2['eid2'].isin(eids))]
+        c.j2 = c.j2[c.j2['sid'].isin(sids)]
         c.make_dics()
         return c
 
@@ -2309,18 +2308,16 @@ class GeneGraph(object):
 
     def find_5groups(self, gsjs, gexs):
         g5s = []
-        ex5s = gexs[gexs['kind']=='5']
-        for e5id in ex5s['eid']:
-            eids, sids = self.get_tree(e5id)
+        ex5s = gexs[gexs['kind']=='5'].groupby('dpos').first()
+        for e5id0,dpos in ex5s[['eid','dpos']].values:
+            e5ids = gexs[(gexs['dpos']==dpos)&(gexs['kind']=='5')]['eid'].values
+            eids, sids = self.get_tree(e5id0)
+            eids = set(list(eids)+list(e5ids))
             dfe = gexs[gexs['eid'].isin(eids)].copy()
             dfj = gsjs[gsjs['sid'].isin(sids)].copy()
             rec = dfe.iloc[0]
             chrom = rec['chr']
-            if self.strand=='+':
-                st = dfe[dfe['eid']==e5id]['ed'].values[0]
-            else:
-                st = dfe[dfe['eid']==e5id]['st'].values[0]
-            id5 = '{0}:{1}:{2}'.format(chrom,st,self.strand)
+            id5 = '{0}:{1}:{2}'.format(chrom,dpos,self.strand)
             dfe['id5'] = id5
             dfj['id5'] = id5
             g5s.append((dfj, dfe))
@@ -2351,35 +2348,39 @@ class GeneGraph(object):
     def find_53groups(self, gsjs, gexs):
         g53s = []
         ex5s = gexs[gexs['kind']=='5'] # heads
+        e5ids = ex5s['eid'].values
+        dpos = ex5s.iloc[0]['dpos']
         j2 = self.j2
-        for e5id in ex5s['eid']:
-            e3ids, e2leaves = self.get_53groups(e5id)
-            for e3id in e3ids:
-                eids = [x for x in e2leaves if e3id in e2leaves[x]]
-                sids = j2[(j2['eid1'].isin(eids))&(j2['eid2'].isin(eids))]['sid'].values
-                dfe = gexs[gexs['eid'].isin(eids)].copy()
-                dfj = gsjs[gsjs['sid'].isin(sids)].copy()
-                rec5 = dfe[dfe['eid']==e5id].iloc[0]
-                rec3 = dfe[dfe['eid']==e3id].iloc[0]
-                chrom = rec5['chr']
-                if self.strand=='+':
-                    st = rec5['ed']
-                    ed = rec3['st']
-                else:
-                    st = rec3['ed']
-                    ed = rec5['st']
-                if st>ed:
-                    st,ed=ed,st # rare case (single exon e5id==e3id)
-                id53 = '{0}:{1}-{2}:{3}'.format(chrom,st,ed,self.strand)
-                dfe['id53'] = id53
-                dfj['id53'] = id53
-                dfe['_e5id'] = e5id
-                dfe['_e3id'] = e3id
-                dfe['tst'] = st
-                dfe['ted'] = ed
-                dfj['tst'] = st
-                dfj['ted'] = ed
-                g53s.append((dfj, dfe))
+        e5id = ex5ids[0]
+        e3ids, e2leaves = self.get_53groups(e5id)
+        aposs = gexs[gexs['eid'].isin(e3ids)]['apos'].unique()
+        for apos in aposs:
+            e3ids = gexs[(gexs['apos']==apos)&(gexs['kind']=='3')]
+            e3id = e3ids[0]
+            eids = [x for x in e2leaves if e3id in e2leaves[x]]
+            eids = list(set(eids + list(e3ids)+list(e5ids)))
+            sids = j2[(j2['eid1'].isin(eids))&(j2['eid2'].isin(eids))]['sid'].values
+            dfe = gexs[gexs['eid'].isin(eids)].copy()
+            dfj = gsjs[gsjs['sid'].isin(sids)].copy()
+            rec5 = dfe[dfe['eid'].isin(e5ids)]
+            rec3 = dfe[dfe['eid'].isin(e3ids)]
+            chrom = rec5.iloc[0]['chr']
+            if dpos<apos:
+                st = dpos
+                ed = apos
+            else:
+                st = apos
+                ed = dpos
+            id53 = '{0}:{1}-{2}:{3}'.format(chrom,st,ed,self.strand)
+            dfe['id53'] = id53
+            dfj['id53'] = id53
+            dfe['_e5id'] = ','.join(e5ids)
+            dfe['_e3id'] = ','.join(e3ids)
+            dfe['tst'] = st
+            dfe['ted'] = ed
+            dfj['tst'] = st
+            dfj['ted'] = ed
+            g53s.append((dfj, dfe))
         return g53s        
 
 ####### Bundle Finder ################################################################
