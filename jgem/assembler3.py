@@ -914,7 +914,7 @@ class LocalAssembler(object):
                     sj = GGB.read_bed(chrpath)
                 else:
                     sj = GGB.read_bed(self.bwpre+'.sjpath.bed.gz')
-            idx0 = (sj['chr']==chrom)&(sj['tst']>=st)&(sj['ted']<=ed)        
+            idx0 = (sj['chr']==self.chrom)&(sj['tst']>=self.st)&(sj['ted']<=self.ed)        
             sj0 = sj[idx0].copy()
             # merged sjpath has 53exon in pathcode => remove
             if len(sj0)>0:
@@ -924,8 +924,8 @@ class LocalAssembler(object):
                     sj0['name'] = [','.join(x.split(',')[1:-1]) for x in sj0['name']]
                 else:
                     idxp = sj0['strand'].isin(['+','.'])
-                    sj0.loc[idxp,'pathcode'] = ['{0},{1},{2}'.format(st,n,ed) for st,n,ed in sj0[idxp][['st','name','ed']].values]
-                    sj0.loc[~idxp,'pathcode'] = ['{2},{1},{0}'.format(st,n,ed) for st,n,ed in sj0[~idxp][['st','name','ed']].values]
+                    sj0.loc[idxp,'pathcode'] = ['{0},{1},{2}'.format(s,n,d) for s,n,d in sj0[idxp][['st','name','ed']].values]
+                    sj0.loc[~idxp,'pathcode'] = ['{2},{1},{0}'.format(s,n,d) for s,n,d in sj0[~idxp][['st','name','ed']].values]
             self._sjpaths0 = sj0
             return 
 
@@ -933,9 +933,11 @@ class LocalAssembler(object):
         LOG.info('loading multiple({0}) sjpaths...'.format(len(self.bwpre)))
         sjps0 = [GGB.read_bed(b+'.sjpath.bed.gz') for b in self.bwpre]
         sjps = []
-        for sj in sjps0:
-            idx0 = (sj['chr']==chrom)&(sj['tst']>=st)&(sj['ted']<=ed)        
+        for i,sj in enumerate(sjps0):
+            n0 = len(sj)
+            idx0 = (sj['chr']==self.chrom)&(sj['tst']>=self.st)&(sj['ted']<=self.ed)        
             sj0 = sj[idx0].copy()
+            n1 = len(sj0)
             if len(sj0)>0:
                 name0 = sj0.iloc[0]['name']
                 if len(name0.split('|'))<len(name0.split(',')):
@@ -943,16 +945,16 @@ class LocalAssembler(object):
                     sj0['name'] = [','.join(x.split(',')[1:-1]) for x in sj0['name']]            
                 else:
                     idxp = sj0['strand'].isin(['+','.'])
-                    sj0.loc[idxp,'pathcode'] = ['{0},{1},{2}'.format(st,n,ed) for st,n,ed in sj0[idxp][['st','name','ed']].values]
-                    sj0.loc[~idxp,'pathcode'] = ['{2},{1},{0}'.format(st,n,ed) for st,n,ed in sj0[~idxp][['st','name','ed']].values]                
+                    sj0.loc[idxp,'pathcode'] = ['{0},{1},{2}'.format(s,n,e) for s,n,e in sj0[idxp][['st','name','ed']].values]
+                    sj0.loc[~idxp,'pathcode'] = ['{2},{1},{0}'.format(s,n,e) for s,n,e in sj0[~idxp][['st','name','ed']].values]                
             sjps.append(sj0)
-            LOG.debug('#sj0:{0}'.format(len(sj0)))
+            LOG.debug('#sj0:{0}=>{1}({2})'.format(n0,n1,self.bwpre[i]))
         sjp = PD.concat(sjps, ignore_index=True)
         n0 = len(sjp)
         sjg = sjp.groupby(['chr','name'])
         sj = sjg.first()
         n1 = len(sj)
-        LOG.debug('#sj0(concat):{0}=>{1}'.format(n0,n1))
+        LOG.debug('#sj0(concat):{0}=>{1}(groupby chr, name)'.format(n0,n1))
         # chr,st,ed,name,sc1,strand,tst,ted,sc2,#exons,esizes,estarts
         sj['st'] = sjg['st'].min().astype(int)
         sj['ed'] = sjg['ed'].max().astype(int)
