@@ -571,22 +571,22 @@ class Colors(object):
         return ','.join(rgba)
         
 ####### Local Assembler ###############################################################
-def detect_exons(sjpaths, offset, sja, exa, classifier=INTG):
+def detect_exons(sjpaths, offset, sja, exa, classifier=INTG, usesja=True):
     x = N.log2(sja+1)
     xd = (x[1:]-x[:-1])
-    # use sjpaths to get donor/acceptor positions
-    idxp = N.nonzero(xd>4)[0]+1 # donor(+ strand), acceptor(- strand)
-    idxn = N.nonzero(xd<-4)[0]+1 # acceptor(+ strand), donor(- strand)
-    tmp = [[x,'p',0] for x in idxp]+[[x,'n',0] for x in idxn]
-    gaps0 = find_np_pairs(tmp, maxsize=10000)
     # tst: donor (+ strand), acceptor (- strand) => idxp
     # ted: => idxn
     idxp = set(sjpaths['tst'].values-offset)
     idxn = set(sjpaths['ted'].values-offset)
     tmp = [[x,'p',0] for x in idxp]+[[x,'n',0] for x in idxn]
-    # gaps = find_np_pairs(tmp, xd)
-    gaps1 = find_np_pairs(tmp)
-    gaps = sorted(set(gaps0+gaps1))
+    gaps = find_np_pairs(tmp)
+    if usesja:
+        # use sjpaths to get donor/acceptor positions
+        idxp = N.nonzero(xd>4)[0]+1 # donor(+ strand), acceptor(- strand)
+        idxn = N.nonzero(xd<-4)[0]+1 # acceptor(+ strand), donor(- strand)
+        tmp = [[x,'p',0] for x in idxp]+[[x,'n',0] for x in idxn]
+        gaps0 = find_np_pairs(tmp, maxsize=10000)
+        gaps = sorted(set(gaps0+gaps))
     zoom = classifier.json['zoom']
     covfactor = classifier.json['th']
     def _gen_params():
@@ -774,6 +774,7 @@ LAPARAMS = dict(
      maxexonsize=30000, 
      edgedelta=10,
      minsearchsize=500,
+     use_sja_for_exon_detection=True
 )
 
 class LocalAssembler(object):
@@ -1040,11 +1041,12 @@ class LocalAssembler(object):
         self.exons  = {}
         self.gaps = {}
         sjs = self.sjpaths
+        usesja = self.params['use_sja_for_exon_detection']
         for s in ['+','-']:
             sja = arrs['sj'][s]
             exa = arrs['ex'][s]
             sj = sjs[sjs['strand'].isin(STRS[s])]
-            df = detect_exons(sj, self.st, sja, exa, classifier=self.intg)
+            df = detect_exons(sj, self.st, sja, exa, classifier=self.intg, usesja=usesja)
             self.exons[s] = df[df['exon']==True].copy()            
             self.gaps[s] = df
             self.filled[s] = fill_gap(sja, sj, self.exons[s], s, self.st)
@@ -1922,13 +1924,12 @@ class PathGenerator(object):
                 allnames = '$'.join(sjp['name'].values)
                 idx = [x in allnames for x in gsjdf['name']]
                 self._gsjdf = gsjdf[idx].copy()
+                LOG.debug('gsjdf {0}=>{1}'.format(len(gsjdf), len(self._gsjdf)))
                 # remake gg
-                try:
-                    self._gg = gg = self.gg.restrict(self._gsjdf, self.gexdf)
-                    # self._gg = gg = GeneGraph(self._gsjdf,self.gexdf.copy(),self.strand, setids=False)
-                    self.pg53s = [PathGenerator53(x,gg,self.gexdf,self.gsjdf, upperpathnum) for i,x in self.e5s.iterrows()]
-                except:
-                    pass
+                self._gg = gg = self.gg.restrict(self._gsjdf, self.gexdf)
+                LOG.debug('gg.ede {0}=>{1}'.format(len(self.gg.ede),len(gg.ede)))
+                # self._gg = gg = GeneGraph(self._gsjdf,self.gexdf.copy(),self.strand, setids=False)
+                self.pg53s = [PathGenerator53(x,gg,self.gexdf,self.gsjdf, upperpathnum) for i,x in self.e5s.iterrows()]
 
         return PD.DataFrame(paths, columns=PATHCOLS)
 
