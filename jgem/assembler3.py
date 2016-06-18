@@ -1841,7 +1841,7 @@ class PathGenerator(object):
                 vmin = max(0, vmax - delta)
             except PathNumUpperLimit:
                 raisecnt += 1
-                if (raisecnt>3)&(vmax<0.001):
+                if (raisecnt>1)&(vmax<0.01):
                     raise TrimSJ
                 vmin0 = vmin
                 vmin = (vmax+vmin)/2.
