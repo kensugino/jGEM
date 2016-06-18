@@ -833,7 +833,7 @@ class LocalAssembler(object):
         self.write()
 
         self.loginfo('finished assembling, {0} paths found'.format(len(self.paths)))
-        if len(self.paths)>0:
+        if self.paths is not None:
             return self.bname
         return None
 
@@ -1378,12 +1378,18 @@ class LocalAssembler(object):
                     exs.append(spanexdf)
                     paths.append(spanpathdf)
                 cnt += 1
-        sjsdf = PD.concat(sjs, ignore_index=True)
-        exsdf = PD.concat(exs, ignore_index=True)
-        pathsdf = PD.concat(paths, ignore_index=True)
-        self.sjdf2 = sjsdf
-        self.exdf2 = exsdf
-        self.paths = pathsdf
+        if (len(sjs)>0) and (len(exs)>0) and (len(pathsdf)>0):
+            sjsdf = PD.concat(sjs, ignore_index=True)
+            exsdf = PD.concat(exs, ignore_index=True)
+            pathsdf = PD.concat(paths, ignore_index=True)
+            self.sjdf2 = sjsdf
+            self.exdf2 = exsdf
+            self.paths = pathsdf
+        else:
+            self.sjdf2 = None
+            self.exdf2 = None
+            self.paths = None
+
 
     def calc_53branchp(self, gg, sj, ex):
         dsump = sj.groupby('dpos')['tcnt'].sum().astype(float)
@@ -1502,8 +1508,14 @@ class LocalAssembler(object):
         scols = SJDFCOLS #['chr','st','ed','strand','name','kind','tcnt','ucnt']
         UT.write_pandas(self.sjdf[scols], pre+'.sjdf.txt.gz', '')
         
-        pcols = PATHCOLS #['chr','st','ed','name','strand','tst','ted','tcov', 'tcov0','tcov0a,b,c']
-        if len(self.paths)>0:
+        if self.exdf2 is not None:
+            ecols = EXDFCOLS +['gid','id5','id53','tst','ted','pa','pd','tcov0','tcov0a','tcov0b','tcov0c']
+            UT.write_pandas(self.exdf2[ecols], pre+'.exdf2.txt.gz', '')
+        if self.sjdf2 is not None:    
+            scols = SJDFCOLS +['gid','id5','id53','tst','ted','p','tcov0','tcov0a','tcov0b','tcov0c']
+            UT.write_pandas(self.sjdf2[scols], pre+'.sjdf2.txt.gz', '')
+        if self.paths is not None:
+            pcols = PATHCOLS #['chr','st','ed','name','strand','tst','ted','tcov', 'tcov0','tcov0a,b,c']
             UT.write_pandas(self.paths[pcols], pre+'.paths.txt.gz', '')
             self.bed12 = path2bed12(self.paths.copy(), cmax, 'tcov')
             GGB.write_bed(self.bed12, pre+'.paths.bed.gz',ncols=12)
@@ -1862,7 +1874,7 @@ class PathGenerator(object):
                 # print('cscore', cscore, nsj, z)
                 if len(paths)>th:
                     tcov = paths[-1][tpos]
-                    txt = '#path (0}>{1} terminate path enumeration. score:{2}/{3} tcov:{4}'
+                    txt = '#path {0}>{1} terminate path enumeration. score:{2}/{3} tcov:{4}'
                     LOG.warning(txt.format(len(paths),th,cscore,nsj,tcov))
                     break
             return paths
