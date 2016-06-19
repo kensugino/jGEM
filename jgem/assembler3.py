@@ -250,9 +250,9 @@ class GapEdgeFinder(object):
             epos = max(epos, -self.maxsize)            
         return epos
         
-EF5JSON = dict(coef=[-0.285,-0.81], intercept=5.6, th=0.01, zoom=1, maxsize=3000, maxgap=300)
+EF5JSON = dict(coef=[-0.285,-0.81], intercept=5.6, th=0.01, zoom=1, maxsize=3000, maxgap=50)
 # EF5 = EdgeFinder(EF5JSON)
-EF3JSON = dict(coef=[-0.25,-0.51], intercept=4.5, th=0.01, zoom=1, maxsize=20000, maxgap=600) # -0.25, -0.5, 4.5
+EF3JSON = dict(coef=[-0.25,-0.51], intercept=4.5, th=0.01, zoom=1, maxsize=20000, maxgap=50) # -0.25, -0.5, 4.5
 # EF3 = EdgeFinder(EF3JSON) 
 
 class EdgeFinder(object):
@@ -526,6 +526,71 @@ class SlopeEdgeFinder(object):
         # if len(bs)>1: # aggregate close by
         #     bs = [bs[0]] + [x1 for x0,x1 in zip(bs[:-1], bs[1:]) if x1-x0>mis]
         return bs        
+
+    def calc_stats(self, exa, direction):
+        if direction=='<':
+            v = exa[:-1]
+        else:
+            v = exa[1:]
+        th = self.covth # abs th
+        sws = self.smwinsize # smooth window for abs cov th detection
+        ws = self.winsize # smooth window for derivative
+        hws = int(ws/2) # ws has to be odd number
+        swin = self.swin
+        win = self.win 
+        lv = N.log2(v+1)
+        v0 = N.concatenate([swin*v[0], v, swin*v[-1]])
+        ssm = N.convolve(v0, swin/float(sws), 'same')[sws:-sws]
+        lv1 = N.concatenate([win*lv[0], lv, win*lv[-1]])
+        sm = N.convolve(lv1, win/float(ws), 'same')
+        dm = (sm[ws:]-sm[:-ws])[(hws+1):-hws]
+        mi = N.min(v)
+        ma = N.max(v)
+        mima = mi/ma
+        sigma = dm.std()
+        th = max(self.minth, self.sigmath*sigma)
+        return v, dm, th, ssm, mima
+
+    def plotone(self,chrom,st,ed,strand='+',utr='3', find=None, ylim=None, xlim=None):
+        if find is None:
+            if utr=='3':
+                find = 'drop' if strand=='+' else 'rise'
+            else:
+                find = 'drop' if strand=='-' else 'rise'
+        with self:
+            tmp, dtmp, th, sm, mima = self.calc_stats(chrom,st,ed)
+            itcv = self.find(chrom,st,ed,find)
+        ltmp = N.log2(tmp+1)
+        self.lacovth = lacovth = N.log2(self._acovth+1)
+        self.lacovth2 = lacovth2 = N.log2(self._acovth2+1)
+        
+        fig,axr = P.subplots(1,1,figsize=(15,3))
+        x = N.arange(st,ed)
+        P.plot(x,ltmp)
+        P.plot(x,N.abs(dtmp))
+        
+        P.plot([x[0],x[-1]], [th,th], 'r')
+        P.plot([x[0],x[-1]], [lacovth,lacovth],'r--')
+        P.plot([x[0],x[-1]], [lacovth2,lacovth2],'g--')
+        if ylim:
+            axr.set_ylim(ylim)
+        else:
+            ylim = P.ylim()
+        if xlim:
+            axr.set_xlim(xlim)
+        P.text(x[0], ylim[1]*0.8, '{0}:{1}-{2}:{3}'.format(chrom,st,ed,strand))
+        for (x1,x2),cov, sel in itcv:
+            LOG.debug( (x1,x2), cov, sel )
+            if sel:
+                P.plot([x1,x1],ylim,'r--')
+                P.plot([x2,x2],ylim,'r--')
+                P.text(x1+1,ylim[1]*0.9,'{0:.4f}'.format(cov))
+            else:
+                P.plot([x1,x1],[0,ylim[1]*0.5],'c--')
+                P.plot([x2,x2],[0,ylim[1]*0.5],'c--')                
+                P.text(x1+1,ylim[1]*0.45,'{0:.4f}'.format(cov))
+        return fig
+
 
 ####### Colors  ########################################################################
 # move to plotutil
