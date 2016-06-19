@@ -306,13 +306,13 @@ def prep_sjdf_chr(j2pres, libsizes, dstpre, chrom):
     for pre,scale in zip(j2pres, scales):
         paths = UT.read_pandas(pre+'.sjdf.txt.gz', names=A3.SJDFCOLS)
         paths = paths[paths['chr']==chrom]
-        for st,ed,pc,s,tst,ted,tcnt,ucnt in paths[cols].values:
-            pc2tst[pc] = tst
-            pc2ted[pc] = ted
+        for st,ed,pc,s,st,ed,tcnt,ucnt in paths[cols].values:
+            pc2st[pc] = st
+            pc2ed[pc] = ed
             pc2strand[pc] = s
             pc2tcnt[pc] = pc2tcnt.get(pc,0)+scale*tcnt
             pc2ucnt[pc] = pc2ucnt.get(pc,0)+scale*ucnt
-    df = PD.DataFrame({'st':pc2st,'ed':pc2ed,'st':pc2tst,'ed':pc2ted,
+    df = PD.DataFrame({'st':pc2st,'ed':pc2ed,'st':pc2st,'ed':pc2ed,
                        'strand':pc2strand,'tcnt':pc2tcnt,'ucnt':pc2ucnt})
     df['chr'] = chrom
     df['kind'] = 'j'
