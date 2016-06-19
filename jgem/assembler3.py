@@ -838,6 +838,7 @@ LAPARAMS = dict(
      edgedelta=50,
      minsearchsize=500,
      use_sja_for_exon_detection=False,
+     use_merged_sjdf=False,
      use_iexon_from_path=True,
      cmax=9,
 )
@@ -850,7 +851,8 @@ MERGEPARAMS.update(dict(
      tcovfactor=0.2,
      use_ef2=True, # whether to use slope edge detector
      edgedelta=1000000, # disable getting 53exons from extruded edges
-     use_sja_for_exon_detection=False,   
+     use_sja_for_exon_detection=True,
+     use_merged_sjdf=True,
      use_iexon_from_path=False,
 ))
 
@@ -1149,25 +1151,30 @@ class LocalAssembler(object):
 
     
     def make_sjdf(self):
-        ap = self.sjpaths
-        o = self.st
-        chrom = self.chrom
-        cols = ['chr','st','ed','strand','name','kind']
-        def _sgen(): # junctions from sjpaths
-            sted = set()
-            for strand in ['+','.+', '-','.-']:
-                for p in ap[ap['strand']==strand]['name'].values:
-                    for x in p.split(','):
-                        st,ed = [int(y) for y in x.split('|')]
-                        if st>ed:
-                            st,ed = ed,st
-                        if (st,ed,strand[-1]) not in sted:
-                            yield (chrom,int(st),int(ed),strand,x,'j')
-                            sted.add((st,ed,strand[-1]))
-        sjdf = PD.DataFrame([x for x in _sgen()], columns=cols)
-        # sjdf = sjdf.groupby(['chr','st','ed','strand']).first().reset_index()
-        set_ad_pos(sjdf, 'sj')
-        self.sjdf = sjdf
+        if self.params['use_merged_sjdf']:
+            path = self.bwpre+'.sjdf.{0}.txt.gz'.format(self.chrom)
+            sj = UT.read_pandas(path, names=SJDFCOLS)
+            self.sjdf = sj[(sj['chr']==self.chrom)&(sj['st']>=self.st)&(sj['ed']<=self.ed)].copy()
+        else:
+            ap = self.sjpaths
+            o = self.st
+            chrom = self.chrom
+            cols = ['chr','st','ed','strand','name','kind']
+            def _sgen(): # junctions from sjpaths
+                sted = set()
+                for strand in ['+','.+', '-','.-']:
+                    for p in ap[ap['strand']==strand]['name'].values:
+                        for x in p.split(','):
+                            st,ed = [int(y) for y in x.split('|')]
+                            if st>ed:
+                                st,ed = ed,st
+                            if (st,ed,strand[-1]) not in sted:
+                                yield (chrom,int(st),int(ed),strand,x,'j')
+                                sted.add((st,ed,strand[-1]))
+            sjdf = PD.DataFrame([x for x in _sgen()], columns=cols)
+            # sjdf = sjdf.groupby(['chr','st','ed','strand']).first().reset_index()
+            set_ad_pos(sjdf, 'sj')
+            self.sjdf = sjdf
 
 
     def make_exdf(self):
@@ -1412,16 +1419,17 @@ class LocalAssembler(object):
 
         
     def calculate_scovs(self):
-        sj = self.sjdf
-        sj0 = self.sjpaths0
-        sj0mat = sj0[['sc1','sc2','name']].values
-        tmp = [[(sc1,sc2) for sc1,sc2,p in sj0mat if y in p] for y in sj['name']]
-        sj['ucnt'] = [N.sum([x[0] for x in y]) for y in tmp]
-        sj['tcnt'] = [N.sum([x[1] for x in y]) for y in tmp]
-        # idx = sj['tcnt']==0
-        # tmp0 = ['{1}|{0}'.format(*y.split('|')) for y in sj[idx]['name']]
-        # tmp1 = [N.sum([x for x,p in sj0mat if y in p]) for y in tmp0]
-        # sj.loc[idx, 'tcnt'] = tmp1
+        if not self.params['use_merged_sjdf']:
+            sj = self.sjdf
+            sj0 = self.sjpaths0
+            sj0mat = sj0[['sc1','sc2','name']].values
+            tmp = [[(sc1,sc2) for sc1,sc2,p in sj0mat if y in p] for y in sj['name']]
+            sj['ucnt'] = [N.sum([x[0] for x in y]) for y in tmp]
+            sj['tcnt'] = [N.sum([x[1] for x in y]) for y in tmp]
+            # idx = sj['tcnt']==0
+            # tmp0 = ['{1}|{0}'.format(*y.split('|')) for y in sj[idx]['name']]
+            # tmp1 = [N.sum([x for x,p in sj0mat if y in p]) for y in tmp0]
+            # sj.loc[idx, 'tcnt'] = tmp1
         idxz = sj['tcnt']==0
         if N.sum(idxz)>0:
             sj.loc[idxz,'tcnt'] = 1e-6

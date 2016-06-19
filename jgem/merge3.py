@@ -67,9 +67,11 @@ class PrepBWSJ(object):
         self.exstatus = exstatus = {}
         self.sjstatus = sjstatus = {}
         self.pastatus = pastatus = {}
+        self.sdstatus = sdstatus = {}
         exdone=False
         sjdone=False
         padone=False
+        sddone=False
         with server:
             for chrom in chroms:
                 # exdf tasks
@@ -86,6 +88,10 @@ class PrepBWSJ(object):
                 tname = 'prep_sjpath_chr.{0}'.format(chrom)
                 args = (self.j2pres, self.libsizes, self.dstpre, chrom)
                 task = TQ.Task(tname, prep_sjpath_chr, args)
+                server.add_task(task)
+                tname = 'prep_sjdf_chr.{0}'.format(chrom)
+                args = (self.j2pres, self.libsizes, self.dstpre, chrom)
+                task = TQ.Task(tname, prep_sjdf_chr, args)
                 server.add_task(task)
             while server.check_error():
                 try:
@@ -120,6 +126,15 @@ class PrepBWSJ(object):
                             args = (self.dstpre, chroms)
                             task = TQ.Task(tname, prep_sjpath, args)
                             server.add_task(task)
+                    if name.startswith('prep_sjdf_chr.'):
+                        chrom = name.split('.')[1]
+                        sdstatus[chrom] = rslt
+                        if len(sdstatus)==len(chroms): # all finished
+                            print('$$$$$$$$ putting in prep_sjdf $$$$$$$$$$$')
+                            tname='prep_sjdf'
+                            args = (self.dstpre, chroms)
+                            task = TQ.Task(tname, prep_sjdf, args)
+                            server.add_task(task)
                     if name=='prep_exbw':
                         print('$$$$$$$$ prep_exbw done $$$$$$$$$$$')
                         exdone=True
@@ -129,7 +144,10 @@ class PrepBWSJ(object):
                     if name=='prep_sjpath':
                         print('$$$$$$$$ prep_sjpath done $$$$$$$$$$$')
                         padone=True
-                    if exdone&sjdone&padone:
+                    if name=='prep_sjdf':
+                        print('$$$$$$$$ prep_sjdf done $$$$$$$$$$$')
+                        sddone=True
+                    if exdone&sjdone&padone&sddone:
                         break
             print('Exit Loop')
         print('Done')
@@ -261,6 +279,51 @@ def prep_sjpath_chr(j2pres, libsizes, dstpre, chrom):
     GGB.write_bed(bed, path, ncols=12)
     return path
     
+def prep_sjdf_chr(j2pres, libsizes, dstpre, chrom):
+    pc2st = {}
+    pc2ed = {}
+    pc2strand = {}
+    pc2tcnt = {}
+    pc2ucnt = {}
+    # chr,st,ed,name,sc1(tcov),strand,tst,ted,sc2(),#exons,estarts,esizes
+    # cols = ['st','ed','name','strand','tst','ted','tcov0','tcov']
+    path = dstpre+'.sjdf.{0}.txt.gz'.format(chrom)
+    path0 = dstpre+'.sjdf.txt.gz'
+    if os.path.exists(path0):
+        return path
+    if os.path.exists(path):
+        return path
+    
+    cols = ['st','ed','name','strand','st','ed','tcnt','ucnt']
+    # cols = A3.SJDFCOLS
+
+    if libsizes is None:
+        n = 1
+        scales = N.ones(len(j2pres))
+    else:
+        n = len(j2pres)
+        scales = [1e6/float(x) for x in libsizes]
+    for pre,scale in zip(j2pres, scales):
+        paths = UT.read_pandas(pre+'.sjdf.txt.gz', names=A3.SJDFCOLS)
+        paths = paths[paths['chr']==chrom]
+        for st,ed,pc,s,tst,ted,tcnt,ucnt in paths[cols].values:
+            pc2tst[pc] = tst
+            pc2ted[pc] = ted
+            pc2strand[pc] = s
+            pc2tcnt[pc] = pc2tcnt.get(pc,0)+scale*tcnt
+            pc2ucnt[pc] = pc2ucnt.get(pc,0)+scale*ucnt
+    df = PD.DataFrame({'st':pc2st,'ed':pc2ed,'st':pc2tst,'ed':pc2ted,
+                       'strand':pc2strand,'tcnt':pc2tcnt,'ucnt':pc2ucnt})
+    df['chr'] = chrom
+    df['kind'] = 'j'
+    if libsizes is not None:
+        df['tcnt'] = df['tcnt']/float(n)
+        df['ucnt'] = df['ucnt']/float(n)
+    df.index.name = 'name'
+    df.reset_index(inplace=True)
+    df = df.groupby('pc').first() # get rid of unstranded duplicates
+    UT.write_pandas(df[A3.SJDFCOLS], path, '')
+    return path
 
 def prep_exbw(dstpre, chroms, genome):
     return _prep_bw(dstpre, chroms, genome, 'ex')
@@ -291,7 +354,6 @@ def _prep_bw(dstpre, chroms, genome, w):
         os.unlink(f)
     return bwpaths
 
-
 def prep_sjpath(dstpre, chroms):
     dstpath = dstpre+'.sjpath.bed.gz'
     if os.path.exists(dstpath):
@@ -307,7 +369,20 @@ def prep_sjpath(dstpre, chroms):
     #     os.unlink(f)
     return dstpath
 
-
+def prep_sjdf(dstpre, chroms):
+    dstpath = dstpre+'.sjdf.txt.gz'
+    if os.path.exists(dstpath):
+        return dstpath
+    files = []
+    with open(dstpath, 'wb') as dst:
+        for c in chroms:
+            srcpath = dstpre+'.sjdf.{0}.txt.gz'.format(c)
+            with open(srcpath,'rb') as src:
+                shutil.copyfileobj(src,dst)
+            files.append(srcpath)
+    # for f in files: # keep separate chr files 
+    #     os.unlink(f)
+    return dstpath
 
 SJFILTERPARAMS = dict(
     th_detected=1,
