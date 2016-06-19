@@ -2796,7 +2796,7 @@ def find_SE_chrom(bwpre, dstpre, genome, chrom, exstrands=['+'], minsizeth=200):
     return dstpath
 
 def find_SE(dstpre, chroms, exstrands=['+'], sestrand='.', 
-    mincovth=5, minsizeth=200, minsep=1000, cmax=9, mergedist=200):
+    mincovth=5, minsizeth=200, minsep=1000, cmax=9, mergedist=200, fprth=0.01):
     # concatenate
     dstpath = dstpre+'.se0.txt.gz'
     if not os.path.exists(dstpath):
@@ -2814,7 +2814,7 @@ def find_SE(dstpre, chroms, exstrands=['+'], sestrand='.',
     exdf = UT.read_pandas(dstpre+'.exdf.txt.gz', names=EXDFCOLS) 
     # th = find_threshold(exdf['ecov'].values, sedf['ecov'].values, mincovth, dstpre)
     paths = UT.read_pandas(dstpre+'.paths.txt.gz', names=PATHCOLS)
-    th = find_threshold(paths['tcov'].values, sedf['ecov'].values, mincovth, dstpre)
+    th = find_threshold(paths['tcov'].values, sedf['ecov'].values, mincovth, dstpre, fprth=fprth)
     se0 = sedf[(sedf['ecov']>th)&(sedf['len']>minsizeth)].copy()  # use FPR 1%
 
     LOG.info('SE covth={0:.2f}, len(se0)={1}'.format(th, len(se0)))
