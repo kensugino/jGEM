@@ -312,8 +312,8 @@ def prep_sjpath(dstpre, chroms):
 SJFILTERPARAMS = dict(
     th_detected=1,
     th_maxcnt=1,
-    th_maxoverhang=18,
-    th_minedgeexon=18,
+    th_maxoverhang=15,
+    th_minedgeexon=15,
     th_sjratio2=1e-3,
 )
 class SJFilter(object):
@@ -427,24 +427,204 @@ class LocalEstimator(A3.LocalAssembler):
         self.calculate_scovs()
         self.estimate_abundance()
         self.write()
-        
+
+    def calculate_scovs(self):
+        sj = self.sjdf
+        sj0 = self.sjpaths0
+        sj0mat = sj0[['sc1','sc2','name']].values
+        tmp = [[(sc1,sc2) for sc1,sc2,p in sj0mat if y in p] for y in sj['name']]
+        sj['ucnt'] = [N.sum([x[0] for x in y]) for y in tmp]
+        sj['tcnt'] = [N.sum([x[1] for x in y]) for y in tmp]
+        # idx = sj['tcnt']==0
+        # tmp0 = ['{1}|{0}'.format(*y.split('|')) for y in sj[idx]['name']]
+        # tmp1 = [N.sum([x for x,p in sj0mat if y in p]) for y in tmp0]
+        # sj.loc[idx, 'tcnt'] = tmp1
+        idxz = sj['tcnt']==0
+        if N.sum(idxz)>0:
+            sj.loc[idxz,'tcnt'] = 1e-6
+        self.sjdfi = sj.set_index('name')
+
+    def calculate_ecovs(self):
+        ex = self.exdf
+        o = self.st
+        if len(ex)==0:
+            return
+        ex['ecov'] = N.nan
+        for strand in ['+','-']:
+            spans = self._get_spans(strand)
+            for st,ed in spans:
+                idx = (ex['st']>=st)&(ex['ed']<=ed)&(ex['strand'].isin(STRS[strand]))
+                es = ex[idx].copy().sort_values(['st','ed'])
+                es['tmpeid'] = N.arange(len(es))
+                ne = len(es)
+                exa = self.arrs['ex'][strand]
+                def cov(s,e):
+                    return N.mean(exa[s-o:e-o])
+                if ne>1:
+                    ci = UT.chopintervals(es, idcol='tmpeid', sort=False)
+                    ci['cov'] = [cov(s,e) for s,e in ci[['st','ed']].values]
+                    ci['name1'] = ci['name'].astype(str).apply(lambda x: [int(y) for y in x.split(',')])    
+                    nc = len(ci)
+                    mat = N.zeros((nc,ne))
+                    for i,n1 in enumerate(ci['name1'].values):# fill in rows
+                        N.put(mat[i], N.array(n1), 1)
+                    try:
+                        ecov,err = nnls(mat, ci['cov'].values)
+                        ex.loc[idx,'ecov'] = ecov
+                    except:
+                        LOG.warning('!!!!!! Exception in NNLS (calculate_ecov) @{0}:{1}-{2}, setting to mean !!!!!!!!!'.format(self.chrom, st, ed))
+                        ex.loc[idx,'ecov'] = cov(st,ed)
+                elif ne==1:
+                    s,e = es.iloc[0][['st','ed']]
+                    ex.loc[idx,'ecov'] = cov(s,e)
+        idxz = ex['ecov']==0
+        ex.loc[idxz, 'ecov'] = 1e-6
+        self.exdfi = ex.set_index('name')
+
+    def calculate_branchp(self, jids, eids):
+        sj0 = self.sjdfi
+        sj = sj0.ix[jids].reset_index()
+        ex0 = self.exdfi
+        ex = ex0.ix[eids].reset_index()
+
+        dsump = sj.groupby('dpos')['tcnt'].sum().astype(float)
+        jdp = sj['tcnt'].values/(dsump.ix[sj['dpos'].values].values)
+        j2p = dict(zip(sj['name'].values, jdp))
+        # exon groupby acceptor
+        asump = ex.groupby('apos')['ecov'].sum().astype(float)
+        eap = ex['ecov'].values/(asump.ix[ex['apos'].values].values)
+        e2ap = dict(zip(ex['name'].values, eap))
+        dsump = ex.groupby('dpos')['ecov'].sum().astype(float)
+        edp = ex['ecov'].values/(dsump.ix[ex['dpos'].values].values)
+        e2dp = dict(zip(ex['name'].values, edp))
+
+        return j2p, e2ap, e2dp
+
+    def tcov_by_nnls(self, s, e, strand):
+        o = self.st
+        p = self.paths
+        idx = (p['tst']>=s)&(p['ted']<=e)&(p['strand'].isin(STRS[strand]))
+        ps = p[idx]
+        if len(ps)==0:
+            return None
+        pg = ps.groupby(['tst','ted']).first().reset_index()[['chr','tst','ted','strand','name']].sort_values(['tst','ted'])
+        pg['strand'] = strand
+        ne = len(pg)
+        exa = self.arrs['ex'][strand]
+        sja = self.arrs['sj'][strand]
+        def cov0(s,e):
+            # return N.sum(sja[s-o:e-o]+exa[s-o:e-o])/(e-s)
+            return N.mean(sja[s-o:e-o])
+        def cov1s(s):
+            s0 = max(0, s-o-10)
+            s1 = max(s0+1,s-o)
+            return N.mean(exa[s0:s1])
+        def cov1e(e):
+            return N.mean(exa[e-o:e-o+10])
+        def cov2s(s):
+            s0 = max(0, s-o-1)
+            return sja[s-o]-sja[s0]
+        def cov2e(e):
+            e0 = max(0, e-o-1)
+            return sja[e-o]-sja[e0]
+        # cov0
+        if ne>1:
+            pg.rename(columns={'tst':'st','ted':'ed'}, inplace=True)
+            pg['eid'] = N.arange(len(pg))
+            ci = UT.chopintervals(pg, idcol='eid')
+            ci['cov'] = [cov0(s,e) for s,e in ci[['st','ed']].values]
+            ci['name1'] = ci['name'].astype(str).apply(lambda x: [int(y) for y in x.split(',')])    
+            nc = len(ci)
+            mat = N.zeros((nc,ne))
+            for i,n1 in enumerate(ci['name1'].values):# fill in rows
+                N.put(mat[i], N.array(n1), 1)
+            try:
+                ecov,err = nnls(mat, ci['cov'].values)
+                pg['tcov0'] = ecov
+            except:
+                # too much iteration?
+                LOG.warning('!!!!!! Exception in NNLS (tcov_by_nnls) @{0}:{1}-{2}, setting to zero !!!!!!!!!'.format(self.chrom, s, e))
+                pg['tcov0a'] = 0
+            pg.rename(columns={'st':'tst','ed':'ted'}, inplace=True)
+        else:
+            s,e = pg.iloc[0][['tst','ted']]
+            pg['tcov0a'] = cov0(s,e)
+        # cov1, cov2
+        if ne>1:
+            sts = sorted(set(pg['tst'].values))
+            eds = sorted(set(pg['ted'].values))
+            nst,ned = len(sts),len(eds)
+            mat = N.array([(pg['tst']==x).values for x in sts]+[(pg['ted']==x).values for x in eds], dtype=float)
+            c = N.array([cov1s(x) for x in sts]+[cov1e(x) for x in eds])
+            # enforce flux conservation: scale up 5'
+            stsum = N.sum(c[:nst])
+            edsum = N.sum(c[nst:])
+            if strand in ['+','.+']:
+                c[:nst] = (edsum/(stsum+1e-6))*c[:nst]
+            else:
+                c[nst:] = (stsum/(edsum+1e-6))*c[nst:]
+            ecov,err = nnls(mat, c)
+            pg['tcov0b'] = ecov
+
+            mat = N.array([(pg['tst']==x).values for x in sts]+[-1*(pg['ted']==x).values for x in eds], dtype=float)
+            c = N.array([cov2s(x) for x in sts]+[cov2e(x) for x in eds])
+            # enforce flux conservation: scale up 5'
+            stsum = N.sum(c[:nst])
+            edsum = N.sum(c[nst:])
+            if strand in ['+','.+']:
+                c[:nst] = ((-1*edsum)/(stsum+1e-6))*c[:nst]
+            else:
+                c[nst:] = ((-1*stsum)/(edsum+1e-6))*c[nst:]
+            ecov,err = nnls(mat, c)
+            pg['tcov0c'] = ecov
+        else:
+            s,e = pg.iloc[0][['tst','ted']]
+            pg['tcov0b'] = (cov1s(s)+cov1e(e))/2.
+            pg['tcov0c'] = (cov2s(s)-cov2e(e))/2.
+
+        pg['tcov0'] = pg[['tcov0a','tcov0b','tcov0c']].mean(axis=1)
+        pg.loc[pg['tcov0']<0,'tcov0'] = 0 # shouldn't really happen
+        keys = [tuple(x) for x in p[idx][['tst','ted']].values]
+        for f in ['tcov0','tcov0a','tcov0b','tcov0c']:
+            p.loc[idx, f] = pg.set_index(['tst','ted']).ix[keys][f].values
+        return pg[['chr','tst','ted','strand','tcov0']]
+                
+    def tcov_by_branchp(self, tst, ted, strand, tcov0):
+        p = self.paths
+        idx = (p['strand'].isin(STRS[strand]))&(p['tst']==tst)&(p['ted']==ted)
+        if N.sum(idx)==0:
+            return
+        if N.sum(idx)>1:
+            # calculate branchp within this group
+            jids = set()
+            eids = set()
+            for n in p[idx]['name']:
+                jids.update(n.split(',')[1:-1])
+                eids.update(n.split('|'))
+            j2p, e2ap, e2dp = self.calculate_branchp(jids, eids)
+            def _prob(y):
+                epath0 = y.split('|')
+                e5 = epath0[0] # use donor p
+                epath = epath0[1:] # use acceptor p
+                jpath = y.split(',')[1:-1]
+                return e2dp[e5]*N.prod([e2ap[x] for x in epath])*N.prod([j2p[x] for x in jpath])
+            p.loc[idx,'tcov'] = [tcov0*_prob(y) for y in p[idx]['name']]
+        else:
+            p.loc[idx,'tcov'] = tcov0
+
     def estimate_abundance(self):
         # 1) 5-3 group by NNLS
-        # 2) UTR difference
-        # 3) within 5-3 group by tree branch prob
+        # 2) within 5-3 group by tree branch prob
         paths = self.paths
         for s in ['+','-']:
             ps = paths[paths['strand'].isin(A3.STRS[s])]
             if len(ps)==0:
                 continue
             for chrom,st,ed in UT.union_contiguous(ps[['chr','st','ed']],returndf=False):
-                pg1 = self.tcov_by_nnls(st,ed,s)
-                if pg1 is not None:
-                    for chrom,tst1,ted1,strand1,tcov1 in pg1.values:
-                        pg2 = self.tcov_by_utr(tst1,ted1,strand1,tcov1)
-                        if pg2 is not None:
-                            for chrom,st2,ed2,strand2,tcov2 in pg2.values:
-                                self.tcov_by_branchp(st2,ed2,tst1,ted1,strand2,tcov2)        
+                pg = self.tcov_by_nnls(st,ed,s)
+                if pg is not None:
+                    for chrom,tst,ted,strand,tcov0 in pg.values:
+                        self.tcov_by_branchp(tst,ted,strand,tcov0)
 
     def write(self):
         pre = self.dstpre+'.{0}_{1}_{2}'.format(self.chrom,self.st,self.ed)

@@ -823,11 +823,12 @@ LAPARAMS = dict(
      refcode='gen9',
      discardunstranded=False,
      uth=0, 
-     mth=5, 
-     sjratioth=2e-3, 
-     usjratioth=1e-2,
+     mth=3, 
+     sjratioth=1e-3, 
+     usjratioth=1e-3,
      #covfactor=0.05, 
-     tcovth=1,
+     tcovth=0,
+     tcovfactor=0.1,
      upperpathnum=1000, # if num of paths larger than this increase stringency for sjs
      pathcheckth=100, # above this num of sjs check sc1(ucnt)==0 if >50% remove
      pathcheckratio=0.2, # ratio of ucnt==0 if above this remove these
@@ -841,7 +842,11 @@ LAPARAMS = dict(
 )
 MERGEPARAMS = LAPARAMS.copy()
 MERGEPARAMS.update(dict(
-     upperpathnum=1500, # if num of paths larger than this increase stringency for sjs
+     uth=0,
+     mth=5,
+     upperpathnum=500, # if num of paths larger than this increase stringency for sjs
+     tcovth=200,
+     tcovfactor=0.2,
      use_ef2=True, # whether to use slope edge detector
      edgedelta=1000000, # disable getting 53exons from extruded edges
      use_sja_for_exon_detection=False,   
@@ -1545,7 +1550,7 @@ class LocalAssembler(object):
             gexdf = spanexdf[spanexdf['gid']==gid]
             gsjdf = spansjdf[spansjdf['gid']==gid]
             self._pg = pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, self.sjpaths, self.params['upperpathnum'])
-            paths.append(pg.select_paths(self.params['tcovth']))
+            paths.append(pg.select_paths(self.params['tcovth'], self.params['tcovfactor']))
         return PD.concat(paths, ignore_index=True)
 
     def calc_span_tcov(self, spansjs, spanexs, strand):
@@ -1943,10 +1948,20 @@ class PathGenerator(object):
         self.upperpathnum = upperpathnum
         self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,upperpathnum) for i,x in e5s.iterrows()] # one unit
 
-    def paths_from_highest_cov(self):
+    def paths_from_highest_cov(self,tcovth=1,tcovfactor=0.1):
         if len(self.gexdf)==0:
             return
         vmax = self.gexdf['tcov0'].max()
+        th1 = vmax*tcovfactor
+        if tcovth < th1:
+            self.tcovth1 = th1
+            self.tcovth2 = tcovth
+        elif tcovth==th1:
+            self.tcovth1 = th1
+            self.tcovth2 = max(tcovth-1,0)
+        else:
+            self.tcovth1 = tcovth
+            self.tcovth2 = th1
         delta = vmax/5.
         vmin = vmax - delta
         raisecnt = 0
@@ -1973,19 +1988,19 @@ class PathGenerator(object):
                 vmin = (vmax+vmin)/2.
                 # print('PathNumUpperLimit, increase vmin {0}=>{1}, vmax {2}'.format(vmin0, vmin, vmax))
 
-    def select_paths(self, tcovth):
+    def select_paths(self, tcovth=1, tcovfactor=0.1):
         sjp = self.sjpaths
         npos = PATHCOLS.index('name')
         tpos = PATHCOLS.index('tcov')
-        th = self.upperpathnum*5
+        th = self.upperpathnum*5        
         def _select(sjnames):
             paths = []
             nsj = len(sjnames)
             z = N.zeros(nsj)
             cscore = 0
-            for p in self.paths_from_highest_cov():
+            for p in self.paths_from_highest_cov(tcovth, tcovfactor): # set th1,th2 according to tcovth,tcovfactor
                 # print('*** check one ***')
-                if p[tpos]>tcovth:
+                if p[tpos]>=self.tcovth1: #tcovth: take if larger than tcovth set within paths_from_highest_cov
                     paths.append(p)
                     for i,sjn in enumerate(sjnames):
                         if z[i]==0:
@@ -1994,7 +2009,7 @@ class PathGenerator(object):
                     # if cscore==nsj:
                     #     print('all covered break 1', cscore, nsj, z)
                     #     break
-                else:
+                elif p[tpos]>=self.tcovth2: # check if it contributes
                     if cscore==nsj: # all sjpaths covered
                         # print('all covered break 2', cscore, nsj, z)
                         break
@@ -2006,14 +2021,16 @@ class PathGenerator(object):
                         if cscore1>cscore:
                             paths.append(p)
                             cscore = cscore1
+                else:
+                    break
                 # print('cscore', cscore, nsj, z)
                 if len(paths)>th:
                     raise TrimSJ
-                if len(paths)>th:
-                    tcov = paths[-1][tpos]
-                    txt = '#path {0}>{1} terminate path enumeration. score:{2}/{3} tcov:{4}'
-                    LOG.warning(txt.format(len(paths),th,cscore,nsj,tcov))
-                    break
+                # if len(paths)>th:
+                #     tcov = paths[-1][tpos]
+                #     txt = '#path {0}>{1} terminate path enumeration. score:{2}/{3} tcov:{4}'
+                #     LOG.warning(txt.format(len(paths),th,cscore,nsj,tcov))
+                #     break
             return paths
 
         # sjnames = [','.join(x.split(',')[1:-1]) for x in sjp['name'].values]
@@ -2032,10 +2049,10 @@ class PathGenerator(object):
                 location = '{0}:{1}-{2}'.format(chrom,stmin,edmax)
                 LOG.warning('Too many low cov paths. Possible repeats. Increasing stringency. {0}'.format(location))
                 
-                uth += 0.5
+                uth += 0.2
                 mcnt = sjp['sc2']-sjp['sc1'] # multi mappers
                 mth = max(0, mcnt.max()-5)
-                sjrth += 0.02
+                sjrth += 0.05
                 n0 = len(sjp)
                 sids0 = list(set([y for x in sjp['name'] for y in x.split(',')]))
                 sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio2']>sjrth)].copy()
