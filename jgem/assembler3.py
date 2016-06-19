@@ -1234,7 +1234,7 @@ class LocalAssembler(object):
             e53df1 = PD.DataFrame([x for x in _e53gen1()], columns=cols)
             e53df1['origin'] = 'path'
             set_ad_pos(e53df1, 'ex')
-            e53df1 = d53df1[c3]
+            e53df1 = e53df1[c3]
             e5set = set([(x,y[-1],z) for x,y,z in e53df1[['dpos','strand','kind']].values])
             e3set = set([(x,y[-1],z) for x,y,z in e53df1[['apos','strand','kind']].values])
         else:
