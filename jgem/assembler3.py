@@ -1346,6 +1346,7 @@ class LocalAssembler(object):
         DIREC = {'+':{'5':'<','3':'>'},'-':{'5':'>','3':'<'}}
         POS = {'+':{'5':'ed','3':'st'},'-':{'5':'st','3':'ed'}}
         SWAP = {'+':{'5':True,'3':False},'-':{'5':False,'3':True}}
+        o = self.st
         sja = self.arrs['sj'][strand]
         exa = self.arrs['ex'][strand]
         self.draw_covs(st,ed,strand,win=0,ax=ax)
