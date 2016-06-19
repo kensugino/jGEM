@@ -120,16 +120,16 @@ class ParamFinder(object):
         self.sj = sj = UT.read_pandas(self.refpre+'.sj.txt.gz')
         self.set_bws(bwpre)
 
-    def process(self, sdiffth=1, covfactor=0, np=10):
+    def process(self, sdiffth=1, covfactor53=0, covfactorexon=0.05, np=10):
         self.extract_all()
         for x in ['ne_i','ne_5','ne_3','e5i','e3i','e53']:
             print('  #{0}:{1}'.format(x, len(getattr(self, x))))
         print('###### 53 params ########')
         self.calc_53_params(sdiffth=sdiffth, np=np)
         print('###### 53gap params ########')
-        self.calc_53gap_params(covfactor=covfactor, np=np)
+        self.calc_53gap_params(covfactor=covfactor53, np=np)
         print('###### exon params ########')
-        self.calc_exon_params(np=np)
+        self.calc_exon_params(np=np, covfactor=covfactorexon)
         
     def set_bws(self, bwpre):
         self.bwpre = bwpre
@@ -432,7 +432,7 @@ class ParamFinder(object):
 
         fig.savefig(spath)
         
-    def calc_exon_params(self, np=10):
+    def calc_exon_params(self, np=10, covfactor=0.05):
         zoom = self.zoom
         # get params
         neipath = self.bwpre+'.{0}.nei.params.txt.gz'.format(self.refcode)
@@ -440,12 +440,12 @@ class ParamFinder(object):
         if os.path.exists(neipath):
             nei = UT.read_pandas(neipath)
         else:
-            nei = self.calc_params_mp(self.ne_i, np=np, gapmode='i',covfactor=0.05) # ~ 1min
+            nei = self.calc_params_mp(self.ne_i, np=np, gapmode='i',covfactor=covfactor) # ~ 1min
             UT.write_pandas(nei, neipath, 'h')
         if os.path.exists(e53path):
             e53 = UT.read_pandas(e53path)
         else:
-            e53 = self.calc_params_mp(self.e53, np=np, gapmode='i',covfactor=0.05) # ~ 10min don't do long ones stupid
+            e53 = self.calc_params_mp(self.e53, np=np, gapmode='i',covfactor=covfactor) # ~ 10min don't do long ones stupid
             UT.write_pandas(e53, e53path, 'h')
         # logistic fit
         cols =  ['chr', 'st', 'ed', 'gap', 'emax', 'emin', 'sIn', 'sOut', 'locus', 'kind','len', 'sdIn','sdOut']
@@ -466,7 +466,7 @@ class ParamFinder(object):
         Z = lr.predict(X)    
         # write json
         ppath = self.bwpre+'.{0}.exonparams.json'.format(self.refcode)
-        self.write_params(ppath, lr, Y, Z, ['lemax','lgap','llen'], {'zoom':zoom, 'th':0.05})
+        self.write_params(ppath, lr, Y, Z, ['lemax','lgap','llen'], {'zoom':zoom, 'th':covfactor})
         # make fig
         spath = self.bwpre+'.{0}.exonparams'.format(self.refcode)
         title = self.bwpre.split('/')[-1]
