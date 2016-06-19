@@ -1962,7 +1962,7 @@ class PathGenerator(object):
         else:
             self.tcovth1 = tcovth
             self.tcovth2 = th1
-        print('tth1:{0}, tth2:{1}'.format(self.tcovth1,self.tcovth2))
+        # print('tth1:{0}, tth2:{1}'.format(self.tcovth1,self.tcovth2))
         delta = vmax/5.
         vmin = vmax - delta
         raisecnt = 0
