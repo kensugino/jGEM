@@ -2796,7 +2796,7 @@ def find_SE_chrom(bwpre, dstpre, genome, chrom, exstrands=['+'], minsizeth=200):
     return dstpath
 
 def find_SE(dstpre, chroms, exstrands=['+'], sestrand='.', 
-    mincovth=5, minsizeth=200, minsep=1000, cmax=9, mergedist=200, fprth=0.01):
+    mincovth=5, minsizeth=200, minsep=1000, cmax=9, mergedist=200, fdrth=0.5, fprth=0.01, usefdr=False):
     # concatenate
     dstpath = dstpre+'.se0.txt.gz'
     if not os.path.exists(dstpath):
@@ -2814,7 +2814,7 @@ def find_SE(dstpre, chroms, exstrands=['+'], sestrand='.',
     exdf = UT.read_pandas(dstpre+'.exdf.txt.gz', names=EXDFCOLS) 
     # th = find_threshold(exdf['ecov'].values, sedf['ecov'].values, mincovth, dstpre)
     paths = UT.read_pandas(dstpre+'.paths.txt.gz', names=PATHCOLS)
-    th = find_threshold(paths['tcov'].values, sedf['ecov'].values, mincovth, dstpre, fprth=fprth)
+    th = find_threshold(paths['tcov'].values, sedf['ecov'].values, mincovth, dstpre, fdrth, fprth, usefdr)
     se0 = sedf[(sedf['ecov']>th)&(sedf['len']>minsizeth)].copy()  # use FPR 1%
 
     LOG.info('SE covth={0:.2f}, len(se0)={1}'.format(th, len(se0)))
@@ -2883,7 +2883,7 @@ def find_SE(dstpre, chroms, exstrands=['+'], sestrand='.',
         num_se_merge_nearby=len(se1))
     return dic
 
-def find_threshold(x0,x1,minth,dstpre,fdrth=0.5, fprth=0.01):
+def find_threshold(x0,x1,minth,dstpre,fdrth=0.5, fprth=0.01, usefdr=False):
     x0 = x0[(~N.isnan(x0))&(x0>0)]  # why exdf contains NaN?
     x1 = x1[(~N.isnan(x1))&(x1>0)]
     x0 = N.log2(x0+1)
@@ -2933,18 +2933,20 @@ def find_threshold(x0,x1,minth,dstpre,fdrth=0.5, fprth=0.01):
             th_fpr = 2**(bins[N.min(idx0[idx0>10])])-1
     fname = dstpre+'.secovth.pdf'
     title = dstpre.split('/')[-1]
-    plot_se_th(b0,h0s,h1,th_fpr,th_fdr,title,fname)
+    plot_se_th(b0,h0s,h1,th_fpr,th_fdr,title,fname,fdrth,fprth)
+    if usefdr:
+        return th_fdr
     return th_fpr
 
 
-def plot_se_th(b0,h0s,h1,th0,th,title,fname=None):
+def plot_se_th(b0,h0s,h1,th0,th,title,fname=None,fdrth=0.5,fprth=0.01):
     fig,ax = P.subplots(1,1)
     w = b0[1]-b0[0]
     ax.bar(b0[:-1], h1, width=w, alpha=0.9,color='c', label='single-exon', lw=0)
     ax.bar(b0[:-1], h0s, width=w, alpha=0.5, color='r', label='multi-exon', lw=0)
     ax.set_yscale('log')
-    ax.axvline(N.log2(th+1), color='r', linestyle='--', label='FDR 50%')
-    ax.axvline(N.log2(th0+1), color='b', linestyle='--', label='FPR 1%')
+    ax.axvline(N.log2(th+1), color='r', linestyle='--', label='FDR {0}%'.format(fdrth*100))
+    ax.axvline(N.log2(th0+1), color='b', linestyle='--', label='FPR {0}%'.format(fprth*100))
     ax.set_xlabel('log2(cov+1)')
     ax.set_ylabel('count')
     ax.set_title(title)
