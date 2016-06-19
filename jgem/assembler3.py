@@ -1152,7 +1152,7 @@ class LocalAssembler(object):
     
     def make_sjdf(self):
         if self.params['use_merged_sjdf']:
-            path = self.bwpre+'.sjdf.{0}.txt.gz'.format(self.chrom)
+            path = self.bwpre+'.sjdf.{0}.filtered.txt.gz'.format(self.chrom)
             sj = UT.read_pandas(path, names=SJDFCOLS)
             self.sjdf = sj[(sj['chr']==self.chrom)&(sj['st']>=self.st)&(sj['ed']<=self.ed)].copy()
         else:

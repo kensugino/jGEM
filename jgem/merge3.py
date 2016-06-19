@@ -389,6 +389,7 @@ SJFILTERPARAMS = dict(
     th_maxoverhang=15,
     th_minedgeexon=15,
     th_sjratio2=1e-3,
+    filter_unstranded=False,# there are substantial number of high cov unstranded
 )
 class SJFilter(object):
 
@@ -407,14 +408,24 @@ class SJFilter(object):
         for c in chroms:
             csize = csizedic[c]
             args.append((self.bwsjpre, self.statspath, c, csize, self.params))
-        rslts = UT.process_mp(filter_sj, args, np=self.np, doreduce=False)
-
+        
+        rslts = UT.process_mp(filter_sjpath, args, np=self.np, doreduce=False)
         dstpath = self.bwsjpre+'.sjpath.filtered.bed.gz'
         with open(dstpath,'wb') as dst:
             for c in chroms:
                 srcpath =  self.bwsjpre+'.sjpath.{0}.filtered.bed.gz'.format(c)
                 with open(srcpath, 'rb') as src:
                     shutil.copyfileobj(src, dst)
+
+        rslts = UT.process_mp(filter_sjdf, args, np=self.np, doreduce=False)
+        dstpath = self.bwsjpre+'.sjdf.filtered.txt.gz'
+        with open(dstpath,'wb') as dst:
+            for c in chroms:
+                srcpath =  self.bwsjpre+'.sjdf.{0}.filtered.txt.gz'.format(c)
+                with open(srcpath, 'rb') as src:
+                    shutil.copyfileobj(src, dst)
+
+
 
 def locus2pc(l):
     chrom,sted,strand = l.split(':')
@@ -424,7 +435,7 @@ def locus2pc(l):
         return  '|'.join([st,ed])
     return '|'.join([ed,st])
 
-def filter_sj(bwsjpre, statspath, chrom, csize, params):
+def filter_sjpath(bwsjpre, statspath, chrom, csize, params):
     # read in junction stats
     stats = UT.read_pandas(statspath)
     if 'chr' not in stats:
@@ -449,7 +460,8 @@ def filter_sj(bwsjpre, statspath, chrom, csize, params):
     if len(name0.split('|'))<len(name0.split(',')): # exons attached?
         sj['name'] = [','.join(x.split(',')[1:-1]) for x in sj['name']]
     # filter unstranded
-    sj = sj[sj['strand'].isin(['+','-'])].copy()
+    if params['filter_unstranded']:
+        sj = sj[sj['strand'].isin(['+','-'])].copy()
     # filter with stats
     for f in flds:
         sj[f] = [N.min([dics[f].get(x,0) for x in y.split(',')]) for y in sj['name']]
@@ -460,18 +472,64 @@ def filter_sj(bwsjpre, statspath, chrom, csize, params):
     eth = params['th_minedgeexon']
     sj = sj[(sj['eflen']>eth)&(sj['ellen']>eth)].copy()
     # calculate sjratio, sjratio2
-    sjexbw = A3.SjExBigWigs(bwsjpre, mixunstranded=False)
-    for s in ['+','-']:
-        idx = sj['strand']==s
-        with sjexbw:
-            sa = sjexbw.bws['sj'][s].get(chrom,0,csize)
-            ea = sjexbw.bws['ex'][s].get(chrom,0,csize)
-        a = sa+ea
-        sj.loc[idx,'sjratio2'] = [x/N.mean(a[int(s):int(e)]) for x,s,e in sj[idx][['sc1','tst','ted']].values]
+    if params['filter_unstranded']:
+        sjexbw = A3.SjExBigWigs(bwsjpre, mixunstranded=False)
+    else:
+        sjexbw = A3.SjExBigWigs(bwsjpre, mixunstranded=True)
+    with sjexbw:
+        sa = sjexbw.bws['sj']['a'].get(chrom,0,csize)
+        ea = sjexbw.bws['ex']['a'].get(chrom,0,csize)
+    a = sa+ea
+    sj['sjratio2'] = [x/N.mean(a[int(s):int(e)]) for x,s,e in sj[idx][['sc1','tst','ted']].values]
     sj = sj[sj['sjratio2']>params['th_sjratio2']]
     GGB.write_bed(sj, dstpath, ncols=12)
 
-
+def filter_sjdf(bwsjpre, statspath, chrom, csize, params):
+    # read in junction stats
+    stats = UT.read_pandas(statspath)
+    if 'chr' not in stats:
+        stats['chr'] = [x.split(':')[0] for x in stats['locus']]
+    if '#detected' in stats:
+        stats.rename(columns={'#detected':'detected'}, inplace=True)
+    stats = stats[stats['chr']==chrom].copy()
+    if 'pc' not in stats:
+        stats['pc'] = [locus2pc(x) for x in stats['locus']]
+    flds = ['detected','maxcnt','maxoverhang']
+    dics = {f: UT.df2dict(stats, 'pc', f) for f in flds}
+    # read sjdf
+    fpath_chr =  bwsjpre+'.sjdf.{0}.txt.gz'.format(chrom)
+    dstpath = bwsjpre+'.sjdf.{0}.filtered.txt.gz'.format(chrom)
+    if os.path.exists(fpath_chr):
+        sj = UT.read_pandas(fpath_chr, names=A3.SJDFCOLS)
+    else:
+        fpath = bwsjpre+'.sjdf.txt.gz'
+        sj = UT.read_pandas(fpath, names=A3.SJDFCOLS)
+        sj = sj[sj['chr']==chrom].copy()
+    # filter unstranded
+    if params['filter_unstranded']:
+        sj = sj[sj['strand'].isin(['+','-'])].copy()
+    # filter with stats
+    for f in flds:
+        # sj[f] = [N.min([dics[f].get(x,0) for x in y.split(',')]) for y in sj['name']]
+        sj[f] = [dics[f].get(y,0) for y in sj['name']]
+        sj = sj[sj[f]>params['th_'+f]].copy() # filter 
+    # edge exon size    
+    # sj['eflen'] = [int(x.split(',')[0]) for x in sj['esizes']]
+    # sj['ellen'] = [int(x.split(',')[-2]) for x in sj['esizes']]    
+    # eth = params['th_minedgeexon']
+    # sj = sj[(sj['eflen']>eth)&(sj['ellen']>eth)].copy()
+    # calculate sjratio, sjratio2
+    if params['filter_unstranded']:
+        sjexbw = A3.SjExBigWigs(bwsjpre, mixunstranded=False)
+    else:
+        sjexbw = A3.SjExBigWigs(bwsjpre, mixunstranded=True)
+    with sjexbw:
+        sa = sjexbw.bws['sj']['a'].get(chrom,0,csize)
+        ea = sjexbw.bws['ex']['a'].get(chrom,0,csize)
+    a = sa+ea
+    sj['sjratio2'] = [x/N.mean(a[int(s):int(e)]) for x,s,e in sj[idx][['tcnt','st','ed']].values]
+    sj = sj[sj['sjratio2']>params['th_sjratio2']]
+    UT.write_pandas(sj[A3.SJDFCOLS], dstpath)
 
 
 class LocalEstimator(A3.LocalAssembler):
