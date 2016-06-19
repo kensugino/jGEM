@@ -1863,7 +1863,7 @@ class LocalAssembler(object):
             df2 = df2.sort_values(df2cov,ascending=False).iloc[:maxdisp]
         self.draw_path(df2, st,ed,strand, ax=axr[1], covfld=df2cov, win=win, delta=delta)
         if maxdisp is not None:
-            df3 = df3.sort_values(df2cov,ascending=False).iloc[:maxdisp]
+            df3 = df3.sort_values(df3cov,ascending=False).iloc[:maxdisp]
         self.draw_path(df3, st,ed,strand, ax=axr[2], win=win, delta=delta, covfld=df3cov)
 
     def drawspan3pn(la,st,ed,win=10000, figsize=(15,6), df2=None, df3=None, delta=500,
@@ -1879,7 +1879,7 @@ class LocalAssembler(object):
             la.draw_path(df2, st,ed,strand, ax=axr[1], covfld=df2cov, win=win, delta=delta)
         if df3 is not None:
             if maxdisp is not None:
-                df3 = df3.sort_values(df2cov,ascending=False).iloc[:maxdisp]
+                df3 = df3.sort_values(df3cov,ascending=False).iloc[:maxdisp]
             la.draw_path(df3, st,ed,strand, ax=axr[2], win=win, delta=delta, covfld=df3cov)
         strand = '-'
         la.draw_covs(st,ed,strand, ax=axr[3], win=win)
@@ -1889,7 +1889,7 @@ class LocalAssembler(object):
             la.draw_path(df2, st,ed,strand, ax=axr[4], covfld=df2cov, win=win, delta=delta)
         if df3 is not None:
             if maxdisp is not None:
-                df3 = df3.sort_values(df2cov,ascending=False).iloc[:maxdisp]
+                df3 = df3.sort_values(df3cov,ascending=False).iloc[:maxdisp]
             la.draw_path(df3, st,ed,strand, ax=axr[5], win=win, delta=delta, covfld=df3cov)
 
 def draw_sjex(sj, ex, st, ed, win=500, ax=None, delta=500, sjcov='tcnt', excov='ecov'):
