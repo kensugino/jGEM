@@ -824,8 +824,8 @@ LAPARAMS = dict(
      discardunstranded=False,
      uth=0, 
      mth=3, 
-     sjratioth=1e-3, 
-     usjratioth=1e-3,
+     sjratioth=1e-3, # 2e-3
+     usjratioth=1e-3, # 1e-2
      #covfactor=0.05, 
      tcovth=0,
      tcovfactor=0.1,
@@ -1985,7 +1985,7 @@ class PathGenerator(object):
                 vmin = max(0, vmax - delta)
             except PathNumUpperLimit:
                 raisecnt += 1
-                if (raisecnt>1)&(vmax<0.01):
+                if ((raisecnt>1)&(vmax<1)) or (raisecnt>3):
                     raise TrimSJ
                 vmin0 = vmin
                 vmin = (vmax+vmin)/2.
