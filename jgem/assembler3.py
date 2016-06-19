@@ -1985,11 +1985,11 @@ class PathGenerator(object):
                 vmin = max(0, vmax - delta)
             except PathNumUpperLimit:
                 raisecnt += 1
-                if ((raisecnt>1)&(vmax<1)) or (raisecnt>3):
+                if ((raisecnt>1)&(vmax<1)) or (raisecnt>5):
                     raise TrimSJ
                 vmin0 = vmin
                 vmin = (vmax+vmin)/2.
-                # print('PathNumUpperLimit, increase vmin {0}=>{1}, vmax {2}'.format(vmin0, vmin, vmax))
+                print('PathNumUpperLimit, increase vmin {0}=>{1}, vmax {2}'.format(vmin0, vmin, vmax))
 
     def select_paths(self, tcovth=1, tcovfactor=0.1):
         sjp = self.sjpaths
