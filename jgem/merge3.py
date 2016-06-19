@@ -480,7 +480,7 @@ def filter_sjpath(bwsjpre, statspath, chrom, csize, params):
         sa = sjexbw.bws['sj']['a'].get(chrom,0,csize)
         ea = sjexbw.bws['ex']['a'].get(chrom,0,csize)
     a = sa+ea
-    sj['sjratio2'] = [x/N.mean(a[int(s):int(e)]) for x,s,e in sj[idx][['sc1','tst','ted']].values]
+    sj['sjratio2'] = [x/N.mean(a[int(s):int(e)]) for x,s,e in sj[['sc1','tst','ted']].values]
     sj = sj[sj['sjratio2']>params['th_sjratio2']]
     GGB.write_bed(sj, dstpath, ncols=12)
 
@@ -527,7 +527,7 @@ def filter_sjdf(bwsjpre, statspath, chrom, csize, params):
         sa = sjexbw.bws['sj']['a'].get(chrom,0,csize)
         ea = sjexbw.bws['ex']['a'].get(chrom,0,csize)
     a = sa+ea
-    sj['sjratio2'] = [x/N.mean(a[int(s):int(e)]) for x,s,e in sj[idx][['tcnt','st','ed']].values]
+    sj['sjratio2'] = [x/N.mean(a[int(s):int(e)]) for x,s,e in sj[['tcnt','st','ed']].values]
     sj = sj[sj['sjratio2']>params['th_sjratio2']]
     UT.write_pandas(sj[A3.SJDFCOLS], dstpath)
 
