@@ -321,7 +321,6 @@ def prep_sjdf_chr(j2pres, libsizes, dstpre, chrom):
         df['ucnt'] = df['ucnt']/float(n)
     df.index.name = 'name'
     df.reset_index(inplace=True)
-    df = df.groupby('pc').first() # get rid of unstranded duplicates
     UT.write_pandas(df[A3.SJDFCOLS], path, '')
     return path
 
