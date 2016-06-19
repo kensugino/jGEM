@@ -845,7 +845,7 @@ MERGEPARAMS.update(dict(
      uth=0,
      mth=5,
      upperpathnum=500, # if num of paths larger than this increase stringency for sjs
-     tcovth=200,
+     tcovth=50,
      tcovfactor=0.2,
      use_ef2=True, # whether to use slope edge detector
      edgedelta=1000000, # disable getting 53exons from extruded edges
@@ -1962,6 +1962,7 @@ class PathGenerator(object):
         else:
             self.tcovth1 = tcovth
             self.tcovth2 = th1
+        print('tth1:{0}, tth2:{1}'.format(self.tcovth1,self.tcovth2))
         delta = vmax/5.
         vmin = vmax - delta
         raisecnt = 0
