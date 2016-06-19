@@ -1399,8 +1399,8 @@ class LocalAssembler(object):
                     # s = pos1
                     e = epos+pos1
                     x = e-st
-                    ax.plot([x,x],[y,y],'r--')
-                    ax.text(x, y, 'kind:{1}, pos1:{0}'.format(pos1, kind))
+                    ax.plot([x,x],[0,y],'r--')
+                    ax.text(x, 0.5*y, 'kind:{1}, pos1:{0}'.format(pos1, kind))
 
         
     def calculate_scovs(self):
