@@ -551,45 +551,29 @@ class SlopeEdgeFinder(object):
         th = max(self.minth, self.sigmath*sigma)
         return v, dm, th, ssm, mima
 
-    def plotone(self,chrom,st,ed,strand='+',utr='3', find=None, ylim=None, xlim=None):
-        if find is None:
-            if utr=='3':
-                find = 'drop' if strand=='+' else 'rise'
-            else:
-                find = 'drop' if strand=='-' else 'rise'
-        with self:
-            tmp, dtmp, th, sm, mima = self.calc_stats(chrom,st,ed)
-            itcv = self.find(chrom,st,ed,find)
+    def plotone(self,sja,exa,direction, ylim=None, xlim=None, ax=None, figsize=(15,3)):
+        if ax is None:
+            fig,ax = P.subplots(1,1,figsize=figsize)
+        tmp, dtmp, th, sm, mima = self.calc_stats(exa)
+        eposs = self.find(sja,exa,direction)
+
         ltmp = N.log2(tmp+1)
-        self.lacovth = lacovth = N.log2(self._acovth+1)
-        self.lacovth2 = lacovth2 = N.log2(self._acovth2+1)
         
-        fig,axr = P.subplots(1,1,figsize=(15,3))
-        x = N.arange(st,ed)
-        P.plot(x,ltmp)
-        P.plot(x,N.abs(dtmp))
+        x = N.arange(len(ltmp))
+        ax.plot(ltmp)
+        ax.plot(N.abs(dtmp))
         
-        P.plot([x[0],x[-1]], [th,th], 'r')
-        P.plot([x[0],x[-1]], [lacovth,lacovth],'r--')
-        P.plot([x[0],x[-1]], [lacovth2,lacovth2],'g--')
+        ax.plot([x[0],x[-1]], [th,th], 'r')
         if ylim:
-            axr.set_ylim(ylim)
+            ax.set_ylim(ylim)
         else:
-            ylim = P.ylim()
+            ylim = ax.get_ylim()
         if xlim:
-            axr.set_xlim(xlim)
-        P.text(x[0], ylim[1]*0.8, '{0}:{1}-{2}:{3}'.format(chrom,st,ed,strand))
-        for (x1,x2),cov, sel in itcv:
-            LOG.debug( (x1,x2), cov, sel )
-            if sel:
-                P.plot([x1,x1],ylim,'r--')
-                P.plot([x2,x2],ylim,'r--')
-                P.text(x1+1,ylim[1]*0.9,'{0:.4f}'.format(cov))
-            else:
-                P.plot([x1,x1],[0,ylim[1]*0.5],'c--')
-                P.plot([x2,x2],[0,ylim[1]*0.5],'c--')                
-                P.text(x1+1,ylim[1]*0.45,'{0:.4f}'.format(cov))
-        return fig
+            ax.set_xlim(xlim)
+
+        for i,x1 in enumerate(eposs):
+            ax.plot([x1,x1],ylim,'r--')
+            ax.text(x1+1,ylim[1]*0.9,'{0}'.format(i))
 
 
 ####### Colors  ########################################################################
@@ -840,7 +824,7 @@ LAPARAMS = dict(
      use_ef2=False, # whether to use slope edge detector
      mixunstranded=True,
      maxexonsize=30000, 
-     edgedelta=10,
+     edgedelta=50,
      minsearchsize=500,
      use_sja_for_exon_detection=False
 )
