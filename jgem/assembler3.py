@@ -622,17 +622,21 @@ class Colors(object):
         return ','.join(rgba)
         
 ####### Local Assembler ###############################################################
-def detect_exons(sjpaths, offset, sja, exa, classifier=INTG, usesja=True):
+def detect_exons(sj, offset, sja, exa, classifier=INTG, usesja=True, sjtype='path'):
     x = N.log2(sja+1)
     xd = (x[1:]-x[:-1])
     # tst: donor (+ strand), acceptor (- strand) => idxp
     # ted: => idxn
-    idxp = set(sjpaths['tst'].values-offset)
-    idxn = set(sjpaths['ted'].values-offset)
+    if sjtype=='path':
+        idxp = set(sj['tst'].values-offset)
+        idxn = set(sj['ted'].values-offset)
+    else: # sjdf
+        idxp = set(sj['st'].values-offset)
+        idxn = set(sj['ed'].values-offset)
     tmp = [[x,'p',0] for x in idxp]+[[x,'n',0] for x in idxn]
     gaps = find_np_pairs(tmp)
     if usesja:
-        # use sjpaths to get donor/acceptor positions
+        # use sjcov to get donor/acceptor positions
         idxp = N.nonzero(xd>4)[0]+1 # donor(+ strand), acceptor(- strand)
         idxn = N.nonzero(xd<-4)[0]+1 # acceptor(+ strand), donor(- strand)
         tmp = [[x,'p',0] for x in idxp]+[[x,'n',0] for x in idxn]
@@ -826,8 +830,17 @@ LAPARAMS = dict(
      maxexonsize=30000, 
      edgedelta=50,
      minsearchsize=500,
-     use_sja_for_exon_detection=False
+     use_sja_for_exon_detection=False,
+     use_iexon_from_path=True,
 )
+MERGEPARAMS = LAPARAMS.copy()
+MERGEPARAMS.update(dict(
+     upperpathnum=1500, # if num of paths larger than this increase stringency for sjs
+     use_ef2=True, # whether to use slope edge detector
+     edgedelta=1000000, # disable getting 53exons from extruded edges
+     use_sja_for_exon_detection=False,   
+     use_iexon_from_path=False,
+))
 
 class LocalAssembler(object):
 
@@ -867,13 +880,14 @@ class LocalAssembler(object):
         self.filter_sjpaths() # .sjpaths
         if len(self.sjpaths)==0:
             return None
+        self.make_sjdf()
 
         self.logdebug('finding exons...')
         self.find_exons() 
         self.logdebug('finding 53 pos...')
         self.find_53pos() 
         self.logdebug('making dataframes...')
-        self.make_sjexdf()
+        self.make_exdf()
         self.logdebug('finding 53 exons...')
         self.find_53edges()
 
@@ -1096,13 +1110,18 @@ class LocalAssembler(object):
         self.filled  = {}
         self.exons  = {}
         self.gaps = {}
-        sjs = self.sjpaths
+        if self.params['use_iexon_from_path']:
+            sjs = self.sjpaths
+            sjtype='path'
+        else:
+            sjs = self.sjdf
+            sjtype='j'
         usesja = self.params['use_sja_for_exon_detection']
         for s in ['+','-']:
             sja = arrs['sj'][s]
             exa = arrs['ex'][s]
             sj = sjs[sjs['strand'].isin(STRS[s])]
-            df = detect_exons(sj, self.st, sja, exa, classifier=self.intg, usesja=usesja)
+            df = detect_exons(sj, self.st, sja, exa, classifier=self.intg, usesja=usesja, sjtype=sjtype)
             self.exons[s] = df[df['exon']==True].copy()            
             self.gaps[s] = df
             self.filled[s] = fill_gap(sja, sj, self.exons[s], s, self.st)
@@ -1116,12 +1135,12 @@ class LocalAssembler(object):
             exa = self.arrs['ex'][s]            
             self.e53pos[s] = detect_53(sja, exa, s, classifier=self.e53c)
 
-    def make_sjexdf(self):
+    
+    def make_sjdf(self):
         ap = self.sjpaths
-        dfs = []
-        dfe = []
         o = self.st
         chrom = self.chrom
+        cols = ['chr','st','ed','strand','name','kind']
         def _sgen(): # junctions from sjpaths
             sted = set()
             for strand in ['+','.+', '-','.-']:
@@ -1133,22 +1152,38 @@ class LocalAssembler(object):
                         if (st,ed,strand[-1]) not in sted:
                             yield (chrom,int(st),int(ed),strand,x,'j')
                             sted.add((st,ed,strand[-1]))
-        def _egen1(): # internal exons from sjpaths
-            sted = set()
-            for strand in ['+','.+', '-','.-']:
-                for p in ap[ap['strand']==strand]['name'].values:
-                    for x in p.split('|')[1:-1]:
-                        st,ed = [int(y) for y in x.split(',')]
-                        if st>ed:
-                            st,ed = ed,st
-                        if (st,ed,strand[-1]) not in sted:
-                            yield (chrom,int(st),int(ed),strand,x,'i')
-                            sted.add((st,ed,strand[-1]))
-        cols = ['chr','st','ed','strand','name','kind']
         sjdf = PD.DataFrame([x for x in _sgen()], columns=cols)
-        exdfi1 = PD.DataFrame([x for x in _egen1()], columns=cols)
-        # sted = set([tuple(x) for x in exdfi1[['st','ed','strand']].values])
-        sted = set([(x,y,z[-1]) for x,y,z in exdfi1[['st','ed','strand']].values])
+        # sjdf = sjdf.groupby(['chr','st','ed','strand']).first().reset_index()
+        set_ad_pos(sjdf, 'sj')
+        self.sjdf = sjdf
+
+
+    def make_exdf(self):
+        ap = self.sjpaths
+        o = self.st
+        chrom = self.chrom
+        cols = ['chr','st','ed','strand','name','kind']
+        c2 = cols+['apos','dpos']
+        c3 = c2 + ['origin']
+        if self.params['use_iexon_from_path']:
+            def _egen1(): # internal exons from sjpaths
+                sted = set()
+                for strand in ['+','.+', '-','.-']:
+                    for p in ap[ap['strand']==strand]['name'].values:
+                        for x in p.split('|')[1:-1]:
+                            st,ed = [int(y) for y in x.split(',')]
+                            if st>ed:
+                                st,ed = ed,st
+                            if (st,ed,strand[-1]) not in sted:
+                                yield (chrom,int(st),int(ed),strand,x,'i')
+                                sted.add((st,ed,strand[-1]))
+            cols = ['chr','st','ed','strand','name','kind']
+            exdfi1 = PD.DataFrame([x for x in _egen1()], columns=cols)
+            # sted = set([tuple(x) for x in exdfi1[['st','ed','strand']].values])
+            sted = set([(x,y,z[-1]) for x,y,z in exdfi1[['st','ed','strand']].values])
+        else:
+            exdfi1 = None
+            sted = set()
         def _egen2(): # internal exons from adjacent junctions        
             for strand in ['+','-']: # connected exons
                 ex = self.exons[strand]
@@ -1162,39 +1197,44 @@ class LocalAssembler(object):
         exdfi = PD.concat([exdfi1, exdfi2], ignore_index=True)
         # other 53 exons: edges of sjpaths not already in exdfi
         # st => ed, ed => st
-        set_ad_pos(sjdf, 'sj')
         set_ad_pos(exdfi, 'ex')
         exdfi['len'] = exdfi['ed'] - exdfi['st']
         exdfi.sort_values('len',inplace=True)
         a2len = UT.df2dict(exdfi, 'apos', 'len')
         d2len = UT.df2dict(exdfi, 'dpos', 'len')
         delta = self.params['edgedelta']
-        def _e53gen1(): # 
-            adpos = set()
-            for strand in ['+','.+', '-','.-']:
-                for pc in ap[ap['strand']==strand]['pathcode'].values:
-                    tmp = pc.split('|')
-                    e5 = tmp[0]
-                    apos,dpos = [int(y) for y in e5.split(',')]
-                    st,ed = min(apos,dpos),max(apos,dpos)
-                    if (dpos, strand[-1]) not in adpos:
-                        if (dpos not in d2len) or (N.abs(apos-dpos)>(d2len[dpos]+delta)):
-                            # print('dpos', strand, dpos, pc)
-                            yield (chrom,int(st),int(ed),strand,e5,'5')
-                            adpos.add((dpos,strand[-1]))
-                    e3 = tmp[-1]
-                    apos,dpos = [int(y) for y in e3.split(',')]
-                    st,ed = min(apos,dpos),max(apos,dpos)
-                    if (apos, strand[-1]) not in adpos:
-                        if (apos not in a2len) or (N.abs(apos-dpos)>(a2len[apos]+delta)):
-                            # print('apos', strand,apos, pc)
-                            yield (chrom,int(st),int(ed),strand,e3,'3')
-                            adpos.add((apos,strand[-1]))
-        e53df1 = PD.DataFrame([x for x in _e53gen1()], columns=cols)
-        e53df1['origin'] = 'path'
-        set_ad_pos(e53df1, 'ex')
-        e5set = set([(x,y[-1],z) for x,y,z in e53df1[['dpos','strand','kind']].values])
-        e3set = set([(x,y[-1],z) for x,y,z in e53df1[['apos','strand','kind']].values])
+        if delta<100:
+            def _e53gen1(): # 
+                adpos = set()
+                for strand in ['+','.+', '-','.-']:
+                    for pc in ap[ap['strand']==strand]['pathcode'].values:
+                        tmp = pc.split('|')
+                        e5 = tmp[0]
+                        apos,dpos = [int(y) for y in e5.split(',')]
+                        st,ed = min(apos,dpos),max(apos,dpos)
+                        if (dpos, strand[-1]) not in adpos:
+                            if (dpos not in d2len) or (N.abs(apos-dpos)>(d2len[dpos]+delta)):
+                                # print('dpos', strand, dpos, pc)
+                                yield (chrom,int(st),int(ed),strand,e5,'5')
+                                adpos.add((dpos,strand[-1]))
+                        e3 = tmp[-1]
+                        apos,dpos = [int(y) for y in e3.split(',')]
+                        st,ed = min(apos,dpos),max(apos,dpos)
+                        if (apos, strand[-1]) not in adpos:
+                            if (apos not in a2len) or (N.abs(apos-dpos)>(a2len[apos]+delta)):
+                                # print('apos', strand,apos, pc)
+                                yield (chrom,int(st),int(ed),strand,e3,'3')
+                                adpos.add((apos,strand[-1]))
+            e53df1 = PD.DataFrame([x for x in _e53gen1()], columns=cols)
+            e53df1['origin'] = 'path'
+            set_ad_pos(e53df1, 'ex')
+            e53df1 = d53df1[c3]
+            e5set = set([(x,y[-1],z) for x,y,z in e53df1[['dpos','strand','kind']].values])
+            e3set = set([(x,y[-1],z) for x,y,z in e53df1[['apos','strand','kind']].values])
+        else:
+            e53df1 = None
+            e5set = set()
+            e3set = set()
         def _e53gen2():
             for strand in ['+','-']:
                 e53 = self.e53pos[strand]
@@ -1206,17 +1246,12 @@ class LocalAssembler(object):
                     else:
                         if (pos1,strand,k) not in e3set:
                             yield (chrom,int(pos1),int(pos1),strand,_pc(pos1,pos1,strand,','),k)
-
         e53df2 = PD.DataFrame([x for x in _e53gen2()], columns=cols)
         e53df2['origin'] = 'flow'
         set_ad_pos(e53df2)
-        c2 = cols+['apos','dpos']
-        c3 = c2 + ['origin']
-        e53df = PD.concat([e53df1[c3], e53df2[c3]], ignore_index=True)
-        # sjdf = sjdf.groupby(['chr','st','ed','strand']).first().reset_index()
+        e53df = PD.concat([e53df1, e53df2[c3]], ignore_index=True)
         # exdfi = exdfi.groupby(['chr','st','ed','strand']).first().reset_index()
         # e53df = e53df.groupby(['chr','st','ed','strand','kind']).first().reset_index()
-        self.sjdf = sjdf
         self.exdfi = exdfi
         self.e53df = e53df
         self.exdf = PD.concat([exdfi[c2], e53df[c2]], ignore_index=True)
@@ -1340,19 +1375,20 @@ class LocalAssembler(object):
     def plot_53edges(self, st, ed, strand, ax=None, figsize=(15,6)):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=figsize)
-        e53df = self.e53df
         EF = {'5':self.ef5, '3':self.ef3}
         KIND = {'<':{'+':'5','-':'3'},'>':{'+':'3','-':'5'}}
         DIREC = {'+':{'5':'<','3':'>'},'-':{'5':'>','3':'<'}}
         POS = {'+':{'5':'ed','3':'st'},'-':{'5':'st','3':'ed'}}
         SWAP = {'+':{'5':True,'3':False},'-':{'5':False,'3':True}}
         o = self.st
+        e53df = self.e53df
+        e53df = e53df[(e53df['strand'].isin(STRS[strand]))&(e53df['st']>=st)&(e53df['ed']<=ed)]
         sja = self.arrs['sj'][strand]
         exa = self.arrs['ex'][strand]
         self.draw_covs(st,ed,strand,win=0,ax=ax)
         y = self._h0
         for kind in ['5','3']: 
-            exs = e53df[(e53df['strand'].isin(STRS[strand]))&(e53df['kind']==kind)]
+            exs = e53df[(e53df['kind']==kind)]
             direction = DIREC[strand][kind]
             for pos1 in exs[POS[strand][kind]].values:
                 pos = pos1-o
