@@ -1419,8 +1419,8 @@ class LocalAssembler(object):
 
         
     def calculate_scovs(self):
+        sj = self.sjdf
         if not self.params['use_merged_sjdf']:
-            sj = self.sjdf
             sj0 = self.sjpaths0
             sj0mat = sj0[['sc1','sc2','name']].values
             tmp = [[(sc1,sc2) for sc1,sc2,p in sj0mat if y in p] for y in sj['name']]
