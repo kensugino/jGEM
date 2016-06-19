@@ -529,7 +529,7 @@ def filter_sjdf(bwsjpre, statspath, chrom, csize, params):
     a = sa+ea
     sj['sjratio2'] = [x/N.mean(a[int(s):int(e)]) for x,s,e in sj[['tcnt','st','ed']].values]
     sj = sj[sj['sjratio2']>params['th_sjratio2']]
-    UT.write_pandas(sj[A3.SJDFCOLS], dstpath)
+    UT.write_pandas(sj[A3.SJDFCOLS], dstpath, '')
 
 
 class LocalEstimator(A3.LocalAssembler):
