@@ -1336,6 +1336,35 @@ class LocalAssembler(object):
         self.e53fixed = e53fixed
         self.exdf = PD.concat([exdfi[c2], e53fixed[c2]], ignore_index=True)
         self._get_spans('+', recalc=True)
+
+    def plot_53edges(self, st, ed, strand, ax=None, figsize=(15,6)):
+        if ax is None:
+            fig,ax = P.subplots(1,1,figsize=figsize)
+        e53df = self.e53df
+        EF = {'5':self.ef5, '3':self.ef3}
+        KIND = {'<':{'+':'5','-':'3'},'>':{'+':'3','-':'5'}}
+        DIREC = {'+':{'5':'<','3':'>'},'-':{'5':'>','3':'<'}}
+        POS = {'+':{'5':'ed','3':'st'},'-':{'5':'st','3':'ed'}}
+        SWAP = {'+':{'5':True,'3':False},'-':{'5':False,'3':True}}
+        sja = self.arrs['sj'][strand]
+        exa = self.arrs['ex'][strand]
+        self.draw_covs(st,ed,strand,win=0,ax=ax)
+        y = self._h0
+        for kind in ['5','3']: 
+            exs = e53df[(e53df['strand'].isin(STRS[strand]))&(e53df['kind']==kind)]
+            direction = DIREC[strand][kind]
+            for pos1 in exs[POS[strand][kind]].values:
+                pos = pos1-o
+                pos0 = self._find_pos0(pos, strand, direction)
+                sja1, exa1 = self._subtract_exons(pos, pos0, sja, exa, exs, direction)
+                eposs = EF[kind].find(sja1,exa1,direction)
+                for epos in eposs:
+                    # s = pos1
+                    e = epos+pos1
+                    x = e-st
+                    ax.plot([x,x],[y,y],'r--')
+                    ax.text(x, y, 'kind:{1}, pos1:{0}'.format(pos1, kind))
+
         
     def calculate_scovs(self):
         sj = self.sjdf
@@ -1626,7 +1655,8 @@ class LocalAssembler(object):
             ec =  exap0[ipx]
             ax.fill_between(ipx, 0, ec, facecolor='m', alpha=0.3)
             h0 = N.ceil(N.max(y0)*1.1)
-        hu = h0/20
+        self._h0 = h0
+        self._hu = hu = h0/20
         # gspan
         gspan = self._get_spans(strand)
         for i, (s1,e1) in enumerate(gspan):
