@@ -263,8 +263,10 @@ class EdgeFinder(object):
         if use_ef2:
             self.slope_ef = SlopeEdgeFinder(json)
 
-    def find(self, sja, exa, direction):
+    def find(self, sja, exa, direction, verbose=False):
         epos = self.gap_ef.find(sja, exa, direction)
+        if verbose:
+            print('gap epos:{0}'.format(epos))
         if self.use_ef2 and  N.abs(epos)>10:
             if direction=='<':
                 sja1 = sja[epos:]
@@ -272,7 +274,10 @@ class EdgeFinder(object):
             else:
                 sja1 = sja[:epos]
                 exa1 = exa[:epos]
+            self.slope_ef.verbose=verbose
             epos2 = self.slope_ef.find(sja1,exa1,direction)
+            if verbose:
+                print('slope detector eposs:{0}'.format(epos2))
             if len(epos2)>0:
                 return epos2
             return [epos]
@@ -405,6 +410,7 @@ class SlopeEdgeFinder(object):
         return [idx[0]]
 
     def detect_rise(self, v):
+        # only detect rise in right side
         ma = N.max(v)
         mima = N.min(v)/ma
         if mima<self.mimath:
@@ -1394,7 +1400,8 @@ class LocalAssembler(object):
                 pos = pos1-o
                 pos0 = self._find_pos0(pos, strand, direction)
                 sja1, exa1 = self._subtract_exons(pos, pos0, sja, exa, exs, direction)
-                eposs = EF[kind].find(sja1,exa1,direction)
+                print('#### pos1:{0}, pos0:{1}'.format(pos1, pos0))
+                eposs = EF[kind].find(sja1,exa1,direction, verbose=True)
                 for epos in eposs:
                     # s = pos1
                     e = epos+pos1
