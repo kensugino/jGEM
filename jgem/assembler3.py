@@ -839,6 +839,7 @@ LAPARAMS = dict(
      minsearchsize=500,
      use_sja_for_exon_detection=False,
      use_iexon_from_path=True,
+     cmax=9,
 )
 MERGEPARAMS = LAPARAMS.copy()
 MERGEPARAMS.update(dict(
@@ -1638,7 +1639,8 @@ class LocalAssembler(object):
             spanexs[f] = pg.ix[exkeys][f].values
             spansjs[f] = pg.ix[sjkeys][f].values     
 
-    def write(self, cmax=9):
+    def write(self):
+        cmax = self.params['cmax']
         pre = self.dstpre+'.{0}_{1}_{2}'.format(self.chrom,self.st,self.ed)
         # 1) exon, junctions, allpaths => csv (no header <= to concatenate bundles)
         
@@ -3018,6 +3020,9 @@ SEPARAMS = dict(
     minsep=1000, 
     cmax=9, 
     mergedist=200
+    fprth=0.01,
+    fdrth=0.5,
+    usefdr=False
 )
 BUNDLEPARAMS = dict(
     sjth=0,
