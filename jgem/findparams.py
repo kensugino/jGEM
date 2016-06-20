@@ -110,11 +110,14 @@ class ParamFinder(object):
         refpre: pathprefix to ref (assume .ex.txt.gz, .sj.txt.gz)
 
     """
-    def __init__(self, refpre, bwpre, refcode, genome, zoom=1):
+    def __init__(self, refpre, bwpre, refcode, genome, zoom=1, dstpre=None):
         self.refpre = refpre
         self.genome = genome
         self.bwpre = bwpre
         self.refcode = refcode
+        if dstpre is None:
+            dstpre = bwpre
+        self.dstpre = dstpre
         self.zoom = zoom # multiply this factor to zoom in to small values
         self.ex = ex = UT.read_pandas(self.refpre+'.ex.txt.gz')
         self.sj = sj = UT.read_pandas(self.refpre+'.sj.txt.gz')
@@ -264,11 +267,11 @@ class ParamFinder(object):
         lr.fit(X,Y)
         Z = lr.predict(X)
         # save fit coefficients
-        ppath = self.bwpre+'.{0}.e53params.json'.format(self.refcode)
+        ppath = self.dstpre+'.{0}.e53params.json'.format(self.refcode)
         self.write_params(ppath, lr, Y, Z, ['sdiff','smean'], {'sdiffth':sdiffth, 'zoom':zoom}, FN0=FN0)
         # save scatter plots
+        spath = self.dstpre+'.{0}.e53params'.format(self.refcode)
         title = self.bwpre.split('/')[-1]
-        spath = self.bwpre+'.{0}.e53params'.format(self.refcode)
         self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.0.png', title)
         self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.pdf', title, ptyp='pdf')
         self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.png', title, ptyp='png')
@@ -379,15 +382,15 @@ class ParamFinder(object):
 
         rx,lrx = 'ein','lein'
         # save coefs
-        p5path = self.bwpre+'.{0}.gap5params.json'.format(self.refcode)
+        p5path = self.dstpre+'.{0}.gap5params.json'.format(self.refcode)
         f = fit5
         self.write_params(p5path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':covfactor,'zoom':zoom, 'maxsize':m5})
-        p3path = self.bwpre+'.{0}.gap3params.json'.format(self.refcode)
+        p3path = self.dstpre+'.{0}.gap3params.json'.format(self.refcode)
         f = fit3
         self.write_params(p3path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':covfactor,'zoom':zoom, 'maxsize':m3})
 
         # save scatter plots
-        spath = self.bwpre+'.{0}.gap53params'.format(self.refcode)
+        spath = self.dstpre+'.{0}.gap53params'.format(self.refcode)
         title = self.bwpre.split('/')[-1]
         self.plot_gap53_fit(fit5, fit3, spath+'.0.png', title, ptyp='both')
         self.plot_gap53_fit(fit5, fit3, spath+'.pdf', title, ptyp='pdf')
@@ -448,7 +451,7 @@ class ParamFinder(object):
             e53 = self.calc_params_mp(self.e53, np=np, gapmode='i',covfactor=covfactor) # ~ 10min don't do long ones stupid
             UT.write_pandas(e53, e53path, 'h')
         # logistic fit
-        cols =  ['chr', 'st', 'ed', 'gap', 'emax', 'emin', 'sIn', 'sOut', 'locus', 'kind','len', 'sdIn','sdOut']
+        cols =  ['chr', 'st', 'ed', 'gap', 'emax', 'emin', 'sIn', 'sOut', 'locus', 'kind','len', 'sdIn','sdOut','mp']
         nei['kind'] = 1
         e53['kind'] = 0
         nei['len'] = nei['ed'] - nei['st']
@@ -459,16 +462,16 @@ class ParamFinder(object):
         D['lemax'] = N.log2(zoom*D['emax']+1)
         D1 = D[(D['emax']>0)&(D['sdIn']!=0)&(D['sdOut']!=0)]
         print(len(D), len(D1))
-        X = D1[['lemax', 'lgap','llen']].values
+        X = D1[['lemax', 'lgap','llen','mp']].values
         Y = D1['kind'].values
         lr = LogisticRegression()
         lr.fit(X,Y)
         Z = lr.predict(X)    
         # write json
-        ppath = self.bwpre+'.{0}.exonparams.json'.format(self.refcode)
-        self.write_params(ppath, lr, Y, Z, ['lemax','lgap','llen'], {'zoom':zoom, 'th':covfactor})
+        ppath = self.dstpre+'.{0}.exonparams.json'.format(self.refcode)
+        self.write_params(ppath, lr, Y, Z, ['lemax','lgap','llen','mp'], {'zoom':zoom, 'th':covfactor})
         # make fig
-        spath = self.bwpre+'.{0}.exonparams'.format(self.refcode)
+        spath = self.dstpre+'.{0}.exonparams'.format(self.refcode)
         title = self.bwpre.split('/')[-1]
         self.plot_exon_fit(spath+'.0.png', title, X, Y, Z, ptyp='both')
         self.plot_exon_fit(spath+'.pdf', title, X, Y, Z, ptyp='pdf')
@@ -724,7 +727,7 @@ CALCPARAMCOLS = ['_id','emax','emin',
             'emaxIn','eminIn','gapIn','gposIn',
             'emaxOut','eminOut','gapOut','gposOut',
             'eIn','sIn','sdIn',
-            'eOut','sOut','sdOut','gap']
+            'eOut','sOut','sdOut','gap', 'mp']
             # 'gap000', 'gap001', 'gap002','gap005']#,'gap010','gap015','gap020']
 
 def calc_params_chr(exdf, bwp, win=300, siz=10,  direction='>', gapmode='i', covfactor=0):
@@ -774,18 +777,19 @@ def calc_params_chr(exdf, bwp, win=300, siz=10,  direction='>', gapmode='i', cov
                     minr = N.min(a1[edpos:])
                     gapl,posl = find_firstgap(a1[:stpos][::-1],minl,maxl,gapth,win)
                     gapr,posr = find_firstgap(a1[edpos:],minr,maxr,gapth,win)
+                    mp = float(N.sum(a1[stpos:edpos]>gapth))/(ed-st)
                     if strand=='+':
                         recs.append([_id,exmax,exmin,
                                      maxl,minl,gapl,posl, 
                                      maxr,minr,gapr,posr, 
                                      exl10,sjl10,sdifl,
-                                     exr10,sjr10,sdifr, gap]) #+[gaps[x] for x in cfs])
+                                     exr10,sjr10,sdifr, gap, mp]) #+[gaps[x] for x in cfs])
                     else:
                         recs.append([_id,exmax,exmin,
                                      maxr,minr,gapr,posr, 
                                      maxl,minl,gapl,posl, 
                                      exr10,sjr10,sdifr,
-                                     exl10,sjl10,sdifl, gap]) #+[gaps[x] for x in cfs])
+                                     exl10,sjl10,sdifl, gap, mp]) #+[gaps[x] for x in cfs])
     return recs
 
 def calc_flux_chr(exdf, bwp):
