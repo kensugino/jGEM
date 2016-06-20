@@ -173,6 +173,8 @@ class ParamFinder(object):
         eov = UT.read_pandas(c2, names=cols)
         eovsize = eov.groupby('_id').size()
         enonov = eovsize[eovsize==1] # only overlaps with self
+        self.ne_i0 = ne_i0 = ex.set_index('_id').ix[enonov.index].sort_values(['chr','st','ed']).reset_index()
+        self.ne_i0['len'] = ne_i0['ed']-ne_i0['st']
 
         LOG.info('#non-ex-ovl-ex={0}, #non-sj-ovl-ex={1}'.format(len(enonov), len(snonov)))
         ids = set(enonov.index).intersection(snonov.index)
@@ -438,12 +440,12 @@ class ParamFinder(object):
     def calc_exon_params(self, np=10, covfactor=0.05):
         zoom = self.zoom
         # get params
-        neipath = self.bwpre+'.{0}.{1}.nei.params.txt.gz'.format(self.refcode,covfactor)
+        neipath = self.bwpre+'.{0}.{1}.nei0.params.txt.gz'.format(self.refcode,covfactor)
         e53path = self.bwpre+'.{0}.{1}.e53.params.txt.gz'.format(self.refcode,covfactor)
         if os.path.exists(neipath):
             nei = UT.read_pandas(neipath)
         else:
-            nei = self.calc_params_mp(self.ne_i, np=np, gapmode='i',covfactor=covfactor) # ~ 1min
+            nei = self.calc_params_mp(self.ne_i0, np=np, gapmode='i',covfactor=covfactor) # ~ 1min
             UT.write_pandas(nei, neipath, 'h')
         if os.path.exists(e53path):
             e53 = UT.read_pandas(e53path)
