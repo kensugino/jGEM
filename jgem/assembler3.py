@@ -2233,6 +2233,8 @@ def path2bed12(paths, cmax=9, covfld='tcov'):
           '.':Colors('G', cmax)}
     bed['sc2'] = [sm[s].RGB(x) for x,s in bed[['ltcov','strand']].values]
     bed.sort_values(['chr','st','ed'], inplace=True)
+    for f in ['st','ed','tst','ted']:
+        bed[f] = bed[f].astype(int)
     return bed
 
 def path2tspan(paths, cmax=9, covfld='tcov0'):
@@ -2273,6 +2275,8 @@ def path2tspan(paths, cmax=9, covfld='tcov0'):
           '.':Colors('G', cmax)}
     bed['sc2'] = [sm[s].RGB(x) for x,s in bed[['ltcov','strand']].values]
     bed.sort_values(['chr','st','ed'], inplace=True)
+    for f in ['st','ed','tst','ted']:
+        bed[f] = bed[f].astype(int)
     return bed    
 
 def sjpaths2tspan(sjpaths, cmax=9, strip53=False, sc2color=True):
@@ -2309,6 +2313,8 @@ def sjpaths2tspan(sjpaths, cmax=9, strip53=False, sc2color=True):
     if strip53:
         bed['name'] = [','.join(x.split(',')[1:-1]) for x in bed['name']]
     bed.sort_values(['chr','st','ed'], inplace=True)
+    for f in ['st','ed','tst','ted']:
+        bed[f] = bed[f].astype(int)
     return bed
 
 ####### Gene Graph ###################################################################
