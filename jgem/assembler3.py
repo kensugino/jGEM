@@ -2087,10 +2087,11 @@ class PathGenerator(object):
                     break
                 # check any sub pg53 is done
                 for x in self.pg53s:
-                    cs = N.sum([z[i] for i in sjidx[x.pgid]])
-                    if cs == len(sjidx[x.pgid]):
-                        print('pg {0} disabled (all covered)'.format(x.pgid))
-                        x.disable = True
+                    if not x.disable:
+                        cs = N.sum([z[i] for i in sjidx[x.pgid]])
+                        if cs == len(sjidx[x.pgid]):
+                            print('pg {0} disabled (all covered)'.format(x.pgid))
+                            x.disable = True
             if cscore<nsj:
                 gid = self.gexdf['gid'].values[0]
                 LOG.warning('gid:{0} terminated without covering all sj ({1}/{2})'.format(gid,cscore,nsj))
@@ -2232,7 +2233,7 @@ class PathGenerator53(object):
                 self.raisecnt += 1
                 if (self.raisecnt>10)&((vmax-vmin)<0.5):
                     self.disable = True
-                    print('pg {0} disabled (raisecnt>{1}, vmax-vmin={2})'.format(x.pgid, self.raisecnt, vmax-vmin))
+                    print('pg {0} disabled (raisecnt>{1}, vmax-vmin={2})'.format(self.pgid, self.raisecnt, vmax-vmin))
                 raise PathNumUpperLimit
 
         pmin0 = N.min(pmins)
