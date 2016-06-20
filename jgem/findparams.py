@@ -151,6 +151,8 @@ class ParamFinder(object):
     def extract_nonovl_exons(self):
         ex = self.ex
         sj = self.sj
+        ex = ex[ex['st']<ex['ed']]
+        sj = sj[sj['st']<sj['ed']]
         # nonovl exons    
         # ex['gene_type'] = ex['extra'].str.split(';').str[2].str.split().str[1].str[1:-1]
         cols0 = ['chr','st','ed','_id']
