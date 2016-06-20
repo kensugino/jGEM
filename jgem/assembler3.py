@@ -838,7 +838,7 @@ LAPARAMS = dict(
      tcovfactor=0.1,
      upperpathnum=1000, # if num of paths larger than this increase stringency for sjs
      pathcheckth=100, # above this num of sjs check sc1(ucnt)==0 if >50% remove
-     pathcheckratio=0.2, # ratio of ucnt==0 if above this remove these
+     pathcheckratio=0.1, # ratio of ucnt==0 if above this remove these
      use_ef2=False, # whether to use slope edge detector
      mixunstranded=True,
      maxexonsize=30000, 
@@ -1492,7 +1492,8 @@ class LocalAssembler(object):
         pct = self.params['pathcheckratio'] # 0.2
         if n0>n1:
             n2 = N.sum(sj['ucnt']==0)
-            if n2>n0*pct:
+            # if n2>n0*pct: # if mcnt only ratio is large then important (e.g. Amy2a3)
+            if n2<n0*pct: # discard if mcnt only ratio is small
                 LOG.warning('num sj ({0}>{1}) removed non unique junctions({2})'.format(n0,n1,n2))
                 idx5 = sj['ucnt']>0
                 sj = sj[idx5]
@@ -2022,7 +2023,10 @@ class PathGenerator(object):
         def _select(sjnames):
             nsj = len(sjnames)
             z = N.zeros(nsj)
-            cscore = 0
+            for p in paths: # score from previously accumulated paths
+                for i,sjn in enumerate(sjnames):
+                    z[i] += (sjn in p[npos])
+            cscore = N.sum(z>0)
             for p in self.paths_from_highest_cov(tcovth, tcovfactor): # set th1,th2 according to tcovth,tcovfactor
                 # print('*** check one ***')
                 if p[tpos]>=self.tcovth1: #tcovth: take if larger than tcovth set within paths_from_highest_cov
@@ -2060,7 +2064,7 @@ class PathGenerator(object):
 
         # sjnames = [','.join(x.split(',')[1:-1]) for x in sjp['name'].values]
         sjnames = sjp['name'].values
-        sjrth = 0.002
+        sjrth = sjp['sjratio2'].min() #0.002
         uth = sjp['sc1'].min()
         upperpathnum = self.upperpathnum
         while True:
@@ -2075,10 +2079,10 @@ class PathGenerator(object):
                 location = '{0}:{1}-{2}'.format(chrom,stmin,edmax)
                 LOG.warning('Too many low cov paths. Possible repeats. Increasing stringency. {0}'.format(location))
                 
-                uth += 0.2
+                uth += 0.1
                 mcnt = sjp['sc2']-sjp['sc1'] # multi mappers
                 mth = max(0, mcnt.max()-5)
-                sjrth += 0.05
+                sjrth += 0.001
                 n0 = len(sjp)
                 sids0 = list(set([y for x in sjp['name'] for y in x.split(',')]))
                 sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio2']>sjrth)].copy()
