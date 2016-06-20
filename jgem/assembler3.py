@@ -1101,7 +1101,7 @@ class LocalAssembler(object):
             self.sjpaths0['sc2'] = sc1
         sc2 = self.sjpaths0['sc2']
         idx1 = (sc1>=uth)|(sc2-sc1>=mth)
-        self.sjpaths = sjpaths = self.sjpaths0[idx1].copy()
+        self._sjpaths1 = sjpaths = self.sjpaths0[idx1].copy()
         # max ratio to cov (sj+ex) > sjratioth
         with self.sjexbw:
             sjaa = self.sjexbw.bws['sj']['a'].get(chrom, st, ed)
@@ -1110,7 +1110,7 @@ class LocalAssembler(object):
         o = int(self.st)
         # sjpaths['minscov'] = [N.min(a[s-o:e-o]) for s,e in sjpaths[['tst','ted']].values]]
         sjpaths['sjratio'] = [x/N.min(a[int(s-o):int(e-o)]) for x,s,e in sjpaths[['sc2','tst','ted']].values]
-        sjpaths['sjratio2'] = [x/N.mean(a[int(s-o):int(e-o)]) for x,s,e in sjpaths[['sc1','tst','ted']].values]
+        sjpaths['sjratio2'] = [x/N.mean(a[int(s-o):int(e-o)]) for x,s,e in sjpaths[['sc2','tst','ted']].values]
         # .values => dtype float matrix => s,e float
         n0 = len(sjpaths)
         idxpn = (sjpaths['strand'].isin(['+','-']))&(sjpaths['sjratio2']>sjratioth)
@@ -1266,9 +1266,14 @@ class LocalAssembler(object):
         e53df = PD.concat([e53df1, e53df2[c3]], ignore_index=True)
         # exdfi = exdfi.groupby(['chr','st','ed','strand']).first().reset_index()
         # e53df = e53df.groupby(['chr','st','ed','strand','kind']).first().reset_index()
-        self.exdfi = exdfi
-        self.e53df = e53df
-        self.exdf = PD.concat([exdfi[c2], e53df[c2]], ignore_index=True)
+        def _fixsted(d):
+            d['st'] = d['st'].astype(int)
+            d['ed'] = d['ed'].astype(int)
+            return d   
+        self.exdfi = _fixsted(exdfi)
+        self.e53df = _fixsted(e53df)
+        exdf = PD.concat([exdfi[c2], e53df[c2]], ignore_index=True)
+        self.exdf = _fixsted(exdf)
 
     def _get_spans(self, strand, recalc=False):
         if hasattr(self, '_spans') and not recalc:
@@ -1436,7 +1441,7 @@ class LocalAssembler(object):
 
     def calculate_ecovs(self):
         ex = self.exdf
-        o = self.st
+        o = int(self.st)
         if len(ex)==0:
             return
         ex['ecov'] = N.nan
@@ -1449,7 +1454,7 @@ class LocalAssembler(object):
                 ne = len(es)
                 exa = self.arrs['ex'][strand]
                 def cov(s,e):
-                    return N.mean(exa[s-o:e-o])
+                    return N.mean(exa[int(s)-o:int(e)-o])
                 if ne>1:
                     ci = UT.chopintervals(es, idcol='tmpeid', sort=False)
                     ci['cov'] = [cov(s,e) for s,e in ci[['st','ed']].values]
@@ -1958,7 +1963,7 @@ class PathGenerator(object):
         self.upperpathnum = upperpathnum
         self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,upperpathnum) for i,x in e5s.iterrows()] # one unit
 
-    def paths_from_highest_cov(self,tcovth=1,tcovfactor=0.1):
+    def paths_from_highest_cov(self,tcovth=0,tcovfactor=0.1):
         if len(self.gexdf)==0:
             return
         vmax = self.gexdf['tcov0'].max()
@@ -1995,6 +2000,8 @@ class PathGenerator(object):
                 raisecnt += 1
                 if ((raisecnt>1)&(vmax<1)) or (raisecnt>5):
                     raise TrimSJ
+                for x in self.pg53s:
+                    x.upperpathnum = 2*x.upperpathnum
                 vmin0 = vmin
                 vmin = (vmax+vmin)/2.
                 print('PathNumUpperLimit, increase vmin {0}=>{1}, vmax {2}'.format(vmin0, vmin, vmax))
@@ -2003,9 +2010,9 @@ class PathGenerator(object):
         sjp = self.sjpaths
         npos = PATHCOLS.index('name')
         tpos = PATHCOLS.index('tcov')
-        th = self.upperpathnum*5        
+        th = self.upperpathnum*5     
+        paths = []   
         def _select(sjnames):
-            paths = []
             nsj = len(sjnames)
             z = N.zeros(nsj)
             cscore = 0
@@ -2035,14 +2042,14 @@ class PathGenerator(object):
                 else:
                     break
                 # print('cscore', cscore, nsj, z)
-                if len(paths)>th:
-                    raise TrimSJ
+                # if len(paths)>th:
+                #     raise TrimSJ
                 # if len(paths)>th:
                 #     tcov = paths[-1][tpos]
                 #     txt = '#path {0}>{1} terminate path enumeration. score:{2}/{3} tcov:{4}'
                 #     LOG.warning(txt.format(len(paths),th,cscore,nsj,tcov))
                 #     break
-            return paths
+            # return paths
 
         # sjnames = [','.join(x.split(',')[1:-1]) for x in sjp['name'].values]
         sjnames = sjp['name'].values
@@ -2051,7 +2058,8 @@ class PathGenerator(object):
         upperpathnum = self.upperpathnum
         while True:
             try:
-                paths = _select(sjnames)
+                # paths = _select(sjnames)
+                _select(sjnames)
                 break
             except TrimSJ: # remove sj to cover
                 chrom = sjp.iloc[0]['chr']
@@ -2080,14 +2088,16 @@ class PathGenerator(object):
                 self._gg = gg = self.gg.restrict(jids)
                 gexdf = self.gexdf
                 n0 = len(gexdf['eid'].unique())
-                eids = set(gg.edj.keys()+gg.eaj.keys())
+                eids = set(gg.edj.keys()+gg.eaj.keys()+list(self.e5s['eid'].values))
                 n1=len(eids)
                 self._gexdf = gexdf[gexdf['eid'].isin(eids)].copy()
                 LOG.debug('gg.ede {0}=>{1} #eids {2}=>{3}'.format(len(self.gg.ede),len(gg.ede), n0,n1))
-                e5s  = self._gexdf[self._gexdf['kind']=='5']
-                self.pg53s = [PathGenerator53(x,gg,self._gexdf,self._gsjdf, upperpathnum) for i,x in e5s.iterrows()]
+                # e5s  = self._gexdf[self._gexdf['kind']=='5']
+                self.pg53s = [PathGenerator53(x,gg,self._gexdf,self._gsjdf, upperpathnum) for i,x in self.e5s.iterrows()]
 
-        return PD.DataFrame(paths, columns=PATHCOLS)
+        df = PD.DataFrame(paths, columns=PATHCOLS)
+        return df.groupby('name').first().reset_index()
+
 
 class PathGenerator53(object):
 
