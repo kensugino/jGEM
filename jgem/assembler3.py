@@ -1156,6 +1156,7 @@ class LocalAssembler(object):
             sj = sjs[sjs['strand'].isin(STRS[s])]
             df = detect_exons(sj, self.st, sja, exa, classifier=self.intg, usesja=usesja, sjtype=sjtype)
             self.exons[s] = df[df['exon']==True].copy()            
+            LOG.info('found {1} exons(strand{0})'.format(s, len(self.exons[s])))
             self.gaps[s] = df
             self.filled[s] = fill_gap(sja, sj, self.exons[s], s, self.st)
 
@@ -2010,7 +2011,7 @@ class PathGenerator(object):
             l = []
             for x in self.pg53s:
                 try:
-                    ps = x.get_paths_range(vmin,vamx)
+                    ps = x.get_paths_range(vmin,vmax)
                     if ps is not None:
                         l.append(ps)
                 except PathNumUpperLimit:
