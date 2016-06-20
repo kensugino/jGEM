@@ -468,7 +468,7 @@ def gtf2bed12(fpath, compress=True):
         LOG.debug("error converting to GenPred...code {0}".format(ret))
         raise Exception
     cmd = ['genePredToBed', base+'.gp', base+'.bed']
-    LOG.debug( "converting to Bed12...", base)
+    LOG.debug( "converting to Bed12... {0}".format(base))
     ret = subprocess.call(cmd)
     if ret != 0:
         LOG.debug("error converting to GenPred...code {0}".format(ret))
