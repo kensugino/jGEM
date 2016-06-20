@@ -421,7 +421,11 @@ class SlopeEdgeFinder(object):
             th2 = th1+(ma*self.mimath)
         else:
             return []
-        ist = N.nonzero(v<th1)[0][0]
+        idx = N.nonzero(v<th1)
+        if len(idx[0])==0:
+            return []
+
+        ist = idx[0][0]
         mis = self.minintsize
         if (ist<mis) or (len(v)-ist<mis):
             return []
@@ -449,7 +453,10 @@ class SlopeEdgeFinder(object):
             th2 = th1+(ma*self.mimath)
         else:
             return []
-        ist = N.nonzero(v>=th1)[0][0] # <=== different from detect_rise
+        idx = N.nonzero(v>=th1)
+        if len(idx)==0:
+            return []
+        ist = idx[0][0] # <=== different from detect_rise
         mis = self.minintsize
         if (ist<mis) or (len(v)-ist<mis):
             return []
