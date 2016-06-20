@@ -2049,7 +2049,7 @@ class PathGenerator(object):
         ipos = -1 # pgid position
         paths = []   
         def _select(sjp):
-            sjnames = sjp['name'].values
+            sjnames = list(sjp['name'].values)
             nsj = len(sjnames)
             z = N.zeros(nsj)
             # find index for each sub pg53 range
