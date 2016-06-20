@@ -1982,6 +1982,7 @@ class PathGenerator(object):
         self.gg = gg # GeneGraph
         self.gexdf = gexdf # gene exons
         self.gsjdf = gsjdf # gene junctions
+        self.gid = gexdf['gid'].values[0]
         self.st = st = gexdf['st'].min()
         self.ed = ed = gexdf['ed'].max()
         self.chrom = chrom 
@@ -2090,7 +2091,7 @@ class PathGenerator(object):
                     if not x.disable:
                         cs = N.sum([z[i] for i in sjidx[x.pgid]])
                         if cs == len(sjidx[x.pgid]):
-                            print('pg {0} disabled (all covered)'.format(x.pgid))
+                            print('gid{1}, pg {0} disabled (all covered)'.format(x.pgid, self.gid))
                             x.disable = True
             if cscore<nsj:
                 gid = self.gexdf['gid'].values[0]
