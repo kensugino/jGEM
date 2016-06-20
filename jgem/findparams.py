@@ -435,8 +435,8 @@ class ParamFinder(object):
     def calc_exon_params(self, np=10, covfactor=0.05):
         zoom = self.zoom
         # get params
-        neipath = self.bwpre+'.{0}.nei.params.txt.gz'.format(self.refcode)
-        e53path = self.bwpre+'.{0}.e53.params.txt.gz'.format(self.refcode)
+        neipath = self.bwpre+'.{0}.{1}.nei.params.txt.gz'.format(self.refcode,covfactor)
+        e53path = self.bwpre+'.{0}.{1}.e53.params.txt.gz'.format(self.refcode,covfactor)
         if os.path.exists(neipath):
             nei = UT.read_pandas(neipath)
         else:
