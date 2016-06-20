@@ -1991,7 +1991,7 @@ class PathGenerator(object):
         self.e5s = e5s = gexdf[gexdf['kind']=='5']
         self.upperpathnum = upperpathnum
         self.raisecntth = raisecntth
-        self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,upperpathnum) for i,x in e5s.iterrows()] # one unit
+        self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,i,upperpathnum) for i,x in e5s.iterrows()] # one unit
 
     def paths_from_highest_cov(self,tcovth=0,tcovfactor=0.1):
         if len(self.gexdf)==0:
@@ -2008,18 +2008,20 @@ class PathGenerator(object):
             self.tcovth1 = tcovth
             self.tcovth2 = th1
         # print('tth1:{0}, tth2:{1}'.format(self.tcovth1,self.tcovth2))
-        delta = vmax/20.
+        delta = vmax/10.
         vmin = vmax - delta
         raisecnt = 0
-        for x in self.pg53s:# reset trigger threshold
-            x.upperpathnum = self.upperpathnum 
         while vmax>0:
             raised = False
             l = []
-            for x in self.pg53s:
+            tgts = [x for x in self.pg53s if not x.disable]
+            if len(tgts)==0:
+                break
+            for x in tgts:
                 try:
                     ps = x.get_paths_range(vmin,vmax)
                     if ps is not None:
+                        ps['pgid'] = x.pgid
                         l.append(ps)
                 except PathNumUpperLimit:
                     raised = True
@@ -2028,37 +2030,38 @@ class PathGenerator(object):
                 paths.sort_values('tcov', ascending=False)
                 for rec in paths.values:
                     yield rec
-            # else: # speed up?
-            #     delta = 1.5*delta
+            else: # speed up?
+                delta = 1.5*delta
             # print(vmax,vmin, len(l))
             # next interval
-            vmax = vmin
-            vmin = max(0, vmax - delta)
             # except PathNumUpperLimit:
-            if raised:
-                raisecnt += 1
-                if ((raisecnt>2)&(vmax<1)) or (raisecnt>self.raisecntth):
-                    raise TrimSJ
-                # reduce interval range
-                vmin0 = vmin
+            if raised: # reduce interval range
                 vmin = (vmax+vmin)/2.
-                # print('PathNumUpperLimit, increase vmin {0}=>{1}, vmax {2}'.format(vmin0, vmin, vmax))
+            else: # go to next interval
+                vmax = vmin
+                vmin = max(0, vmax - delta)
+
 
     def select_paths(self, tcovth=1, tcovfactor=0.1):
         sjp = self.sjpaths
         npos = PATHCOLS.index('name')
         tpos = PATHCOLS.index('tcov')
-        th = self.upperpathnum*5     
+        ipos = -1 # pgid position
         paths = []   
-        def _select(sjnames):
+        def _select(sjp):
+            sjnames = sjp['name'].values
             nsj = len(sjnames)
             z = N.zeros(nsj)
+            # find index for each sub pg53 range
+            sjidx = {}
+            for x in self.pg53s:
+                sjp0 = sjp[(sjp['tst']>x.e5['tst'])&(sjp['ted']<x.e5['ted'])]
+                sjidx[x.pgid] = [sjnames.index(y) for y in sjp0['name']]
             for p in paths: # score from previously accumulated paths
                 for i,sjn in enumerate(sjnames):
                     z[i] += (sjn in p[npos])
             cscore = N.sum(z>0)
             for p in self.paths_from_highest_cov(tcovth, tcovfactor): # set th1,th2 according to tcovth,tcovfactor
-                # print('*** check one ***')
                 if p[tpos]>=self.tcovth1: #tcovth: take if larger than tcovth set within paths_from_highest_cov
                     paths.append(p)
                     for i,sjn in enumerate(sjnames):
@@ -2082,15 +2085,11 @@ class PathGenerator(object):
                             cscore = cscore1
                 else:
                     break
-                # print('cscore', cscore, nsj, z)
-                # if len(paths)>th:
-                #     raise TrimSJ
-                # if len(paths)>th:
-                #     tcov = paths[-1][tpos]
-                #     txt = '#path {0}>{1} terminate path enumeration. score:{2}/{3} tcov:{4}'
-                #     LOG.warning(txt.format(len(paths),th,cscore,nsj,tcov))
-                #     break
-            # return paths
+                # check any sub pg53 is done
+                for x in self.pg53s:
+                    cs = N.sum([z[i] for i in sjidx[x.pgid]])
+                    if cs == len(sjidx[x.pgid]):
+                        x.disable = True
 
         # sjnames = [','.join(x.split(',')[1:-1]) for x in sjp['name'].values]
         sjnames = sjp['name'].values
@@ -2100,7 +2099,7 @@ class PathGenerator(object):
         while True:
             try:
                 # paths = _select(sjnames)
-                _select(sjnames)
+                _select(sjp)
                 break
             except TrimSJ: # remove sj to cover
                 chrom = sjp.iloc[0]['chr']
@@ -2119,8 +2118,8 @@ class PathGenerator(object):
                 sids = list(set([y for x in sjp['name'] for y in x.split(',')]))
                 n1 = len(sjp)
                 LOG.debug('#sjp:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
-                sjnames = sjp['name'].values
-                upperpathnum = 2*upperpathnum
+                # sjnames = sjp['name'].values
+                # upperpathnum = 2*upperpathnum
                 gsjdf = self.gsjdf
                 self._gsjdf = gsjdf[gsjdf['name'].isin(sids)].copy()
                 LOG.debug('gsjdf {0}=>{1} #sids {2}=>{3}'.format(len(gsjdf), len(self._gsjdf), len(sids0), len(sids)))
@@ -2134,7 +2133,7 @@ class PathGenerator(object):
                 self._gexdf = gexdf[gexdf['eid'].isin(eids)].copy()
                 LOG.debug('gg.ede {0}=>{1} #eids {2}=>{3}'.format(len(self.gg.ede),len(gg.ede), n0,n1))
                 # e5s  = self._gexdf[self._gexdf['kind']=='5']
-                self.pg53s = [PathGenerator53(x,gg,self._gexdf,self._gsjdf, upperpathnum) for i,x in self.e5s.iterrows()]
+                self.pg53s = [PathGenerator53(x,gg,self._gexdf,self._gsjdf, i, self.upperpathnum) for i,x in self.e5s.iterrows()]
 
         df = PD.DataFrame(paths, columns=PATHCOLS)
         return df.groupby('name').first().reset_index()
@@ -2142,7 +2141,7 @@ class PathGenerator(object):
 
 class PathGenerator53(object):
 
-    def __init__(self, e5, gg, gexdf, gsjdf, upperpathnum=100):
+    def __init__(self, e5, gg, gexdf, gsjdf, pgid, upperpathnum=100):
         # edges
         self.e5 = e5
         self.gg = gg
@@ -2162,6 +2161,9 @@ class PathGenerator53(object):
         self.e2kind = UT.df2dict(self.exdf, 'eid', 'kind')
         self.e2name = UT.df2dict(self.exdf, 'eid', 'name')
         self.upperpathnum = upperpathnum
+        self.raisecnt = 0
+        self.disable = False
+        self.pgid = pgid
 
         
     def get_paths_range(self, vmin, vmax):
@@ -2222,7 +2224,10 @@ class PathGenerator53(object):
                     pmins.append(0)
                     pmaxs.append(p)
             if len(recs)>self.upperpathnum:
-                self.upperpathnum = 2*self.upperpathnum # increase trigger threshold
+                # self.upperpathnum = 2*self.upperpathnum # increase trigger threshold
+                self.raisecnt += 1
+                if (self.raisecnt>10)&((vmax-vmin)<0.5):
+                    self.disable = True
                 raise PathNumUpperLimit
 
         pmin0 = N.min(pmins)
