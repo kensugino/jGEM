@@ -100,7 +100,7 @@ class BWs(object):
             a += b.get(chrom, st, ed)
         return a
 
-COPYCOLS = ['chr','st','ed','_gidx','locus','gene_id','gene_type']
+COPYCOLS = ['chr','st','ed','_gidx','locus','gene_id']#,'gene_type']
 CALCFLUXCOLS = ['_id', 'sdelta','ecovavg','ecovmin','ecovmax',
                 'sin','sout','ein','eout','sdin','sdout']
 
@@ -152,7 +152,7 @@ class ParamFinder(object):
         ex = self.ex
         sj = self.sj
         # nonovl exons    
-        ex['gene_type'] = ex['extra'].str.split(';').str[2].str.split().str[1].str[1:-1]
+        # ex['gene_type'] = ex['extra'].str.split(';').str[2].str.split().str[1].str[1:-1]
         cols0 = ['chr','st','ed','_id']
         a = self.refpre+'.ex.bed.gz'
         a = UT.write_pandas(ex[cols0], a, '')
