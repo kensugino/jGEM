@@ -1985,7 +1985,7 @@ class PathGenerator(object):
             self.tcovth1 = tcovth
             self.tcovth2 = th1
         # print('tth1:{0}, tth2:{1}'.format(self.tcovth1,self.tcovth2))
-        delta = vmax/5.
+        delta = vmax/20.
         vmin = vmax - delta
         raisecnt = 0
         for x in self.pg53s:
@@ -2007,7 +2007,7 @@ class PathGenerator(object):
                 vmin = max(0, vmax - delta)
             except PathNumUpperLimit:
                 raisecnt += 1
-                if ((raisecnt>1)&(vmax<1)) or (raisecnt>7):
+                if ((raisecnt>2)&(vmax<1)) or (raisecnt>8):
                     raise TrimSJ
                 vmin0 = vmin
                 vmin = (vmax+vmin)/2.
