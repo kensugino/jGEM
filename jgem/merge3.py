@@ -393,7 +393,7 @@ SJFILTERPARAMS = dict(
 )
 class SJFilter(object):
 
-    def __init__(self, bwsjpre, statspath, genome, np=10, *kw):
+    def __init__(self, bwsjpre, statspath, genome, np=10, **kw):
         self.bwsjpre = bwsjpre
         self.statspath = statspath
         self.genome = genome
