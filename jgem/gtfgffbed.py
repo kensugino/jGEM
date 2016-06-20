@@ -457,21 +457,21 @@ def gtf2bed12(fpath, compress=True):
     if fpath.endswith('.gz'):
         base = fpath[:-7]
         cmd = ['gunzip',fpath]
-        LOG.debug( "expanding compressed ...", base)
+        LOG.debug( "expanding compressed ...{0}".format(base))
         subprocess.call(cmd)
     else:
         base = fpath[:-4]
     cmd = ['gtfToGenePred','-genePredExt','-ignoreGroupsWithoutExons',base+'.gtf',base+'.gp']
-    LOG.debug( "converting to GenPred...", base)
+    LOG.debug( "converting to GenPred...{0}".format(base))
     ret = subprocess.call(cmd)
     if ret != 0:
-        LOG.debug("error converting to GenPred...code{0}".format(ret))
+        LOG.debug("error converting to GenPred...code {0}".format(ret))
         raise Exception
     cmd = ['genePredToBed', base+'.gp', base+'.bed']
     LOG.debug( "converting to Bed12...", base)
     ret = subprocess.call(cmd)
     if ret != 0:
-        LOG.debug("error converting to GenPred...code{0}".format(ret))
+        LOG.debug("error converting to GenPred...code {0}".format(ret))
         raise Exception
     os.unlink(base+'.gp')
     # gzip
@@ -480,9 +480,9 @@ def gtf2bed12(fpath, compress=True):
     if compress:
         bdpath = UT.compress(bdpath)
     if fpath.endswith('.gz'):
-        LOG.debug( "gzipping ...", fpath[:-3])
+        LOG.debug( "gzipping ...{0}".format(fpath[:-3]))
         p = subprocess.call(['gzip',fpath[:-3]])
-        LOG.debug( "subprocess result", p)
+        LOG.debug( "subprocess result: {0} ".format(p))
     return bdpath
 
 def bed2gtf(fpath, compress=True):
