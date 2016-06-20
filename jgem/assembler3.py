@@ -1981,6 +1981,8 @@ class PathGenerator(object):
         delta = vmax/5.
         vmin = vmax - delta
         raisecnt = 0
+        for x in self.pg53s:
+            x.upperpathnum = self.upperpathnum # reset trigger threshold
         while vmax>0:
             try:
                 l = [x.get_paths_range(vmin,vmax) for x in self.pg53s]
@@ -2000,8 +2002,6 @@ class PathGenerator(object):
                 raisecnt += 1
                 if ((raisecnt>1)&(vmax<1)) or (raisecnt>5):
                     raise TrimSJ
-                for x in self.pg53s:
-                    x.upperpathnum = 2*x.upperpathnum
                 vmin0 = vmin
                 vmin = (vmax+vmin)/2.
                 print('PathNumUpperLimit, increase vmin {0}=>{1}, vmax {2}'.format(vmin0, vmin, vmax))
@@ -2181,6 +2181,7 @@ class PathGenerator53(object):
                     pmins.append(0)
                     pmaxs.append(p)
             if len(recs)>self.upperpathnum:
+                self.upperpathnum = 2*self.upperpathnum # increase trigger threshold
                 raise PathNumUpperLimit
 
         pmin0 = N.min(pmins)
