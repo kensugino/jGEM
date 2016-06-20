@@ -837,6 +837,7 @@ LAPARAMS = dict(
      tcovth=0,
      tcovfactor=0.1,
      upperpathnum=1000, # if num of paths larger than this increase stringency for sjs
+     raisecntth=7, 
      pathcheckth=100, # above this num of sjs check sc1(ucnt)==0 if >50% remove
      pathcheckratio=0.1, # ratio of ucnt==0 if above this remove these
      use_ef2=False, # whether to use slope edge detector
@@ -871,6 +872,7 @@ class LocalAssembler(object):
         dstpre, 
         classifierpre=None, 
         sjbwpre=None,
+        exbwpre=None,# used by detect exon classifier
         sjpaths=None, 
         **kw):
 
@@ -892,6 +894,13 @@ class LocalAssembler(object):
                 arrs[k] = {}
                 for s in ['+','-']:
                     arrs[k][s] = sjexbw.bws[k][s].get(chrom, st, ed)
+        self.exbwpre = exbwpre
+        if exbwpre is not None:
+            self.exbw = SjExBigWigs(exbwpre,None,mixunstranded=True)
+            with self.exbw:
+                arrs['exbw'] = {}
+                for s in ['+','-']:
+                    arrs['exbw'][s] = self.exbw.bws['ex'][s].get(chrom,st,ed)
         self._sjpaths=sjpaths
         self.load_classifiers()
 
@@ -1140,7 +1149,10 @@ class LocalAssembler(object):
         usesja = self.params['use_sja_for_exon_detection']
         for s in ['+','-']:
             sja = arrs['sj'][s]
-            exa = arrs['ex'][s]
+            if self.exbwpre is not None:
+                exa = arrs['exbw'][s]
+            else:
+                exa = arrs['ex'][s]
             sj = sjs[sjs['strand'].isin(STRS[s])]
             df = detect_exons(sj, self.st, sja, exa, classifier=self.intg, usesja=usesja, sjtype=sjtype)
             self.exons[s] = df[df['exon']==True].copy()            
@@ -1494,7 +1506,7 @@ class LocalAssembler(object):
             n2 = N.sum(sj['ucnt']==0)
             # if n2>n0*pct: # if mcnt only ratio is large then important (e.g. Amy2a3)
             if n2<n0*pct: # discard if mcnt only ratio is small
-                LOG.warning('num sj ({0}>{1}) removed non unique junctions({2})'.format(n0,n1,n2))
+                LOG.warning('num sj ({0}>{1}, {3}) removed non unique junctions({2})'.format(n0,n1,n2,n0*pct))
                 idx5 = sj['ucnt']>0
                 sj = sj[idx5]
         sj = sj.copy()
@@ -1571,7 +1583,8 @@ class LocalAssembler(object):
         for gid in spanexdf['gid'].unique():
             gexdf = spanexdf[spanexdf['gid']==gid]
             gsjdf = spansjdf[spansjdf['gid']==gid]
-            self._pg = pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, self.sjpaths, self.params['upperpathnum'])
+            self._pg = pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, self.sjpaths, 
+                self.params['upperpathnum'], self.params['raisecntth'])
             paths.append(pg.select_paths(self.params['tcovth'], self.params['tcovfactor']))
         return PD.concat(paths, ignore_index=True)
 
@@ -1957,7 +1970,7 @@ def draw_sjex(sj, ex, st, ed, win=500, ax=None, delta=500, sjcov='tcnt', excov='
 class PathGenerator(object):
     # gene level path generator
 
-    def __init__(self, gg, gsjdf, gexdf, chrom, strand, sjpaths, upperpathnum=100):
+    def __init__(self, gg, gsjdf, gexdf, chrom, strand, sjpaths, upperpathnum=100, raisecntth=7):
         self.gg = gg # GeneGraph
         self.gexdf = gexdf # gene exons
         self.gsjdf = gsjdf # gene junctions
@@ -1969,6 +1982,7 @@ class PathGenerator(object):
         self.sjpaths = sjpaths[idx]
         self.e5s = e5s = gexdf[gexdf['kind']=='5']
         self.upperpathnum = upperpathnum
+        self.raisecntth = raisecntth
         self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,upperpathnum) for i,x in e5s.iterrows()] # one unit
 
     def paths_from_highest_cov(self,tcovth=0,tcovfactor=0.1):
@@ -1989,27 +2003,35 @@ class PathGenerator(object):
         delta = vmax/20.
         vmin = vmax - delta
         raisecnt = 0
-        for x in self.pg53s:
-            x.upperpathnum = self.upperpathnum # reset trigger threshold
+        for x in self.pg53s:# reset trigger threshold
+            x.upperpathnum = self.upperpathnum 
         while vmax>0:
-            try:
-                l = [x.get_paths_range(vmin,vmax) for x in self.pg53s]
-                l = [x for x in l if x is not None]
-                if len(l)>0:
-                    paths = PD.concat(l, ignore_index=True)
-                    paths.sort_values('tcov', ascending=False)
-                    # print(paths)
-                    for rec in paths.values:
-                        yield rec
-                else:
-                    delta = 1.5*delta
-                # print(vmax,vmin, len(l))
-                vmax = vmin
-                vmin = max(0, vmax - delta)
-            except PathNumUpperLimit:
+            raised = False
+            l = []
+            for x in self.pg53s:
+                try:
+                    ps = x.get_paths_range(vmin,vamx)
+                    if ps is not None:
+                        l.append(ps)
+                except PathNumUpperLimit:
+                    raised = True
+            if len(l)>0:
+                paths = PD.concat(l, ignore_index=True)
+                paths.sort_values('tcov', ascending=False)
+                for rec in paths.values:
+                    yield rec
+            # else: # speed up?
+            #     delta = 1.5*delta
+            # print(vmax,vmin, len(l))
+            # next interval
+            vmax = vmin
+            vmin = max(0, vmax - delta)
+            # except PathNumUpperLimit:
+            if raised:
                 raisecnt += 1
-                if ((raisecnt>2)&(vmax<1)) or (raisecnt>8):
+                if ((raisecnt>2)&(vmax<1)) or (raisecnt>self.raisecntth):
                     raise TrimSJ
+                # reduce interval range
                 vmin0 = vmin
                 vmin = (vmax+vmin)/2.
                 # print('PathNumUpperLimit, increase vmin {0}=>{1}, vmax {2}'.format(vmin0, vmin, vmax))
