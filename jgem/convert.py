@@ -86,6 +86,17 @@ def as3exsj(dstpre, np=7):
     ci = UT.chopintervals(ex, dstpre+'.ci.txt.gz')
     return sj, ex    
 
+def as3genes(dstpre):
+    # assume converted by as3exsj
+    sj = UT.read_pandas(dstpre+'.sj.txt.gz')
+    ex = UT.read_pandas(dstpre+'.ex.txt.gz')
+    gpre = dstpre+'.genegraph-'
+    mg = GP.MEGraph4(sj,ex,gpre)
+    bw = BEDWriter(mg)
+    path = dstpre+'.genes.bed.gz'
+    LOG.info(' writing bed12 genes... {0}'.format(path))
+    bw.write(path)
+
 def gtf2exonsj(gtf, np=12, graphpre=None):
     """Extract exons and sj from GTF
     exon, junction coordinates = zero based (same as BED)

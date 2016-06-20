@@ -44,6 +44,7 @@ from jgem import bedtools as BT
 from jgem import gtfgffbed as GGB
 from jgem import taskqueue as TQ
 from jgem import assembler3 as A3
+
 import jgem.cy.bw as cybw
 
 
@@ -842,7 +843,6 @@ def estimatecovs(modelpre, bwpre, dstpre, genome, tcovth=1, np=6):
     rslts = UT.process_mp(bundle_estimator, args, np=np, doreduce=False)
 
     concatenate_bundles(bundles, dstpre)
-
 
 
 
