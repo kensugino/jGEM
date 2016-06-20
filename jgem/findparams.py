@@ -175,6 +175,7 @@ class ParamFinder(object):
         enonov = eovsize[eovsize==1] # only overlaps with self
         self.ne_i0 = ne_i0 = ex.set_index('_id').ix[enonov.index].sort_values(['chr','st','ed']).reset_index()
         self.ne_i0['len'] = ne_i0['ed']-ne_i0['st']
+        LOG.info('#non-ovl-ex0={0}'.format(len(enonov)))
 
         LOG.info('#non-ex-ovl-ex={0}, #non-sj-ovl-ex={1}'.format(len(enonov), len(snonov)))
         ids = set(enonov.index).intersection(snonov.index)
