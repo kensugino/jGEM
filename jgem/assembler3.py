@@ -2063,7 +2063,7 @@ class PathGenerator(object):
             cscore = N.sum(z>0)
             for p in self.paths_from_highest_cov(tcovth, tcovfactor): # set th1,th2 according to tcovth,tcovfactor
                 if p[tpos]>=self.tcovth1: #tcovth: take if larger than tcovth set within paths_from_highest_cov
-                    paths.append(p)
+                    paths.append(p[:-1])
                     for i,sjn in enumerate(sjnames):
                         if z[i]==0:
                             z[i] += (sjn in p[npos])
@@ -2081,7 +2081,7 @@ class PathGenerator(object):
                                 z[i] += (sjn in p[npos])
                         cscore1 = N.sum(z>0)
                         if cscore1>cscore:
-                            paths.append(p)
+                            paths.append(p[:-1])
                             cscore = cscore1
                 else:
                     break
