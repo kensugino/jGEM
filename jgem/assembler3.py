@@ -152,6 +152,13 @@ class LogisticClassifier(object):
         p = 1./(1.+e)
         df[self.dstcol] = p>0.5
         
+class IntgClassifier(LogisticClassifier):
+
+    def classify(self, df):
+        LogisticClassifier.classify(self, df)
+        if 'mp' in df:
+            idx = (df['llen']>4)&(df['mp']>0.99)
+            df.loc[idx, self.dstcol] = True
 
 # for intergenic        
 itg_p = dict(coef = N.array([ -0.40,  -4.72, 0.86]),
@@ -159,7 +166,7 @@ itg_p = dict(coef = N.array([ -0.40,  -4.72, 0.86]),
            cols = ['lemax','lgap','llen'],
            th = 0.05,
            zoom = 1)
-INTG = LogisticClassifier(json=itg_p, dstcol='exon')
+INTG = IntgClassifier(json=itg_p, dstcol='exon')
 
 e53_p = dict(coef = N.array([2.51, -0.77]),
              intercept= -2.7,
@@ -963,7 +970,7 @@ class LocalAssembler(object):
             LOG.info('loading INTG from {0}'.format(path))
             with open(path,'r') as fp:
                 self.exonparams = ep = json.load(fp)
-            self.intg = LogisticClassifier(json=ep, dstcol='exon')        
+            self.intg = IntgClassifier(json=ep, dstcol='exon')        
         else:
             LOG.warning('{0} does not exists, reverting to default'.format(path))
             self.intg = INTG
