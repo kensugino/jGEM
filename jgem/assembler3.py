@@ -843,8 +843,9 @@ LAPARAMS = dict(
      #covfactor=0.05, 
      tcovth=0,
      tcovfactor=0.1,
-     upperpathnum=1000, # if num of paths larger than this increase stringency for sjs
-     raisecntth=7, 
+     upperpathnum=100, # if num of paths larger than this increase stringency for sjs
+     maxraisecnt=10, 
+     minvmimadiff=0.5,
      pathcheckth=100, # above this num of sjs check sc1(ucnt)==0 if >50% remove
      pathcheckratio=0.1, # ratio of ucnt==0 if above this remove these
      use_ef2=False, # whether to use slope edge detector
@@ -1592,7 +1593,7 @@ class LocalAssembler(object):
             gexdf = spanexdf[spanexdf['gid']==gid]
             gsjdf = spansjdf[spansjdf['gid']==gid]
             self._pg = pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, self.sjpaths, 
-                self.params['upperpathnum'], self.params['raisecntth'])
+                self.params['upperpathnum'], self.params['maxraisecnt'], self.params['minvmimadiff'])
             paths.append(pg.select_paths(self.params['tcovth'], self.params['tcovfactor']))
         return PD.concat(paths, ignore_index=True)
 
@@ -1978,7 +1979,7 @@ def draw_sjex(sj, ex, st, ed, win=500, ax=None, delta=500, sjcov='tcnt', excov='
 class PathGenerator(object):
     # gene level path generator
 
-    def __init__(self, gg, gsjdf, gexdf, chrom, strand, sjpaths, upperpathnum=100, raisecntth=7):
+    def __init__(self, gg, gsjdf, gexdf, chrom, strand, sjpaths, upperpathnum=100, maxraisecnt=10,minvmimadiff=0.5):
         self.gg = gg # GeneGraph
         self.gexdf = gexdf # gene exons
         self.gsjdf = gsjdf # gene junctions
@@ -1991,8 +1992,9 @@ class PathGenerator(object):
         self.sjpaths = sjpaths[idx]
         self.e5s = e5s = gexdf[gexdf['kind']=='5']
         self.upperpathnum = upperpathnum
-        self.raisecntth = raisecntth
-        self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,i,upperpathnum) for i,x in e5s.iterrows()] # one unit
+        self.maxraisecnt = maxraisecnt
+        self.minvmimadiff = minvmimadiff
+        self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,i,upperpathnum,maxraisecnt,minvmimadiff) for i,x in e5s.iterrows()] # one unit
 
     def paths_from_highest_cov(self,tcovth=0,tcovfactor=0.1):
         if len(self.gexdf)==0:
@@ -2147,7 +2149,7 @@ class PathGenerator(object):
 
 class PathGenerator53(object):
 
-    def __init__(self, e5, gg, gexdf, gsjdf, pgid, upperpathnum=100):
+    def __init__(self, e5, gg, gexdf, gsjdf, pgid, upperpathnum=100, maxraisecnt=10, minvmimadiff=0.5):
         # edges
         self.e5 = e5
         self.gg = gg
@@ -2167,7 +2169,10 @@ class PathGenerator53(object):
         self.e2kind = UT.df2dict(self.exdf, 'eid', 'kind')
         self.e2name = UT.df2dict(self.exdf, 'eid', 'name')
         self.upperpathnum = upperpathnum
+        self.maxraisecnt = maxraisecnt
+        self.minvmimadiff = minvmimadiff
         self.raisecnt = 0
+        self.currvmax = None
         self.disable = False
         self.pgid = pgid
 
@@ -2175,6 +2180,9 @@ class PathGenerator53(object):
     def get_paths_range(self, vmin, vmax):
         if self.tcov <= vmin:
             return None
+        if vmax != self.currvmax:
+            self.currvmax = vmax
+            self.raisecnt = 0
         # get paths whose tcov is >vmin & <=vmax
         # do BFS, ignore branch whose tmax<=vmin or tmin>vmax
         # (chr,st,ed,strand,name(pc),tcov0,tcov1,e5dp,tcov,tst,ted,tcov0a,tcov0b,tcov0c)
