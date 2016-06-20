@@ -1994,7 +1994,7 @@ class PathGenerator(object):
         self.upperpathnum = upperpathnum
         self.maxraisecnt = maxraisecnt
         self.minvmimadiff = minvmimadiff
-        self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,i,upperpathnum,maxraisecnt,minvmimadiff) for i,x in e5s.iterrows()] # one unit
+        self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,x['eid'],upperpathnum,maxraisecnt,minvmimadiff) for i,x in e5s.iterrows()] # one unit
 
     def paths_from_highest_cov(self,tcovth=0,tcovfactor=0.1):
         if len(self.gexdf)==0:
@@ -2097,7 +2097,8 @@ class PathGenerator(object):
                             x.disable = True
             if cscore<nsj:
                 gid = self.gexdf['gid'].values[0]
-                LOG.warning('gid:{0} terminated without covering all sj ({1}/{2})'.format(gid,cscore,nsj))
+                LOG.warning('gid:{0} terminated without covering all sj ({1}/{2} #paths:{3} th1:{4} th2:{5},#sjdf:{6})'\
+                    .format(gid,cscore,nsj,len(paths),self.tcovth1,self.tcovth2,len(self.gsjdf)))
 
         # sjnames = [','.join(x.split(',')[1:-1]) for x in sjp['name'].values]
         sjnames = sjp['name'].values
@@ -2240,9 +2241,9 @@ class PathGenerator53(object):
             if len(recs)>self.upperpathnum:
                 # self.upperpathnum = 2*self.upperpathnum # increase trigger threshold
                 self.raisecnt += 1
-                if (self.raisecnt>10)&((vmax-vmin)<0.5):
+                if (self.raisecnt>self.maxraisecnt)&((vmax-vmin)<self.minvmimadiff):
                     self.disable = True
-                    print('pg {0} disabled (raisecnt>{1}, vmax-vmin={2})'.format(self.pgid, self.raisecnt, vmax-vmin))
+                    print('pgid:{0} disabled (raisecnt>{1}, vmax-vmin={2})'.format(self.pgid, self.raisecnt, vmax-vmin))
                 raise PathNumUpperLimit
 
         pmin0 = N.min(pmins)
