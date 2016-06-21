@@ -1237,6 +1237,8 @@ class LocalAssembler(object):
                                 sted.add((st,ed,strand[-1]))
             sjdf = PD.DataFrame([x for x in _sgen()], columns=cols)
             # sjdf = sjdf.groupby(['chr','st','ed','strand']).first().reset_index()
+            sjdf['tst'] = sjdf['st']
+            sjdf['ted'] = sjdf['ed']
             set_ad_pos(sjdf, 'sj')
             self.sjdf = sjdf
 
