@@ -294,7 +294,7 @@ class EdgeFinder(object):
 
 SEDJSON = dict(
     smwinsize=151,# smwinsize (int): (default 151)
-    minintsize=10,# minintsize (int): (default 10)
+    minintsize=50,# minintsize (int): (default 10)
     aggregateratio=0.1,# aggregateratio (float): (default 0.1)
     winsize=15,# winsize (int): (default 15)
     minth=0.5,# minth (float):  (default 0.5)
