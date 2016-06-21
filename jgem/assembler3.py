@@ -2193,6 +2193,7 @@ class PathGenerator(object):
         if len(e33)==0: # no multiple 3exon
             df = df
         else:
+            e2c = UT.df2dict(t3,'name','pa')
             def _gen():
                 if self.strand=='+':
                     pos = PATHCOLS.index('ed')
@@ -2207,6 +2208,7 @@ class PathGenerator(object):
                             r = rec.copy()
                             r[npos] = '{0}|{1}'.format(name0,e)
                             r[pos] = int(e.split(',')[-1])
+                            r[tpos] = rec[tpos]*e2c[e]/e2c[e3id]
                             yield r
                     else:
                         yield rec
