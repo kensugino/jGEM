@@ -1220,6 +1220,7 @@ class LocalAssembler(object):
             idxpn = (sj['strand'].isin(['+','-']))&(sj['sjratio']>sjratioth)
             idxu = (sj['strand'].isin(['.+','.-']))&(sj['sjratio']>usjratioth)
             idx = (sj['ucnt']>=uth)|(sj['tcnt']-sj['ucnt']>=mth)
+            sj['len'] = sj['ed']-sj['st']
             idxl = (sj['len']<1e5)|(sj['sjratio']>lsjratioth)
             self.sjdf = sj[idx&(idxpn|idxu)].copy()
             n1 = len(self.sjdf)
