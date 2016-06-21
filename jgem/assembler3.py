@@ -844,7 +844,7 @@ SJDFCOLS = ['chr','st','ed','strand','name','kind','tcnt','ucnt' ]#,'donor','acc
 PATHCOLS = ['chr','st','ed','name','strand','tst','ted','tcov','tcov0','tcov0a','tcov0b','tcov0c']
 
 LAPARAMS = dict(
-     refcode='gen9',
+     refcode='rfsq',
      discardunstranded=False,
      uth=0, 
      mth=3, 
@@ -857,6 +857,8 @@ LAPARAMS = dict(
      upperpathnum=100, # if num of paths larger than this increase stringency for sjs
      maxraisecnt=2, 
      minvmimadiff=1,
+     trimth=150,
+     raisecntth=50,
      pathcheckth=200, # above this num of sjs check sc1(ucnt)==0 if >50% remove
      pathcheckratio=0.1, # ratio of ucnt==0 if above this remove these
      use_ef2=False, # whether to use slope edge detector
@@ -1676,7 +1678,8 @@ class LocalAssembler(object):
             gexdf = spanexdf[spanexdf['gid']==gid]
             gsjdf = spansjdf[spansjdf['gid']==gid]
             self._pg = pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, sjpaths, 
-                self.params['upperpathnum'], self.params['maxraisecnt'], self.params['minvmimadiff'])
+                self.params['upperpathnum'], self.params['maxraisecnt'], 
+                self.params['minvmimadiff'], self.params['trimth'], self.params['raisecntth'])
             paths.append(pg.select_paths(self.params['tcovth'], self.params['tcovfactor']))
         return PD.concat(paths, ignore_index=True)
 
@@ -2062,7 +2065,8 @@ def draw_sjex(sj, ex, st, ed, win=500, ax=None, delta=500, sjcov='tcnt', excov='
 class PathGenerator(object):
     # gene level path generator
 
-    def __init__(self, gg, gsjdf, gexdf, chrom, strand, sjpaths, upperpathnum=100, maxraisecnt=10,minvmimadiff=0.5):
+    def __init__(self, gg, gsjdf, gexdf, chrom, strand, sjpaths, 
+        upperpathnum=100, maxraisecnt=10,minvmimadiff=0.5,trimth=150,raisecntth=50):
         self.gg = gg # GeneGraph
         self.gexdf = gexdf # gene exons
         self.gsjdf = gsjdf # gene junctions
@@ -2077,12 +2081,13 @@ class PathGenerator(object):
         self.upperpathnum = upperpathnum
         self.maxraisecnt = maxraisecnt
         self.minvmimadiff = minvmimadiff
+        self.raisecntth = raisecntth
         self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,x['eid'],upperpathnum,maxraisecnt,minvmimadiff) for i,x in e5s.iterrows()] # one unit
         self.verbose = False
         self.sjrth = sjpaths['sjratio'].min() #0.001
         self.uth = sjpaths['sc1'].min()
         nid53s = len(gsjdf['id53'].unique())
-        if nid53s>200:
+        if nid53s>trimth:
             msg = 'Too many id53s({0}) in a gene ({1}).'.format(nid53s, self.gid)
             self.sjpaths = self.trim(self.sjpaths, msg=msg)
             n0 = len(self.gsjdf)
@@ -2123,6 +2128,7 @@ class PathGenerator(object):
                         ps['pgid'] = x.pgid
                         l.append(ps)
                 except PathNumUpperLimit:
+                    raisecnt += 1
                     raised = True
             if len(l)>0:
                 paths = PD.concat(l, ignore_index=True)
@@ -2133,10 +2139,9 @@ class PathGenerator(object):
             #     delta = min(vmin, 2*delta)
             if raised: # reduce interval range
                 vmin = (vmax+vmin)/2.
-                raisecnt += 1
                 if self.verbose:
                     print('raisecnt={0}'.format(raisecnt))
-                if raisecnt>50:
+                if raisecnt>self.raisecntth:
                     raise TrimSJ
             else: # go to next interval
                 vmax = vmin
