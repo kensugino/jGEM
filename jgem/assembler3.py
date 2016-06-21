@@ -855,6 +855,7 @@ LAPARAMS = dict(
      minsearchsize=500,
      use_sja_for_exon_detection=False,
      use_merged_sjdf=False,
+     use_sjdf_for_check=False,
      use_iexon_from_path=True,
      cmax=9,
 )
@@ -1304,6 +1305,16 @@ class LocalAssembler(object):
         self.e53df = _fixsted(e53df)
         exdf = PD.concat([exdfi[c2], e53df[c2]], ignore_index=True)
         self.exdf = _fixsted(exdf)
+        # select sjpaths consistent with exdf and sjdf
+        idx = []
+        epcs = set(self.exdf['name'].values)
+        jpcs = set(self.sjdf['name'].values)
+        for p in self.sjpaths['name'].values:
+            epc = p.split('|')[1:-1]
+            jpc = p.split(',')
+            idx.append(all([x in epcs for x in epc]+[x in jpcs for x in jpc]))
+        self.sjpaths1 = self.sjpaths[idx]
+
 
     def _get_spans(self, strand, recalc=False):
         if hasattr(self, '_spans') and not recalc:
@@ -1591,10 +1602,10 @@ class LocalAssembler(object):
 
     def select_53paths(self, gg, spansjdf, spanexdf, chrom, strand):
         paths = []
-        if self.params['use_merged_sjdf']: 
+        if self.params['use_merged_sjdf']&self.params['use_sjdf_for_check']: 
             sjpaths = self.sjdf
         else:
-            sjpaths = self.sjpaths
+            sjpaths = self.sjpaths1
         for gid in spanexdf['gid'].unique():
             gexdf = spanexdf[spanexdf['gid']==gid]
             gsjdf = spansjdf[spansjdf['gid']==gid]
