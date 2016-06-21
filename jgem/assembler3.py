@@ -2100,16 +2100,15 @@ class PathGenerator(object):
                     if not x.disable:
                         cs = N.sum([z[i] for i in sjidx[x.pgid]])
                         if cs == len(sjidx[x.pgid]):
-                            print('gid{1}, pgid:{0} disabled (all covered)'.format(x.pgid, self.gid))
+                            # print('gid{1}, pgid:{0} disabled (all covered)'.format(x.pgid, self.gid))
                             x.disable = True
-            if cscore<nsj:
-                gid = self.gexdf['gid'].values[0]
-                LOG.debug('gid:{0} terminated without covering all sj ({1}/{2} #paths:{3} th1:{4} th2:{5},#sjdf:{6})'\
-                    .format(gid,cscore,nsj,len(paths),self.tcovth1,self.tcovth2,len(self.gsjdf)))
-                for i,zi in enumerate(z):
-                    if zi==0:
-                        print('  i:{0} name:{1}'.format(i, sjnames[i]))
-        _select(sjp)
+            # if cscore<nsj:
+            #     gid = self.gexdf['gid'].values[0]
+            #     LOG.debug('gid:{0} terminated without covering all sj ({1}/{2} #paths:{3} th1:{4} th2:{5},#sjdf:{6})'\
+            #         .format(gid,cscore,nsj,len(paths),self.tcovth1,self.tcovth2,len(self.gsjdf)))
+            #     for i,zi in enumerate(z):
+            #         if zi==0:
+            #             print('  i:{0} name:{1}'.format(i, sjnames[i]))
         # # sjnames = [','.join(x.split(',')[1:-1]) for x in sjp['name'].values]
         # sjnames = sjp['name'].values
         # sjrth = sjp['sjratio2'].min() #0.002
@@ -2153,7 +2152,8 @@ class PathGenerator(object):
         #         LOG.debug('gg.ede {0}=>{1} #eids {2}=>{3}'.format(len(self.gg.ede),len(gg.ede), n0,n1))
         #         # e5s  = self._gexdf[self._gexdf['kind']=='5']
         #         self.pg53s = [PathGenerator53(x,gg,self._gexdf,self._gsjdf, i, self.upperpathnum) for i,x in self.e5s.iterrows()]
-
+        
+        _select(sjp)
         df = PD.DataFrame(paths, columns=PATHCOLS)
         return df.groupby('name').first().reset_index()
 
