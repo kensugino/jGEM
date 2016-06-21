@@ -370,9 +370,13 @@ class SlopeEdgeFinder(object):
         eds = self._aggregate(olen,eds)
         if len(eds)==0:
             return []
-        if len(eds)>3:
-            mid = int(len(eds)/2)
-            eds = eds[:1]+eds[mid:mid+1]+eds[-1:]
+        # if len(eds)>3:
+        #     mid = int(len(eds)/2)
+        #     eds = eds[:1]+eds[mid:mid+1]+eds[-1:]
+        # if len(eds)>=3:
+        #     eds = eds[-2:] # last 2 
+        if len(eds)>=3:
+            eds = eds[:1]+eds[-1:] # first and last
         if direction=='<':
             return [-x for x in eds]
         return eds
@@ -2173,6 +2177,35 @@ class PathGenerator(object):
         
         _select(sjp)
         df = PD.DataFrame(paths, columns=PATHCOLS)
+        # add 3exons
+        # e3 => e3s
+        t = self.gexdf
+        t3 = t[(t['kind']=='3')]
+        e33 = {}
+        for apo, g in t3.groupby('apos'):
+            eids = g['name'].values
+            if len(eids)>1:
+                for e in eids:
+                    e33[e] = eids
+        if len(e33)==0: # no multiple 3exon
+            df = df
+        else:
+            def _gen():
+                edpos = PATHCOLS.index('ed')
+                for rec in df.values:
+                    tmp = rec[npos].split('|')
+                    e3id = tmp[-1]
+                    if e3id in e33:
+                        name0 = '|'.join(tmp[:-1])
+                        for e in e33[e3id]:
+                            r = rec.copy()
+                            r[npos] = '{0}|{1}'.format(name0,e)
+                            r[edpos] = int(e.split(',')[-1])
+                            yield r
+                    else:
+                        yield rec
+            df = PD.DataFrame([x for x in _gen()], columns=PATHCOLS)
+        # make sure no duplicates
         return df.groupby('name').first().reset_index()
 
 
