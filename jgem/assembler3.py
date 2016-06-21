@@ -1150,11 +1150,12 @@ class LocalAssembler(object):
         o = int(self.st)
         # sjpaths['minscov'] = [N.min(a[s-o:e-o]) for s,e in sjpaths[['tst','ted']].values]]
         # sjpaths['sjratio'] = [x/N.min(a[int(s-o):int(e-o)]) for x,s,e in sjpaths[['sc2','tst','ted']].values]
-        sjpaths['sjratio2'] = [x/N.mean(a[int(s-o):int(e-o)]) for x,s,e in sjpaths[['sc2','tst','ted']].values]
+        sjpaths['sjratio'] = [x/N.max(a[int(s-o):int(e-o)]) for x,s,e in sjpaths[['sc2','tst','ted']].values]
+        # sjpaths['sjratio'] = [x/N.mean(a[int(s-o):int(e-o)]) for x,s,e in sjpaths[['sc2','tst','ted']].values]
         # .values => dtype float matrix => s,e float
         n0 = len(sjpaths)
-        idxpn = (sjpaths['strand'].isin(['+','-']))&(sjpaths['sjratio2']>sjratioth)
-        idxu = (sjpaths['strand'].isin(['.+','.-']))&(sjpaths['sjratio2']>usjratioth)
+        idxpn = (sjpaths['strand'].isin(['+','-']))&(sjpaths['sjratio']>sjratioth)
+        idxu = (sjpaths['strand'].isin(['.+','.-']))&(sjpaths['sjratio']>usjratioth)
         self.sjpaths = sjpaths[idxpn|idxu].copy()
         n1 = len(self.sjpaths)
         self.loginfo('sjratio filter: {0}=>{1}'.format(n0,n1))
@@ -1212,9 +1213,10 @@ class LocalAssembler(object):
                 exaa = self.sjexbw.bws['ex']['a'].get(chrom, st, ed)
             a = sjaa+exaa # all of the coverages
             o = int(self.st)
-            sj['sjratio2'] = [x/N.mean(a[int(s-o):int(e-o)]) for x,s,e in sj[['tcnt','st','ed']].values]
-            idxpn = (sj['strand'].isin(['+','-']))&(sj['sjratio2']>sjratioth)
-            idxu = (sj['strand'].isin(['.+','.-']))&(sj['sjratio2']>usjratioth)
+            # sj['sjratio'] = [x/N.mean(a[int(s-o):int(e-o)]) for x,s,e in sj[['tcnt','st','ed']].values]
+            sj['sjratio'] = [x/N.mean(a[int(s-o):int(e-o)]) for x,s,e in sj[['tcnt','st','ed']].values]
+            idxpn = (sj['strand'].isin(['+','-']))&(sj['sjratio']>sjratioth)
+            idxu = (sj['strand'].isin(['.+','.-']))&(sj['sjratio']>usjratioth)
             idx = (sj['ucnt']>=uth)|(sj['tcnt']-sj['ucnt']>=mth)
             self.sjdf = sj[idx&(idxpn|idxu)].copy()
             n1 = len(self.sjdf)
