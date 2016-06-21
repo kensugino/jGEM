@@ -1214,7 +1214,7 @@ class LocalAssembler(object):
             a = sjaa+exaa # all of the coverages
             o = int(self.st)
             # sj['sjratio'] = [x/N.mean(a[int(s-o):int(e-o)]) for x,s,e in sj[['tcnt','st','ed']].values]
-            sj['sjratio'] = [x/N.mean(a[int(s-o):int(e-o)]) for x,s,e in sj[['tcnt','st','ed']].values]
+            sj['sjratio'] = [x/N.max(a[int(s-o):int(e-o)]) for x,s,e in sj[['tcnt','st','ed']].values]
             idxpn = (sj['strand'].isin(['+','-']))&(sj['sjratio']>sjratioth)
             idxu = (sj['strand'].isin(['.+','.-']))&(sj['sjratio']>usjratioth)
             idx = (sj['ucnt']>=uth)|(sj['tcnt']-sj['ucnt']>=mth)
