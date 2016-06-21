@@ -856,7 +856,7 @@ LAPARAMS = dict(
      upperpathnum=100, # if num of paths larger than this increase stringency for sjs
      maxraisecnt=2, 
      minvmimadiff=1,
-     pathcheckth=100, # above this num of sjs check sc1(ucnt)==0 if >50% remove
+     pathcheckth=200, # above this num of sjs check sc1(ucnt)==0 if >50% remove
      pathcheckratio=0.1, # ratio of ucnt==0 if above this remove these
      use_ef2=False, # whether to use slope edge detector
      mixunstranded=True,
@@ -881,6 +881,7 @@ MERGEPARAMS.update(dict(
      use_ef2=True, # whether to use slope edge detector
      edgedelta=1000000, # disable getting 53exons from extruded edges
      use_sja_for_exon_detection=True,
+     pathcheckth=300, # above this num of sjs check sc1(ucnt)==0 if >50% remove
      use_merged_sjdf=True,
      use_sjdf_for_check=True,
      use_iexon_from_path=False,
@@ -1200,6 +1201,7 @@ class LocalAssembler(object):
             sj = sj[(sj['chr']==self.chrom)&(sj['st']>=self.st)&(sj['ed']<=self.ed)].copy()
             sj['tst'] = sj['st']
             sj['ted'] = sj['ed']
+            n0 = len(sj)
             # calculate sjratio2 and filter
             uth,mth = self.params['uth'],self.params['mth']
             sjratioth = self.params['sjratioth']
@@ -1215,6 +1217,8 @@ class LocalAssembler(object):
             idxu = (sj['strand'].isin(['.+','.-']))&(sj['sjratio2']>usjratioth)
             idx = (sj['ucnt']>=uth)|(sj['tcnt']-sj['ucnt']>=mth)
             self.sjdf = sj[idx&(idxpn|idxu)].copy()
+            n1 = len(self.sjdf)
+            LOG.info('merged sjdf loaded: filtered {0}=>{1}'.format(n0,n1))
         else:
             ap = self.sjpaths
             o = self.st
