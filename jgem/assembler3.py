@@ -2180,7 +2180,10 @@ class PathGenerator(object):
         # add 3exons
         # e3 => e3s
         t = self.gexdf
-        t3 = t[(t['kind']=='3')]
+        # e3names = [x.split('|')[-1] for x in df['name']]
+        # eth = 
+        # t3 = t[(t['kind']=='3')&((t['ecov']>eth)|(t['name'].isin(e3names)))]
+        t3 = t[t['kind']=='3']
         e33 = {}
         for apo, g in t3.groupby('apos'):
             eids = g['name'].values
@@ -2191,7 +2194,10 @@ class PathGenerator(object):
             df = df
         else:
             def _gen():
-                edpos = PATHCOLS.index('ed')
+                if self.strand=='+':
+                    pos = PATHCOLS.index('ed')
+                else:
+                    pos = PATHCOLS.index('st')
                 for rec in df.values:
                     tmp = rec[npos].split('|')
                     e3id = tmp[-1]
@@ -2200,7 +2206,7 @@ class PathGenerator(object):
                         for e in e33[e3id]:
                             r = rec.copy()
                             r[npos] = '{0}|{1}'.format(name0,e)
-                            r[edpos] = int(e.split(',')[-1])
+                            r[pos] = int(e.split(',')[-1])
                             yield r
                     else:
                         yield rec
