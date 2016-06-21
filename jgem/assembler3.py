@@ -276,11 +276,11 @@ class EdgeFinder(object):
             print('gap epos:{0}'.format(epos))
         if self.use_ef2 and  N.abs(epos)>50:
             if direction=='<':
-                sja1 = sja[epos-10:]
-                exa1 = exa[epos-10:]
+                sja1 = sja[epos:]
+                exa1 = exa[epos:]
             else:
-                sja1 = sja[:epos+10]
-                exa1 = exa[:epos+10]
+                sja1 = sja[:epos]
+                exa1 = exa[:epos]
             self.slope_ef.verbose=verbose
             epos2 = self.slope_ef.find(sja1,exa1,direction)
             if verbose:
@@ -1462,7 +1462,7 @@ class LocalAssembler(object):
                 pos = pos1-o
                 pos0 = self._find_pos0(pos, strand, direction)
                 sja1, exa1 = self._subtract_exons(pos, pos0, sja, exa, exs, direction)
-                print('#### pos1:{0}, pos0:{1}'.format(pos1, pos0))
+                print('#### pos1:{0}, pos0:{1}, kind:{2}'.format(pos1, pos0, kind))
                 eposs = EF[kind].find(sja1,exa1,direction, verbose=True)
                 for epos in eposs:
                     # s = pos1
