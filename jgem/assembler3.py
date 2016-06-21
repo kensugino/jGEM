@@ -2019,6 +2019,7 @@ class PathGenerator(object):
             l = []
             tgts = [x for x in self.pg53s if not x.disable]
             if len(tgts)==0:
+                print('gid:{0} all disabled'.format(self.gid))
                 break
             for x in tgts:
                 try:
@@ -2093,7 +2094,7 @@ class PathGenerator(object):
                     if not x.disable:
                         cs = N.sum([z[i] for i in sjidx[x.pgid]])
                         if cs == len(sjidx[x.pgid]):
-                            # print('gid{1}, pgid:{0} disabled (all covered)'.format(x.pgid, self.gid))
+                            print('gid{1}, pgid:{0} disabled (all covered)'.format(x.pgid, self.gid))
                             x.disable = True
             if cscore<nsj:
                 gid = self.gexdf['gid'].values[0]
@@ -2243,7 +2244,8 @@ class PathGenerator53(object):
                 self.raisecnt += 1
                 if (self.raisecnt>self.maxraisecnt)&((vmax-vmin)<self.minvmimadiff):
                     self.disable = True
-                    print('pgid:{0} disabled (raisecnt>{1}, vmax-vmin={2})'.format(self.pgid, self.raisecnt, vmax-vmin))
+                    gid = self.e5['gid']
+                    print('gid:{3}, pgid:{0} disabled (raisecnt>{1}, vmax-vmin={2})'.format(self.pgid, self.raisecnt, vmax-vmin, gid))
                 raise PathNumUpperLimit
 
         pmin0 = N.min(pmins)
