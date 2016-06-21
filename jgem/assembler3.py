@@ -1302,9 +1302,9 @@ class LocalAssembler(object):
                     for s,e,n in sjdf[sjdf['strand']==strand][['st','ed','name']].values:
                         if strand in ['+','.+']:
                             # (5)dpos(st)-sj-(ed)apos(3)
-                            dpos,apos = st,ed
+                            dpos,apos = s,e
                         else:
-                            dpos,apos = ed,st
+                            dpos,apos = e,s
                         if (dpos, strand[-1]) not in adpos:
                             if (dpos not in d2len) or (N.abs(apos-dpos)>(d2len[dpos]+delta)):
                                 yield (chrom,int(dpos),int(dpos),strand,n,'5')
