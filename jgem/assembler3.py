@@ -2078,6 +2078,7 @@ class PathGenerator(object):
         self.maxraisecnt = maxraisecnt
         self.minvmimadiff = minvmimadiff
         self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,x['eid'],upperpathnum,maxraisecnt,minvmimadiff) for i,x in e5s.iterrows()] # one unit
+        self.verbose = False
         self.sjrth = sjpaths['sjratio'].min() #0.001
         self.uth = sjpaths['sc1'].min()
         nid53s = len(gsjdf['id53'].unique())
@@ -2133,7 +2134,9 @@ class PathGenerator(object):
             if raised: # reduce interval range
                 vmin = (vmax+vmin)/2.
                 raisecnt += 1
-                if raisecnt>100:
+                if self.verbose:
+                    print('raisecnt={0}'.format(raisecnt))
+                if raisecnt>50:
                     raise TrimSJ
             else: # go to next interval
                 vmax = vmin
@@ -2145,14 +2148,16 @@ class PathGenerator(object):
         edmax = sjp['ed'].max()
         location = '{0}:{1}-{2}'.format(chrom,stmin,edmax)
         LOG.warning('{1} Possible repeats. Increasing stringency. {0}'.format(location, msg))
+        self.verbose = True
         
         self.uth = uth = self.uth + 0.1
         mcnt = sjp['sc2']-sjp['sc1'] # multi mappers
-        mth = max(0, mcnt.max()-5)
-        self.sjrth = sjrth = self.sjrth + 0.001
+        mth = mcnt.max()/2
+        self.sjrth = sjrth = self.sjrth + 0.01
         n0 = len(sjp)
         sids0 = list(set([y for x in sjp['name'] for y in x.split(',')]))
-        sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio']>sjrth)].copy()
+        # sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio']>sjrth)].copy()
+        sjp = sjp[(mcnt<=mth)&(sjp['sjratio']>sjrth)].copy()
         sids = list(set([y for x in sjp['name'] for y in x.split(',')]))
         n1 = len(sjp)
         LOG.debug('#sjp:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
