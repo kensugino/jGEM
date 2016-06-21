@@ -368,8 +368,8 @@ class SlopeEdgeFinder(object):
         eds = self._aggregate(olen,eds)
         if len(eds)==0:
             return []
-        if len(eds)>=4:
-            eds = eds[:2]+eds[-1:]
+        if len(eds)>=3:
+            eds = eds[:1]+eds[-1:]
         if direction=='<':
             return [-x for x in eds]
         return eds
@@ -2056,11 +2056,8 @@ class PathGenerator(object):
                 paths.sort_values('tcov', ascending=False)
                 for rec in paths.values:
                     yield rec
-            else: # speed up?
-                delta = 1.5*delta
-            # print(vmax,vmin, len(l))
-            # next interval
-            # except PathNumUpperLimit:
+            # else: # speed up?
+            #     delta = min(vmin, 2*delta)
             if raised: # reduce interval range
                 vmin = (vmax+vmin)/2.
             else: # go to next interval
