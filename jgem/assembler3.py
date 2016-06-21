@@ -2058,7 +2058,7 @@ class PathGenerator(object):
             # find index for each sub pg53 range
             sjidx = {}
             for x in self.pg53s:
-                sjp0 = sjp[(sjp['tst']>x.e5['tst'])&(sjp['ted']<x.e5['ted'])]
+                sjp0 = sjp[(sjp['tst']>=x.e5['tst'])&(sjp['ted']<=x.e5['ted'])]
                 sjidx[x.pgid] = [sjnames.index(y) for y in sjp0['name']]
             for p in paths: # score from previously accumulated paths
                 for i,sjn in enumerate(sjnames):
@@ -2093,11 +2093,11 @@ class PathGenerator(object):
                     if not x.disable:
                         cs = N.sum([z[i] for i in sjidx[x.pgid]])
                         if cs == len(sjidx[x.pgid]):
-                            print('gid{1}, pgid:{0} disabled (all covered)'.format(x.pgid, self.gid))
+                            # print('gid{1}, pgid:{0} disabled (all covered)'.format(x.pgid, self.gid))
                             x.disable = True
             if cscore<nsj:
                 gid = self.gexdf['gid'].values[0]
-                LOG.warning('gid:{0} terminated without covering all sj ({1}/{2} #paths:{3} th1:{4} th2:{5},#sjdf:{6})'\
+                LOG.debug('gid:{0} terminated without covering all sj ({1}/{2} #paths:{3} th1:{4} th2:{5},#sjdf:{6})'\
                     .format(gid,cscore,nsj,len(paths),self.tcovth1,self.tcovth2,len(self.gsjdf)))
 
         # sjnames = [','.join(x.split(',')[1:-1]) for x in sjp['name'].values]
