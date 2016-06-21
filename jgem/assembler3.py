@@ -1311,7 +1311,7 @@ class LocalAssembler(object):
                                 adpos.add((dpos,strand[-1]))
                         if (apos, strand[-1]) not in adpos:
                             if (apos not in a2len) or (N.abs(apos-dpos)>(a2len[apos]+delta)):
-                                yield (chrom,int(apos),int(apos),strand,e3,'3')
+                                yield (chrom,int(apos),int(apos),strand,n,'3')
                                 adpos.add((apos,strand[-1]))
             e53df1 = PD.DataFrame([x for x in _e53gen1()], columns=cols)
             e53df1['origin'] = 'sjdf'
