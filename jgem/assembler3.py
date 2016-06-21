@@ -1148,7 +1148,7 @@ class LocalAssembler(object):
         a = sjaa+exaa # all of the coverages
         o = int(self.st)
         # sjpaths['minscov'] = [N.min(a[s-o:e-o]) for s,e in sjpaths[['tst','ted']].values]]
-        sjpaths['sjratio'] = [x/N.min(a[int(s-o):int(e-o)]) for x,s,e in sjpaths[['sc2','tst','ted']].values]
+        # sjpaths['sjratio'] = [x/N.min(a[int(s-o):int(e-o)]) for x,s,e in sjpaths[['sc2','tst','ted']].values]
         sjpaths['sjratio2'] = [x/N.mean(a[int(s-o):int(e-o)]) for x,s,e in sjpaths[['sc2','tst','ted']].values]
         # .values => dtype float matrix => s,e float
         n0 = len(sjpaths)
@@ -1197,9 +1197,19 @@ class LocalAssembler(object):
         if self.params['use_merged_sjdf']:
             path = self.bwpre+'.sjdf.{0}.filtered.txt.gz'.format(self.chrom)
             sj = UT.read_pandas(path, names=SJDFCOLS)
-            self.sjdf = sj[(sj['chr']==self.chrom)&(sj['st']>=self.st)&(sj['ed']<=self.ed)].copy()
-            self.sjdf['tst'] = self.sjdf['st']
-            self.sjdf['ted'] = self.sjdf['ed']
+            sj = sj[(sj['chr']==self.chrom)&(sj['st']>=self.st)&(sj['ed']<=self.ed)].copy()
+            sj['tst'] = sj['st']
+            sj['ted'] = sj['ed']
+            # calculate sjratio2 and filter
+            with self.sjexbw:
+                sjaa = self.sjexbw.bws['sj']['a'].get(chrom, st, ed)
+                exaa = self.sjexbw.bws['ex']['a'].get(chrom, st, ed)
+            a = sjaa+exaa # all of the coverages
+            o = int(self.st)
+            sj['sjratio2'] = [x/N.mean(a[int(s-o):int(e-o)]) for x,s,e in sj[['tcnt','st','ed']].values]
+            idxpn = (sj['strand'].isin(['+','-']))&(sj['sjratio2']>self.params['sjratioth'])
+            idxu = (sj['strand'].isin(['.+','.-']))&(sj['sjratio2']>self.params['usjratioth'])
+            self.sjdf = sj[idxpn|idxu].copy()
         else:
             ap = self.sjpaths
             o = self.st
