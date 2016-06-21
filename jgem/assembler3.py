@@ -309,22 +309,24 @@ SEDJSON = dict(
 class SlopeEdgeFinder(object):
 
     def __init__(self, json, verbose=False):
+        params = SEDJSON.copy()
+        params.update(json)
         self.json = json
-        self.smwinsize=json.get('smwinsize', 151)
+        self.smwinsize=params.get('smwinsize', 151)
         self.swin = N.ones(self.smwinsize)
-        self.minintsize = json.get('minintsize', 10)
-        self.aggregateratio = json.get('aggregateratio', 0.1)
-        self.winsize = json.get('winsize', 15)
+        self.minintsize = params.get('minintsize', 50)
+        self.aggregateratio = params.get('aggregateratio', 0.1)
+        self.winsize = params.get('winsize', 15)
         self.win = N.ones(self.winsize)
-        self.minth = json.get('minth', 0.5)
-        self.sigmath = json.get('sigmath', 3)
-        self.mimath = json.get('mimath', 0.15)
-        self.mimath2 = json.get('mimath2', None)
+        self.minth = params.get('minth', 0.5)
+        self.sigmath = params.get('sigmath', 3)
+        self.mimath = params.get('mimath', 0.15)
+        self.mimath2 = params.get('mimath2', None)
         if self.mimath2 is None:
             self.mimath2 = min(0.5, self.mimath*2.5)
-        self.triggerth = json.get('triggerth', 2)
-        self.covth = json.get('covth', 0.005)
-        self.covratio = json.get('covratio', 0.1)
+        self.triggerth = params.get('triggerth', 2)
+        self.covth = params.get('covth', 0.005)
+        self.covratio = params.get('covratio', 0.1)
         self.verbose = verbose
 
     def find(self, sja, exa, direction):
