@@ -257,9 +257,9 @@ class GapEdgeFinder(object):
             epos = max(epos, -self.maxsize)            
         return epos
         
-EF5JSON = dict(coef=[-0.285,-0.81], intercept=5.6, th=0.01, zoom=1, maxsize=3000, maxgap=50)
+EF5JSON = dict(coef=[-0.285,-0.81], intercept=5.6, th=0.01, zoom=1, maxsize=3000, maxgap=50, minintsize=50)
 # EF5 = EdgeFinder(EF5JSON)
-EF3JSON = dict(coef=[-0.25,-0.51], intercept=4.5, th=0.01, zoom=1, maxsize=20000, maxgap=50) # -0.25, -0.5, 4.5
+EF3JSON = dict(coef=[-0.25,-0.51], intercept=4.5, th=0.01, zoom=1, maxsize=20000, maxgap=50, minintsize=300) # -0.25, -0.5, 4.5
 # EF3 = EdgeFinder(EF3JSON) 
 
 class EdgeFinder(object):
@@ -998,7 +998,8 @@ class LocalAssembler(object):
         if os.path.exists(path):        
             LOG.info('loading EF3 from {0}'.format(path))
             with open(path,'r') as fp:
-                self.gap3params = g3p = json.load(fp)        
+                self.gap3params = g3p = json.load(fp)
+                g3p['minintsize'] = 300 # min 3'UTR size
             self.ef3 = EdgeFinder(g3p,self.params['use_ef2'])
         else:
             LOG.warning('{0} does not exists, reverting to default'.format(path))
