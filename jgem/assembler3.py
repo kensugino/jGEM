@@ -1222,7 +1222,7 @@ class LocalAssembler(object):
             idx = (sj['ucnt']>=uth)|(sj['tcnt']-sj['ucnt']>=mth)
             sj['len'] = sj['ed']-sj['st']
             idxl = (sj['len']<1e5)|(sj['sjratio']>lsjratioth)
-            self.sjdf = sj[idx&(idxpn|idxu)].copy()
+            self.sjdf = sj[idx&(idxpn|idxu)&idxl].copy()
             n1 = len(self.sjdf)
             LOG.info('merged sjdf loaded: filtered {0}=>{1}'.format(n0,n1))
         else:
