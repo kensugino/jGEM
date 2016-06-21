@@ -2081,11 +2081,14 @@ class PathGenerator(object):
         self.sjrth = sjpaths['sjratio'].min() #0.001
         self.uth = sjpaths['sc1'].min()
         nid53s = len(gsjdf['id53'].unique())
+        if nid53s>50:
+            LOG.debug('PathGenerator:gid {1}, #id53s={0}.'.format(nid53s,self.gid))
         if nid53s>100:
-            LOG.debug('PathGenerator:gid {1}, len(id53s)(={0}) > 100'.format(nid53s,self.gid))
-        if nid53s>500:
-            msg = 'Too many id53s ({0}).'.format(nid53s)
+            msg = 'Too many id53s({0}) in a gene ({1}).'.format(nid53s, self.gid)
             self.sjpaths = self.trim(self.sjpaths, msg=msg)
+            n0 = len(self.gsjdf)
+            n1 = len(self._gsjdf)
+            LOG.debug('#gsjdf:{0}=>{1}'.format(n0,n1))
 
     def paths_from_highest_cov(self,tcovth=0,tcovfactor=0.1):
         if len(self.gexdf)==0:
