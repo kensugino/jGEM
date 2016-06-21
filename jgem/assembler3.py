@@ -1183,6 +1183,8 @@ class LocalAssembler(object):
             path = self.bwpre+'.sjdf.{0}.filtered.txt.gz'.format(self.chrom)
             sj = UT.read_pandas(path, names=SJDFCOLS)
             self.sjdf = sj[(sj['chr']==self.chrom)&(sj['st']>=self.st)&(sj['ed']<=self.ed)].copy()
+            self.sjdf['tst'] = self.sjdf['st']
+            self.sjdf['ted'] = self.sjdf['ed']
         else:
             ap = self.sjpaths
             o = self.st
@@ -1589,10 +1591,14 @@ class LocalAssembler(object):
 
     def select_53paths(self, gg, spansjdf, spanexdf, chrom, strand):
         paths = []
+        if self.params['use_merged_sjdf']: 
+            sjpaths = self.sjdf
+        else:
+            sjpaths = self.sjpaths
         for gid in spanexdf['gid'].unique():
             gexdf = spanexdf[spanexdf['gid']==gid]
             gsjdf = spansjdf[spansjdf['gid']==gid]
-            self._pg = pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, self.sjpaths, 
+            self._pg = pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, sjpaths, 
                 self.params['upperpathnum'], self.params['maxraisecnt'], self.params['minvmimadiff'])
             paths.append(pg.select_paths(self.params['tcovth'], self.params['tcovfactor']))
         return PD.concat(paths, ignore_index=True)
