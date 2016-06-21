@@ -1201,15 +1201,20 @@ class LocalAssembler(object):
             sj['tst'] = sj['st']
             sj['ted'] = sj['ed']
             # calculate sjratio2 and filter
+            uth,mth = self.params['uth'],self.params['mth']
+            sjratioth = self.params['sjratioth']
+            usjratioth = self.params['usjratioth']
+            chrom,st,ed = self.chrom,self.st,self.ed
             with self.sjexbw:
                 sjaa = self.sjexbw.bws['sj']['a'].get(chrom, st, ed)
                 exaa = self.sjexbw.bws['ex']['a'].get(chrom, st, ed)
             a = sjaa+exaa # all of the coverages
             o = int(self.st)
             sj['sjratio2'] = [x/N.mean(a[int(s-o):int(e-o)]) for x,s,e in sj[['tcnt','st','ed']].values]
-            idxpn = (sj['strand'].isin(['+','-']))&(sj['sjratio2']>self.params['sjratioth'])
-            idxu = (sj['strand'].isin(['.+','.-']))&(sj['sjratio2']>self.params['usjratioth'])
-            self.sjdf = sj[idxpn|idxu].copy()
+            idxpn = (sj['strand'].isin(['+','-']))&(sj['sjratio2']>sjratioth])
+            idxu = (sj['strand'].isin(['.+','.-']))&(sj['sjratio2']>usjratioth])
+            idx = (sj['ucnt']>=uth)|(sj['tcnt']-sj['ucnt']>=mth)
+            self.sjdf = sj[idx&(idxpn|idxu)].copy()
         else:
             ap = self.sjpaths
             o = self.st
