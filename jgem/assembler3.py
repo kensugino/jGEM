@@ -1294,31 +1294,54 @@ class LocalAssembler(object):
         a2len = UT.df2dict(exdfi, 'apos', 'len')
         d2len = UT.df2dict(exdfi, 'dpos', 'len')
         delta = self.params['edgedelta']
-        def _e53gen1(): # 
-            adpos = set()
-            for strand in ['+','.+', '-','.-']:
-                for pc in ap[ap['strand']==strand]['pathcode'].values:
-                    tmp = pc.split('|')
-                    e5 = tmp[0]
-                    apos,dpos = [int(y) for y in e5.split(',')]
-                    st,ed = min(apos,dpos),max(apos,dpos)
-                    if (dpos, strand[-1]) not in adpos:
-                        if (dpos not in d2len) or (N.abs(apos-dpos)>(d2len[dpos]+delta)):
-                            # print('dpos', strand, dpos, pc)
-                            yield (chrom,int(st),int(ed),strand,e5,'5')
-                            adpos.add((dpos,strand[-1]))
-                    e3 = tmp[-1]
-                    apos,dpos = [int(y) for y in e3.split(',')]
-                    st,ed = min(apos,dpos),max(apos,dpos)
-                    if (apos, strand[-1]) not in adpos:
-                        if (apos not in a2len) or (N.abs(apos-dpos)>(a2len[apos]+delta)):
-                            # print('apos', strand,apos, pc)
-                            yield (chrom,int(st),int(ed),strand,e3,'3')
-                            adpos.add((apos,strand[-1]))
-        e53df1 = PD.DataFrame([x for x in _e53gen1()], columns=cols)
-        e53df1['origin'] = 'path'
+        if self.params['use_merged_sjdf']:
+            sjdf = self.sjdf
+            def _e53gen1(): # 
+                adpos = set()
+                for strand in ['+','.+', '-','.-']:
+                    for s,e,n in sjdf[sjdf['strand']==strand][['st','ed','name']].values:
+                        if strand in ['+','.+']:
+                            # (5)dpos(st)-sj-(ed)apos(3)
+                            dpos,apos = st,ed
+                        else:
+                            dpos,apos = ed,st
+                        if (dpos, strand[-1]) not in adpos:
+                            if (dpos not in d2len) or (N.abs(apos-dpos)>(d2len[dpos]+delta)):
+                                yield (chrom,int(dpos),int(dpos),strand,n,'5')
+                                adpos.add((dpos,strand[-1]))
+                        if (apos, strand[-1]) not in adpos:
+                            if (apos not in a2len) or (N.abs(apos-dpos)>(a2len[apos]+delta)):
+                                yield (chrom,int(apos),int(apos),strand,e3,'3')
+                                adpos.add((apos,strand[-1]))
+            e53df1 = PD.DataFrame([x for x in _e53gen1()], columns=cols)
+            e53df1['origin'] = 'sjdf'
+        else:
+            def _e53gen1(): # 
+                adpos = set()
+                for strand in ['+','.+', '-','.-']:
+                    for pc in ap[ap['strand']==strand]['pathcode'].values:
+                        tmp = pc.split('|')
+                        e5 = tmp[0]
+                        apos,dpos = [int(y) for y in e5.split(',')]
+                        st,ed = min(apos,dpos),max(apos,dpos)
+                        if (dpos, strand[-1]) not in adpos:
+                            if (dpos not in d2len) or (N.abs(apos-dpos)>(d2len[dpos]+delta)):
+                                # print('dpos', strand, dpos, pc)
+                                yield (chrom,int(st),int(ed),strand,e5,'5')
+                                adpos.add((dpos,strand[-1]))
+                        e3 = tmp[-1]
+                        apos,dpos = [int(y) for y in e3.split(',')]
+                        st,ed = min(apos,dpos),max(apos,dpos)
+                        if (apos, strand[-1]) not in adpos:
+                            if (apos not in a2len) or (N.abs(apos-dpos)>(a2len[apos]+delta)):
+                                # print('apos', strand,apos, pc)
+                                yield (chrom,int(st),int(ed),strand,e3,'3')
+                                adpos.add((apos,strand[-1]))
+            e53df1 = PD.DataFrame([x for x in _e53gen1()], columns=cols)
+            e53df1['origin'] = 'path'
         set_ad_pos(e53df1, 'ex')
         e53df1 = e53df1[c3]
+
         e5set = set([(x,y[-1],z) for x,y,z in e53df1[['dpos','strand','kind']].values])
         e3set = set([(x,y[-1],z) for x,y,z in e53df1[['apos','strand','kind']].values])
         def _e53gen2():
