@@ -532,8 +532,9 @@ class SlopeEdgeFinder(object):
         mis = self.minintsize
         while(len(bs)>0 and bs[0]<mis):
             bs = bs[1:]
-        while(len(bs)>0 and maxlen-bs[-1]<mis):
-            bs = bs[:-1]
+        # no need to do this side
+        # while(len(bs)>0 and maxlen-bs[-1]<mis):
+        #     bs = bs[:-1]
         if len(bs)>1:
             bsi = bs[::-1]
             ar = self.aggregateratio # 10% of longer
