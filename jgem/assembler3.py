@@ -1201,8 +1201,10 @@ class LocalAssembler(object):
             path = self.bwpre+'.sjdf.{0}.filtered.txt.gz'.format(self.chrom)
             sj = UT.read_pandas(path, names=SJDFCOLS)
             sj = sj[(sj['chr']==self.chrom)&(sj['st']>=self.st)&(sj['ed']<=self.ed)].copy()
-            sj['tst'] = sj['st']
+            sj['tst'] = sj['st'] # for sjpath compatibility
             sj['ted'] = sj['ed']
+            sj['sc1'] = sj['ucnt']
+            sj['sc2'] = sj['tcnt']
             n0 = len(sj)
             # calculate sjratio2 and filter
             uth,mth = self.params['uth'],self.params['mth']
@@ -2076,6 +2078,12 @@ class PathGenerator(object):
         self.maxraisecnt = maxraisecnt
         self.minvmimadiff = minvmimadiff
         self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,x['eid'],upperpathnum,maxraisecnt,minvmimadiff) for i,x in e5s.iterrows()] # one unit
+        self.sjrth = sjpaths['sjratio'].min() #0.001
+        self.uth = sjpaths['sc1'].min()
+        n = len(gsjdf['id53'].unique())
+        if nid53s>500:
+            msg = 'Too many id53s ({0}).'.format(nid53s)
+            self.sjpaths = self.trim(self.sjpaths, msg=msg)
 
     def paths_from_highest_cov(self,tcovth=0,tcovfactor=0.1):
         if len(self.gexdf)==0:
@@ -2123,6 +2131,38 @@ class PathGenerator(object):
                 vmax = vmin
                 vmin = max(0, vmax - delta)
 
+    def trim(self, sjp, msg='Too many low cov paths.'):
+        chrom = sjp.iloc[0]['chr']
+        stmin = sjp['st'].min()
+        edmax = sjp['ed'].max()
+        location = '{0}:{1}-{2}'.format(chrom,stmin,edmax)
+        LOG.warning('{1} Possible repeats. Increasing stringency. {0}'.format(location, msg))
+        
+        self.uth = uth = self.uth + 0.1
+        mcnt = sjp['sc2']-sjp['sc1'] # multi mappers
+        mth = max(0, mcnt.max()-5)
+        self.sjrth = sjrth = self.sjrth + 0.001
+        n0 = len(sjp)
+        sids0 = list(set([y for x in sjp['name'] for y in x.split(',')]))
+        sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio']>sjrth)].copy()
+        sids = list(set([y for x in sjp['name'] for y in x.split(',')]))
+        n1 = len(sjp)
+        LOG.debug('#sjp:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
+        gsjdf = self.gsjdf
+        self._gsjdf = gsjdf[gsjdf['name'].isin(sids)].copy()
+        LOG.debug('gsjdf {0}=>{1} #sids {2}=>{3}'.format(len(gsjdf), len(self._gsjdf), len(sids0), len(sids)))
+        # remake gg
+        jids = list(set(self._gsjdf['sid'].values))
+        self._gg = gg = self.gg.restrict(jids)
+        gexdf = self.gexdf
+        n0 = len(gexdf['eid'].unique())
+        eids = set(gg.edj.keys()+gg.eaj.keys()+list(self.e5s['eid'].values))
+        n1=len(eids)
+        self._gexdf = gexdf[gexdf['eid'].isin(eids)].copy()
+        LOG.debug('gg.ede {0}=>{1} #eids {2}=>{3}'.format(len(self.gg.ede),len(gg.ede), n0,n1))
+        # e5s  = self._gexdf[self._gexdf['kind']=='5']
+        self.pg53s = [PathGenerator53(x,gg,self._gexdf,self._gsjdf, i, self.upperpathnum) for i,x in self.e5s.iterrows()]        
+        return sjp
 
     def select_paths(self, tcovth=1, tcovfactor=0.1):
         sjp = self.sjpaths
@@ -2181,51 +2221,17 @@ class PathGenerator(object):
             #     for i,zi in enumerate(z):
             #         if zi==0:
             #             print('  i:{0} name:{1}'.format(i, sjnames[i]))
-        # # sjnames = [','.join(x.split(',')[1:-1]) for x in sjp['name'].values]
-        # sjnames = sjp['name'].values
-        # sjrth = sjp['sjratio2'].min() #0.002
-        # uth = sjp['sc1'].min()
-        # upperpathnum = self.upperpathnum
-        # while True:
-        #     try:
-        #         # paths = _select(sjnames)
-        #         _select(sjp)
-        #         break
-        #     except TrimSJ: # remove sj to cover # <== not used anymore
-        #         chrom = sjp.iloc[0]['chr']
-        #         stmin = sjp['st'].min()
-        #         edmax = sjp['ed'].max()
-        #         location = '{0}:{1}-{2}'.format(chrom,stmin,edmax)
-        #         LOG.warning('Too many low cov paths. Possible repeats. Increasing stringency. {0}'.format(location))
-                
-        #         uth += 0.1
-        #         mcnt = sjp['sc2']-sjp['sc1'] # multi mappers
-        #         mth = max(0, mcnt.max()-5)
-        #         sjrth += 0.001
-        #         n0 = len(sjp)
-        #         sids0 = list(set([y for x in sjp['name'] for y in x.split(',')]))
-        #         sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio2']>sjrth)].copy()
-        #         sids = list(set([y for x in sjp['name'] for y in x.split(',')]))
-        #         n1 = len(sjp)
-        #         LOG.debug('#sjp:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
-        #         # sjnames = sjp['name'].values
-        #         # upperpathnum = 2*upperpathnum
-        #         gsjdf = self.gsjdf
-        #         self._gsjdf = gsjdf[gsjdf['name'].isin(sids)].copy()
-        #         LOG.debug('gsjdf {0}=>{1} #sids {2}=>{3}'.format(len(gsjdf), len(self._gsjdf), len(sids0), len(sids)))
-        #         # remake gg
-        #         jids = list(set(self._gsjdf['sid'].values))
-        #         self._gg = gg = self.gg.restrict(jids)
-        #         gexdf = self.gexdf
-        #         n0 = len(gexdf['eid'].unique())
-        #         eids = set(gg.edj.keys()+gg.eaj.keys()+list(self.e5s['eid'].values))
-        #         n1=len(eids)
-        #         self._gexdf = gexdf[gexdf['eid'].isin(eids)].copy()
-        #         LOG.debug('gg.ede {0}=>{1} #eids {2}=>{3}'.format(len(self.gg.ede),len(gg.ede), n0,n1))
-        #         # e5s  = self._gexdf[self._gexdf['kind']=='5']
-        #         self.pg53s = [PathGenerator53(x,gg,self._gexdf,self._gsjdf, i, self.upperpathnum) for i,x in self.e5s.iterrows()]
-        
-        _select(sjp)
+        self.sjrth = sjp['sjratio2'].min() #0.002
+        self.uth = sjp['sc1'].min()
+        while True:
+            try:
+                # paths = _select(sjnames)
+                _select(sjp)
+                break
+            except TrimSJ: # remove sj to cover # <== not used anymore
+                sjp = self.trim(sjp)
+
+        # _select(sjp)
         df = PD.DataFrame(paths, columns=PATHCOLS)
         # add 3exons
         # e3 => e3s
