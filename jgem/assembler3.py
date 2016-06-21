@@ -274,13 +274,13 @@ class EdgeFinder(object):
         epos = self.gap_ef.find(sja, exa, direction)
         if verbose:
             print('gap epos:{0}'.format(epos))
-        if self.use_ef2 and  N.abs(epos)>10:
+        if self.use_ef2 and  N.abs(epos)>50:
             if direction=='<':
-                sja1 = sja[epos:]
-                exa1 = exa[epos:]
+                sja1 = sja[epos-10:]
+                exa1 = exa[epos-10:]
             else:
-                sja1 = sja[:epos]
-                exa1 = exa[:epos]
+                sja1 = sja[:epos+10]
+                exa1 = exa[:epos+10]
             self.slope_ef.verbose=verbose
             epos2 = self.slope_ef.find(sja1,exa1,direction)
             if verbose:
