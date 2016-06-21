@@ -845,7 +845,7 @@ LAPARAMS = dict(
      tcovfactor=0.1,
      upperpathnum=100, # if num of paths larger than this increase stringency for sjs
      maxraisecnt=2, 
-     minvmimadiff=0.5,
+     minvmimadiff=1,
      pathcheckth=100, # above this num of sjs check sc1(ucnt)==0 if >50% remove
      pathcheckratio=0.1, # ratio of ucnt==0 if above this remove these
      use_ef2=False, # whether to use slope edge detector
@@ -2025,7 +2025,7 @@ class PathGenerator(object):
             l = []
             tgts = [x for x in self.pg53s if not x.disable]
             if len(tgts)==0:
-                print('gid:{0} all disabled'.format(self.gid))
+                # print('gid:{0} all disabled'.format(self.gid))
                 break
             for x in tgts:
                 try:
