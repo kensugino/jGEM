@@ -2081,7 +2081,7 @@ class PathGenerator(object):
         self.sjrth = sjpaths['sjratio'].min() #0.001
         self.uth = sjpaths['sc1'].min()
         nid53s = len(gsjdf['id53'].unique())
-        if nid53s>100:
+        if nid53s>200:
             msg = 'Too many id53s({0}) in a gene ({1}).'.format(nid53s, self.gid)
             self.sjpaths = self.trim(self.sjpaths, msg=msg)
             n0 = len(self.gsjdf)
