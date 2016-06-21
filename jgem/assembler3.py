@@ -370,8 +370,9 @@ class SlopeEdgeFinder(object):
         eds = self._aggregate(olen,eds)
         if len(eds)==0:
             return []
-        if len(eds)>=3:
-            eds = eds[:1]+eds[-1:]
+        if len(eds)>3:
+            mid = int(len(eds)/2)
+            eds = eds[:1]+eds[mid:mid+1]+eds[-1:]
         if direction=='<':
             return [-x for x in eds]
         return eds
