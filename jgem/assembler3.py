@@ -2100,6 +2100,9 @@ class PathGenerator(object):
                 gid = self.gexdf['gid'].values[0]
                 LOG.debug('gid:{0} terminated without covering all sj ({1}/{2} #paths:{3} th1:{4} th2:{5},#sjdf:{6})'\
                     .format(gid,cscore,nsj,len(paths),self.tcovth1,self.tcovth2,len(self.gsjdf)))
+                for i,zi in enumerate(z):
+                    if zi==0:
+                        print('  i:{0} name:{1}'.format(i, sjnames[i]))
 
         # sjnames = [','.join(x.split(',')[1:-1]) for x in sjp['name'].values]
         sjnames = sjp['name'].values
