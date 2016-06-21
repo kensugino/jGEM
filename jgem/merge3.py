@@ -389,7 +389,7 @@ SJFILTERPARAMS = dict(
     th_maxcnt=1,
     th_maxoverhang=15,
     th_minedgeexon=15,
-    th_sjratio2=1e-3,
+    th_sjratio=1e-3,
     filter_unstranded=False,# there are substantial number of high cov unstranded
 )
 class SJFilter(object):
@@ -472,7 +472,7 @@ def filter_sjpath(bwsjpre, statspath, chrom, csize, params):
     sj['ellen'] = [int(x.split(',')[-2]) for x in sj['esizes']]    
     eth = params['th_minedgeexon']
     sj = sj[(sj['eflen']>eth)&(sj['ellen']>eth)].copy()
-    # calculate sjratio, sjratio2
+    # calculate sjratio, sjratio
     if params['filter_unstranded']:
         sjexbw = A3.SjExBigWigs(bwsjpre, mixunstranded=False)
     else:
@@ -481,8 +481,9 @@ def filter_sjpath(bwsjpre, statspath, chrom, csize, params):
         sa = sjexbw.bws['sj']['a'].get(chrom,0,csize)
         ea = sjexbw.bws['ex']['a'].get(chrom,0,csize)
     a = sa+ea
-    sj['sjratio2'] = [x/N.mean(a[int(s):int(e)]) for x,s,e in sj[['sc1','tst','ted']].values]
-    sj = sj[sj['sjratio2']>params['th_sjratio2']]
+    # sj['sjratio'] = [x/N.mean(a[int(s):int(e)]) for x,s,e in sj[['sc1','tst','ted']].values]
+    sj['sjratio'] = [x/N.max(a[int(s):int(e)]) for x,s,e in sj[['sc1','tst','ted']].values]
+    sj = sj[sj['sjratio']>params['th_sjratio']]
     GGB.write_bed(sj, dstpath, ncols=12)
 
 def filter_sjdf(bwsjpre, statspath, chrom, csize, params):
@@ -519,7 +520,7 @@ def filter_sjdf(bwsjpre, statspath, chrom, csize, params):
     # sj['ellen'] = [int(x.split(',')[-2]) for x in sj['esizes']]    
     # eth = params['th_minedgeexon']
     # sj = sj[(sj['eflen']>eth)&(sj['ellen']>eth)].copy()
-    # calculate sjratio, sjratio2
+    # calculate sjratio, sjratio
     if params['filter_unstranded']:
         sjexbw = A3.SjExBigWigs(bwsjpre, mixunstranded=False)
     else:
@@ -528,8 +529,9 @@ def filter_sjdf(bwsjpre, statspath, chrom, csize, params):
         sa = sjexbw.bws['sj']['a'].get(chrom,0,csize)
         ea = sjexbw.bws['ex']['a'].get(chrom,0,csize)
     a = sa+ea
-    sj['sjratio2'] = [x/N.mean(a[int(s):int(e)]) for x,s,e in sj[['tcnt','st','ed']].values]
-    sj = sj[sj['sjratio2']>params['th_sjratio2']]
+    # sj['sjratio'] = [x/N.mean(a[int(s):int(e)]) for x,s,e in sj[['tcnt','st','ed']].values]
+    sj['sjratio'] = [x/N.max(a[int(s):int(e)]) for x,s,e in sj[['tcnt','st','ed']].values]
+    sj = sj[sj['sjratio']>params['th_sjratio']]
     UT.write_pandas(sj[A3.SJDFCOLS], dstpath, '')
 
 
