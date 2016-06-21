@@ -2080,9 +2080,9 @@ class PathGenerator(object):
         self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,x['eid'],upperpathnum,maxraisecnt,minvmimadiff) for i,x in e5s.iterrows()] # one unit
         self.sjrth = sjpaths['sjratio'].min() #0.001
         self.uth = sjpaths['sc1'].min()
-        n = len(gsjdf['id53'].unique())
-        if n>100:
-            LOG.debug('PathGenerator:gid {1}, len(id53s)(={0}) > 100'.format(n,self.gid))
+        nid53s = len(gsjdf['id53'].unique())
+        if nid53s>100:
+            LOG.debug('PathGenerator:gid {1}, len(id53s)(={0}) > 100'.format(nid53s,self.gid))
         if nid53s>500:
             msg = 'Too many id53s ({0}).'.format(nid53s)
             self.sjpaths = self.trim(self.sjpaths, msg=msg)
