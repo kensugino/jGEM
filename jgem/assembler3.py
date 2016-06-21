@@ -362,12 +362,14 @@ class SlopeEdgeFinder(object):
             eds1 = self.trim(v,sm,eds1)
         if self.verbose:
             LOG.debug('drop({0}), rise({1}), low({2}), min({3}), rise2({4})'.format(l0,l1,l2,l3,l4))
-        eds = eds0[:2]+eds1[:1]
+        eds = eds0+eds1
         if len(eds)==0:
             eds = [olen]
         eds = self._aggregate(olen,eds)
         if len(eds)==0:
             return []
+        if len(eds)>=4:
+            eds = eds[:2]+eds[-1:]
         if direction=='<':
             return [-x for x in eds]
         return eds
@@ -863,13 +865,16 @@ MERGEPARAMS = LAPARAMS.copy()
 MERGEPARAMS.update(dict(
      uth=0,
      mth=5,
-     upperpathnum=500, # if num of paths larger than this increase stringency for sjs
+     upperpathnum=50, # if num of paths larger than this increase stringency for sjs
      tcovth=50,
      tcovfactor=0.2,
+     maxraisecnt=2, 
+     minvmimadiff=5,     
      use_ef2=True, # whether to use slope edge detector
      edgedelta=1000000, # disable getting 53exons from extruded edges
      use_sja_for_exon_detection=True,
      use_merged_sjdf=True,
+     use_sjdf_for_check=True,
      use_iexon_from_path=False,
 ))
 
