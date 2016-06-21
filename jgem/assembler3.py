@@ -849,7 +849,8 @@ LAPARAMS = dict(
      uth=0, 
      mth=3, 
      sjratioth=1e-3, # 2e-3
-     usjratioth=1e-3, # 1e-2
+     usjratioth=5e-3, # 1e-2 for unstranded sj
+     lsjratioth=5e-3, # for sj > 100Kbp
      #covfactor=0.05, 
      tcovth=0,
      tcovfactor=0.1,
@@ -1207,6 +1208,7 @@ class LocalAssembler(object):
             uth,mth = self.params['uth'],self.params['mth']
             sjratioth = self.params['sjratioth']
             usjratioth = self.params['usjratioth']
+            lsjratioth = self.params['lsjratioth']
             chrom,st,ed = self.chrom,self.st,self.ed
             with self.sjexbw:
                 sjaa = self.sjexbw.bws['sj']['a'].get(chrom, st, ed)
@@ -1218,6 +1220,7 @@ class LocalAssembler(object):
             idxpn = (sj['strand'].isin(['+','-']))&(sj['sjratio']>sjratioth)
             idxu = (sj['strand'].isin(['.+','.-']))&(sj['sjratio']>usjratioth)
             idx = (sj['ucnt']>=uth)|(sj['tcnt']-sj['ucnt']>=mth)
+            idxl = (sj['len']<1e5)|(sj['sjratio']>lsjratioth)
             self.sjdf = sj[idx&(idxpn|idxu)].copy()
             n1 = len(self.sjdf)
             LOG.info('merged sjdf loaded: filtered {0}=>{1}'.format(n0,n1))
