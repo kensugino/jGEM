@@ -2109,50 +2109,50 @@ class PathGenerator(object):
                 for i,zi in enumerate(z):
                     if zi==0:
                         print('  i:{0} name:{1}'.format(i, sjnames[i]))
-
-        # sjnames = [','.join(x.split(',')[1:-1]) for x in sjp['name'].values]
-        sjnames = sjp['name'].values
-        sjrth = sjp['sjratio2'].min() #0.002
-        uth = sjp['sc1'].min()
-        upperpathnum = self.upperpathnum
-        while True:
-            try:
-                # paths = _select(sjnames)
-                _select(sjp)
-                break
-            except TrimSJ: # remove sj to cover # <== not used anymore
-                chrom = sjp.iloc[0]['chr']
-                stmin = sjp['st'].min()
-                edmax = sjp['ed'].max()
-                location = '{0}:{1}-{2}'.format(chrom,stmin,edmax)
-                LOG.warning('Too many low cov paths. Possible repeats. Increasing stringency. {0}'.format(location))
+        _select(sjp)
+        # # sjnames = [','.join(x.split(',')[1:-1]) for x in sjp['name'].values]
+        # sjnames = sjp['name'].values
+        # sjrth = sjp['sjratio2'].min() #0.002
+        # uth = sjp['sc1'].min()
+        # upperpathnum = self.upperpathnum
+        # while True:
+        #     try:
+        #         # paths = _select(sjnames)
+        #         _select(sjp)
+        #         break
+        #     except TrimSJ: # remove sj to cover # <== not used anymore
+        #         chrom = sjp.iloc[0]['chr']
+        #         stmin = sjp['st'].min()
+        #         edmax = sjp['ed'].max()
+        #         location = '{0}:{1}-{2}'.format(chrom,stmin,edmax)
+        #         LOG.warning('Too many low cov paths. Possible repeats. Increasing stringency. {0}'.format(location))
                 
-                uth += 0.1
-                mcnt = sjp['sc2']-sjp['sc1'] # multi mappers
-                mth = max(0, mcnt.max()-5)
-                sjrth += 0.001
-                n0 = len(sjp)
-                sids0 = list(set([y for x in sjp['name'] for y in x.split(',')]))
-                sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio2']>sjrth)].copy()
-                sids = list(set([y for x in sjp['name'] for y in x.split(',')]))
-                n1 = len(sjp)
-                LOG.debug('#sjp:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
-                # sjnames = sjp['name'].values
-                # upperpathnum = 2*upperpathnum
-                gsjdf = self.gsjdf
-                self._gsjdf = gsjdf[gsjdf['name'].isin(sids)].copy()
-                LOG.debug('gsjdf {0}=>{1} #sids {2}=>{3}'.format(len(gsjdf), len(self._gsjdf), len(sids0), len(sids)))
-                # remake gg
-                jids = list(set(self._gsjdf['sid'].values))
-                self._gg = gg = self.gg.restrict(jids)
-                gexdf = self.gexdf
-                n0 = len(gexdf['eid'].unique())
-                eids = set(gg.edj.keys()+gg.eaj.keys()+list(self.e5s['eid'].values))
-                n1=len(eids)
-                self._gexdf = gexdf[gexdf['eid'].isin(eids)].copy()
-                LOG.debug('gg.ede {0}=>{1} #eids {2}=>{3}'.format(len(self.gg.ede),len(gg.ede), n0,n1))
-                # e5s  = self._gexdf[self._gexdf['kind']=='5']
-                self.pg53s = [PathGenerator53(x,gg,self._gexdf,self._gsjdf, i, self.upperpathnum) for i,x in self.e5s.iterrows()]
+        #         uth += 0.1
+        #         mcnt = sjp['sc2']-sjp['sc1'] # multi mappers
+        #         mth = max(0, mcnt.max()-5)
+        #         sjrth += 0.001
+        #         n0 = len(sjp)
+        #         sids0 = list(set([y for x in sjp['name'] for y in x.split(',')]))
+        #         sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio2']>sjrth)].copy()
+        #         sids = list(set([y for x in sjp['name'] for y in x.split(',')]))
+        #         n1 = len(sjp)
+        #         LOG.debug('#sjp:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
+        #         # sjnames = sjp['name'].values
+        #         # upperpathnum = 2*upperpathnum
+        #         gsjdf = self.gsjdf
+        #         self._gsjdf = gsjdf[gsjdf['name'].isin(sids)].copy()
+        #         LOG.debug('gsjdf {0}=>{1} #sids {2}=>{3}'.format(len(gsjdf), len(self._gsjdf), len(sids0), len(sids)))
+        #         # remake gg
+        #         jids = list(set(self._gsjdf['sid'].values))
+        #         self._gg = gg = self.gg.restrict(jids)
+        #         gexdf = self.gexdf
+        #         n0 = len(gexdf['eid'].unique())
+        #         eids = set(gg.edj.keys()+gg.eaj.keys()+list(self.e5s['eid'].values))
+        #         n1=len(eids)
+        #         self._gexdf = gexdf[gexdf['eid'].isin(eids)].copy()
+        #         LOG.debug('gg.ede {0}=>{1} #eids {2}=>{3}'.format(len(self.gg.ede),len(gg.ede), n0,n1))
+        #         # e5s  = self._gexdf[self._gexdf['kind']=='5']
+        #         self.pg53s = [PathGenerator53(x,gg,self._gexdf,self._gsjdf, i, self.upperpathnum) for i,x in self.e5s.iterrows()]
 
         df = PD.DataFrame(paths, columns=PATHCOLS)
         return df.groupby('name').first().reset_index()
