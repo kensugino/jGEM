@@ -2223,8 +2223,6 @@ class PathGenerator(object):
             #     for i,zi in enumerate(z):
             #         if zi==0:
             #             print('  i:{0} name:{1}'.format(i, sjnames[i]))
-        self.sjrth = sjp['sjratio2'].min() #0.002
-        self.uth = sjp['sc1'].min()
         while True:
             try:
                 # paths = _select(sjnames)
