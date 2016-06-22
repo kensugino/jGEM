@@ -2150,18 +2150,18 @@ class PathGenerator(object):
                 vmin = max(0, vmax - delta)
 
     def trim(self, sjp, msg='Too many paths.'):
-        chrom = sjp.iloc[0]['chr']
+        # chrom = sjp.iloc[0]['chr']
         stmin = sjp['st'].min()
         edmax = sjp['ed'].max()
-        location = '{0}:{1}-{2}'.format(chrom,stmin,edmax)
+        location = '{0}:{1}-{2}:{3}'.format(self.chrom,stmin,edmax,self.strand)
         LOG.warning('{1} Possible repeats. Increasing stringency. {0}'.format(location, msg))
         self.verbose = True
         
         self.uth = uth = self.uth + 0.1
         mcnt = sjp['sc2']-sjp['sc1'] # multi mappers
-        mth = mcnt.max()*0.8
+        mth = mcnt.max()*0.6
         self.sjrth = sjrth = self.sjrth + 0.01
-        lth = max(50000, min(100000, sjp['len'].max()*0.8))
+        lth = max(50000, min(100000, sjp['len'].max()*0.6))
         n0 = len(sjp)
         sids0 = list(set([y for x in sjp['name'] for y in x.split(',')]))
         # sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio']>sjrth)].copy()

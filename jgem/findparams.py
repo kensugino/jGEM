@@ -446,11 +446,13 @@ class ParamFinder(object):
         neipath = self.bwpre+'.{0}.{1}.nei0.params.txt.gz'.format(self.refcode,covfactor)
         e53path = self.bwpre+'.{0}.{1}.e53.params.txt.gz'.format(self.refcode,covfactor)
         if os.path.exists(neipath):
+            print('reading from cache {0}'.format(neipath))
             nei = UT.read_pandas(neipath)
         else:
             nei = self.calc_params_mp(self.ne_i0, np=np, gapmode='i',covfactor=covfactor) # ~ 1min
             UT.write_pandas(nei, neipath, 'h')
         if os.path.exists(e53path):
+            print('reading from cache {0}'.format(e53path))
             e53 = UT.read_pandas(e53path)
         else:
             e53 = self.calc_params_mp(self.e53, np=np, gapmode='i',covfactor=covfactor) # ~ 10min don't do long ones stupid
@@ -697,7 +699,11 @@ class ParamFinder(object):
         ax.plot(avx,avy,'r.-')
         ax.set_title('emin')
     
-    
+    def calc_junction_params(self, statspath, np=7):
+        # len, sjratio2, ucnt, tcnt, maxoverhang, #detect, ...
+        pass
+
+
 def calc_sensitivity_specificity(Y,Z,FN0=0):
     mismatch=N.sum(Y!=Z)
     print('mismatch:{0}/{1}'.format(mismatch, len(Y)))
