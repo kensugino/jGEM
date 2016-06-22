@@ -549,7 +549,15 @@ class LocalEstimator(A3.LocalAssembler):
         bed12 = GGB.read_bed(modelpre+'.paths.withse.bed.gz')
         idx = (bed12['chr']==chrom)&(bed12['tst']>=st)&(bed12['ted']<=ed)
         self.paths = bed12[idx].copy()
-        sj = GGB.read_bed(bwpre+'.sjpath.bed.gz')
+        tgt1 = bwpre+'.{0}.filtered.bed.gz'.format(chrom)
+        tgt2 = bwpre+'.{0}.bed.gz'.format(chrom)
+        tgt3 = bwpre+'.sjpath.bed.gz'
+        if os.path.exists(tgt1):
+            sj = GGB.read_bed(tgt1)
+        elif os.path.exists(tgt2):
+            sj = GGB.read_bed(tgt2)
+        else:
+            sj = GGB.read_bed(tgt3)
         idx0 = (sj['chr']==chrom)&(sj['tst']>=st)&(sj['ted']<=ed)        
         self.sjpaths0 = sj[idx0].copy()        
         # load exdf, sjdf
@@ -987,7 +995,7 @@ def _collect_subset(modelpre, covpressub, dstpre, subid, which):
         flds = ['tcov0','tcov']
         fsuf = 'tcovs'
         cols = A3.PATHCOLS
-    ex0 = UT.read_pandas(modelpre+'.{0}.txt.gz'.format(suf), names=cols)
+    ex0 = UT.read_pandas(modelpre+'.covs.{0}.txt.gz'.format(suf), names=cols)
     chroms = ex0['chr'].unique()
     # read in exdf sort, transpose and write(append) to dst
     if all([os.path.exists(dstpre+'.{1}.{0}.txt.gz'.format(c,fsuf)) for c in chroms]):
@@ -1027,7 +1035,7 @@ def _concatenate_subsets(modelpre, dstpre, subids, which, chrom):
         fsuf = 'tcovs'
         cols = A3.PATHCOLS
     
-    ex0 = UT.read_pandas(modelpre+'.{0}.txt.gz'.format(suf), names=cols)
+    ex0 = UT.read_pandas(modelpre+'.covs.{0}.txt.gz'.format(suf), names=cols)
     chroms = ex0['chr'].unique()
     files = []
     dstpath0 = dstpre+'.{1}.{0}.tmp.txt.gz'.format(chrom,fsuf)
