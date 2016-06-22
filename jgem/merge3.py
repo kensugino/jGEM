@@ -988,13 +988,13 @@ def _collect_subset(modelpre, covpressub, dstpre, subid, which):
         fsuf = 'tcovs'
         cols = A3.PATHCOLS
     # read in exdf sort, transpose and write(append) to dst
-    ex0 = UT.read_pandas(modelpre+'.covs.{0}.txt.gz'.format(suf), names=cols)
-    chroms = ex0['chr'].unique()
     if all([os.path.exists(dstpre+'.{1}.{0}.txt.gz'.format(c,fsuf)) for c in chroms]):
         return []
     if all([os.path.exists(dstpre+'.{2}.{0}.{1}.txt.gz'.format(c,subid,fsuf)) for c in chroms]):
         return []
+    ex0 = UT.read_pandas(modelpre+'.{0}.txt.gz'.format(suf), names=cols)
     ex0.sort_values(['chr','st','ed','strand'], inplace=True)
+    chroms = ex0['chr'].unique()
     names = []
     for pre in covpressub:
         name = pre.split('/')[-1]
@@ -1027,7 +1027,7 @@ def _concatenate_subsets(modelpre, dstpre, subids, which, chrom):
         fsuf = 'tcovs'
         cols = A3.PATHCOLS
     
-    ex0 = UT.read_pandas(modelpre+'.covs.{0}.txt.gz'.format(suf), names=cols)
+    ex0 = UT.read_pandas(modelpre+'.{0}.txt.gz'.format(suf), names=cols)
     chroms = ex0['chr'].unique()
     files = []
     dstpath0 = dstpre+'.{1}.{0}.tmp.txt.gz'.format(chrom,fsuf)
