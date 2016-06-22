@@ -595,7 +595,7 @@ class LocalEstimator(A3.LocalAssembler):
         for strand in ['+','-']:
             spans = self._get_spans(strand)
             for st,ed in spans:
-                idx = (ex['st']>=st)&(ex['ed']<=ed)&(ex['strand'].isin(STRS[strand]))
+                idx = (ex['st']>=st)&(ex['ed']<=ed)&(ex['strand'].isin(A3.STRS[strand]))
                 es = ex[idx].copy().sort_values(['st','ed'])
                 es['tmpeid'] = N.arange(len(es))
                 ne = len(es)
@@ -645,7 +645,7 @@ class LocalEstimator(A3.LocalAssembler):
     def tcov_by_nnls(self, s, e, strand):
         o = self.st
         p = self.paths
-        idx = (p['tst']>=s)&(p['ted']<=e)&(p['strand'].isin(STRS[strand]))
+        idx = (p['tst']>=s)&(p['ted']<=e)&(p['strand'].isin(A3.STRS[strand]))
         ps = p[idx]
         if len(ps)==0:
             return None
@@ -733,7 +733,7 @@ class LocalEstimator(A3.LocalAssembler):
                 
     def tcov_by_branchp(self, tst, ted, strand, tcov0):
         p = self.paths
-        idx = (p['strand'].isin(STRS[strand]))&(p['tst']==tst)&(p['ted']==ted)
+        idx = (p['strand'].isin(A3.STRS[strand]))&(p['tst']==tst)&(p['ted']==ted)
         if N.sum(idx)==0:
             return
         if N.sum(idx)>1:
