@@ -47,6 +47,7 @@ from jgem import assembler3 as A3
 
 import jgem.cy.bw as cybw
 
+############# Merge Prep ######################################################
 
 class PrepBWSJ(object):
     
@@ -384,6 +385,9 @@ def prep_sjdf(dstpre, chroms):
     #     os.unlink(f)
     return dstpath
 
+
+############# SJ Filter #######################################################
+
 SJFILTERPARAMS = dict(
     th_detected=1,
     th_maxcnt=1,
@@ -534,6 +538,7 @@ def filter_sjdf(bwsjpre, statspath, chrom, csize, params):
     sj = sj[sj['sjratio']>params['th_sjratio']]
     UT.write_pandas(sj[A3.SJDFCOLS], dstpath, '')
 
+############# Cov Estimator ######################################################
 
 class LocalEstimator(A3.LocalAssembler):
 
@@ -855,3 +860,191 @@ def estimatecovs(modelpre, bwpre, dstpre, genome, tcovth=1, np=6):
 
 
 
+
+############# Cov Collector ######################################################
+
+class CovCollector(object):
+    
+    def __init__(self, covpres, dstpre, np=14):
+        self.covpres = covpres
+        self.modelpre = covpres[0]
+        self.dstpre = dstpre
+        self.np = np
+        
+    def run(self):
+        self.server = server = TQ.Server(np=self.np)
+        self.exdf = ex = UT.read_pandas(self.modelpre+'.covs.exdf.txt.gz', names=A2.EXDFCOLS)
+        self.chroms = chroms = ex['chr'].unique()
+        self.exstatus = exstatus = {}
+        self.sjstatus = sjstatus = {}
+        self.pastatus = pastatus = {}
+        exdone=False
+        sjdone=False
+        padone=False
+        n = len(self.covpres)
+        nb = int(N.ceil(n/50.))
+        with server:
+            for subid in range(nb):
+                covpressub = self.covpres[50*subid:50*(subid+1)]
+                # ex
+                tname = 'collect_ecov_subset.{0}'.format(subid)
+                args = (self.modelpre, covpressub, self.dstpre, subid)
+                task = TQ.Task(tname, collect_ecov_subset, args)
+                server.add_task(task)
+                # sj
+                tname = 'collect_tcnt_subset.{0}'.format(subid)
+                args = (self.modelpre, covpressub, self.dstpre, subid)
+                task = TQ.Task(tname, collect_tcnt_subset, args)
+                server.add_task(task)
+                # path
+                tname = 'collect_tcovs_subset.{0}'.format(subid)
+                args = (self.modelpre, covpressub, self.dstpre, subid)
+                task = TQ.Task(tname, collect_tcovs_subset, args)
+                server.add_task(task)
+            while server.check_error():
+                try:
+                    name, rslt = server.get_result(timeout=5)
+                except TQ.Empty:
+                    name, rslt = None, None
+                if name is not None:
+                    if name.startswith('collect_ecov_subset.'):
+                        subid = name.split('.')[-1]
+                        exstatus[subid] = rslt
+                        if len(exstatus)==nb:
+                            print('$$$$$$$$ putting in concatenate_ecov_subsets $$$$$$$$$$$')
+                            for chrom in chroms:
+                                tname='concatenate_ecov_subsets'
+                                args = (self.modelpre, self.dstpre, range(nb), chrom)
+                                task = TQ.Task(tname, concatenate_ecov_subsets, args)
+                                server.add_task(task)
+                    if name.startswith('collect_tcnt_subset.'):
+                        subid = name.split('.')[-1]
+                        sjstatus[subid] = rslt
+                        if len(sjstatus)==nb:
+                            print('$$$$$$$$ putting in concatenate_tcnt_subsets $$$$$$$$$$$')
+                            for chrom in chroms:
+                                tname='concatenate_tcnt_subsets'
+                                args = (self.modelpre, self.dstpre, range(nb), chrom)
+                                task = TQ.Task(tname, concatenate_tcnt_subsets, args)
+                                server.add_task(task)
+                    if name.startswith('collect_tcovs_subset.'):
+                        subid = name.split('.')[-1]
+                        pastatus[subid] = rslt
+                        if len(pastatus)==nb:
+                            print('$$$$$$$$ putting in concatenate_tcovs_subsets $$$$$$$$$$$')
+                            for chrom in chroms:
+                                tname='concatenate_tcovs_subsets'
+                                args = (self.modelpre, self.dstpre, range(nb), chrom)
+                                task = TQ.Task(tname, concatenate_tcovs_subsets, args)
+                                server.add_task(task)
+                    if name=='concatenate_ecov_subsets':
+                        print('$$$$$$$$ concatenate_ecov_subsets done $$$$$$$$$$$')
+                        exdone=True
+                    if name=='concatenate_tcnt_subsets':
+                        print('$$$$$$$$ concatenate_tcnt_subsets done $$$$$$$$$$$')
+                        sjdone=True
+                    if name=='concatenate_tcovs_subsets':
+                        print('$$$$$$$$ concatenate_tcovs_subsets done $$$$$$$$$$$')
+                        padone=True
+                    if exdone&sjdone&padone:
+                        break
+            print('Exit Loop')
+        print('Done')
+                    
+                
+        
+def collect_ecov_subset(modelpre, covpressub, dstpre, subid):
+    return _collect_subset(modelpre, covpressub, dstpre, subid, 'ex')
+
+def concatenate_ecov_subsets(modelpre, dstpre, subids, chrom):
+    return _concatenate_subsets(modelpre, dstpre, subids, 'ex', chrom)
+
+def collect_tcnt_subset(modelpre, covpressub, dstpre, subid):
+    return _collect_subset(modelpre, covpressub, dstpre, subid, 'sj')
+
+def concatenate_tcnt_subsets(modelpre, dstpre, subids, chrom):
+    return _concatenate_subsets(modelpre, dstpre, subids, 'sj', chrom)
+    
+def collect_tcovs_subset(modelpre, covpressub, dstpre, subid):
+    return _collect_subset(modelpre, covpressub, dstpre, subid, 'pa')
+
+def concatenate_tcovs_subsets(modelpre, dstpre, subids, chrom):
+    return _concatenate_subsets(modelpre, dstpre, subids, 'pa', chrom)
+
+def _collect_subset(modelpre, covpressub, dstpre, subid, which):
+    if which == 'ex':
+        suf = 'exdf'
+        flds = ['ecov']
+        fsuf = 'ecovs'
+        cols = A2.EXDFCOLS
+    elif which == 'sj':
+        suf = 'sjdf'
+        flds = ['tcnt']
+        fsuf = 'tcnts'
+        cols = A2.SJDFCOLS
+    else:
+        suf = 'paths'
+        flds = ['tcov0','tcov']
+        fsuf = 'tcovs'
+        cols = A2.PATHCOLS
+    # read in exdf sort, transpose and write(append) to dst
+    ex0 = UT.read_pandas(modelpre+'.covs.{0}.txt.gz'.format(suf), names=cols)
+    chroms = ex0['chr'].unique()
+    if all([os.path.exists(dstpre+'.{1}.{0}.txt.gz'.format(c,fsuf)) for c in chroms]):
+        return []
+    if all([os.path.exists(dstpre+'.{2}.{0}.{1}.txt.gz'.format(c,subid,fsuf)) for c in chroms]):
+        return []
+    ex0.sort_values(['chr','st','ed','strand'], inplace=True)
+    names = []
+    for pre in covpressub:
+        name = pre.split('/')[-1]
+        ex1 = UT.read_pandas(pre+'.covs.{0}.txt.gz'.format(suf), names=cols)
+        ex1.sort_values(['chr','st','ed','strand'], inplace=True)
+        for f in flds:
+            cname = '{0}.{1}'.format(name, f)
+            ex0[cname] = ex1[f].values
+            names.append(cname)
+    ex0.reset_index(inplace=True)
+    files = []
+    for chrom in ex0['chr'].unique():
+        ex0chr = ex0[ex0['chr']==chrom].sort_values(['st','ed','strand'])
+        dst = dstpre+'.{2}.{0}.{1}.txt.gz'.format(chrom,subid,fsuf)
+        UT.write_pandas(ex0chr[names].T, dst, 'i')
+        files.append(dst)
+    return files
+
+def _concatenate_subsets(modelpre, dstpre, subids, which, chrom):
+    if which == 'ex':
+        suf = 'exdf'
+        fsuf = 'ecovs'
+        cols = A2.EXDFCOLS
+    elif which == 'sj':
+        suf = 'sjdf'
+        fsuf = 'tcnts'
+        cols = A2.SJDFCOLS
+    else:
+        suf = 'paths'
+        fsuf = 'tcovs'
+        cols = A2.PATHCOLS
+    
+    ex0 = UT.read_pandas(modelpre+'.covs.{0}.txt.gz'.format(suf), names=cols)
+    chroms = ex0['chr'].unique()
+    files = []
+    dstpath0 = dstpre+'.{1}.{0}.tmp.txt.gz'.format(chrom,fsuf)
+    dstpath1 = dstpre+'.{1}.{0}.txt.gz'.format(chrom,fsuf)
+    if not os.path.exists(dstpath1):
+        with open(dstpath0, 'wb') as dst:
+            for subid in subids:
+                srcpath = dstpre+'.{2}.{0}.{1}.txt.gz'.format(chrom,subid,fsuf)
+                with open(srcpath, 'rb') as src:
+                    shutil.copyfileobj(src,dst)
+                files.append(srcpath)
+        ex0chr = ex0[ex0['chr']==chrom].sort_values(['st','ed','strand'])
+        ex1chr = UT.read_pandas(dstpath0,names=ex0chr.index,index_col=[0]).T
+        df = PD.concat([ex0chr, ex1chr],axis=1)
+        UT.write_pandas(df, dstpath1, 'h')
+        #os.unlink(dstpath0)
+    for f in files:
+        if os.path.exists(f):
+            os.unlink(f)
+            
