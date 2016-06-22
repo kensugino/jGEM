@@ -110,11 +110,12 @@ class ParamFinder(object):
         refpre: pathprefix to ref (assume .ex.txt.gz, .sj.txt.gz)
 
     """
-    def __init__(self, refpre, bwpre, refcode, genome, zoom=1, dstpre=None):
+    def __init__(self, refpre, bwpre, refcode, datacode, genome, zoom=1, dstpre=None):
         self.refpre = refpre
         self.genome = genome
         self.bwpre = bwpre
         self.refcode = refcode
+        self.datacode = datacode
         if dstpre is None:
             dstpre = bwpre
         self.dstpre = dstpre
@@ -238,8 +239,9 @@ class ParamFinder(object):
         dic = {}
         zoom = self.zoom
         for x in ['ne_i','ne_5','ne_3','e5i','e3i']:
-            fpath = self.bwpre+'.{0}.{1}.flux.txt.gz'.format(self.refcode,x)
+            fpath = self.bwpre+'.{0}.{2}.{1}.flux.txt.gz'.format(self.refcode,x,self.datacode)
             if os.path.exists(fpath):
+                print('reading from cache {0}'.format(fpath))
                 dic[x] = UT.read_pandas(fpath)
             else:
                 df = getattr(self, x)
@@ -347,14 +349,16 @@ class ParamFinder(object):
 
     def calc_53gap_params(self, covfactor=0, np=10):
         zoom = self.zoom
-        d5path = self.bwpre+'.{0}.{1}.gap5params.txt.gz'.format(self.refcode, covfactor)
-        d3path = self.bwpre+'.{0}.{1}.gap3params.txt.gz'.format(self.refcode, covfactor)
+        d5path = self.bwpre+'.{0}.{2}.{1}.gap5params.txt.gz'.format(self.refcode, covfactor, self.datacode)
+        d3path = self.bwpre+'.{0}.{2}.{1}.gap3params.txt.gz'.format(self.refcode, covfactor, self.datacode)
         if os.path.exists(d5path):
+            print('reading from cache {0}'.format(d5path))
             d5 = UT.read_pandas(d5path)
         else:
             d5 = self.calc_params_mp(self.ne_5, win=8192, np=np, gapmode='53', direction='<', covfactor=covfactor)
             UT.write_pandas(d5, d5path, 'h')
         if os.path.exists(d3path):
+            print('reading from cache {0}'.format(d3path))
             d3 = UT.read_pandas(d3path)
         else:
             d3 = self.calc_params_mp(self.ne_3, win=8192, np=np, gapmode='53', direction='>', covfactor=covfactor)
@@ -443,8 +447,8 @@ class ParamFinder(object):
     def calc_exon_params(self, np=10, covfactor=0.05):
         zoom = self.zoom
         # get params
-        neipath = self.bwpre+'.{0}.{1}.nei0.params.txt.gz'.format(self.refcode,covfactor)
-        e53path = self.bwpre+'.{0}.{1}.e53.params.txt.gz'.format(self.refcode,covfactor)
+        neipath = self.bwpre+'.{0}.{2}.{1}.nei0.params.txt.gz'.format(self.refcode,covfactor, self.datacode)
+        e53path = self.bwpre+'.{0}.{2}.{1}.e53.params.txt.gz'.format(self.refcode,covfactor, self.datacode)
         if os.path.exists(neipath):
             print('reading from cache {0}'.format(neipath))
             nei = UT.read_pandas(neipath)
