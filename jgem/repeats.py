@@ -39,6 +39,45 @@ RMSKPARAMS = dict(
     gname='gname',
 )
 
+
+def filter_paths(mdstpre, rdstpre):
+    paths =  GGB.read_bed(mdstpre+'.paths.withse.bed.gz')
+    ex = UT.read_pandas(rdstpre+'.ex.txt.gz')
+    def select_chromwise(paths, ex):
+        npchrs = []
+        for chrom in paths['chr'].unique():
+            pchr = paths[paths['chr']==chrom]
+            echr = ex[ex['chr']==chrom]
+            exnames = set(echr['name'].values)
+            #e2gname = UT.df2dict(echr,'name','gname')
+            idx = [all([x in exnames for x in y.split('|')]) for y in pchr['name']]
+            npchrs.append(pchr[idx])
+        return PD.concat(npchrs, ignore_index=True)
+    npaths = select_chromwise(paths, ex)
+    GGB.write_bed(npaths, rdstpre+'.paths.withse.bed.gz', ncols=12)
+
+def filter_sjexdf(mdstpre, rdstpre):
+    exdf =  UT.read_pandas(mdstpre+'.exdf.txt.gz', names=A3.EXDFCOLS)
+    sjdf =  UT.read_pandas(mdstpre+'.sjdf.txt.gz', names=A3.SJDFCOLS)
+
+    ex = UT.read_pandas(rdstpre+'.ex.txt.gz')
+    sj = UT.read_pandas(rdstpre+'.sj.txt.gz')
+
+    def select_chromwise_df(exdf, ex):
+        npchrs = []
+        for chrom in exdf['chr'].unique():
+            pchr = exdf[exdf['chr']==chrom]
+            echr = ex[ex['chr']==chrom]
+            exnames = set(echr['name'].values)
+            idx = [x in exnames for x in pchr['name']]
+            npchrs.append(pchr[idx])
+        return PD.concat(npchrs, ignore_index=True)
+
+    nexdf = select_chromwise_df(exdf, ex)
+    nsjdf = select_chromwise_df(sjdf, sj)
+    UT.write_pandas(nexdf, rdstpre+'.exdf.txt.gz', '')
+    UT.write_pandas(nsjdf, rdstpre+'.sjdf.txt.gz', '')
+
 class RmskFilter(object):
     """Filter genes with by overlap to repeat masker.
 
@@ -203,6 +242,9 @@ class RmskFilter(object):
         self.calculate()
         self.filter()
         self.save_params()
+
+        filter_paths(self.sjexpre, self.prefix)
+        filter_sjexdf(self.sjexpre, self.prefix)
 
 
 def plot_tlen_vs_glen_panels(gbed, fld='rep%', alpha=0.1, ms=0.8):
