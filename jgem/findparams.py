@@ -239,7 +239,7 @@ class ParamFinder(object):
         dic = {}
         zoom = self.zoom
         for x in ['ne_i','ne_5','ne_3','e5i','e3i']:
-            fpath = self.bwpre+'.{0}.{2}.{1}.flux.txt.gz'.format(self.refcode,x,self.datacode)
+            fpath = self.bwpre+'.{0}.{1}.flux.txt.gz'.format(self.refcode,x)
             if os.path.exists(fpath):
                 print('reading from cache {0}'.format(fpath))
                 dic[x] = UT.read_pandas(fpath)
@@ -349,8 +349,8 @@ class ParamFinder(object):
 
     def calc_53gap_params(self, covfactor=0, np=10):
         zoom = self.zoom
-        d5path = self.bwpre+'.{0}.{2}.{1}.gap5params.txt.gz'.format(self.refcode, covfactor, self.datacode)
-        d3path = self.bwpre+'.{0}.{2}.{1}.gap3params.txt.gz'.format(self.refcode, covfactor, self.datacode)
+        d5path = self.bwpre+'.{0}.{1}.gap5params.txt.gz'.format(self.refcode, covfactor)
+        d3path = self.bwpre+'.{0}.{1}.gap3params.txt.gz'.format(self.refcode, covfactor)
         if os.path.exists(d5path):
             print('reading from cache {0}'.format(d5path))
             d5 = UT.read_pandas(d5path)
@@ -447,8 +447,8 @@ class ParamFinder(object):
     def calc_exon_params(self, np=10, covfactor=0.05):
         zoom = self.zoom
         # get params
-        neipath = self.bwpre+'.{0}.{2}.{1}.nei0.params.txt.gz'.format(self.refcode,covfactor, self.datacode)
-        e53path = self.bwpre+'.{0}.{2}.{1}.e53.params.txt.gz'.format(self.refcode,covfactor, self.datacode)
+        neipath = self.bwpre+'.{0}.{1}.nei0.params.txt.gz'.format(self.refcode,covfactor)
+        e53path = self.bwpre+'.{0}.{1}.e53.params.txt.gz'.format(self.refcode,covfactor)
         if os.path.exists(neipath):
             print('reading from cache {0}'.format(neipath))
             nei = UT.read_pandas(neipath)

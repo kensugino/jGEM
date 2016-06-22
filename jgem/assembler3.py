@@ -2831,7 +2831,7 @@ def find_bundles(bwpre, genome, dstpre, chrom=None, sjbwpre=None, mingap=5e5, mi
 ######### Chrom Assembler ###########################################################
 
 
-def bundle_assembler(bwpre, chrom, st, ed, dstpre, laparams={}, sjbwpre=None, refcode='gen9'):
+def bundle_assembler(bwpre, chrom, st, ed, dstpre, laparams={}, sjbwpre=None, exbwpre=None,refcode='gen9'):
     bname = bundle2bname((chrom,st,ed))
     bsuf = '.{0}_{1}_{2}'.format(chrom,st,ed)
     csuf = '.{0}'.format(chrom)
@@ -2857,6 +2857,7 @@ def bundle_assembler(bwpre, chrom, st, ed, dstpre, laparams={}, sjbwpre=None, re
     la = LocalAssembler(bwpre, chrom, st, ed, dstpre, 
         classifierpre=classifierpre,
         sjbwpre=sjbwpre, 
+        exbwpre=exbwpre,
         **laparams
         )
     return la.process()
@@ -3268,7 +3269,7 @@ BUNDLEPARAMS = dict(
 class SampleAssembler(object):
 
     def __init__(self, bwpre, dstpre, genome, 
-        sjbwpre=None,
+        sjbwpre=None,exbwpre=None,
         refcode='gen9',
         np=4, 
         chroms=None, 
@@ -3281,6 +3282,7 @@ class SampleAssembler(object):
         self.dstpre = dstpre
         self.genome = genome
         self.sjbwpre = sjbwpre
+        self.exbwpre = exbwpre
         self.np = np
         self.chroms = chroms
         if self.chroms is None:
@@ -3322,7 +3324,7 @@ class SampleAssembler(object):
                             # print('put task##bundle_assembler {0}:{1}-{2}'.format(chrom,st,ed))
                             tname = 'bundle_assembler.{0}:{1}-{2}'.format(c,st,ed)
                             # bwpre, chrom, st, ed, dstpre, laparams={}, sjbwpre=None, refcode='gen9'
-                            args = (self.bwpre, c, st, ed, self.dstpre, self.laparams, self.sjbwpre, self.refcode)
+                            args = (self.bwpre, c, st, ed, self.dstpre, self.laparams, self.sjbwpre, self.exbwpre, self.refcode)
                             task = TQ.Task(tname, bundle_assembler, args)
                             server.add_task(task)
                     if name.startswith('bundle_assembler.'):
