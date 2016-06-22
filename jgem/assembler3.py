@@ -2084,7 +2084,7 @@ class PathGenerator(object):
         self.maxraisecnt = maxraisecnt
         self.minvmimadiff = minvmimadiff
         self.raisecntth = raisecntth
-        self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,x['eid'],upperpathnum,maxraisecnt,minvmimadiff) for i,x in e5s.iterrows()] # one unit
+        self.pg53s = [PathGenerator53(x,gg,gexdf,gsjdf,x['eid'],strand,upperpathnum,maxraisecnt,minvmimadiff) for i,x in e5s.iterrows()] # one unit
         self.verbose = False
         self.sjrth = sjpaths['sjratio'].min() #0.001
         self.uth = sjpaths['sc1'].min()
@@ -2297,11 +2297,12 @@ class PathGenerator(object):
 
 class PathGenerator53(object):
 
-    def __init__(self, e5, gg, gexdf, gsjdf, pgid, upperpathnum=100, maxraisecnt=10, minvmimadiff=0.5):
+    def __init__(self, e5, gg, gexdf, gsjdf, pgid, strand,upperpathnum=100, maxraisecnt=10, minvmimadiff=0.5):
         # edges
         self.e5 = e5
         self.gg = gg
         self.id53 = id53 = e5['id53']
+        self.strand = strand
         self.exdf = gexdf[gexdf['id53']==id53]
         self.sjdf = gsjdf[gsjdf['id53']==id53]
         self.sids = sids = gsjdf[gsjdf['id53']==id53]['sid'].values
@@ -2339,7 +2340,8 @@ class PathGenerator53(object):
             return None
         pathsdf = PD.DataFrame(recs, columns=['name','st','ed','tcov'])
         # paths: st,ed,name,tcov
-        for f in ['chr','strand','tst','ted','tcov0','tcov0a','tcov0b','tcov0c']:
+        pathsdf['strand'] = self.strand
+        for f in ['chr','tst','ted','tcov0','tcov0a','tcov0b','tcov0c']:
             pathsdf[f] = self.e5[f]
         return pathsdf[PATHCOLS]
 
