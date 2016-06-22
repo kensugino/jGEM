@@ -2075,6 +2075,8 @@ class PathGenerator(object):
         self.ed = ed = gexdf['ed'].max()
         self.chrom = chrom 
         self.strand = strand
+        if 'len' not in sjpaths:
+            sjpaths['len'] = sjpaths['ed']-sjpaths['st']
         idx = (sjpaths['tst']>=st)&(sjpaths['ted']<=ed)&(sjpaths['strand'].isin(STRS[strand]))&(sjpaths['chr']==chrom)
         self.sjpaths = sjpaths[idx]
         self.e5s = e5s = gexdf[gexdf['kind']=='5']
@@ -2147,7 +2149,7 @@ class PathGenerator(object):
                 vmax = vmin
                 vmin = max(0, vmax - delta)
 
-    def trim(self, sjp, msg='Too many low cov paths.'):
+    def trim(self, sjp, msg='Too many paths.'):
         chrom = sjp.iloc[0]['chr']
         stmin = sjp['st'].min()
         edmax = sjp['ed'].max()
@@ -2157,15 +2159,19 @@ class PathGenerator(object):
         
         self.uth = uth = self.uth + 0.1
         mcnt = sjp['sc2']-sjp['sc1'] # multi mappers
-        mth = mcnt.max()/2
+        mth = mcnt.max()*0.8
         self.sjrth = sjrth = self.sjrth + 0.01
+        lth = max(50000, sjp['len'].max()*0.8)
         n0 = len(sjp)
         sids0 = list(set([y for x in sjp['name'] for y in x.split(',')]))
         # sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio']>sjrth)].copy()
-        sjp = sjp[(mcnt<=mth)&(sjp['sjratio']>sjrth)].copy()
+        # sjp = sjp[(mcnt<=mth)&(sjp['sjratio']>sjrth)].copy()
+        sjp = sjp[(sjp['len']<lth)&(mcnt<=mth)&(sjp['sjratio']>sjrth)].copy()
         sids = list(set([y for x in sjp['name'] for y in x.split(',')]))
         n1 = len(sjp)
-        LOG.debug('#sjp:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
+        # LOG.debug('#sjp:{0}=>{1}, uth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
+        # LOG.debug('#sjp:{0}=>{1}, mth:{3}, sjrth:{4}'.format(n0,n1,uth,mth,sjrth))
+        LOG.debug('#sjp:{0}=>{1},lth:{2}, mth:{3}, sjrth:{4}'.format(n0,n1,lth,mth,sjrth))
         gsjdf = self.gsjdf
         self._gsjdf = gsjdf[gsjdf['name'].isin(sids)].copy()
         LOG.debug('gsjdf {0}=>{1} #sids {2}=>{3}'.format(len(gsjdf), len(self._gsjdf), len(sids0), len(sids)))
