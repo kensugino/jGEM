@@ -682,7 +682,7 @@ class LocalEstimator(A3.LocalAssembler):
                 N.put(mat[i], N.array(n1), 1)
             try:
                 ecov,err = nnls(mat, ci['cov'].values)
-                pg['tcov0'] = ecov
+                pg['tcov0a'] = ecov
             except:
                 # too much iteration?
                 LOG.warning('!!!!!! Exception in NNLS (tcov_by_nnls) @{0}:{1}-{2}, setting to zero !!!!!!!!!'.format(self.chrom, s, e))
