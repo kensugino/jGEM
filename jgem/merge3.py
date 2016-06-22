@@ -556,7 +556,7 @@ class LocalEstimator(A3.LocalAssembler):
         self.exdf = exdf[idx].copy()
         A3.set_ad_pos(self.sjdf, 'sj')
         A3.set_ad_pos(self.exdf, 'ex')
-        self.sjexbw = sjexbw = SjExBigWigs(bwpre, None, mixunstranded=True)
+        self.sjexbw = sjexbw = A3.SjExBigWigs(bwpre, None, mixunstranded=True)
         self.arrs = arrs = {}
         with sjexbw: # get bw arrays
             for k in ['ex','sj']:
