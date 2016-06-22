@@ -2161,7 +2161,7 @@ class PathGenerator(object):
         mcnt = sjp['sc2']-sjp['sc1'] # multi mappers
         mth = mcnt.max()*0.8
         self.sjrth = sjrth = self.sjrth + 0.01
-        lth = max(50000, sjp['len'].max()*0.8)
+        lth = max(50000, min(100000, sjp['len'].max()*0.8))
         n0 = len(sjp)
         sids0 = list(set([y for x in sjp['name'] for y in x.split(',')]))
         # sjp = sjp[(sjp['sc1']>uth)&(mcnt<=mth)&(sjp['sjratio']>sjrth)].copy()
