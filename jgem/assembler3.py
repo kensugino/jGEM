@@ -2185,7 +2185,7 @@ class PathGenerator(object):
         self._gexdf = gexdf[gexdf['eid'].isin(eids)].copy()
         LOG.debug('gg.ede {0}=>{1} #eids {2}=>{3}'.format(len(self.gg.ede),len(gg.ede), n0,n1))
         # e5s  = self._gexdf[self._gexdf['kind']=='5']
-        self.pg53s = [PathGenerator53(x,gg,self._gexdf,self._gsjdf, i, self.upperpathnum) for i,x in self.e5s.iterrows()]        
+        self.pg53s = [PathGenerator53(x,gg,self._gexdf,self._gsjdf, i, self.strand, self.upperpathnum) for i,x in self.e5s.iterrows()]        
         return sjp
 
     def select_paths(self, tcovth=1, tcovfactor=0.1):
