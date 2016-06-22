@@ -873,7 +873,7 @@ class CovCollector(object):
         
     def run(self):
         self.server = server = TQ.Server(np=self.np)
-        self.exdf = ex = UT.read_pandas(self.modelpre+'.covs.exdf.txt.gz', names=A2.EXDFCOLS)
+        self.exdf = ex = UT.read_pandas(self.modelpre+'.covs.exdf.txt.gz', names=A3.EXDFCOLS)
         self.chroms = chroms = ex['chr'].unique()
         self.exstatus = exstatus = {}
         self.sjstatus = sjstatus = {}
@@ -976,17 +976,17 @@ def _collect_subset(modelpre, covpressub, dstpre, subid, which):
         suf = 'exdf'
         flds = ['ecov']
         fsuf = 'ecovs'
-        cols = A2.EXDFCOLS
+        cols = A3.EXDFCOLS
     elif which == 'sj':
         suf = 'sjdf'
         flds = ['tcnt']
         fsuf = 'tcnts'
-        cols = A2.SJDFCOLS
+        cols = A3.SJDFCOLS
     else:
         suf = 'paths'
         flds = ['tcov0','tcov']
         fsuf = 'tcovs'
-        cols = A2.PATHCOLS
+        cols = A3.PATHCOLS
     # read in exdf sort, transpose and write(append) to dst
     ex0 = UT.read_pandas(modelpre+'.covs.{0}.txt.gz'.format(suf), names=cols)
     chroms = ex0['chr'].unique()
@@ -1017,15 +1017,15 @@ def _concatenate_subsets(modelpre, dstpre, subids, which, chrom):
     if which == 'ex':
         suf = 'exdf'
         fsuf = 'ecovs'
-        cols = A2.EXDFCOLS
+        cols = A3.EXDFCOLS
     elif which == 'sj':
         suf = 'sjdf'
         fsuf = 'tcnts'
-        cols = A2.SJDFCOLS
+        cols = A3.SJDFCOLS
     else:
         suf = 'paths'
         fsuf = 'tcovs'
-        cols = A2.PATHCOLS
+        cols = A3.PATHCOLS
     
     ex0 = UT.read_pandas(modelpre+'.covs.{0}.txt.gz'.format(suf), names=cols)
     chroms = ex0['chr'].unique()
