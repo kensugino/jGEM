@@ -1238,7 +1238,9 @@ class LocalAssembler(object):
             idxl = (sj['len']<lsjth)|(sj['sjratio']>lsjratioth)
             muratio=mcnt/sj['ucnt']
             idxm = ((sj['len']<msjlenth)&(muratio>msjrth))|(sj['sjratio']>msjratioth)
-            self.sjdf = sj[idx&(idxpn|idxu)&idxl].copy()
+            LOG.info('uthmth:{0}, sjratio:{1}, usjratio:{2}, lsjratio:{3}, msjratio:{4}'.\
+                format(N.sum(idx),N.sum(idxpn),N.sum(idxu),N.sum(idxl),N.sum(idxm)))
+            self.sjdf = sj[idx&(idxpn|idxu)&idxl&idxm].copy()
             n1 = len(self.sjdf)
             LOG.info('merged sjdf loaded: filtered {0}=>{1}'.format(n0,n1))
         else:
