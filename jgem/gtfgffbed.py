@@ -498,26 +498,26 @@ def bed2gtf(fpath, compress=True):
     if fpath.endswith('.gz'):
         base = fpath[:-7]
         cmd = ['gunzip',fpath]
-        LOG.debug( "expanding compressed ...", base)
+        LOG.debug( "expanding compressed ... {0}".format(base))
         subprocess.call(cmd)
     else:
         base = fpath[:-4]
     gppath = base+'.genePred'
     bdpath = base+'.gtf'
     cmd = ['bedToGenePred',base+'.bed', gppath]
-    LOG.debug( "converting to GenPred...", base)
+    LOG.debug( "converting to GenPred...{0}".format(base))
     subprocess.call(cmd)
     cmd = ['genePredToGtf','-source=.','file', gppath, bdpath]
-    LOG.debug( "converting to GTF...", base)
+    LOG.debug( "converting to GTF...{0}".format(base))
     subprocess.call(cmd)
     os.unlink(gppath)
     # gzip
-    LOG.debug( "gzipping ...", bdpath)
+    LOG.debug( "gzipping ... {0}".format(bdpath))
     if compress:
         UT.compress(bdpath)
         bdpath=bdpath+'.gz'
     if fpath.endswith('.gz'):
-        LOG.debug( "gzipping ...", fpath[:-3])
+        LOG.debug( "gzipping ... {0}".format(fpath[:-3]))
         subprocess.call(['gzip',fpath[:-3]])
     return bdpath
 
