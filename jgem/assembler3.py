@@ -1242,7 +1242,8 @@ class LocalAssembler(object):
             #     format(N.sum(idx),N.sum(idxpn),N.sum(idxu),N.sum(idxl),N.sum(idxm)))
             LOG.info('uthmth:{0}, sjratio:{1}, usjratio:{2}, lsjratio:{3}'.\
                 format(N.sum(idx),N.sum(idxpn),N.sum(idxu),N.sum(idxl)))
-            self.sjdf = sj[idx&(idxpn|idxu)&idxl&idxm].copy()
+            # self.sjdf = sj[idx&(idxpn|idxu)&idxl&idxm].copy()
+            self.sjdf = sj[idx&(idxpn|idxu)&idxl].copy()
             n1 = len(self.sjdf)
             LOG.info('merged sjdf loaded: filtered {0}=>{1}'.format(n0,n1))
         else:
