@@ -377,6 +377,7 @@ class SlopeEdgeFinder(object):
         #     eds = eds[-2:] # last 2 
         if len(eds)>=3:
             eds = eds[:1]+eds[-1:] # first and last
+            # eds = eds[:1]+eds[-2:-1] # first and 2nd to last
         if direction=='<':
             return [-x for x in eds]
         return eds
@@ -848,8 +849,8 @@ LAPARAMS = dict(
      discardunstranded=False,
      uth=0, 
      mth=3, 
-     sjratioth=1e-3, # 2e-3
-     usjratioth=5e-3, # 1e-2 for unstranded sj
+     sjratioth=0.5e-3, # 2e-3
+     usjratioth=2.5e-3, # 1e-2 for unstranded sj
      lsjratioth=5e-3, # for sj > 100Kbp
      #covfactor=0.05, 
      tcovth=0,
@@ -1648,6 +1649,11 @@ class LocalAssembler(object):
             pathsdf = PD.concat(paths, ignore_index=True)
             self.sjdf2 = sjsdf
             self.exdf2 = exsdf
+            # fix tst,ted
+            idx0 = pathsdf['st']>pathsdf['tst'] # - strand incomplete
+            pathsdf.loc[idx0,'tst'] = [int(x.split('|')[0].split(',')[1]) for x in pathsdf[idx0]['name']]
+            idx1 = pathsdf['ed']<pathsdf['ted'] # + strand incomplete
+            pathsdf.loc[idx1,'ted'] = [int(x.split('|')[-1].split(',')[0]) for x in pathsdf[idx1]['name']]
             self.paths = pathsdf
         else:
             self.sjdf2 = None
@@ -1696,12 +1702,18 @@ class LocalAssembler(object):
             return N.mean(exa[s0:s1])
         def cov1e(e):
             return N.mean(exa[e-o:e-o+10])
-        def cov2s(s):
-            s0 = max(0, s-o-1)
-            return sja[s-o]-sja[s0]
-        def cov2e(e):
-            e0 = max(0, e-o-1)
-            return sja[e-o]-sja[e0]     
+        # def cov2s(s):
+        #     s0 = max(0, s-o-1)
+        #     return sja[s-o]-sja[s0]
+        # def cov2e(e):
+        #     e0 = max(0, e-o-1)
+        #     return sja[e-o]-sja[e0]     
+        def cov2s(s): # donor
+            # s0 = max(0, s-o-1)
+            return max(0, sja[s-o]-sja[s-o-1])
+        def cov2e(e): # acceptor
+            # e0 = max(0, e-o-1)
+            return max(0, sja[e-o-1]-sja[e-o])
 
         self._pg = pg = spanexs.groupby('id53').first().sort_values(['tst','ted'])[['chr','tst','ted']]
         ne = len(pg)
@@ -1736,24 +1748,29 @@ class LocalAssembler(object):
             # enforce flux conservation: scale up 5'
             stsum = N.sum(c[:nst])
             edsum = N.sum(c[nst:])
-            if strand in ['+','.+']:
-                c[:nst] = (edsum/(stsum+1e-6))*c[:nst]
+            if stsum==0 or edsum==0:
+                pg['tcov0b'] = 0
             else:
-                c[nst:] = (stsum/(edsum+1e-6))*c[nst:]
-            ecov,err = nnls(mat, c)
-            pg['tcov0b'] = ecov
-
+                if strand in ['+','.+']:
+                    c[:nst] = (edsum/stsum)*c[:nst]
+                else:
+                    c[nst:] = (stsum/edsum)*c[nst:]
+                ecov,err = nnls(mat, c)
+                pg['tcov0b'] = ecov
             mat = N.array([(pg['tst']==x).values for x in sts]+[-1*(pg['ted']==x).values for x in eds], dtype=float)
             c = N.array([cov2s(int(x)) for x in sts]+[cov2e(int(x)) for x in eds])
             # enforce flux conservation: scale up 5'
             stsum = N.sum(c[:nst])
             edsum = N.sum(c[nst:])
-            if strand in ['+','.+']:
-                c[:nst] = ((-1*edsum)/(stsum+1e-6))*c[:nst]
+            if stsum==0 or edsum==0:
+                pg['tcov0c'] = 0
             else:
-                c[nst:] = ((-1*stsum)/(edsum+1e-6))*c[nst:]
-            ecov,err = nnls(mat, c)
-            pg['tcov0c'] = ecov
+                if strand in ['+','.+']:
+                    c[:nst] = (edsum/stsum)*c[:nst]
+                else:
+                    c[nst:] = (stsum/edsum)*c[nst:]
+                ecov,err = nnls(mat, c)
+                pg['tcov0c'] = ecov
         else:
             s,e = pg.iloc[0][['tst','ted']]
             pg['tcov0b'] = (cov1s(int(s))+cov1e(int(e)))/2.

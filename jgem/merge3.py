@@ -656,7 +656,7 @@ class LocalEstimator(A3.LocalAssembler):
         return j2p, e2ap, e2dp
 
     def tcov_by_nnls(self, s, e, strand):
-        o = self.st
+        o = int(self.st)
         p = self.paths
         idx = (p['tst']>=s)&(p['ted']<=e)&(p['strand'].isin(A3.STRS[strand]))
         ps = p[idx]
@@ -671,17 +671,17 @@ class LocalEstimator(A3.LocalAssembler):
             # return N.sum(sja[s-o:e-o]+exa[s-o:e-o])/(e-s)
             return N.mean(sja[s-o:e-o])
         def cov1s(s):
-            s0 = max(0, s-o-10)
-            s1 = max(s0+1,s-o)
+            s0 = max(0, int(s)-o-10)
+            s1 = max(s0+1,int(s)-o)
             return N.mean(exa[s0:s1])
         def cov1e(e):
-            return N.mean(exa[e-o:e-o+10])
-        def cov2s(s):
-            s0 = max(0, s-o-1)
-            return sja[s-o]-sja[s0]
-        def cov2e(e):
-            e0 = max(0, e-o-1)
-            return sja[e-o]-sja[e0]
+            return N.mean(exa[int(e)-o:int(e)-o+10])
+        def cov2s(s): # donor
+            # s0 = max(0, s-o-1)
+            return max(0, sja[int(s)-o]-sja[int(s)-o-1])
+        def cov2e(e): # acceptor
+            # e0 = max(0, e-o-1)
+            return max(0, sja[int(e)-o-1]-sja[int(e)-o])
         # cov0
         if ne>1:
             pg.rename(columns={'tst':'st','ted':'ed'}, inplace=True)
@@ -714,24 +714,30 @@ class LocalEstimator(A3.LocalAssembler):
             # enforce flux conservation: scale up 5'
             stsum = N.sum(c[:nst])
             edsum = N.sum(c[nst:])
-            if strand in ['+','.+']:
-                c[:nst] = (edsum/(stsum+1e-6))*c[:nst]
+            if stsum==0 or edsum==0:
+                pg['tcov0b'] = 0
             else:
-                c[nst:] = (stsum/(edsum+1e-6))*c[nst:]
-            ecov,err = nnls(mat, c)
-            pg['tcov0b'] = ecov
+                if strand in ['+','.+']:
+                    c[:nst] = (edsum/stsum)*c[:nst]
+                else:
+                    c[nst:] = (stsum/edsum)*c[nst:]
+                ecov,err = nnls(mat, c)
+                pg['tcov0b'] = ecov
 
             mat = N.array([(pg['tst']==x).values for x in sts]+[-1*(pg['ted']==x).values for x in eds], dtype=float)
             c = N.array([cov2s(x) for x in sts]+[cov2e(x) for x in eds])
             # enforce flux conservation: scale up 5'
             stsum = N.sum(c[:nst])
             edsum = N.sum(c[nst:])
-            if strand in ['+','.+']:
-                c[:nst] = ((-1*edsum)/(stsum+1e-6))*c[:nst]
+            if stsum==0 or edsum==0:
+                pg['tcov0c'] = 0
             else:
-                c[nst:] = ((-1*stsum)/(edsum+1e-6))*c[nst:]
-            ecov,err = nnls(mat, c)
-            pg['tcov0c'] = ecov
+                if strand in ['+','.+']:
+                    c[:nst] = (edsum/stsum)*c[:nst]
+                else:
+                    c[nst:] = (stsum/edsum)*c[nst:]
+                ecov,err = nnls(mat, c)
+                pg['tcov0c'] = ecov
         else:
             s,e = pg.iloc[0][['tst','ted']]
             pg['tcov0b'] = (cov1s(s)+cov1e(e))/2.
@@ -1055,4 +1061,5 @@ def _concatenate_subsets(modelpre, dstpre, subids, which, chrom):
     for f in files:
         if os.path.exists(f):
             os.unlink(f)
+    return dstpath1
             
