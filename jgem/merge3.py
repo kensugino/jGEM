@@ -617,7 +617,7 @@ class LocalEstimator(A3.LocalAssembler):
                 return N.mean(exa[int(s)-o:int(e)-o])
             spans = self._get_spans(strand)
             for st,ed in spans:
-                es = ex[(ex['st']>=st)&(ex['ed']<=ed)&(ex['strand'].isin(STRS[strand]))].copy()
+                es = ex[(ex['st']>=st)&(ex['ed']<=ed)&(ex['strand'].isin(A3.STRS[strand]))].copy()
                 # es = ex[idx].copy().sort_values(['st','ed']) # <== BUG!: sort after idx messes up relationship
                 idx = es.index.values # _eid's
                 es['tmpeid'] = N.arange(len(es))
