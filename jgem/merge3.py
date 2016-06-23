@@ -594,9 +594,9 @@ class LocalEstimator(A3.LocalAssembler):
         # tmp0 = ['{1}|{0}'.format(*y.split('|')) for y in sj[idx]['name']]
         # tmp1 = [N.sum([x for x,p in sj0mat if y in p]) for y in tmp0]
         # sj.loc[idx, 'tcnt'] = tmp1
-        idxz = sj['tcnt']==0
-        if N.sum(idxz)>0:
-            sj.loc[idxz,'tcnt'] = 1e-6
+        # idxz = sj['tcnt']==0
+        # if N.sum(idxz)>0:
+        #     sj.loc[idxz,'tcnt'] = 1e-6
         self.sjdfi = sj.set_index('name')
 
     def calculate_ecovs(self):
@@ -632,8 +632,8 @@ class LocalEstimator(A3.LocalAssembler):
                 elif ne==1:
                     s,e = es.iloc[0][['st','ed']]
                     ex.loc[idx,'ecov'] = cov(s,e)
-        idxz = ex['ecov']==0
-        ex.loc[idxz, 'ecov'] = 1e-6
+        # idxz = ex['ecov']==0
+        # ex.loc[idxz, 'ecov'] = 1e-6
         self.exdfi = ex.set_index('name')
 
     def calculate_branchp(self, jids, eids):
@@ -643,14 +643,22 @@ class LocalEstimator(A3.LocalAssembler):
         ex = ex0.ix[eids].reset_index()
 
         dsump = sj.groupby('dpos')['tcnt'].sum().astype(float)
-        jdp = sj['tcnt'].values/(dsump.ix[sj['dpos'].values].values)
+        tmp = dsump.ix[sj['dpos'].values]
+        jdp = sj['tcnt'].values/tmp.values
+        jdp[tmp==0] = 0. 
         j2p = dict(zip(sj['name'].values, jdp))
+        
         # exon groupby acceptor
         asump = ex.groupby('apos')['ecov'].sum().astype(float)
-        eap = ex['ecov'].values/(asump.ix[ex['apos'].values].values)
+        tmp = asump.ix[ex['apos'].values]
+        eap = ex['ecov'].values/(tmp.values)
+        eap[tmp==0] = 0.
         e2ap = dict(zip(ex['name'].values, eap))
+
         dsump = ex.groupby('dpos')['ecov'].sum().astype(float)
-        edp = ex['ecov'].values/(dsump.ix[ex['dpos'].values].values)
+        tmp = dsump.ix[ex['dpos'].values]
+        edp = ex['ecov'].values/(tmp.values)
+        edp[tmp==0] = 0.
         e2dp = dict(zip(ex['name'].values, edp))
 
         return j2p, e2ap, e2dp

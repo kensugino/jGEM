@@ -1545,9 +1545,9 @@ class LocalAssembler(object):
             # tmp0 = ['{1}|{0}'.format(*y.split('|')) for y in sj[idx]['name']]
             # tmp1 = [N.sum([x for x,p in sj0mat if y in p]) for y in tmp0]
             # sj.loc[idx, 'tcnt'] = tmp1
-        idxz = sj['tcnt']==0
-        if N.sum(idxz)>0:
-            sj.loc[idxz,'tcnt'] = 1e-6
+        # idxz = sj['tcnt']==0
+        # if N.sum(idxz)>0:
+        #     sj.loc[idxz,'tcnt'] = 1e-6
 
     def calculate_ecovs(self):
         ex = self.exdf
@@ -1583,8 +1583,8 @@ class LocalAssembler(object):
                     s,e = es.iloc[0][['st','ed']]
                     ex.loc[idx,'ecov'] = cov(s,e)
         # self._ne2ecov = UT.df2dict(ex, 'name', 'ecov')
-        idxz = ex['ecov']==0
-        ex.loc[idxz, 'ecov'] = 1e-6
+        # idxz = ex['ecov']==0
+        # ex.loc[idxz, 'ecov'] = 1e-6
                        
     def _get_sub_sjex(self, st, ed, strand):
         sj0 = self.sjdf
@@ -1650,10 +1650,15 @@ class LocalAssembler(object):
             self.sjdf2 = sjsdf
             self.exdf2 = exsdf
             # fix tst,ted
-            idx0 = pathsdf['st']>pathsdf['tst'] # - strand incomplete
-            pathsdf.loc[idx0,'tst'] = [int(x.split('|')[0].split(',')[1]) for x in pathsdf[idx0]['name']]
-            idx1 = pathsdf['ed']<pathsdf['ted'] # + strand incomplete
-            pathsdf.loc[idx1,'ted'] = [int(x.split('|')[-1].split(',')[0]) for x in pathsdf[idx1]['name']]
+            idx = (pathsdf['st']>pathsdf['tst'])|(pathsdf['ed']<pathsdf['ted']) 
+            idxp = idx & (pathsdf['strand'].isin(['+','.+']))
+            idxn = idx & (pathsdf['strand'].isin(['-','.-']))
+            pathsdf.loc[idxp,'tst'] = [int(x.split('|')[0].split(',')[1]) for x in pathsdf[idxp]['name']]
+            pathsdf.loc[idxp,'ted'] = [int(x.split('|')[-1].split(',')[0]) for x in pathsdf[idxp]['name']]
+            pathsdf.loc[idxn,'tst'] = [int(x.split('|')[-1].split(',')[0]) for x in pathsdf[idxn]['name']]
+            pathsdf.loc[idxn,'ted'] = [int(x.split('|')[0].split(',')[1]) for x in pathsdf[idxn]['name']]
+            pathsdf['tst'] = pathsdf['tst'].astype(int)
+            pathsdf['ted'] = pathsdf['ted'].astype(int)            
             self.paths = pathsdf
         else:
             self.sjdf2 = None
@@ -1663,16 +1668,22 @@ class LocalAssembler(object):
 
     def calc_53branchp(self, sj, ex):
         dsump = sj.groupby('dpos')['tcnt'].sum().astype(float)
-        sj['p'] = jdp = sj['tcnt'].values/(dsump.ix[sj['dpos'].values].values)
+        tmp = dsump.ix[sj['dpos'].values]
+        jdp = sj['tcnt'].values/(tmp.values)
+        jdp[tmp==0] = 0.
+        sj['p'] = jdp
         # j2p = dict(zip(sj['name'].values, jdp))
         # exon groupby acceptor
         asump = ex.groupby('apos')['ecov'].sum().astype(float)
-        ex['pa'] = eap = ex['ecov'].values/(asump.ix[ex['apos'].values].values)
+        tmp = asump.ix[ex['apos'].values]
+        eap = ex['ecov'].values/(tmp.values)
+        eap[tmp==0] = 0.
+        ex['pa'] = eap
         dsump = ex.groupby('dpos')['ecov'].sum().astype(float)
-        ex['pd'] = edp = ex['ecov'].values/(dsump.ix[ex['dpos'].values].values)
-        if (N.sum(N.isnan(eap))>0):
-            self._cblcls = locals()
-            raise
+        tmp = dsump.ix[ex['dpos'].values]
+        edp = ex['ecov'].values/(tmp.values)
+        edp[tmp==0] = 0.
+        ex['pd'] = edp
 
     def select_53paths(self, gg, spansjdf, spanexdf, chrom, strand):
         paths = []
