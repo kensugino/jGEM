@@ -917,7 +917,7 @@ class CovEstimator(object):
                 nb = int(N.ceil(n/1000.))
                 print(chrom,nb)
                 for i in range(nb):
-                    print('putting in bundle_estimator {0}.{1}'.format(chrom,i))
+                    print('putting in bundle_estimator {0}.{1}'.format(chrom,subid))
                     sti = 1000*i
                     edi = min(1000*(i+1), len(uc)-1)
                     st = max(uc.iloc[sti]['st'] - 100, 0)
