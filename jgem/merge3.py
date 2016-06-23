@@ -901,7 +901,7 @@ class CovEstimator(object):
         bed = GGB.read_bed(self.modelpre+'.paths.withse.bed.gz')
         chroms = bed['chr'].unique()
         csizedic = UT.df2dict(UT.chromdf(self.genome), 'chr', 'size')
-        self.bundlestatus = budlestatus = {}
+        self.bundlestatus = bundlestatus = {}
         self.bundles = bundles = []
 
         with server:
