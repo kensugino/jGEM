@@ -89,6 +89,40 @@ def read_sj(path, parsename=False):
     return df
 
 
+# BED12 to GTF #########################################################################
+
+def gtf_from_bed12(bedpath, dstpath=None, source='.'):
+    # path['gname'] contains gene id
+    if UT.isstring(bedpath):
+        paths = read_bed(bedpath)
+    else:
+        paths = bedpath
+        assert(dstpath is not None)
+    g2cnt = {}
+    tnames = []
+    for x in paths['gname']:
+        i = g2cnt.get(x,1)
+        tnames.append('{0}.{1}'.format(x,i))
+        g2cnt[x] = i+1
+    paths['tname'] = tnames    
+    txt = 'gene_id "{0}"; transcript_id "{1}"; exon_number "{2}";'
+    def _gen():
+        cols = ['chr','st','ed','gname','tname','esizes','estarts','strand']
+        for c,s,e,gn,tn,esi,est,strand in paths[cols].values:
+            esizes = [int(x) for x in esi.split(',')[:-1]]
+            estarts = [int(x) for x in est.split(',')[:-1]]
+            for i,(x,y) in enumerate(zip(esizes,estarts)):
+                est = st+y
+                eed = est+x
+                extra = txt.format(gn,tn,i+1)
+                yield (c,source,'exon',est,eed,'.',strand,'.',extra)
+    df = PD.DataFrame([x for x in _gen()], columns=GTFCOLS)
+    if dstpath is None:
+        dstpath = bedpath.replace('.bed','.gtf')
+    write_gtf(df, gtfpath)
+    return df
+
+
 # READ/WRITE       ######################################################################    
 def get_gff_attr_col(gff, aname):
     "helper function for read_gff"
@@ -495,15 +529,19 @@ def bed2gtf(fpath, compress=True):
     Returns:
         Pandas.DataFrame containing converted GTF data
     """
+
     if fpath.endswith('.gz'):
         base = fpath[:-7]
-        cmd = ['gunzip',fpath]
-        LOG.debug( "expanding compressed ... {0}".format(base))
-        subprocess.call(cmd)
     else:
         base = fpath[:-4]
     gppath = base+'.genePred'
     bdpath = base+'.gtf'
+
+    # sc1 should be integer
+    d = read_bed(fpath)
+    d['sc1'] = d['sc1'].astype(int)
+    write_bed(d, base+'.bed')
+
     cmd = ['bedToGenePred',base+'.bed', gppath]
     LOG.debug( "converting to GenPred...{0}".format(base))
     subprocess.call(cmd)
