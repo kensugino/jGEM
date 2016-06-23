@@ -873,6 +873,67 @@ def estimatecovs(modelpre, bwpre, dstpre, genome, tcovth=1, np=6):
     concatenate_bundles(bundles, dstpre)
 
 
+class CovEstimator(object):
+    
+    def __init__(self, modelpre, bwpre, dstpre, genome, tcovth=1, np=6):
+        self.modelpre = modelpre
+        self.bwpre = bwpre
+        self.dstpre = dstpre
+        self.genome = genome
+        self.tcovth = tcovth
+        self.np = np
+        
+    def run(self):
+        self.server = server = TQ.Server(np=self.np)
+        print('reading paths.withse.bed.gz')
+        bed = GGB.read_bed(self.modelpre+'.paths.withse.bed.gz')
+        chroms = bed['chr'].unique()
+        csizedic = UT.df2dict(UT.chromdf(self.genome), 'chr', 'size')
+        self.bundlestatus = budlestatus = {}
+        self.bundles = bundles = []
+
+        with server:
+            print('starting task server')
+            for chrom in chroms:
+                print('chrom {0}'.format(chrom))
+                sub = bed[(bed['chr']==chrom)]
+                uc = UT.union_contiguous(sub[['chr','st','ed']], returndf=True)
+                # total about 30K=> make batch of ~1000
+                n = len(uc)
+                nb = int(N.ceil(n/1000.))
+                print(chrom,nb)
+                for i in range(nb):
+                    print('putting in bundle_estimator {0}.{1}'.format(chrom,i))
+                    sti = 1000*i
+                    edi = min(1000*(i+1), len(uc)-1)
+                    st = max(uc.iloc[sti]['st'] - 100, 0)
+                    ed = min(uc.iloc[edi]['ed'] + 100, csizedic[chrom])
+                    arg = [modelpre, bwpre, chrom, st, ed, dstpre, tcovth]
+                    tname = 'bundle_estimator.{0}'.format(i)
+                    task = TQ.Task(tname, bundle_estimator, args)
+                    server.add_task(task)
+                    bundles.append((chrom,st,ed))
+            nb = len(bundles)
+            while server.check_error():
+                try:
+                    name, rslt = server.get_result(timeout=5)
+                except TQ.Empty:
+                    name, rslt = None, None
+                if name is not None:
+                    if name.startswith('bundle_estimator.'):
+                        subid = name.split('.')[-1]
+                        bundlestatus[subid] = rslt
+                        if len(bundlestatus)==nb:
+                            print('$$$$$$$$ putting in concatenate_bundles $$$$$$$$$$$')
+                            tname='concatenate_bundles'
+                            args = (bundles, self.dstpre)
+                            task = TQ.Task(tname, concatenate_bundles, args)
+                            server.add_task(task)
+                    if name=='concatenate_bundles':
+                        print('$$$$$$$$ concatenate_bundles done $$$$$$$$$$$')
+                        break
+            print('Exit Loop')
+        print('Done')
 
 
 ############# Cov Collector ######################################################
