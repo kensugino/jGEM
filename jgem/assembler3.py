@@ -851,7 +851,11 @@ LAPARAMS = dict(
      mth=3, 
      sjratioth=0.5e-3, # 2e-3
      usjratioth=2.5e-3, # 1e-2 for unstranded sj
-     lsjratioth=5e-3, # for sj > 100Kbp
+     lsjratioth=5e-3, # for sj > lsjth
+     lsjth=1e5, # long sj apply lsjratioth
+     msjratioth=5e-3,
+     msjrth=5, # (mcnt/ucnt>msjrth)&(len>msjlenth) => apply msjratioth
+     msjlenth=1e4,
      #covfactor=0.05, 
      tcovth=0,
      tcovfactor=0.1,
@@ -1214,6 +1218,10 @@ class LocalAssembler(object):
             sjratioth = self.params['sjratioth']
             usjratioth = self.params['usjratioth']
             lsjratioth = self.params['lsjratioth']
+            lsjth = self.params['lsjth']
+             msjratioth=self.params['msjratioth'] #5e-3,
+             msjrth=self.params['msjrth']#5, # (mcnt/ucnt>msjrth)&(len>msjlenth) => apply msjratioth
+             msjlenth=self.params['msjlenth']#1e4,
             chrom,st,ed = self.chrom,self.st,self.ed
             with self.sjexbw:
                 sjaa = self.sjexbw.bws['sj']['a'].get(chrom, st, ed)
@@ -1224,9 +1232,12 @@ class LocalAssembler(object):
             sj['sjratio'] = [x/N.max(a[int(s-o):int(e-o)]) for x,s,e in sj[['tcnt','st','ed']].values]
             idxpn = (sj['strand'].isin(['+','-']))&(sj['sjratio']>sjratioth)
             idxu = (sj['strand'].isin(['.+','.-']))&(sj['sjratio']>usjratioth)
-            idx = (sj['ucnt']>=uth)|(sj['tcnt']-sj['ucnt']>=mth)
+            mcnt = sj['tcnt']-sj['ucnt']
+            idx = (sj['ucnt']>=uth)|(mcnt>=mth)
             sj['len'] = sj['ed']-sj['st']
-            idxl = (sj['len']<1e5)|(sj['sjratio']>lsjratioth)
+            idxl = (sj['len']<lsjth)|(sj['sjratio']>lsjratioth)
+            muratio=mcnt/sj['ucnt']
+            idxm = ((sj['len']<msjlenth)&(muratio>msjrth))|(sj['sjratio']>msjratioth)
             self.sjdf = sj[idx&(idxpn|idxu)&idxl].copy()
             n1 = len(self.sjdf)
             LOG.info('merged sjdf loaded: filtered {0}=>{1}'.format(n0,n1))
