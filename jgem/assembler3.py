@@ -1235,9 +1235,9 @@ class LocalAssembler(object):
             mcnt = sj['tcnt']-sj['ucnt']
             idx = (sj['ucnt']>=uth)|(mcnt>=mth)
             sj['len'] = sj['ed']-sj['st']
-            idxl = (sj['len']<lsjth)|(sj['sjratio']>lsjratioth)
+            idxl = (sj['len']<=lsjth)|(sj['sjratio']>lsjratioth)
             muratio=mcnt/sj['ucnt']
-            idxm = ((sj['len']<msjlenth)&(muratio>msjrth))|(sj['sjratio']>msjratioth)
+            idxm = (sj['len']<=msjlenth)|(muratio<=msjrth)|(sj['sjratio']>msjratioth)
             LOG.info('uthmth:{0}, sjratio:{1}, usjratio:{2}, lsjratio:{3}, msjratio:{4}'.\
                 format(N.sum(idx),N.sum(idxpn),N.sum(idxu),N.sum(idxl),N.sum(idxm)))
             self.sjdf = sj[idx&(idxpn|idxu)&idxl&idxm].copy()
