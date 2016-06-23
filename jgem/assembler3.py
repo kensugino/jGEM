@@ -852,10 +852,10 @@ LAPARAMS = dict(
      sjratioth=0.5e-3, # 2e-3
      usjratioth=2.5e-3, # 1e-2 for unstranded sj
      lsjratioth=5e-3, # for sj > lsjth
-     lsjth=1e5, # long sj apply lsjratioth
-     msjratioth=5e-3,
-     msjrth=5, # (mcnt/ucnt>msjrth)&(len>msjlenth) => apply msjratioth
-     msjlenth=1e4,
+     lsjth=8e4, # long sj apply lsjratioth
+     # msjratioth=5e-3,
+     # msjrth=5, # (mcnt/ucnt>msjrth)&(len>msjlenth) => apply msjratioth
+     # msjlenth=1e4,
      #covfactor=0.05, 
      tcovth=0,
      tcovfactor=0.1,
@@ -1236,10 +1236,12 @@ class LocalAssembler(object):
             idx = (sj['ucnt']>=uth)|(mcnt>=mth)
             sj['len'] = sj['ed']-sj['st']
             idxl = (sj['len']<=lsjth)|(sj['sjratio']>lsjratioth)
-            muratio=mcnt/sj['ucnt']
-            idxm = (sj['len']<=msjlenth)|(muratio<=msjrth)|(sj['sjratio']>msjratioth)
-            LOG.info('uthmth:{0}, sjratio:{1}, usjratio:{2}, lsjratio:{3}, msjratio:{4}'.\
-                format(N.sum(idx),N.sum(idxpn),N.sum(idxu),N.sum(idxl),N.sum(idxm)))
+            # muratio=mcnt/sj['ucnt']
+            # idxm = (sj['len']<=msjlenth)|(muratio<=msjrth)|(sj['sjratio']>msjratioth)
+            # LOG.info('uthmth:{0}, sjratio:{1}, usjratio:{2}, lsjratio:{3}, msjratio:{4}'.\
+            #     format(N.sum(idx),N.sum(idxpn),N.sum(idxu),N.sum(idxl),N.sum(idxm)))
+            LOG.info('uthmth:{0}, sjratio:{1}, usjratio:{2}, lsjratio:{3}'.\
+                format(N.sum(idx),N.sum(idxpn),N.sum(idxu),N.sum(idxl)))
             self.sjdf = sj[idx&(idxpn|idxu)&idxl&idxm].copy()
             n1 = len(self.sjdf)
             LOG.info('merged sjdf loaded: filtered {0}=>{1}'.format(n0,n1))
