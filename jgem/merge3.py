@@ -583,6 +583,7 @@ class LocalEstimator(A3.LocalAssembler):
         self.calculate_scovs()
         self.estimate_abundance()
         self.write()
+        return 
 
     def calculate_scovs(self):
         sj = self.sjdf
@@ -906,6 +907,7 @@ class CovEstimator(object):
 
         with server:
             print('starting task server')
+            subid = 0
             for chrom in chroms:
                 print('chrom {0}'.format(chrom))
                 sub = bed[(bed['chr']==chrom)]
@@ -921,7 +923,8 @@ class CovEstimator(object):
                     st = max(uc.iloc[sti]['st'] - 100, 0)
                     ed = min(uc.iloc[edi]['ed'] + 100, csizedic[chrom])
                     args = [self.modelpre, self.bwpre, chrom, st, ed, self.dstpre, self.tcovth]
-                    tname = 'bundle_estimator.{0}'.format(i)
+                    tname = 'bundle_estimator.{0}'.format(subid)
+                    subid += 1
                     task = TQ.Task(tname, bundle_estimator, args)
                     server.add_task(task)
                     bundles.append((chrom,st,ed))
