@@ -1670,19 +1670,22 @@ class LocalAssembler(object):
         dsump = sj.groupby('dpos')['tcnt'].sum().astype(float)
         tmp = dsump.ix[sj['dpos'].values]
         jdp = sj['tcnt'].values/(tmp.values)
-        jdp[tmp==0] = 0.
+        idx = N.array(tmp==0, dtype=bool)
+        jdp[idx] = 0. 
         sj['p'] = jdp
         # j2p = dict(zip(sj['name'].values, jdp))
         # exon groupby acceptor
         asump = ex.groupby('apos')['ecov'].sum().astype(float)
         tmp = asump.ix[ex['apos'].values]
         eap = ex['ecov'].values/(tmp.values)
-        eap[tmp==0] = 0.
+        idx = N.array(tmp==0, dtype=bool)
+        eap[idx] = 0. 
         ex['pa'] = eap
         dsump = ex.groupby('dpos')['ecov'].sum().astype(float)
         tmp = dsump.ix[ex['dpos'].values]
         edp = ex['ecov'].values/(tmp.values)
-        edp[tmp==0] = 0.
+        idx = N.array(tmp==0, dtype=bool)
+        edp[idx] = 0. 
         ex['pd'] = edp
 
     def select_53paths(self, gg, spansjdf, spanexdf, chrom, strand):

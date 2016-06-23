@@ -645,20 +645,23 @@ class LocalEstimator(A3.LocalAssembler):
         dsump = sj.groupby('dpos')['tcnt'].sum().astype(float)
         tmp = dsump.ix[sj['dpos'].values]
         jdp = sj['tcnt'].values/tmp.values
-        jdp[tmp==0] = 0. 
+        idx = N.array(tmp==0, dtype=bool)
+        jdp[idx] = 0. 
         j2p = dict(zip(sj['name'].values, jdp))
         
         # exon groupby acceptor
         asump = ex.groupby('apos')['ecov'].sum().astype(float)
         tmp = asump.ix[ex['apos'].values]
         eap = ex['ecov'].values/(tmp.values)
-        eap[tmp==0] = 0.
+        idx = N.array(tmp==0, dtype=bool)
+        eap[idx] = 0. 
         e2ap = dict(zip(ex['name'].values, eap))
 
         dsump = ex.groupby('dpos')['ecov'].sum().astype(float)
         tmp = dsump.ix[ex['dpos'].values]
         edp = ex['ecov'].values/(tmp.values)
-        edp[tmp==0] = 0.
+        idx = N.array(tmp==0, dtype=bool)
+        edp[idx] = 0. 
         e2dp = dict(zip(ex['name'].values, edp))
 
         return j2p, e2ap, e2dp
