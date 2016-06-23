@@ -32,6 +32,8 @@ import pandas as PD
 import numpy as N
 import scipy.optimize as SO
 
+from jgem import taskqueue as TQ
+
 import logging
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
@@ -854,6 +856,39 @@ def process_mp(func, args, np, doreduce=True):
     if doreduce:
         rslts = reduce(iadd, rslts, [])
     return rslts    
+
+
+def process_mp2(func, args, np, doreduce=True):
+    rslts = []
+    if np==1:
+        for i, arg in enumerate(args):
+            rslts.append(func(*arg))
+            LOG.debug(' processing: {0}/{1}...'.format(i+1,len(args)))
+    else:
+        status = {}
+        server = TQ.Server(np=np)
+        with server:
+            for i,a in enumerate(args):
+                tname = 'func.{0}'.format(i)
+                task = TQ.Task(tname, func, a)
+                server.add_task(task)
+            while server.check_error():
+                try:
+                    name, rslt = server.get_result(timeout=5)
+                except TQ.Empty:
+                    name, rslt = None, None
+                if name is not None:
+                    subid = name.split('.')[-1]
+                    status[subid] = rslt
+                    if len(status)==len(args):
+                        break
+        rslts = status.values()
+    if doreduce:
+        rslts = reduce(iadd, rslts, [])
+    return rslts    
+
+
+
 
 def grouper(iterable, n, fill=None):
     "Collect data into fixed-length chunks or blocks"
