@@ -52,9 +52,12 @@ class Worker(multiprocessing.Process):
                 next_task = self.task_queue.get(timeout=10)                
                 if next_task is None:
                     # Poison pill means shutdown
-                    maxdur = N.max(self.durs)
-                    avgdur = N.mean(self.durs)
-                    numrun = len(self.durs)
+                    if len(self.dur)>0:
+                        maxdur = N.max(self.durs)
+                        avgdur = N.mean(self.durs)
+                        numrun = len(self.durs)
+                    else:
+                        maxdur,avgdur,numrun=0,0,0
                     print('{0}: Exiting (through shutdown) maxdur({1:.2f}) avgdur({2:.2f}) run({3})'.format(proc_name, maxdur, avgdur,numrun))
                     self.set_info(status='exit')
                     self.task_queue.task_done()
