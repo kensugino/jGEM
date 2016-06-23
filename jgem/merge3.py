@@ -908,7 +908,7 @@ class CovEstimator(object):
                     edi = min(1000*(i+1), len(uc)-1)
                     st = max(uc.iloc[sti]['st'] - 100, 0)
                     ed = min(uc.iloc[edi]['ed'] + 100, csizedic[chrom])
-                    arg = [self.modelpre, self.bwpre, chrom, st, ed, self.dstpre, self.tcovth]
+                    args = [self.modelpre, self.bwpre, chrom, st, ed, self.dstpre, self.tcovth]
                     tname = 'bundle_estimator.{0}'.format(i)
                     task = TQ.Task(tname, bundle_estimator, args)
                     server.add_task(task)
