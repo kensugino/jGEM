@@ -1219,9 +1219,9 @@ class LocalAssembler(object):
             usjratioth = self.params['usjratioth']
             lsjratioth = self.params['lsjratioth']
             lsjth = self.params['lsjth']
-            msjratioth=self.params['msjratioth'] #5e-3,
-            msjrth=self.params['msjrth']#5, # (mcnt/ucnt>msjrth)&(len>msjlenth) => apply msjratioth
-            msjlenth=self.params['msjlenth']#1e4,
+            # msjratioth=self.params['msjratioth'] #5e-3,
+            # msjrth=self.params['msjrth']#5, # (mcnt/ucnt>msjrth)&(len>msjlenth) => apply msjratioth
+            # msjlenth=self.params['msjlenth']#1e4,
             chrom,st,ed = self.chrom,self.st,self.ed
             with self.sjexbw:
                 sjaa = self.sjexbw.bws['sj']['a'].get(chrom, st, ed)
