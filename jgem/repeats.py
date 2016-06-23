@@ -41,7 +41,6 @@ RMSKPARAMS = dict(
 
 
 def filter_paths(mdstpre, rdstpre):
-    paths =  GGB.read_bed(mdstpre+'.paths.withse.bed.gz')
     ex = UT.read_pandas(rdstpre+'.ex.txt.gz')
     def select_chromwise(paths, ex):
         npchrs = []
@@ -53,8 +52,14 @@ def filter_paths(mdstpre, rdstpre):
             idx = [all([x in exnames for x in y.split('|')]) for y in pchr['name']]
             npchrs.append(pchr[idx])
         return PD.concat(npchrs, ignore_index=True)
+    paths =  GGB.read_bed(mdstpre+'.paths.withse.bed.gz')
     npaths = select_chromwise(paths, ex)
     GGB.write_bed(npaths, rdstpre+'.paths.withse.bed.gz', ncols=12)
+
+    paths =  GGB.read_bed(mdstpre+'.paths.txt.gz')
+    npaths = select_chromwise(paths, ex)
+    GGB.write_bed(npaths, rdstpre+'.paths.txt.gz', ncols=12)
+
 
 def filter_sjexdf(mdstpre, rdstpre):
     exdf =  UT.read_pandas(mdstpre+'.exdf.txt.gz', names=A3.EXDFCOLS)
