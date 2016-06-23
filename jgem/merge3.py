@@ -547,6 +547,7 @@ class LocalEstimator(A3.LocalAssembler):
         self.tcovth = tcovth
         A3.LocalAssembler.__init__(self, bwpre, chrom, st, ed, dstpre)
         bed12 = GGB.read_bed(modelpre+'.paths.withse.bed.gz')
+        assert(all(bed12['tst']<bed12['ted']))
         idx = (bed12['chr']==chrom)&(bed12['tst']>=st)&(bed12['ted']<=ed)
         self.paths = bed12[idx].copy()
         tgt1 = bwpre+'.{0}.filtered.bed.gz'.format(chrom)
@@ -712,7 +713,7 @@ class LocalEstimator(A3.LocalAssembler):
                 LOG.warning('!!!!!! Exception in NNLS (tcov_by_nnls) @{0}:{1}-{2}, setting to zero !!!!!!!!!'.format(self.chrom, s, e))
                 pg['tcov0a'] = 0
             pg.rename(columns={'st':'tst','ed':'ted'}, inplace=True)
-        else:
+        else: # this includes single exons
             s,e = pg.iloc[0][['tst','ted']]
             pg['tcov0a'] = cov0(s,e)
         # cov1, cov2

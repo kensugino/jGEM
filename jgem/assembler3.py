@@ -1657,8 +1657,15 @@ class LocalAssembler(object):
             pathsdf.loc[idxp,'ted'] = [int(x.split('|')[-1].split(',')[0]) for x in pathsdf[idxp]['name']]
             pathsdf.loc[idxn,'tst'] = [int(x.split('|')[-1].split(',')[0]) for x in pathsdf[idxn]['name']]
             pathsdf.loc[idxn,'ted'] = [int(x.split('|')[0].split(',')[1]) for x in pathsdf[idxn]['name']]
+            # no junction
+            idxu = (pathsdf['strand'].isin(['.'])) | (~pathsdf['name'].str.contains('\|'))
+            tmp = [[int(y) for y in x.split(',')] for x in pathsdf[idxu]['name']]
+            pathsdf.loc[idxu,'tst'] = [min(x) for x in tmp]
+            pathsdf.loc[idxu,'ted'] = [max(x) for x in tmp]
+
             pathsdf['tst'] = pathsdf['tst'].astype(int)
             pathsdf['ted'] = pathsdf['ted'].astype(int)            
+            assert(all(pathsdf['tst']<pathsdf['ted']))
             self.paths = pathsdf
         else:
             self.sjdf2 = None
