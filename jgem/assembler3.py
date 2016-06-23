@@ -1567,17 +1567,22 @@ class LocalAssembler(object):
         o = int(self.st)
         if len(ex)==0:
             return
+        if '_eid' not in ex:
+            ex.sort_values(['chr','st','ed'], inplace=True)
+            ex['_eid'] = N.arange(len(ex))
+        ex.set_index('_eid', inplace=True)
         ex['ecov'] = N.nan
         for strand in ['+','-']:
+            exa = self.arrs['ex'][strand]
+            def cov(s,e):
+                return N.mean(exa[int(s)-o:int(e)-o])
             spans = self._get_spans(strand)
             for st,ed in spans:
-                idx = (ex['st']>=st)&(ex['ed']<=ed)&(ex['strand'].isin(STRS[strand]))
-                es = ex[idx].copy().sort_values(['st','ed'])
+                es = ex[(ex['st']>=st)&(ex['ed']<=ed)&(ex['strand'].isin(STRS[strand]))].copy()
+                # es = ex[idx].copy().sort_values(['st','ed']) # <== BUG!: sort after idx messes up relationship
+                idx = es.index.values # _eid's
                 es['tmpeid'] = N.arange(len(es))
                 ne = len(es)
-                exa = self.arrs['ex'][strand]
-                def cov(s,e):
-                    return N.mean(exa[int(s)-o:int(e)-o])
                 if ne>1:
                     ci = UT.chopintervals(es, idcol='tmpeid', sort=False)
                     ci['cov'] = [cov(s,e) for s,e in ci[['st','ed']].values]
