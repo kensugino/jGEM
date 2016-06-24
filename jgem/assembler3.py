@@ -2446,10 +2446,15 @@ class PathGenerator(object):
                             yield rec
                 df = PD.DataFrame([x for x in _gen()], columns=PATHCOLS)
             return df
-        df3 = _add_alt3(df) # add 3' alt
-        df =  _add_alt5(df3) # add 5' alt
+        print('before add_alt3:#df={0}'.format(len(df)))
+        df = _add_alt3(df) # add 3' alt
+        print('before add_alt5:#df={0}'.format(len(df)))
+        df =  _add_alt5(df) # add 5' alt
+        print('before groupby:#df={0}'.format(len(df)))
         # make sure no duplicates
-        return df.groupby('name').first().reset_index()
+        df = df.groupby('name').first().reset_index()
+        print('select paths #df={0}'.format(len(df)))
+        return df
 
 
 class PathGenerator53(object):
@@ -2550,7 +2555,7 @@ class PathGenerator53(object):
                 if (self.raisecnt>self.maxraisecnt)&((vmax-vmin)<self.minvmimadiff):
                     self.disable = True
                     gid = self.e5['gid']
-                    print('gid:{3}, pgid:{0} disabled (raisecnt>{1}, vmax-vmin={2})'.format(self.pgid, self.raisecnt, vmax-vmin, gid))
+                    print('gid:{3}, pgid:{0} disabled (raisecnt>{1}, vmax:{2}, vmin:{3})'.format(self.pgid, self.raisecnt, vmax, vmin, gid))
                 raise PathNumUpperLimit
 
         pmin0 = N.min(pmins)
