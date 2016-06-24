@@ -570,14 +570,20 @@ class LocalEstimator(A3.LocalAssembler):
         self.exdf = exdf[idx].copy()
         A3.set_ad_pos(self.sjdf, 'sj')
         A3.set_ad_pos(self.exdf, 'ex')
-        self.sjexbw = sjexbw = A3.SjExBigWigs(bwpre, None, mixunstranded=True)
-        self.stranded = sjexbw.strandedQ('ex')
-        self.arrs = arrs = {}
-        with sjexbw: # get bw arrays
-            for k in ['ex','sj']:
-                arrs[k] = {}
-                for s in ['+','-']:
-                    arrs[k][s] = sjexbw.bws[k][s].get(chrom, st, ed)
+        
+        # self.sjexbw = sjexbw = A3.SjExBigWigs(bwpre, None, mixunstranded=True)
+        # self.stranded = sjexbw.strandedQ('ex')
+        # self.arrs = arrs = {}
+        # with sjexbw: # get bw arrays
+        #     for k in ['ex','sj']:
+        #         arrs[k] = {}
+        #         if self.stranded:
+        #             for s in ['+','-','a']:
+        #                 arrs[k][s] = sjexbw.bws[k][s].get(chrom, st, ed)
+        #         else:
+        #             arrs[k]['+'] = sjexbw.bws[k]['-'].get(chrom, st, ed)
+        #             arrs[k]['-'] = arrs[k]['+']
+        #             arrs[k]['a'] = arrs[k]['+']
 
     def process(self):
         self.calculate_ecovs()
