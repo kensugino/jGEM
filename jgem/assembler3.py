@@ -931,13 +931,14 @@ class LocalAssembler(object):
         with sjexbw: # get bw arrays
             for k in ['ex','sj']:
                 arrs[k] = {}
-                if self.stranded:
-                    for s in ['+','-','a']:
-                        arrs[k][s] = sjexbw.bws[k][s].get(chrom, st, ed)
-                else:
-                    arrs[k]['+'] = sjexbw.bws[k]['-'].get(chrom, st, ed)
+                if k=='ex' and not self.stranded:
+                    arrs[k]['+'] = sjexbw.bws[k]['+'].get(chrom, st, ed)
                     arrs[k]['-'] = arrs[k]['+']
                     arrs[k]['a'] = arrs[k]['+']
+                else:
+                    for s in ['+','-','a']:
+                        arrs[k][s] = sjexbw.bws[k][s].get(chrom, st, ed)
+
 
         self.exbwpre = exbwpre
         if exbwpre is not None:
@@ -1868,7 +1869,8 @@ class LocalAssembler(object):
             pg['tcov0c'] = (cov2s(int(s))+cov2e(int(e)))/2.
 
         # pg['tcov0'] = pg[['tcov0a','tcov0b','tcov0c']].mean(axis=1)
-        pg['tcov0'] = N.power(pg['tcov0a']*pg['tcov0b']*pg['tcov0c'], 1/3.) # geometric mean
+        pg['tcov0'] = (2*pg['tcov0a']+pg['tcov0b']+pg['tcov0c'])/4.
+        # pg['tcov0'] = N.power(pg['tcov0a']*pg['tcov0b']*pg['tcov0c'], 1/3.) # geometric mean
         pg.loc[pg['tcov0']<0,'tcov0'] = 0 # shouldn't really happen
 
         exkeys = spanexs['id53'].values

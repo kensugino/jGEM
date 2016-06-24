@@ -576,19 +576,6 @@ class LocalEstimator(A3.LocalAssembler):
         A3.set_ad_pos(self.sjdf, 'sj')
         A3.set_ad_pos(self.exdf, 'ex')
 
-        # self.sjexbw = sjexbw = A3.SjExBigWigs(bwpre, None, mixunstranded=True)
-        # self.stranded = sjexbw.strandedQ('ex')
-        # self.arrs = arrs = {}
-        # with sjexbw: # get bw arrays
-        #     for k in ['ex','sj']:
-        #         arrs[k] = {}
-        #         if self.stranded:
-        #             for s in ['+','-','a']:
-        #                 arrs[k][s] = sjexbw.bws[k][s].get(chrom, st, ed)
-        #         else:
-        #             arrs[k]['+'] = sjexbw.bws[k]['-'].get(chrom, st, ed)
-        #             arrs[k]['-'] = arrs[k]['+']
-        #             arrs[k]['a'] = arrs[k]['+']
 
     def process(self):
         self.calculate_ecovs()
@@ -781,10 +768,11 @@ class LocalEstimator(A3.LocalAssembler):
         else:
             s,e = pg.iloc[0][['tst','ted']]
             pg['tcov0b'] = (cov1s(s)+cov1e(e))/2.
-            pg['tcov0c'] = (cov2s(s)-cov2e(e))/2.
+            pg['tcov0c'] = (cov2s(s)+cov2e(e))/2.
 
         # pg['tcov0'] = pg[['tcov0a','tcov0b','tcov0c']].mean(axis=1)
-        pg['tcov0'] = N.power(pg['tcov0a']*pg['tcov0b']*pg['tcov0c'], 1/3.) # geometric mean
+        pg['tcov0'] = (2*pg['tcov0a']+pg['tcov0b']+pg['tcov0c'])/4. # weighted        
+        # pg['tcov0'] = N.power(pg['tcov0a']*pg['tcov0b']*pg['tcov0c'], 1/3.) # geometric mean
         pg.loc[pg['tcov0']<0,'tcov0'] = 0 # shouldn't really happen
         keys = [tuple(x) for x in p[idx][['tst','ted']].values]
         for f in ['tcov0','tcov0a','tcov0b','tcov0c']:
