@@ -369,7 +369,7 @@ class SlopeEdgeFinder(object):
             eds1 = self.trim(v,sm,eds1)
         eds = eds0+eds1
         if verbose or self.verbose:
-            LOG.debug('drop({0}), rise({1}), low({2}), min({3}), rise2({4}),eds:{5}'.format(l0,l1,l2,l3,l4),eds)
+            LOG.debug('drop({0}), rise({1}), low({2}), min({3}), rise2({4}),eds:{5}'.format(l0,l1,l2,l3,l4,eds))
         if len(eds)==0:
             eds = [olen]
         eds = self._aggregate(olen,eds)
