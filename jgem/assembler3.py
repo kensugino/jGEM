@@ -1280,6 +1280,7 @@ class LocalAssembler(object):
             # sjdf = sjdf.groupby(['chr','st','ed','strand']).first().reset_index()
             sjdf['tst'] = sjdf['st']
             sjdf['ted'] = sjdf['ed']
+            sjdf['len'] = sjdf['ed']-sjdf['st']
             set_ad_pos(sjdf, 'sj')
             self.sjdf = sjdf
 
@@ -1730,7 +1731,7 @@ class LocalAssembler(object):
                     idx = (ex3b['st']<=jst)&(ex3b['ed']>=jed) # 3'exon opposite strand containing j
                     if N.sum(idx)==0: # not contained in 3'exons
                         yield rec
-        df0n = PD.DataFrame([x for x in _gen_df0n()], names=cols)
+        df0n = PD.DataFrame([x for x in _gen_df0n()], columns=cols)
         dfn = PD.concat([df1, df0n], ignore_index=True)
         dfn.sort_values(['chr','st','ed'], inplace=True)
         return dfn
