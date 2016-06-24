@@ -850,7 +850,8 @@ class LocalEstimator(A3.LocalAssembler):
             ps = mepaths[mepaths['strand'].isin(A3.STRS[s])]
             if len(ps)==0:
                 continue
-            for chrom,st,ed in UT.union_contiguous(ps[['chr','st','ed']],returndf=False):
+            # for chrom,st,ed in UT.union_contiguous(ps[['chr','st','ed']],returndf=False):
+            for chrom,st,ed in UT.union_contiguous(ps[['chr','tst','ted']],returndf=False):
                 pg = self.tcov_by_nnls(st,ed,s)
                 if pg is not None:
                     for chrom,tst,ted,strand,tcov0 in pg.values:
