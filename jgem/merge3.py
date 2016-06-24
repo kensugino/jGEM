@@ -776,7 +776,11 @@ class LocalEstimator(A3.LocalAssembler):
                     c[:nst] = (edsum/stsum)*c[:nst]
                 else:
                     c[nst:] = (stsum/edsum)*c[nst:]
-                ecov,err = nnls(mat, c)
+                try:
+                    ecov,err = nnls(mat, c)
+                except e:
+                    print('nnls error', mat, c)
+                    raise e
                 pg['tcov0c'] = ecov
         else:
             s,e = pg.iloc[0][['tst','ted']]
