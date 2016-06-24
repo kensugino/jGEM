@@ -824,6 +824,8 @@ class LocalEstimator(A3.LocalAssembler):
         idxme = paths['name'].str.contains('\|')
         mepaths = paths[idxme].copy()
         sepaths = paths[~idxme].copy()
+
+        self.paths = mepaths
         for s in ['+','-']:
             ps = mepaths[mepaths['strand'].isin(A3.STRS[s])]
             if len(ps)==0:
@@ -833,12 +835,14 @@ class LocalEstimator(A3.LocalAssembler):
                 if pg is not None:
                     for chrom,tst,ted,strand,tcov0 in pg.values:
                         self.tcov_by_branchp(tst,ted,strand,tcov0)
+
         e2c = UT.df2dict(self.exdf, 'name', 'ecov')
         sepaths['tcov'] = [e2c[x] for x in sepaths['name']]
         for f in ['tcov0','tcov0b']:
             sepaths[f] = sepaths['tcov']
         sepaths['tcov0a'] = 0.
         sepaths['tcov0b'] = 0.
+
         paths = PD.concat([mepaths, sepaths], ignore_index=True)
         paths.sort_values(['chr','st','ed'],inplace=True)
         self.paths = paths
