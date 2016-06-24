@@ -736,10 +736,11 @@ class LocalEstimator(A3.LocalAssembler):
             try:
                 ecov,err = nnls(mat, ci['cov'].values)
                 pg['tcov0a'] = ecov
-            except:
+            except e:
                 # too much iteration?
                 LOG.warning('!!!!!! Exception in NNLS (tcov_by_nnls) @{0}:{1}-{2}, setting to zero !!!!!!!!!'.format(self.chrom, s, e))
                 pg['tcov0a'] = 0
+                # raise e
             pg.rename(columns={'st':'tst','ed':'ted'}, inplace=True)
         else: # this includes single exons
             s,e = pg.iloc[0][['tst','ted']]
@@ -764,7 +765,7 @@ class LocalEstimator(A3.LocalAssembler):
                     c[nst:] = (stsum/edsum)*c[nst:]
                 try:
                     ecov,err = nnls(mat, c)
-                except:
+                except e:
                     print('s:{0},e:{1},strand:{2}'.format(s,e,strand))
                     print('stsum:', stsum)
                     print('edsum:', edsum)
@@ -772,6 +773,8 @@ class LocalEstimator(A3.LocalAssembler):
                     print('sts:',sts)
                     print('eds:',eds)
                     print('pg:',pg)
+                    pg['tcov0c'] = 0
+                    raise e
 
                 pg['tcov0b'] = ecov
 
@@ -792,6 +795,7 @@ class LocalEstimator(A3.LocalAssembler):
                 except e:
                     print('s:{0},e:{1},strand:{2}'.format(s,e,strand))
                     print('nnls error tcov0c', mat, c)
+                    pg['tcov0c'] = 0
                     raise e
                 pg['tcov0c'] = ecov
         else:
