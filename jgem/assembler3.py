@@ -1918,8 +1918,11 @@ class LocalAssembler(object):
         e0 = ed+win-offset
         sjap0 = self.arrs['sj'][strand][s0:e0]
         exap0 = self.arrs['ex'][strand][s0:e0]
-        sjap1 = self.filled[strand][s0:e0]
-        #ax.plot(N.log2(sjap0+1), 'r--')
+        if hasattr(self, 'filled'): # for LocalEstimator
+            sjap1 = self.filled[strand][s0:e0]
+        else:
+            sjap1 = sjap0
+
         ipx = set(N.nonzero(exap0>0)[0])
         n = len(exap0)
         ipx.update([x+1 for x in ipx if x<n-1])
@@ -1949,26 +1952,28 @@ class LocalAssembler(object):
                 gx0 = max(min((gx1+gx2)/2., e0-s0), 0)
                 ax.text(gx0, h0-2*hu, '{0}'.format(i))
         # 53
-        e53p = self.e53pos[strand]
-        t5 = e53p[(e53p['kind']=='5')&(e53p['pos']>s0)&(e53p['pos']<e0)]
-        t3 = e53p[(e53p['kind']=='3')&(e53p['pos']>s0)&(e53p['pos']<e0)]
-        i5p = N.array(t5['pos'].values-s0, dtype=N.int64)
-        i3p = N.array(t3['pos'].values-s0, dtype=N.int64)
-        if len(i5p)>0:
-            ax.plot(i5p, y0[i5p], 'm^')
-        if len(i3p)>0:
-            ax.plot(i3p, y0[i3p], 'mv')
+        if hasattr(self, 'e53pos'):
+            e53p = self.e53pos[strand]
+            t5 = e53p[(e53p['kind']=='5')&(e53p['pos']>s0)&(e53p['pos']<e0)]
+            t3 = e53p[(e53p['kind']=='3')&(e53p['pos']>s0)&(e53p['pos']<e0)]
+            i5p = N.array(t5['pos'].values-s0, dtype=N.int64)
+            i3p = N.array(t3['pos'].values-s0, dtype=N.int64)
+            if len(i5p)>0:
+                ax.plot(i5p, y0[i5p], 'm^')
+            if len(i3p)>0:
+                ax.plot(i3p, y0[i3p], 'mv')
 
         # exons
-        ex = self.exons[strand]
-        ex = ex[(ex['ost']>s0)&(ex['oed']<e0)]
-        ymid = h0+5*hu
-        h = 2*hu
-        yrange = (ymid-h/2., h)
-        xranges = [(x-s0,y-x) for x,y in ex[['ost','oed']].values]
-        cargs = dict(facecolor='k', edgecolor='k')#, linewidth=0.2)
-        bbhc = BrokenBarHCollection(xranges, yrange, **cargs)
-        ax.add_collection(bbhc)
+        if hasattr(self, 'exons'):
+            ex = self.exons[strand]
+            ex = ex[(ex['ost']>s0)&(ex['oed']<e0)]
+            ymid = h0+5*hu
+            h = 2*hu
+            yrange = (ymid-h/2., h)
+            xranges = [(x-s0,y-x) for x,y in ex[['ost','oed']].values]
+            cargs = dict(facecolor='k', edgecolor='k')#, linewidth=0.2)
+            bbhc = BrokenBarHCollection(xranges, yrange, **cargs)
+            ax.add_collection(bbhc)
 
         # exdfi, e53df
         def _plt_ex(ex, ymid, c, h=2, alpha=0.3):
