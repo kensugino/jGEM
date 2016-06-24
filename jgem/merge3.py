@@ -542,9 +542,10 @@ def filter_sjdf(bwsjpre, statspath, chrom, csize, params):
 
 class LocalEstimator(A3.LocalAssembler):
 
-    def __init__(self, modelpre, bwpre, chrom, st, ed, dstpre, tcovth):
+    def __init__(self, modelpre, bwpre, chrom, st, ed, dstpre, tcovth, usegeom=True):
         self.modelpre = modelpre
         self.tcovth = tcovth
+        self.usegeom = usegeom
         A3.LocalAssembler.__init__(self, bwpre, chrom, st, ed, dstpre)
         bed12 = GGB.read_bed(modelpre+'.paths.withse.bed.gz')
         assert(all(bed12['tst']<bed12['ted']))
@@ -777,9 +778,11 @@ class LocalEstimator(A3.LocalAssembler):
             pg['tcov0b'] = (cov1s(s)+cov1e(e))/2.
             pg['tcov0c'] = (cov2s(s)+cov2e(e))/2.
 
-        pg['tcov0'] = pg[['tcov0a','tcov0b','tcov0c']].mean(axis=1)
-        # pg['tcov0'] = (2*pg['tcov0a']+pg['tcov0b']+pg['tcov0c'])/4. # weighted        
-        # pg['tcov0'] = N.power(pg['tcov0a']*pg['tcov0b']*pg['tcov0c'], 1/3.) # geometric mean
+        if not self.usegeom:
+            pg['tcov0'] = pg[['tcov0a','tcov0b','tcov0c']].mean(axis=1)
+            # pg['tcov0'] = (2*pg['tcov0a']+pg['tcov0b']+pg['tcov0c'])/4. # weighted        
+        else:
+            pg['tcov0'] = N.power(pg['tcov0a']*pg['tcov0b']*pg['tcov0c'], 1/3.) # geometric mean
         pg.loc[pg['tcov0']<0,'tcov0'] = 0 # shouldn't really happen
         keys = [tuple(x) for x in p[idx][['tst','ted']].values]
         for f in ['tcov0','tcov0a','tcov0b','tcov0c']:
@@ -837,7 +840,7 @@ class LocalEstimator(A3.LocalAssembler):
         self.bed12 = A3.path2bed12(tgt, cmax=9, covfld='tcov')
         GGB.write_bed(self.bed12, pre+'.covs.paths.bed.gz',ncols=12)
 
-def bundle_estimator(modelpre, bwpre, chrom, st, ed, dstpre, tcovth):
+def bundle_estimator(modelpre, bwpre, chrom, st, ed, dstpre, tcovth, usegeom):
     bname = A3.bundle2bname((chrom,st,ed))
     bsuf = '.{0}_{1}_{2}'.format(chrom,st,ed)
     csuf = '.{0}'.format(chrom)
@@ -855,7 +858,7 @@ def bundle_estimator(modelpre, bwpre, chrom, st, ed, dstpre, tcovth):
         LOG.info('bunle {0} already done, skipping'.format(bname))
         return bname
     LOG.info('processing bunle {0}'.format(bname))
-    la = LocalEstimator(modelpre, bwpre, chrom, st, ed, dstpre, tcovth)
+    la = LocalEstimator(modelpre, bwpre, chrom, st, ed, dstpre, tcovth, usegeom)
     return la.process()    
 
 def concatenate_bundles(bundles, dstpre):
@@ -884,7 +887,7 @@ def concatenate_bundles(bundles, dstpre):
             os.unlink(f)
 
 
-def estimatecovs(modelpre, bwpre, dstpre, genome, tcovth=1, np=6):
+def estimatecovs(modelpre, bwpre, dstpre, genome, tcovth=1, usegeom=True, np=6):
     bed = GGB.read_bed(modelpre+'.paths.withse.bed.gz')
     chroms = bed['chr'].unique()
     csizedic = UT.df2dict(UT.chromdf(genome), 'chr', 'size')
@@ -901,7 +904,7 @@ def estimatecovs(modelpre, bwpre, dstpre, genome, tcovth=1, np=6):
             edi = min(1000*(i+1), len(uc)-1)
             st = max(uc.iloc[sti]['st'] - 100, 0)
             ed = min(uc.iloc[edi]['ed'] + 100, csizedic[chrom])
-            args.append([modelpre, bwpre, chrom, st, ed, dstpre, tcovth])
+            args.append([modelpre, bwpre, chrom, st, ed, dstpre, tcovth, usegeom])
             bundles.append((chrom,st,ed))
 
     rslts = UT.process_mp(bundle_estimator, args, np=np, doreduce=False)
@@ -911,12 +914,13 @@ def estimatecovs(modelpre, bwpre, dstpre, genome, tcovth=1, np=6):
 
 class CovEstimator(object):
     
-    def __init__(self, modelpre, bwpre, dstpre, genome, tcovth=1, np=6):
+    def __init__(self, modelpre, bwpre, dstpre, genome, tcovth=1, usegeom=True, np=6):
         self.modelpre = modelpre
         self.bwpre = bwpre
         self.dstpre = dstpre
         self.genome = genome
         self.tcovth = tcovth
+        self.usegeom = usegeom
         self.np = np
         
     def run(self):
@@ -945,7 +949,7 @@ class CovEstimator(object):
                     edi = min(1000*(i+1), len(uc)-1)
                     st = max(uc.iloc[sti]['st'] - 100, 0)
                     ed = min(uc.iloc[edi]['ed'] + 100, csizedic[chrom])
-                    args = [self.modelpre, self.bwpre, chrom, st, ed, self.dstpre, self.tcovth]
+                    args = [self.modelpre, self.bwpre, chrom, st, ed, self.dstpre, self.tcovth, self.usegeom]
                     tname = 'bundle_estimator.{0}'.format(subid)
                     subid += 1
                     task = TQ.Task(tname, bundle_estimator, args)
