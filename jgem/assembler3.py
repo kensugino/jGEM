@@ -2382,7 +2382,7 @@ class PathGenerator(object):
         
         def _add_alt3(df):
             t = self.gexdf
-            t3 = t[t['kind']=='3'].groupby('name').first()
+            t3 = t[t['kind']=='3'].groupby('name').first().reset_index()
             e33 = {}
             for apo, g in t3.groupby('apos'):
                 eids = g['name'].values
@@ -2415,7 +2415,7 @@ class PathGenerator(object):
             return df
         def _add_alt5(df):
             t = self.gexdf
-            t5 = t[t['kind']=='5'].groupby('name').first()
+            t5 = t[t['kind']=='5'].groupby('name').first().reset_index()
             e55 = {}
             for apo, g in t5.groupby('dpos'):
                 eids = g['name'].values
