@@ -1689,11 +1689,12 @@ class LocalAssembler(object):
         if (len(sjs)>0) and (len(exs)>0) and (len(paths)>0):
             sjsdf = PD.concat(sjs, ignore_index=True)
             exsdf = PD.concat(exs, ignore_index=True)
-            pathsdf = PD.concat(paths, ignore_index=True)
+            self._pathsdf = pathsdf = PD.concat(paths, ignore_index=True)
             self.sjdf2 = sjsdf
             self.exdf2 = exsdf
             # fix tst,ted
             idx = (pathsdf['st']>pathsdf['tst'])|(pathsdf['ed']<pathsdf['ted']) 
+            idxm = pathsdf['name'].str.contains('\|') # has intron
             idxp = idx & (pathsdf['strand'].isin(['+','.+']))
             idxn = idx & (pathsdf['strand'].isin(['-','.-']))
             pathsdf.loc[idxp,'tst'] = [int(x.split('|')[0].split(',')[1]) for x in pathsdf[idxp]['name']]
