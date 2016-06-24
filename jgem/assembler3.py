@@ -2424,7 +2424,7 @@ class PathGenerator(object):
             if len(e55)==0: # no multiple 3exon
                 df = df
             else:
-                e2c = UT.df2dict(t3,'name', 'pd') # name => prob
+                e2c = UT.df2dict(t5,'name', 'pd') # name => prob
                 def _gen():
                     if self.strand=='+':
                         pos = PATHCOLS.index('st')
