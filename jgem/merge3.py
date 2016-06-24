@@ -567,12 +567,11 @@ class LocalEstimator(A3.LocalAssembler):
         sjdf['ted'] = sjdf['ed']
         sjdf['sc1'] = sjdf['ucnt']
         sjdf['sc2'] = sjdf['tcnt']
-
         exdf = UT.read_pandas(modelpre+'.exdf.txt.gz', names=A3.EXDFCOLS)
         idx = (sjdf['chr']==chrom)&(sjdf['st']>=st)&(sjdf['ed']<=ed)
-        self.sjdf = sjdf[idx].copy()
+        self.sjdf = sjdf[idx].groupby(['chr','st','ed','strand']).first().reset_index()
         idx = (exdf['chr']==chrom)&(exdf['st']>=st)&(exdf['ed']<=ed)
-        self.exdf = exdf[idx].copy()
+        self.exdf = exdf[idx].groupby(['chr','st','ed','strand','kind']).first().reset_index()
         A3.set_ad_pos(self.sjdf, 'sj')
         A3.set_ad_pos(self.exdf, 'ex')
 
