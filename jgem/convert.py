@@ -56,7 +56,7 @@ def gtf_from_bed12(modelpre, dstpath=None, source='.'):
     df = PD.DataFrame([x for x in _gen()], columns=GGB.GTFCOLS)
     if dstpath is None:
         dstpath = bedpath.replace('.bed','.gtf')
-    GGB.write_gtf(df, gtfpath)
+    GGB.write_gtf(df, dstpath)
     return df
 
 
