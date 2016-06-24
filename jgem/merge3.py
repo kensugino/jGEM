@@ -766,6 +766,9 @@ class LocalEstimator(A3.LocalAssembler):
                 except:
                     print('s:{0},e:{1},strand:{2}'.format(s,e,strand))
                     print('nnls error tcov0b', mat, c)
+                    print('sts:',sts)
+                    print('eds:',eds)
+                    print('pg:',pg)
 
                 pg['tcov0b'] = ecov
 
