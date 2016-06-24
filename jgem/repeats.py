@@ -28,7 +28,7 @@ from jgem import bedtools as BT
 from jgem import gtfgffbed as GGB
 
 from jgem import assembler2 as A2
-
+from jgem import assembler3 as A3
 
 RMSKPARAMS = dict(
     np = 4,
