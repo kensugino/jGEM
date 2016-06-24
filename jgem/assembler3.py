@@ -2013,7 +2013,7 @@ class LocalAssembler(object):
         ax.set_frame_on(False)        
         return ax
         
-    def draw_path(self, pathdf, st, ed, strand, covfld='tcov',win=500, ax=None, delta=500, maxdisp=None):
+    def draw_path(self, pathdf, st, ed, strand, covfld='tcov',win=500, ax=None, delta=500, maxdisp=None, tmax=None):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=(15,3))
         st0 = st-win
@@ -2038,7 +2038,11 @@ class LocalAssembler(object):
         if covfld not in df.columns:
             df[covfld] = 1.
         df['ltcov'] = N.log2(df[covfld]+2)
-        df['tcovn'] = df['ltcov']/df['ltcov'].max()
+        if tmax is None:
+            ltmax = N.log2(df[covfld].max()+2)
+        else:
+            ltmax = N.log2(tmax+2)
+        df['tcovn'] = df['ltcov']/ltmax #df['ltcov'].max()
         for pc, tst, ted, s, tcov in df[['name','tst','ted','strand','tcovn']].values:
             if cted+delta>tst:
                 cnt +=1
