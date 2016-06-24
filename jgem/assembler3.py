@@ -937,7 +937,7 @@ class LocalAssembler(object):
                 else:
                     arrs[k]['+'] = sjexbw.bws[k]['-'].get(chrom, st, ed)
                     arrs[k]['-'] = arrs[k]['+']
-                    arrs[k]['a'] = arrs[k]['a']
+                    arrs[k]['a'] = arrs[k]['+']
 
         self.exbwpre = exbwpre
         if exbwpre is not None:
