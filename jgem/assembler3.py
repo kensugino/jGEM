@@ -114,9 +114,9 @@ class SjExBigWigs(object):
         self.make_bws()
     
     def strandedQ(self, which='ex'):
-        exbwp = self.bwp[which]['+']
-        exbwn = self.bwp[which]['-']
-        return (os.path.exists(exbwp)&os.path.exists(exbwn))
+        exbwp = [os.path.exists(x) for x in self.bwp[which]['+']]
+        exbwn = [os.path.exists(x) for x in self.bwp[which]['-']]
+        return all(exbwp+exbwn)
 
     def make_bws(self):
         bwp = self.bwpaths
