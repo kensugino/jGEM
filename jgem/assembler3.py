@@ -2446,14 +2446,14 @@ class PathGenerator(object):
                             yield rec
                 df = PD.DataFrame([x for x in _gen()], columns=PATHCOLS)
             return df
-        print('before add_alt3:#df={0}'.format(len(df)))
+        # print('before add_alt3:#df={0}'.format(len(df)))
         df = _add_alt3(df) # add 3' alt
-        print('before add_alt5:#df={0}'.format(len(df)))
+        # print('before add_alt5:#df={0}'.format(len(df)))
         df =  _add_alt5(df) # add 5' alt
-        print('before groupby:#df={0}'.format(len(df)))
+        # print('before groupby:#df={0}'.format(len(df)))
         # make sure no duplicates
         df = df.groupby('name').first().reset_index()
-        print('select paths #df={0}'.format(len(df)))
+        # print('select paths #df={0}'.format(len(df)))
         return df
 
 
