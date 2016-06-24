@@ -53,12 +53,12 @@ def gtf_from_bed12(modelpre, dstpath=None, source='.'):
                 eed = est+x
                 extra = txt.format(gn,tn,i+1)
                 yield (c,source,'exon',est+1,eed,'.',strand,'.',extra)
-    df = PD.DataFrame([x for x in _gen()], columns=GTFCOLS)
+    df = PD.DataFrame([x for x in _gen()], columns=GGB.GTFCOLS)
     if dstpath is None:
         dstpath = bedpath.replace('.bed','.gtf')
     GGB.write_gtf(df, gtfpath)
     return df
-    
+
 
 # GTF <=> EX,SJ    ######################################################################
 
