@@ -99,7 +99,7 @@ class RmskFilter(object):
 
     def __init__(self, sjexpre, code, chromdir, rmskviz, outdir, **kw):
         self.sjexpre = sjexpre
-        prefix = os.path.join(outdir, code)
+        self.prefix = prefix = os.path.join(outdir, code)
         self.fnobj = FN.FileNamesBase(prefix)
         self.chromdir = chromdir
         self.rmskviz = rmskviz
