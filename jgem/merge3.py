@@ -764,7 +764,7 @@ class LocalEstimator(A3.LocalAssembler):
                 ecov,err = nnls(mat, c)
                 pg['tcov0b'] = ecov
 
-            mat = N.array([(pg['tst']==x).values for x in sts]+[-1*(pg['ted']==x).values for x in eds], dtype=float)
+            mat = N.array([(pg['tst']==x).values for x in sts]+[(pg['ted']==x).values for x in eds], dtype=float)
             c = N.array([cov2s(x) for x in sts]+[cov2e(x) for x in eds])
             # enforce flux conservation: scale up 5'
             stsum = N.sum(c[:nst])
