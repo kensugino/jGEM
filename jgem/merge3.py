@@ -757,6 +757,7 @@ class LocalEstimator(A3.LocalAssembler):
             if stsum==0 or edsum==0:
                 pg['tcov0b'] = 0
             else:
+                c0 = c.copy()
                 if strand in ['+','.+']:
                     c[:nst] = (edsum/stsum)*c[:nst]
                 else:
@@ -765,7 +766,9 @@ class LocalEstimator(A3.LocalAssembler):
                     ecov,err = nnls(mat, c)
                 except:
                     print('s:{0},e:{1},strand:{2}'.format(s,e,strand))
-                    print('nnls error tcov0b', mat, c)
+                    print('stsum:', stsum)
+                    print('edsum:', edsum)
+                    print('nnls error tcov0b', mat, c, c0)
                     print('sts:',sts)
                     print('eds:',eds)
                     print('pg:',pg)
