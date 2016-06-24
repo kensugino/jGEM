@@ -1624,9 +1624,11 @@ class LocalAssembler(object):
         for strand in ['+','-']:
             exsub = ex[ex['strand'].isin(STRS[strand])]
             exged = exsub.groupby('ed')['ecov'].sum()
-            self.eed2cov[strand] = UT.series2dict(exged)
+            idx = exged.notnull()
+            self.eed2cov[strand] = UT.series2dict(exged[idx])
             exgst = exsub.groupby('st')['ecov'].sum()
-            self.est2cov[strand] = UT.series2dict(exgst)
+            idx = exgst.notnull()
+            self.est2cov[strand] = UT.series2dict(exgst[idx])
 
                        
     def _get_sub_sjex(self, st, ed, strand):
