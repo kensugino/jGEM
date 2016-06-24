@@ -783,7 +783,8 @@ class LocalEstimator(A3.LocalAssembler):
             pg['tcov0b'] = (cov1s(s)+cov1e(e))/2.
             pg['tcov0c'] = (cov2s(s)-cov2e(e))/2.
 
-        pg['tcov0'] = pg[['tcov0a','tcov0b','tcov0c']].mean(axis=1)
+        # pg['tcov0'] = pg[['tcov0a','tcov0b','tcov0c']].mean(axis=1)
+        pg['tcov0'] = N.power(pg['tcov0a']*pg['tcov0b']*pg['tcov0c'], 1/3.) # geometric mean
         pg.loc[pg['tcov0']<0,'tcov0'] = 0 # shouldn't really happen
         keys = [tuple(x) for x in p[idx][['tst','ted']].values]
         for f in ['tcov0','tcov0a','tcov0b','tcov0c']:
