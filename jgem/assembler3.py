@@ -1278,7 +1278,7 @@ class LocalAssembler(object):
                                 yield (chrom,int(st),int(ed),strand,x,'j')
                                 sted.add((st,ed,strand[-1]))
             sjdf = PD.DataFrame([x for x in _sgen()], columns=cols)
-            # sjdf = sjdf.groupby(['chr','st','ed','strand']).first().reset_index()
+            sjdf = sjdf.groupby(['chr','st','ed','strand']).first().reset_index()
             sjdf['tst'] = sjdf['st']
             sjdf['ted'] = sjdf['ed']
             sjdf['len'] = sjdf['ed']-sjdf['st']
@@ -1405,6 +1405,7 @@ class LocalAssembler(object):
         self.exdfi = _fixsted(exdfi)
         self.e53df = _fixsted(e53df)
         exdf = PD.concat([exdfi[c2], e53df[c2]], ignore_index=True)
+        exdf = exdf.groupby(['chr','st','ed','strand','kind']).first().reset_index()
         self.exdf = _fixsted(exdf)
         # select sjpaths consistent with exdf and sjdf
         idx = []
@@ -2371,42 +2372,81 @@ class PathGenerator(object):
 
         # _select(sjp)
         df = PD.DataFrame(paths, columns=PATHCOLS)
-        # add 3exons
+
+        # add alt 3exons, 5exons
         # e3 => e3s
-        t = self.gexdf
         # e3names = [x.split('|')[-1] for x in df['name']]
         # eth = 
         # t3 = t[(t['kind']=='3')&((t['ecov']>eth)|(t['name'].isin(e3names)))]
-        t3 = t[t['kind']=='3']
-        e33 = {}
-        for apo, g in t3.groupby('apos'):
-            eids = g['name'].values
-            if len(eids)>1:
-                for e in eids:
-                    e33[e] = eids
-        if len(e33)==0: # no multiple 3exon
-            df = df
-        else:
-            e2c = UT.df2dict(t3,'name','pa')
-            def _gen():
-                if self.strand=='+':
-                    pos = PATHCOLS.index('ed')
-                else:
-                    pos = PATHCOLS.index('st')
-                for rec in df.values:
-                    tmp = rec[npos].split('|')
-                    e3id = tmp[-1]
-                    if e3id in e33:
-                        name0 = '|'.join(tmp[:-1])
-                        for e in e33[e3id]:
-                            r = rec.copy()
-                            r[npos] = '{0}|{1}'.format(name0,e)
-                            r[pos] = int(e.split(',')[-1])
-                            r[tpos] = rec[tpos]*e2c[e]/e2c[e3id]
-                            yield r
+        
+        def _add_alt3(df):
+            t = self.gexdf
+            t3 = t[t['kind']=='3']
+            e33 = {}
+            for apo, g in t3.groupby('apos'):
+                eids = g['name'].values
+                if len(eids)>1: # alt
+                    for e in eids:
+                        e33[e] = eids # individual => set
+            if len(e33)==0: # no multiple 3exon
+                df = df
+            else:
+                e2c = UT.df2dict(t3,'name', 'pa') # name => prob
+                def _gen():
+                    if self.strand=='+':
+                        pos = PATHCOLS.index('ed')
                     else:
-                        yield rec
-            df = PD.DataFrame([x for x in _gen()], columns=PATHCOLS)
+                        pos = PATHCOLS.index('st')
+                    for rec in df.values:
+                        tmp = rec[npos].split('|') # exon names
+                        e3id = tmp[-1] # last (3'exon)
+                        name0 = '|'.join(tmp[:-1])
+                        if e3id in e33: # alt exon
+                            for e in e33[e3id]:
+                                r = rec.copy()
+                                r[npos] = '{0}|{1}'.format(name0,e)
+                                r[pos] = int(e.split(',')[-1]) # fix the other end
+                                r[tpos] = rec[tpos]*e2c[e]/e2c[e3id]
+                                yield r
+                        else:
+                            yield rec
+                df = PD.DataFrame([x for x in _gen()], columns=PATHCOLS)
+            return df
+        def _add_alt5(df):
+            t = self.gexdf
+            t5 = t[t['kind']=='5']
+            e55 = {}
+            for apo, g in t5.groupby('dpos'):
+                eids = g['name'].values
+                if len(eids)>1: # alt
+                    for e in eids:
+                        e55[e] = eids # individual => set
+            if len(e55)==0: # no multiple 3exon
+                df = df
+            else:
+                e2c = UT.df2dict(t3,'name', 'pd') # name => prob
+                def _gen():
+                    if self.strand=='+':
+                        pos = PATHCOLS.index('st')
+                    else:
+                        pos = PATHCOLS.index('ed')
+                    for rec in df.values:
+                        tmp = rec[npos].split('|') # exon names
+                        e5id = tmp[0] # first (5'exon)
+                        name0 = '|'.join(tmp[1:])
+                        if e5id in e55: # alt exon
+                            for e in e55[e5id]:
+                                r = rec.copy()
+                                r[npos] = '{0}|{1}'.format(e,name0)
+                                r[pos] = int(e.split(',')[0])
+                                r[tpos] = rec[tpos]*e2c[e]/e2c[e5id]
+                                yield r
+                        else:
+                            yield rec
+                df = PD.DataFrame([x for x in _gen()], columns=PATHCOLS)
+            return df
+        df3 = _add_alt3(df) # add 3' alt
+        df =  _add_alt5(df3) # add 5' alt
         # make sure no duplicates
         return df.groupby('name').first().reset_index()
 
