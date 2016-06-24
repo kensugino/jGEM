@@ -754,7 +754,7 @@ class LocalEstimator(A3.LocalAssembler):
             # enforce flux conservation: scale up 5'
             stsum = N.sum(c[:nst])
             edsum = N.sum(c[nst:])
-            if stsum==0 or edsum==0:
+            if stsum<1e-9 or edsum<1e-9:
                 pg['tcov0b'] = 0
             else:
                 c0 = c.copy()
@@ -780,7 +780,7 @@ class LocalEstimator(A3.LocalAssembler):
             # enforce flux conservation: scale up 5'
             stsum = N.sum(c[:nst])
             edsum = N.sum(c[nst:])
-            if stsum==0 or edsum==0:
+            if stsum<1e-9 or edsum<1e-9:
                 pg['tcov0c'] = 0
             else:
                 if strand in ['+','.+']:
