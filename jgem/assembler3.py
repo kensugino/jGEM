@@ -287,7 +287,7 @@ class EdgeFinder(object):
                 sja1 = sja[:epos]
                 exa1 = exa[:epos]
             self.slope_ef.verbose=verbose
-            epos2 = self.slope_ef.find(sja1,exa1,direction)
+            epos2 = self.slope_ef.find(sja1,exa1,direction, verbose=verbose)
             if verbose:
                 print('slope detector eposs:{0}'.format(epos2))
             if len(epos2)>0:
@@ -334,7 +334,7 @@ class SlopeEdgeFinder(object):
         self.covratio = params.get('covratio', 0.1)
         self.verbose = verbose
 
-    def find(self, sja, exa, direction):
+    def find(self, sja, exa, direction, verbose=False):
         # sja, exa : pos0=>pos+1(<), pos-1=>pos0(>)        
         sws = self.smwinsize # smooth window for abs cov th detection
         swin = self.swin
@@ -344,9 +344,9 @@ class SlopeEdgeFinder(object):
             v = exa[1:]
         v0 = N.concatenate([swin*v[0], v, swin*v[-1]])
         sm = N.convolve(v0, swin/float(sws), 'same')[sws:-sws]
-        return self.fix(v, sm, direction)
+        return self.fix(v, sm, direction, verbose=verbose)
 
-    def fix(self, v, sm, direction):
+    def fix(self, v, sm, direction, verbose=False):
         if direction=='<':
             v = v[::-1]
             sm = sm[::-1]
@@ -367,9 +367,9 @@ class SlopeEdgeFinder(object):
                     l4 = len(eds1)
         if len(eds1)>0:
             eds1 = self.trim(v,sm,eds1)
-        if self.verbose:
-            LOG.debug('drop({0}), rise({1}), low({2}), min({3}), rise2({4})'.format(l0,l1,l2,l3,l4))
         eds = eds0+eds1
+        if verbose or self.verbose:
+            LOG.debug('drop({0}), rise({1}), low({2}), min({3}), rise2({4}),eds:{5}'.format(l0,l1,l2,l3,l4),eds)
         if len(eds)==0:
             eds = [olen]
         eds = self._aggregate(olen,eds)
@@ -1865,7 +1865,7 @@ class LocalAssembler(object):
         else:
             s,e = pg.iloc[0][['tst','ted']]
             pg['tcov0b'] = (cov1s(int(s))+cov1e(int(e)))/2.
-            pg['tcov0c'] = (cov2s(int(s))-cov2e(int(e)))/2.
+            pg['tcov0c'] = (cov2s(int(s))+cov2e(int(e)))/2.
 
         # pg['tcov0'] = pg[['tcov0a','tcov0b','tcov0c']].mean(axis=1)
         pg['tcov0'] = N.power(pg['tcov0a']*pg['tcov0b']*pg['tcov0c'], 1/3.) # geometric mean
