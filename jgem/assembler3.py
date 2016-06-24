@@ -1870,9 +1870,9 @@ class LocalAssembler(object):
             pg['tcov0b'] = (cov1s(int(s))+cov1e(int(e)))/2.
             pg['tcov0c'] = (cov2s(int(s))+cov2e(int(e)))/2.
 
-        # pg['tcov0'] = pg[['tcov0a','tcov0b','tcov0c']].mean(axis=1)
+        pg['tcov0'] = pg[['tcov0a','tcov0b','tcov0c']].mean(axis=1)
         # pg['tcov0'] = (2*pg['tcov0a']+pg['tcov0b']+pg['tcov0c'])/4.
-        pg['tcov0'] = N.power(pg['tcov0a']*pg['tcov0b']*pg['tcov0c'], 1/3.) # geometric mean
+        # pg['tcov0'] = N.power(pg['tcov0a']*pg['tcov0b']*pg['tcov0c'], 1/3.) # geometric mean
         pg.loc[pg['tcov0']<0,'tcov0'] = 0 # shouldn't really happen
 
         exkeys = spanexs['id53'].values
@@ -2382,7 +2382,7 @@ class PathGenerator(object):
         
         def _add_alt3(df):
             t = self.gexdf
-            t3 = t[t['kind']=='3']
+            t3 = t[t['kind']=='3'].groupby('name').first()
             e33 = {}
             for apo, g in t3.groupby('apos'):
                 eids = g['name'].values
@@ -2415,7 +2415,7 @@ class PathGenerator(object):
             return df
         def _add_alt5(df):
             t = self.gexdf
-            t5 = t[t['kind']=='5']
+            t5 = t[t['kind']=='5'].groupby('name').first()
             e55 = {}
             for apo, g in t5.groupby('dpos'):
                 eids = g['name'].values
