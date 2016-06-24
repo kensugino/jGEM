@@ -1619,7 +1619,7 @@ class LocalAssembler(object):
         self.eed2cov = {}
         self.est2cov = {}
         for strand in ['+','-']:
-            exsub = ex[ex['strand'].isin(A3.STRS[strand])]
+            exsub = ex[ex['strand'].isin(STRS[strand])]
             exged = exsub.groupby('ed')['ecov'].sum()
             self.eed2cov[strand] = UT.series2dict(exged)
             exgst = exsub.groupby('st')['ecov'].sum()
