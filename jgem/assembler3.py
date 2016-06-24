@@ -2402,7 +2402,7 @@ class PathGenerator(object):
                         tmp = rec[npos].split('|') # exon names
                         e3id = tmp[-1] # last (3'exon)
                         name0 = '|'.join(tmp[:-1])
-                        if e3id in e33: # alt exon
+                        if (name0 != '') and (e3id in e33): # alt exon
                             for e in e33[e3id]:
                                 r = rec.copy()
                                 r[npos] = '{0}|{1}'.format(name0,e)
@@ -2435,7 +2435,7 @@ class PathGenerator(object):
                         tmp = rec[npos].split('|') # exon names
                         e5id = tmp[0] # first (5'exon)
                         name0 = '|'.join(tmp[1:])
-                        if e5id in e55: # alt exon
+                        if (name0 !='') and (e5id in e55): # alt exon
                             for e in e55[e5id]:
                                 r = rec.copy()
                                 r[npos] = '{0}|{1}'.format(e,name0)
