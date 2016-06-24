@@ -839,6 +839,9 @@ class LocalEstimator(A3.LocalAssembler):
             sepaths[f] = sepaths['tcov']
         sepaths['tcov0a'] = 0.
         sepaths['tcov0b'] = 0.
+        paths = PD.concat([mepaths, sepaths], ignore_index=True)
+        paths.sort_values(['chr','st','ed'],inplace=True)
+        self.paths = paths
 
     def write(self):
         pre = self.dstpre+'.{0}_{1}_{2}'.format(self.chrom,self.st,self.ed)
