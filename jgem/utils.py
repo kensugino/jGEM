@@ -763,12 +763,12 @@ def read_ci(cipath):
     return read_pandas(cipath, names=header)
 
 
-def union_contiguous(beddf, returndf=True):
+def union_contiguous(beddf, returndf=True, pos_cols=['chr','st','ed']):
     """ Union contiguous records into one. 
     Uses chr,st,ed (not strand) columns.
     For other fields, values from the first record is used. 
     """
-    pos_cols = ['chr','st','ed']
+    # pos_cols = ['chr','st','ed']
     beddf = beddf.sort_values(pos_cols)
     cols = list(beddf.columns)
     pos_idx = [cols.index(x) for x in pos_cols]
