@@ -931,8 +931,14 @@ class LocalAssembler(object):
         with sjexbw: # get bw arrays
             for k in ['ex','sj']:
                 arrs[k] = {}
-                for s in ['+','-']:
-                    arrs[k][s] = sjexbw.bws[k][s].get(chrom, st, ed)
+                if self.stranded:
+                    for s in ['+','-','a']:
+                        arrs[k][s] = sjexbw.bws[k][s].get(chrom, st, ed)
+                else:
+                    arrs[k]['+'] = sjexbw.bws[k]['-'].get(chrom, st, ed)
+                    arrs[k]['-'] = arrs[k]['+']
+                    arrs[k]['a'] = arrs[k]['a']
+
         self.exbwpre = exbwpre
         if exbwpre is not None:
             self.exbw = SjExBigWigs(exbwpre,None,mixunstranded=True)
