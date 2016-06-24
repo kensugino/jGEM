@@ -563,6 +563,11 @@ class LocalEstimator(A3.LocalAssembler):
         self.sjpaths0 = sj[idx0].copy()        
         # load exdf, sjdf
         sjdf = UT.read_pandas(modelpre+'.sjdf.txt.gz', names=A3.SJDFCOLS)
+        sjdf['tst'] = sjdf['st'] # for sjpath compatibility
+        sjdf['ted'] = sjdf['ed']
+        sjdf['sc1'] = sjdf['ucnt']
+        sjdf['sc2'] = sjdf['tcnt']
+
         exdf = UT.read_pandas(modelpre+'.exdf.txt.gz', names=A3.EXDFCOLS)
         idx = (sjdf['chr']==chrom)&(sjdf['st']>=st)&(sjdf['ed']<=ed)
         self.sjdf = sjdf[idx].copy()
@@ -570,7 +575,7 @@ class LocalEstimator(A3.LocalAssembler):
         self.exdf = exdf[idx].copy()
         A3.set_ad_pos(self.sjdf, 'sj')
         A3.set_ad_pos(self.exdf, 'ex')
-        
+
         # self.sjexbw = sjexbw = A3.SjExBigWigs(bwpre, None, mixunstranded=True)
         # self.stranded = sjexbw.strandedQ('ex')
         # self.arrs = arrs = {}
