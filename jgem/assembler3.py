@@ -87,7 +87,7 @@ class SjExBigWigs(object):
         self.sjbwpre = sjbwpre
         self.mixunstranded = mixunstranded
         S2S = {'+':'.p','-':'.n','.':'.u','r+':'.rp','r-':'.rn','r.':'.ru'}
-        bwp = {
+        self.bwp = bwp = {
             'ex': {s:[b+'.ex{0}.bw'.format(S2S[s]) for b in bwpre] for s in S2S},
             'sj': {s:[b+'.sj{0}.bw'.format(S2S[s]) for b in sjbwpre] for s in S2S},
         }
@@ -113,6 +113,11 @@ class SjExBigWigs(object):
         
         self.make_bws()
     
+    def strandedQ(self, which='ex'):
+        exbwp = self.bwp[which]['+']
+        exbwn = self.bwp[which]['-']
+        return (os.path.exists(exbwp)&os.path.exists(exbwn))
+
     def make_bws(self):
         bwp = self.bwpaths
         self.bws = bws = {}
@@ -839,7 +844,9 @@ DFLD = {'ex':{'+':'ed','-':'st','.':'ed'},
         'sj':{'+':'st','-':'ed','.':'st'}}
 STRS = {'+':['+','.+','.'],
         '-':['-','.-','.'],
-        '.':['.+','.-','.']}
+        '.':['.+','.-','.'],
+        'a':['+','-','.','.+','.-']}
+
 EXDFCOLS = ['chr','st','ed','strand','name','kind','ecov']
 SJDFCOLS = ['chr','st','ed','strand','name','kind','tcnt','ucnt' ]#,'donor','acceptor','dp','ap']
 PATHCOLS = ['chr','st','ed','name','strand','tst','ted','tcov','tcov0','tcov0a','tcov0b','tcov0c']
@@ -849,8 +856,8 @@ LAPARAMS = dict(
      discardunstranded=False,
      uth=0, 
      mth=3, 
-     sjratioth=0.5e-3, # 2e-3
-     usjratioth=2.5e-3, # 1e-2 for unstranded sj
+     sjratioth=1e-3, # 2e-3
+     usjratioth=3e-3, # 1e-2 for unstranded sj
      lsjratioth=5e-3, # for sj > lsjth
      lsjth=8e4, # long sj apply lsjratioth
      # msjratioth=5e-3,
@@ -919,6 +926,7 @@ class LocalAssembler(object):
         self.params.update(kw)
         mixunstranded = not self.params['discardunstranded']
         self.sjexbw = sjexbw = SjExBigWigs(bwpre, sjbwpre, mixunstranded=mixunstranded)
+        self.stranded = sjexbw.strandedQ('ex')
         self.arrs = arrs = {}
         with sjexbw: # get bw arrays
             for k in ['ex','sj']:
@@ -1407,7 +1415,7 @@ class LocalAssembler(object):
         sj0 = self.sjdf
         ex0 = self.exdf
         self._spans={}
-        for s in ['+','-']:
+        for s in ['+','-','a']:
             sj0s = sj0[sj0['strand'].isin(STRS[s])]
             ex0s = ex0[ex0['strand'].isin(STRS[s])]
             o = self.st
@@ -1557,13 +1565,7 @@ class LocalAssembler(object):
             tmp = [[(sc1,sc2) for sc1,sc2,p in sj0mat if y in p] for y in sj['name']]
             sj['ucnt'] = [N.sum([x[0] for x in y]) for y in tmp]
             sj['tcnt'] = [N.sum([x[1] for x in y]) for y in tmp]
-            # idx = sj['tcnt']==0
-            # tmp0 = ['{1}|{0}'.format(*y.split('|')) for y in sj[idx]['name']]
-            # tmp1 = [N.sum([x for x,p in sj0mat if y in p]) for y in tmp0]
-            # sj.loc[idx, 'tcnt'] = tmp1
-        # idxz = sj['tcnt']==0
-        # if N.sum(idxz)>0:
-        #     sj.loc[idxz,'tcnt'] = 1e-6
+        self.sjdfi = sj.set_index('name')
 
     def calculate_ecovs(self):
         ex = self.exdf
@@ -1575,7 +1577,11 @@ class LocalAssembler(object):
             ex['_eid'] = N.arange(len(ex))
         ex.set_index('_eid', inplace=True)
         ex['ecov'] = N.nan
-        for strand in ['+','-']:
+        if self.stranded:
+            tgts = ['+','-']
+        else:
+            tgts = ['a']
+        for strand in tgts: #['+','-']:
             exa = self.arrs['ex'][strand]
             def cov(s,e):
                 return N.mean(exa[int(s)-o:int(e)-o])
@@ -1603,9 +1609,16 @@ class LocalAssembler(object):
                 elif ne==1:
                     s,e = es.iloc[0][['st','ed']]
                     ex.loc[idx,'ecov'] = cov(s,e)
-        # self._ne2ecov = UT.df2dict(ex, 'name', 'ecov')
-        # idxz = ex['ecov']==0
-        # ex.loc[idxz, 'ecov'] = 1e-6
+        self.exdfi = ex.set_index('name')
+        self.eed2cov = {}
+        self.est2cov = {}
+        for strand in ['+','-']:
+            exsub = ex[ex['strand'].isin(A3.STRS[strand])]
+            exged = exsub.groupby('ed')['ecov'].sum()
+            self.eed2cov[strand] = UT.series2dict(exged)
+            exgst = exsub.groupby('st')['ecov'].sum()
+            self.est2cov[strand] = UT.series2dict(exgst)
+
                        
     def _get_sub_sjex(self, st, ed, strand):
         sj0 = self.sjdf
@@ -1687,11 +1700,34 @@ class LocalAssembler(object):
             pathsdf['tst'] = pathsdf['tst'].astype(int)
             pathsdf['ted'] = pathsdf['ted'].astype(int)            
             assert(all(pathsdf['tst']<pathsdf['ted']))
-            self.paths = pathsdf
+            self.paths = self.filter_ji3e(pathsdf)
         else:
             self.sjdf2 = None
             self.exdf2 = None
             self.paths = []
+
+    def filter_ji3e(self, df): 
+        # remove 2 exon paths whose junction is included in a 3'exon
+        df['#j'] = [x.count('|') for x in df['name']]
+        df0 = df[df['#j']==1] # 2 exon paths
+        df1 = df[df['#j']!=1] # others
+        cols = list(df0.columns)
+        npos = cols.index('name') # pos of 'name' column
+        def _gen_df0n():
+            ex3 = self.exdf[self.exdf['kind']=='3']
+            for s0,s1 in [('+','-'),('-','+')]:
+                df0b = df0[df0['strand']==s0]
+                ex3b = ex3[ex3['strand']==s1]
+                for rec in df0b.values:
+                    n = rec[npos]
+                    jst,jed = [int(x) for x in n.split(',')[1].split('|')] # junction st,ed
+                    idx = (ex3b['st']<=jst)&(ex3b['ed']>=jed) # 3'exon opposite strand containing j
+                    if N.sum(idx)==0: # not contained in 3'exons
+                        yield rec
+        df0n = PD.DataFrame([x for x in _gen_df0n()], names=cols)
+        dfn = PD.concat([df1, df0n], ignore_index=True)
+        dfn.sort_values(['chr','st','ed'], inplace=True)
+        return dfn
 
 
     def calc_53branchp(self, sj, ex):
@@ -1738,12 +1774,18 @@ class LocalAssembler(object):
         # ne2ecov = self._ne2ecov
         def cov0(s,e):
             return N.mean(sja[s-o:e-o])
+        # def cov1s(s):
+        #     s0 = max(0, s-o-10)
+        #     s1 = max(s0+1,s-o)
+        #     return N.mean(exa[s0:s1])
+        # def cov1e(e):
+        #     return N.mean(exa[e-o:e-o+10])
+        e_ed2cov = self.eed2cov[strand]
+        e_st2cov = self.est2cov[strand]
         def cov1s(s):
-            s0 = max(0, s-o-10)
-            s1 = max(s0+1,s-o)
-            return N.mean(exa[s0:s1])
+            return e_ed2cov.get(s,0)
         def cov1e(e):
-            return N.mean(exa[e-o:e-o+10])
+            return e_st2cov.get(e,0)
         # def cov2s(s):
         #     s0 = max(0, s-o-1)
         #     return sja[s-o]-sja[s0]

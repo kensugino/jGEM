@@ -571,6 +571,7 @@ class LocalEstimator(A3.LocalAssembler):
         A3.set_ad_pos(self.sjdf, 'sj')
         A3.set_ad_pos(self.exdf, 'ex')
         self.sjexbw = sjexbw = A3.SjExBigWigs(bwpre, None, mixunstranded=True)
+        self.stranded = sjexbw.strandedQ('ex')
         self.arrs = arrs = {}
         with sjexbw: # get bw arrays
             for k in ['ex','sj']:
@@ -592,54 +593,60 @@ class LocalEstimator(A3.LocalAssembler):
         tmp = [[(sc1,sc2) for sc1,sc2,p in sj0mat if y in p] for y in sj['name']]
         sj['ucnt'] = [N.sum([x[0] for x in y]) for y in tmp]
         sj['tcnt'] = [N.sum([x[1] for x in y]) for y in tmp]
-        # idx = sj['tcnt']==0
-        # tmp0 = ['{1}|{0}'.format(*y.split('|')) for y in sj[idx]['name']]
-        # tmp1 = [N.sum([x for x,p in sj0mat if y in p]) for y in tmp0]
-        # sj.loc[idx, 'tcnt'] = tmp1
-        # idxz = sj['tcnt']==0
-        # if N.sum(idxz)>0:
-        #     sj.loc[idxz,'tcnt'] = 1e-6
         self.sjdfi = sj.set_index('name')
 
-    def calculate_ecovs(self):
-        ex = self.exdf
-        o = int(self.st)
-        if len(ex)==0:
-            return
-        if '_eid' not in ex:
-            ex.sort_values(['chr','st','ed'], inplace=True)
-            ex['_eid'] = N.arange(len(ex))
-        ex.set_index('_eid', inplace=True)
-        ex['ecov'] = N.nan
-        for strand in ['+','-']:
-            exa = self.arrs['ex'][strand]
-            def cov(s,e):
-                return N.mean(exa[int(s)-o:int(e)-o])
-            spans = self._get_spans(strand)
-            for st,ed in spans:
-                es = ex[(ex['st']>=st)&(ex['ed']<=ed)&(ex['strand'].isin(A3.STRS[strand]))].copy()
-                # es = ex[idx].copy().sort_values(['st','ed']) # <== BUG!: sort after idx messes up relationship
-                idx = es.index.values # _eid's
-                es['tmpeid'] = N.arange(len(es))
-                ne = len(es)
-                if ne>1:
-                    ci = UT.chopintervals(es, idcol='tmpeid', sort=False)
-                    ci['cov'] = [cov(s,e) for s,e in ci[['st','ed']].values]
-                    ci['name1'] = ci['name'].astype(str).apply(lambda x: [int(y) for y in x.split(',')])    
-                    nc = len(ci)
-                    mat = N.zeros((nc,ne))
-                    for i,n1 in enumerate(ci['name1'].values):# fill in rows
-                        N.put(mat[i], N.array(n1), 1)
-                    try:
-                        ecov,err = nnls(mat, ci['cov'].values)
-                        ex.loc[idx,'ecov'] = ecov
-                    except:
-                        LOG.warning('!!!!!! Exception in NNLS (calculate_ecov) @{0}:{1}-{2}, setting to mean !!!!!!!!!'.format(self.chrom, st, ed))
-                        ex.loc[idx,'ecov'] = cov(st,ed)
-                elif ne==1:
-                    s,e = es.iloc[0][['st','ed']]
-                    ex.loc[idx,'ecov'] = cov(s,e)
-        self.exdfi = ex.set_index('name')
+    # def calculate_ecovs(self):
+    #     ex = self.exdf
+    #     o = int(self.st)
+    #     if len(ex)==0:
+    #         return
+    #     if '_eid' not in ex:
+    #         ex.sort_values(['chr','st','ed'], inplace=True)
+    #         ex['_eid'] = N.arange(len(ex))
+    #     ex.set_index('_eid', inplace=True)
+    #     ex['ecov'] = N.nan
+    #     if self.stranded:
+    #         tgts = ['+','-']
+    #     else:
+    #         tgts = ['a']
+    #     for strand in tgts: #['+','-']:
+    #         exa = self.arrs['ex'][strand]
+    #         def cov(s,e):
+    #             return N.mean(exa[int(s)-o:int(e)-o])
+    #         spans = self._get_spans(strand)
+    #         for st,ed in spans:
+    #             es = ex[(ex['st']>=st)&(ex['ed']<=ed)&(ex['strand'].isin(A3.STRS[strand]))].copy()
+    #             # es = ex[idx].copy().sort_values(['st','ed']) # <== BUG!: sort after idx messes up relationship
+    #             idx = es.index.values # _eid's
+    #             es['tmpeid'] = N.arange(len(es))
+    #             ne = len(es)
+    #             if ne>1:
+    #                 ci = UT.chopintervals(es, idcol='tmpeid', sort=False)
+    #                 ci['cov'] = [cov(s,e) for s,e in ci[['st','ed']].values]
+    #                 ci['name1'] = ci['name'].astype(str).apply(lambda x: [int(y) for y in x.split(',')])    
+    #                 nc = len(ci)
+    #                 mat = N.zeros((nc,ne))
+    #                 for i,n1 in enumerate(ci['name1'].values):# fill in rows
+    #                     N.put(mat[i], N.array(n1), 1)
+    #                 try:
+    #                     ecov,err = nnls(mat, ci['cov'].values)
+    #                     ex.loc[idx,'ecov'] = ecov
+    #                 except:
+    #                     LOG.warning('!!!!!! Exception in NNLS (calculate_ecov) @{0}:{1}-{2}, setting to mean !!!!!!!!!'.format(self.chrom, st, ed))
+    #                     ex.loc[idx,'ecov'] = cov(st,ed)
+    #             elif ne==1:
+    #                 s,e = es.iloc[0][['st','ed']]
+    #                 ex.loc[idx,'ecov'] = cov(s,e)
+    #     self.exdfi = ex.set_index('name')
+    #     self.eed2cov = {}
+    #     self.est2cov = {}
+    #     for strand in ['+','-']:
+    #         exsub = ex[ex['strand'].isin(A3.STRS[strand])]
+    #         exged = exsub.groupby('ed')['ecov'].sum()
+    #         self.eed2cov[strand] = UT.series2dict(exged)
+    #         exgst = exsub.groupby('st')['ecov'].sum()
+    #         self.est2cov[strand] = UT.series2dict(exgst)
+            
 
     def calculate_branchp(self, jids, eids):
         sj0 = self.sjdfi
@@ -686,12 +693,18 @@ class LocalEstimator(A3.LocalAssembler):
         def cov0(s,e):
             # return N.sum(sja[s-o:e-o]+exa[s-o:e-o])/(e-s)
             return N.mean(sja[s-o:e-o])
+        # def cov1s(s):
+        #     s0 = max(0, int(s)-o-10)
+        #     s1 = max(s0+1,int(s)-o)
+        #     return N.mean(exa[s0:s1])
+        # def cov1e(e):
+        #     return N.mean(exa[int(e)-o:int(e)-o+10])
+        e_ed2cov = self.eed2cov[strand]
+        e_st2cov = self.est2cov[strand]
         def cov1s(s):
-            s0 = max(0, int(s)-o-10)
-            s1 = max(s0+1,int(s)-o)
-            return N.mean(exa[s0:s1])
+            return e_ed2cov.get(s,0)
         def cov1e(e):
-            return N.mean(exa[int(e)-o:int(e)-o+10])
+            return e_st2cov.get(e,0)
         def cov2s(s): # donor
             # s0 = max(0, s-o-1)
             return max(0, sja[int(s)-o]-sja[int(s)-o-1])
