@@ -841,7 +841,7 @@ class LocalEstimator(A3.LocalAssembler):
         for f in ['tcov0','tcov0b']:
             sepaths[f] = sepaths['tcov']
         sepaths['tcov0a'] = 0.
-        sepaths['tcov0b'] = 0.
+        sepaths['tcov0c'] = 0.
 
         paths = PD.concat([mepaths, sepaths], ignore_index=True)
         paths.sort_values(['chr','st','ed'],inplace=True)
