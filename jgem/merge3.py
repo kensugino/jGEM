@@ -578,8 +578,12 @@ class LocalEstimator(A3.LocalAssembler):
         self.sjdf = sjdf.groupby(['chr','st','ed','strand']).first().reset_index()
 
         exdf = UT.read_pandas(modelpre+'.exdf.txt.gz', names=A3.EXDFCOLS)
+        sedf = UT.read_pandas(modelpre+'.sedf.txt.gz', names=A3.EXDFCOLS)
         exdf = exdf[(exdf['chr']==chrom)&(exdf['st']>=st)&(exdf['ed']<=ed)]
         exdf = exdf[exdf['name'].isin(eids)]
+        sedf = sedf[(sedf['chr']==chrom)&(sedf['st']>=st)&(sedf['ed']<=ed)]
+        sedf = sedf[sedf['name'].isin(eids)]
+        exdf = PD.concat([exdf,sedf],ignore_index=True)
         self.exdf = exdf.groupby(['chr','st','ed','strand','kind']).first().reset_index()
         A3.set_ad_pos(self.sjdf, 'sj')
         A3.set_ad_pos(self.exdf, 'ex')
@@ -816,8 +820,11 @@ class LocalEstimator(A3.LocalAssembler):
         # 1) 5-3 group by NNLS
         # 2) within 5-3 group by tree branch prob
         paths = self.paths
+        idxme = paths['name'].str.contains('\|')
+        mepaths = paths[idxme].copy()
+        sepaths = paths[~idxme].copy()
         for s in ['+','-']:
-            ps = paths[paths['strand'].isin(A3.STRS[s])]
+            ps = mepaths[mepaths['strand'].isin(A3.STRS[s])]
             if len(ps)==0:
                 continue
             for chrom,st,ed in UT.union_contiguous(ps[['chr','st','ed']],returndf=False):
@@ -825,6 +832,12 @@ class LocalEstimator(A3.LocalAssembler):
                 if pg is not None:
                     for chrom,tst,ted,strand,tcov0 in pg.values:
                         self.tcov_by_branchp(tst,ted,strand,tcov0)
+        e2c = UT.df2dict(self.exdf, 'name', 'ecov')
+        sepaths['tcov'] = [e2c[x] for x in sepaths['name']]
+        for f in ['tcov0','tcov0b']:
+            sepaths[f] = sepaths['tcov']
+        sepaths['tcov0a'] = 0.
+        sepaths['tcov0b'] = 0.
 
     def write(self):
         pre = self.dstpre+'.{0}_{1}_{2}'.format(self.chrom,self.st,self.ed)
