@@ -63,6 +63,8 @@ def filter_paths(mdstpre, rdstpre):
 
 def filter_sjexdf(mdstpre, rdstpre):
     exdf =  UT.read_pandas(mdstpre+'.exdf.txt.gz', names=A3.EXDFCOLS)
+    sedf =  UT.read_pandas(mdstpre+'.sedf.txt.gz', names=A3.EXDFCOLS)
+    exdf = PD.concat([exdf, sedf], ignore_index=True)
     sjdf =  UT.read_pandas(mdstpre+'.sjdf.txt.gz', names=A3.SJDFCOLS)
 
     ex = UT.read_pandas(rdstpre+'.ex.txt.gz')

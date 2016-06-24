@@ -578,12 +578,13 @@ class LocalEstimator(A3.LocalAssembler):
         self.sjdf = sjdf.groupby(['chr','st','ed','strand']).first().reset_index()
 
         exdf = UT.read_pandas(modelpre+'.exdf.txt.gz', names=A3.EXDFCOLS)
-        sedf = UT.read_pandas(modelpre+'.sedf.txt.gz', names=A3.EXDFCOLS)
         exdf = exdf[(exdf['chr']==chrom)&(exdf['st']>=st)&(exdf['ed']<=ed)]
         exdf = exdf[exdf['name'].isin(eids)]
-        sedf = sedf[(sedf['chr']==chrom)&(sedf['st']>=st)&(sedf['ed']<=ed)]
-        sedf = sedf[sedf['name'].isin(eids)]
-        exdf = PD.concat([exdf,sedf],ignore_index=True)
+        if os.path.exists(modelpre+'.sedf.txt.gz'):
+            sedf = UT.read_pandas(modelpre+'.sedf.txt.gz', names=A3.EXDFCOLS)
+            sedf = sedf[(sedf['chr']==chrom)&(sedf['st']>=st)&(sedf['ed']<=ed)]
+            sedf = sedf[sedf['name'].isin(eids)]
+            exdf = PD.concat([exdf,sedf],ignore_index=True)
         self.exdf = exdf.groupby(['chr','st','ed','strand','kind']).first().reset_index()
         A3.set_ad_pos(self.sjdf, 'sj')
         A3.set_ad_pos(self.exdf, 'ex')
