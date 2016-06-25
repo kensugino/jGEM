@@ -757,7 +757,7 @@ CALCPARAMCOLS = ['_id','emax','emin',
             'emaxIn','eminIn','gapIn','gposIn',
             'emaxOut','eminOut','gapOut','gposOut',
             'eIn','sIn','sdIn',
-            'eOut','sOut','sdOut','gap', 'mp','chr','st','ed']
+            'eOut','sOut','sdOut','gap', 'mp','chr','st','ed','strand']
             # 'gap000', 'gap001', 'gap002','gap005']#,'gap010','gap015','gap020']
 
 def calc_params_chr(exdf, bwp, win=300, siz=10,  direction='>', gapmode='i', covfactor=0):
@@ -814,19 +814,19 @@ def calc_params_chr(exdf, bwp, win=300, siz=10,  direction='>', gapmode='i', cov
                                  maxl,minl,gapl,posl, 
                                  maxr,minr,gapr,posr, 
                                  exl10,sjl10,sdifl,
-                                 exr10,sjr10,sdifr, gap, mp,chrom,st,ed]) #+[gaps[x] for x in cfs])
+                                 exr10,sjr10,sdifr, gap, mp,chrom,st,ed,strand]) #+[gaps[x] for x in cfs])
                 else:
                     recs.append([_id,exmax,exmin,
                                  maxr,minr,gapr,posr, 
                                  maxl,minl,gapl,posl, 
                                  exr10,sjr10,sdifr,
-                                 exl10,sjl10,sdifl, gap, mp,chrom,st,ed]) #+[gaps[x] for x in cfs])
+                                 exl10,sjl10,sdifl, gap, mp,chrom,st,ed,strand]) #+[gaps[x] for x in cfs])
     return recs
 
 COPYCOLS = ['_gidx','locus','gene_id']#,'gene_type']
 
 CALCFLUXCOLS = ['_id', 'sdelta','ecovavg','ecovmin','ecovmax',
-                'sin','sout','ein','eout','sdin','sdout','chr','st','ed']
+                'sin','sout','ein','eout','sdin','sdout','chr','st','ed','strand']
 
 def calc_flux_chr(exdf, bwp):
     # bws = make_bws(bwp)
@@ -839,7 +839,7 @@ def calc_flux_chr(exdf, bwp):
     with sjexbw:
         for strand in ['+','-','.']:
             exdfsub = exdf[exdf['strand']==strand]
-            for chrom, st, ed, _id in exdf[['chr','st','ed', '_id']].values:
+            for chrom, st, ed, _id in exdfsub[['chr','st','ed', '_id']].values:
                 ecov = ebw[strand].get(chrom,st-1,ed+1)
                 scov = sbw[strand].get(chrom,st-1,ed+1)
                 if strand=='+':
@@ -855,5 +855,5 @@ def calc_flux_chr(exdf, bwp):
                     sdout= -scov[1]+scov[0]
                     sdin = -scov[-1]+scov[-2]
                 recs.append([_id, sd, ecov.mean(), ecov.min(), ecov.max(),
-                             sin,sout,ein,eout,sdin,sdout,chrom,st,ed])
+                             sin,sout,ein,eout,sdin,sdout,chrom,st,ed,strand])
     return recs
