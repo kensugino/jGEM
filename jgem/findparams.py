@@ -219,7 +219,7 @@ class ParamFinder(object):
             bedc = beddf[beddf['chr']==c]
             if len(bedc)>0:
                 # args.append((bedc, self.bwpaths.copy()))
-                args.append((bedc, self.bwpre)
+                args.append((bedc, self.bwpre))
         rslts = UT.process_mp(calc_flux_chr, args, np=np, doreduce=True)
         df = PD.DataFrame(rslts, columns=CALCFLUXCOLS)
         exdfi = beddf.set_index('_id').ix[df['_id'].values]
