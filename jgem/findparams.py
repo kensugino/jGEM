@@ -82,28 +82,6 @@ def average(arr, n):
     end =  n * int(len(arr)/n)
     return N.mean(arr[:end].reshape(-1, n), 1)
 
-class BWs(object):
-
-    def __init__(self, paths):
-        self.bwobjs = [BWObj(p) for p in paths]
-
-    def __enter__(self):
-        for b in self.bwobjs:
-            b.__enter__()
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        for b in self.bwobjs:
-            b.__exit__(exc_type, exc_value, traceback)
-
-    def get(self, chrom, st, ed):
-        a = self.bwobjs[0].get(chrom, st, ed)
-        for b in self.bwobjs[1:]:
-            a += b.get(chrom, st, ed)
-        return a
-
-COPYCOLS = ['chr','st','ed','_gidx','locus','gene_id']#,'gene_type']
-CALCFLUXCOLS = ['_id', 'sdelta','ecovavg','ecovmin','ecovmax',
-                'sin','sout','ein','eout','sdin','sdout']
 
 class ParamFinder(object):
     """
@@ -744,7 +722,25 @@ def calc_sensitivity_specificity(Y,Z,FN0=0):
 
 
 
-    
+# class BWs(object):
+
+#     def __init__(self, paths):
+#         self.bwobjs = [BWObj(p) for p in paths]
+
+#     def __enter__(self):
+#         for b in self.bwobjs:
+#             b.__enter__()
+
+#     def __exit__(self, exc_type, exc_value, traceback):
+#         for b in self.bwobjs:
+#             b.__exit__(exc_type, exc_value, traceback)
+
+#     def get(self, chrom, st, ed):
+#         a = self.bwobjs[0].get(chrom, st, ed)
+#         for b in self.bwobjs[1:]:
+#             a += b.get(chrom, st, ed)
+#         return a
+
 # def make_bws(bwp):
 #     # .ex.p.bw, .ex.n.bw, .ex.u.bw, .sj.p.bw, .sj.n.bw, .sj.u.bw
 #     bws = {'ex':{},'sj':{}}
@@ -827,6 +823,11 @@ def calc_params_chr(exdf, bwp, win=300, siz=10,  direction='>', gapmode='i', cov
                                  exl10,sjl10,sdifl, gap, mp]) #+[gaps[x] for x in cfs])
     return recs
 
+COPYCOLS = ['_gidx','locus','gene_id']#,'gene_type']
+
+CALCFLUXCOLS = ['_id', 'sdelta','ecovavg','ecovmin','ecovmax',
+                'sin','sout','ein','eout','sdin','sdout','chr','st','ed']
+
 def calc_flux_chr(exdf, bwp):
     # bws = make_bws(bwp)
     sjexbw = A3.SjExBigWigs(bwp)
@@ -854,5 +855,5 @@ def calc_flux_chr(exdf, bwp):
                     sdout= -scov[1]+scov[0]
                     sdin = -scov[-1]+scov[-2]
                 recs.append([_id, sd, ecov.mean(), ecov.min(), ecov.max(),
-                             sin,sout,ein,eout,sdin,sdout])
+                             sin,sout,ein,eout,sdin,sdout,chrom,st,ed])
     return recs
