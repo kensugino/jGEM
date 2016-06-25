@@ -257,7 +257,9 @@ class ParamFinder(object):
         f['kind'] = 0
         idx = (f['ecovmax']>1)&((f['sdin']!=0)&(f['sdout']!=0)) # should have both in&out
         dicb['ne_i'] = f[idx]
-        D = PD.concat(dicb.values(),ignore_index=True)
+        D = PD.concat([dicb['ne_i'],dicb['ne_3'],dicb['ne_5']],ignore_index=True)
+        D2 = PD.concat([dicb['ne_i'], dicb['e3i'],dicb['e5i']],ignore_index=True)
+        # don't use e3i, e5i too many non-actives
 
         D['lsin'] = N.log2(zoom*D['sin']+1)
         D['lsout'] = N.log2(zoom*D['sout']+1)
@@ -268,15 +270,21 @@ class ParamFinder(object):
         lr = LogisticRegression()
         lr.fit(X,Y)
         Z = lr.predict(X)
+        D2['lsin'] = N.log2(zoom*D2['sin']+1)
+        D2['lsout'] = N.log2(zoom*D2['sout']+1)
+        D2['sdiff'] = N.abs(D2['lsin']-D2['lsout'])
+        D2['smean'] = (D2['lsin']+D2['lsout'])/2.
+        X2 = D2[['sdiff','smean']].values
+        z2 = lr.predict(X2)
         # save fit coefficients
         ppath = self.dstpre+'.{0}.e53params.json'.format(self.refcode)
         self.write_params(ppath, lr, Y, Z, ['sdiff','smean'], {'sdiffth':sdiffth, 'zoom':zoom}, FN0=FN0)
         # save scatter plots
         spath = self.dstpre+'.{0}.e53params'.format(self.refcode)
         title = self.bwpre.split('/')[-1]
-        self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.0.png', title, alpha=alpha)
-        self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.pdf', title, ptyp='pdf', alpha=alpha)
-        self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.png', title, ptyp='png', alpha=alpha)
+        self.plot_sin_sout(dic, D, Y, Z, D2, Z2, sdiffth, spath+'.0.png', title, alpha=alpha)
+        self.plot_sin_sout(dic, D, Y, Z, D2, Z2, sdiffth, spath+'.pdf', title, ptyp='pdf', alpha=alpha)
+        self.plot_sin_sout(dic, D, Y, Z, D2, Z2, sdiffth, spath+'.png', title, ptyp='png', alpha=alpha)
         return locals()
 
     def write_params(self, ppath, lr, Y, Z, cols, dic={},FN0=0):
@@ -291,8 +299,8 @@ class ParamFinder(object):
             json.dump(params, fp)
 
 
-    def plot_sin_sout(self, dicb, D, Y, Z, sdiffth, spath=None, title='', alpha=0.1, ptyp='both'):
-        fig,axr = P.subplots(2,2,figsize=(8,8),sharex=True,sharey=True)
+    def plot_sin_sout(self, dicb, D, Y, Z, D2, Z2, sdiffth, spath=None, title='', alpha=0.1, ptyp='both'):
+        fig,axr = P.subplots(2,3,figsize=(12,8),sharex=True,sharey=True)
         P.subplots_adjust(hspace=0.1,wspace=0.1)
         zoom = self.zoom
         def _plt(Dsub, c, ax, dosdiffth=False):
@@ -314,15 +322,21 @@ class ParamFinder(object):
             _plt(dicb['ne_5'], 'r.', axr[0][0])
             _plt(dicb['ne_3'], 'r.', axr[0][0])
             # 0,1 ne_i vs e5i,e3i
-            _plt(dicb['ne_i'], 'b.', axr[0][1])
+            #_plt(dicb['ne_i'], 'b.', axr[0][1])
             _plt(dicb['e5i'], 'r.', axr[0][1])
             _plt(dicb['e3i'], 'r.', axr[0][1])
+            # 0,2
+            #_plt(dicb['ne_i'], 'b.', axr[0][2])
             # 1,0 Y
             _plt(D[Y==0], 'b.', axr[1][0])
             _plt(D[Y==1], 'r.', axr[1][0], True)
             # 1,1 Z
             _plt(D[Z==0], 'b.', axr[1][1])
             _plt(D[Z==1], 'r.', axr[1][1], True)
+            # 1,2 e3i,e5i fit
+            _plt(D2[Z2==0], 'b.', axr[1][2])
+            _plt(D2[Z2==1], 'r.', axr[1][2], True)
+
         if ptyp != 'png':
             axr[0][0].set_title('edge 53 exons')
             axr[0][1].set_title('internal 53 exons')
