@@ -212,11 +212,25 @@ class ParamFinder(object):
         a3i = self.refpre + '.ex3-ovl-exi.txt.gz'
 
         nc = len(cols0)
-        e5i0 = BT.calc_ovlratio(a5,ai,a5i,nc,nc)
-        e3i0 = BT.calc_ovlratio(a3,ai,a3i,nc,nc)
+        # e5i0 = BT.calc_ovlratio(a5,ai,a5i,nc,nc)
+        # e3i0 = BT.calc_ovlratio(a3,ai,a3i,nc,nc)
 
-        self.e5i = e5i = e5i0[e5i0['ovlratio']==1].rename(columns={'name':'_id'})
-        self.e3i = e3i = e3i0[e3i0['ovlratio']==1].rename(columns={'name':'_id'})
+        # self.e5i = e5i = e5i0[e5i0['ovlratio']==1].rename(columns={'name':'_id'})
+        # self.e3i = e3i = e3i0[e3i0['ovlratio']==1].rename(columns={'name':'_id'})
+
+        # find internal exons which shares st or ed with 5 or 3 exons
+        a5i = BT.bedtoolintersect(ai, a5, a5i, wao=True)
+        a3i = BT.bedtoolintersect(ai, a3, a3i, wao=True)
+        # read tmp file
+        a5idf = UT.read_pandas(a5i, names=cols)
+        a3idf = UT.read_pandas(a3i, names=cols)
+        idx5 = ((a5idf['strand']=='-')&(a5idf['st']==a5idf['b_st']))|\
+               ((a5idf['strand']=='+')&(a5idf['ed']==a5idf['b_ed']))
+        idx3 = ((a3idf['strand']=='-')&(a3idf['st']==a3idf['b_st']))|\
+               ((a3idf['strand']=='+')&(a3idf['ed']==a3idf['b_ed']))
+        self.e5i = a5idf[idx5]
+        self.e3i = a3idf[idx3]
+
     
     def calc_flux_mp(self, beddf, np=10):
         chroms = UT.chroms(self.genome)
@@ -234,7 +248,7 @@ class ParamFinder(object):
         df['len'] = df['ed']-df['st']
         return df
     
-    def calc_53_params(self, sdiffth=1, np=10):
+    def calc_53_params(self, sdiffth=1, np=10, alpha=0.1):
         # get parameters
         dic = {}
         zoom = self.zoom
@@ -279,9 +293,9 @@ class ParamFinder(object):
         # save scatter plots
         spath = self.dstpre+'.{0}.e53params'.format(self.refcode)
         title = self.bwpre.split('/')[-1]
-        self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.0.png', title)
-        self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.pdf', title, ptyp='pdf')
-        self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.png', title, ptyp='png')
+        self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.0.png', title, alpha=alpha)
+        self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.pdf', title, ptyp='pdf', alpha=alpha)
+        self.plot_sin_sout(dic, D, Y, Z, sdiffth, spath+'.png', title, ptyp='png', alpha=alpha)
         return locals()
 
     def write_params(self, ppath, lr, Y, Z, cols, dic={},FN0=0):
