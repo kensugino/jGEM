@@ -228,8 +228,8 @@ class ParamFinder(object):
                ((a5idf['strand']=='+')&(a5idf['ed']==a5idf['b_ed']))
         idx3 = ((a3idf['strand']=='-')&(a3idf['st']==a3idf['b_st']))|\
                ((a3idf['strand']=='+')&(a3idf['ed']==a3idf['b_ed']))
-        self.e5i = a5idf[idx5]
-        self.e3i = a3idf[idx3]
+        self.e5i = a5idf[idx5].rename(columns={'name':'_id'})
+        self.e3i = a3idf[idx3].rename(columns={'name':'_id'})
 
     
     def calc_flux_mp(self, beddf, np=10):
