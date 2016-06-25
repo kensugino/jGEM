@@ -339,13 +339,16 @@ class ParamFinder(object):
 
         if ptyp != 'png':
             axr[0][0].set_title('edge 53 exons')
-            axr[0][1].set_title('internal 53 exons')
-            axr[1][0].set_title('non zero subsets')
-            axr[1][1].set_title('logistic regression')
+            axr[0][1].set_title('int.exons with 53 overlap')
+            axr[0][2].set_title('int.exons without overlap')
+            axr[1][0].set_title('sdiff>{0}'.format(sdiffth))
+            axr[1][1].set_title('logistic regression (edge exons)')
+            axr[1][2].set_title('logistic regression (internal)')
             axr[0][0].set_ylabel('log2(junction outflux)')
             axr[1][0].set_ylabel('log2(junction outflux)')
             axr[1][0].set_xlabel('log2(junction influx)')
             axr[1][1].set_xlabel('log2(junction influx)')
+            axr[1][2].set_xlabel('log2(junction influx)')
             fig.suptitle(title)
 
         vmax = N.floor(N.log2(zoom*max(D['sin'].max(),D['sout'].max())+1))-1
