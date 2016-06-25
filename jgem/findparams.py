@@ -275,7 +275,7 @@ class ParamFinder(object):
         D2['sdiff'] = N.abs(D2['lsin']-D2['lsout'])
         D2['smean'] = (D2['lsin']+D2['lsout'])/2.
         X2 = D2[['sdiff','smean']].values
-        z2 = lr.predict(X2)
+        Z2 = lr.predict(X2)
         # save fit coefficients
         ppath = self.dstpre+'.{0}.e53params.json'.format(self.refcode)
         self.write_params(ppath, lr, Y, Z, ['sdiff','smean'], {'sdiffth':sdiffth, 'zoom':zoom}, FN0=FN0)
