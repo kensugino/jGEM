@@ -110,12 +110,12 @@ class ParamFinder(object):
         refpre: pathprefix to ref (assume .ex.txt.gz, .sj.txt.gz)
 
     """
-    def __init__(self, refpre, bwpre, refcode, datacode, genome, zoom=1, dstpre=None):
+    def __init__(self, refpre, bwpre, refcode, genome, zoom=1, dstpre=None):
         self.refpre = refpre
         self.genome = genome
         self.bwpre = bwpre
         self.refcode = refcode
-        self.datacode = datacode
+        # self.datacode = datacode
         if dstpre is None:
             dstpre = bwpre
         self.dstpre = dstpre
