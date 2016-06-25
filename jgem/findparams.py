@@ -326,7 +326,7 @@ class ParamFinder(object):
             _plt(dicb['e5i'], 'r.', axr[0][1])
             _plt(dicb['e3i'], 'r.', axr[0][1])
             # 0,2
-            #_plt(dicb['ne_i'], 'b.', axr[0][2])
+            _plt(dicb['ne_i'], 'b.', axr[0][2])
             # 1,0 Y
             _plt(D[Y==0], 'b.', axr[1][0])
             _plt(D[Y==1], 'r.', axr[1][0], True)
