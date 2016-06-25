@@ -33,6 +33,7 @@ from jgem import bigwig as BW
 from jgem import gtfgffbed as GGB
 
 from jgem.bigwig import BWObj #, BWs 
+from jgem import assembler3 as A3
 
 from sklearn.linear_model import LogisticRegression
 
@@ -122,7 +123,7 @@ class ParamFinder(object):
         self.zoom = zoom # multiply this factor to zoom in to small values
         self.ex = ex = UT.read_pandas(self.refpre+'.ex.txt.gz')
         self.sj = sj = UT.read_pandas(self.refpre+'.sj.txt.gz')
-        self.set_bws(bwpre)
+        # self.set_bws(bwpre)
 
     def process(self, sdiffth=1, covfactor53=0, covfactorexon=0.05, np=10):
         self.extract_all()
@@ -226,8 +227,8 @@ class ParamFinder(object):
         a3idf = UT.read_pandas(a3i, names=cols)
         idx5 = ((a5idf['strand']=='-')&(a5idf['st']==a5idf['b_st']))|\
                ((a5idf['strand']=='+')&(a5idf['ed']==a5idf['b_ed']))
-        idx3 = ((a3idf['strand']=='-')&(a3idf['st']==a3idf['b_st']))|\
-               ((a3idf['strand']=='+')&(a3idf['ed']==a3idf['b_ed']))
+        idx3 = ((a3idf['strand']=='-')&(a3idf['ed']==a3idf['b_ed']))|\
+               ((a3idf['strand']=='+')&(a3idf['st']==a3idf['b_st']))
         self.e5i = a5idf[idx5].groupby('_id').first().reset_index()
         self.e3i = a3idf[idx3].groupby('_id').first().reset_index()
         LOG.info('#e5i={0}'.format(len(self.e5i)))
@@ -239,7 +240,8 @@ class ParamFinder(object):
         for c in chroms:
             bedc = beddf[beddf['chr']==c]
             if len(bedc)>0:
-                args.append((bedc, self.bwpaths.copy()))
+                # args.append((bedc, self.bwpaths.copy()))
+                args.append((bedc, self.bwpre)
         rslts = UT.process_mp(calc_flux_chr, args, np=np, doreduce=True)
         df = PD.DataFrame(rslts, columns=CALCFLUXCOLS)
         exdfi = beddf.set_index('_id').ix[df['_id'].values]
@@ -610,7 +612,8 @@ class ParamFinder(object):
         for c in chroms:
             bedc = beddf[beddf['chr']==c]
             if len(bedc)>0:
-                args.append((bedc, self.bwpaths.copy(), win, siz, direction, gapmode, covfactor))
+                # args.append((bedc, self.bwpaths.copy(), win, siz, direction, gapmode, covfactor))
+                args.append((bedc, self.bwpre, win, siz, direction, gapmode, covfactor))
         rslts = UT.process_mp(calc_params_chr, args, np=np, doreduce=True)
         df = PD.DataFrame(rslts, columns=CALCPARAMCOLS)
         exdfi = beddf.set_index('_id').ix[df['_id'].values]
@@ -742,16 +745,17 @@ def calc_sensitivity_specificity(Y,Z,FN0=0):
 
 
     
-def make_bws(bwp):
-    # .ex.p.bw, .ex.n.bw, .ex.u.bw, .sj.p.bw, .sj.n.bw, .sj.u.bw
-    bws = {'ex':{},'sj':{}}
-    bws['ex']['.'] = BWs([bwp['ex']['.']])
-    bws['ex']['+'] = BWs([bwp['ex']['+'],bwp['ex']['.']]) if os.path.exists(bwp['ex']['+']) else bws['ex']['.']
-    bws['ex']['-'] = BWs([bwp['ex']['-'],bwp['ex']['.']]) if os.path.exists(bwp['ex']['-']) else bws['ex']['.']
-    bws['sj']['+'] = BWs([bwp['sj']['+'],bwp['sj']['.']])
-    bws['sj']['-'] = BWs([bwp['sj']['-'],bwp['sj']['.']])
-    bws['sj']['.'] = BWs([bwp['sj']['.']])
-    return bws
+# def make_bws(bwp):
+#     # .ex.p.bw, .ex.n.bw, .ex.u.bw, .sj.p.bw, .sj.n.bw, .sj.u.bw
+#     bws = {'ex':{},'sj':{}}
+#     bws['ex']['.'] = BWs([bwp['ex']['.']])
+#     bws['ex']['+'] = BWs([bwp['ex']['+'],bwp['ex']['.']]) if os.path.exists(bwp['ex']['+']) else bws['ex']['.']
+#     bws['ex']['-'] = BWs([bwp['ex']['-'],bwp['ex']['.']]) if os.path.exists(bwp['ex']['-']) else bws['ex']['.']
+#     bws['sj']['+'] = BWs([bwp['sj']['+'],bwp['sj']['.']])
+#     bws['sj']['-'] = BWs([bwp['sj']['-'],bwp['sj']['.']])
+#     bws['sj']['.'] = BWs([bwp['sj']['.']])
+#     return bws
+
 
 CALCPARAMCOLS = ['_id','emax','emin',
             'emaxIn','eminIn','gapIn','gposIn',
@@ -761,92 +765,94 @@ CALCPARAMCOLS = ['_id','emax','emin',
             # 'gap000', 'gap001', 'gap002','gap005']#,'gap010','gap015','gap020']
 
 def calc_params_chr(exdf, bwp, win=300, siz=10,  direction='>', gapmode='i', covfactor=0):
-    bws = make_bws(bwp)
-    ebw = bws['ex']
-    sbw = bws['sj']
+    # bws = make_bws(bwp)
+    sjexbw = A3.SjExBigWigs(bwp)
+
+    ebw = sjexbw.bws['ex']
+    sbw = sjexbw.bws['sj']    
     recs = []
     cols =CALCPARAMCOLS
-    for strand in ['+','-','.']:
-        exdfsub = exdf[exdf['strand']==strand]
-        with ebw[strand]:
-            with sbw[strand]:
-                for chrom,st,ed,_id in exdfsub[['chr','st','ed','_id']].values:
-                    #win = ed-st # same size as exon
-                    left = max(0, st-win)
-                    if left==0:
-                        print('st-win<0:{0}:{1}-{2}'.format(chrom,st,ed))
-                    right = ed+win
-                    stpos = st-left
-                    edpos = ed-left
-                    a1 = ebw[strand].get(chrom,left,right)
-                    b1 = sbw[strand].get(chrom,left,right)
-                     
-                    exl10 = N.mean(a1[stpos:stpos+siz])
-                    sjl10 = N.mean(b1[stpos-siz:stpos])
-                    exr10 = N.mean(a1[edpos-siz:edpos])
-                    sjr10 = N.mean(b1[edpos:edpos+siz])
-                    sdifl = b1[stpos]-b1[stpos-1]
-                    sdifr = b1[edpos]-b1[edpos-1]
-                    exmax = N.max(a1[stpos:edpos])
-                    exmin = N.min(a1[stpos:edpos])
-                    #gapth = sjl10*covfactor if strand=='+' else sjr10*covfactor
-                    if gapmode=='i':
-                        gapth = exmax*covfactor
+    with sjexbw:
+        for strand in ['+','-','.']:
+            exdfsub = exdf[exdf['strand']==strand]
+            for chrom,st,ed,_id in exdfsub[['chr','st','ed','_id']].values:
+                #win = ed-st # same size as exon
+                left = max(0, st-win)
+                if left==0:
+                    print('st-win<0:{0}:{1}-{2}'.format(chrom,st,ed))
+                right = ed+win
+                stpos = st-left
+                edpos = ed-left
+                a1 = ebw[strand].get(chrom,left,right)
+                b1 = sbw[strand].get(chrom,left,right)
+                 
+                exl10 = N.mean(a1[stpos:stpos+siz])
+                sjl10 = N.mean(b1[stpos-siz:stpos])
+                exr10 = N.mean(a1[edpos-siz:edpos])
+                sjr10 = N.mean(b1[edpos:edpos+siz])
+                sdifl = b1[stpos]-b1[stpos-1]
+                sdifr = b1[edpos]-b1[edpos-1]
+                exmax = N.max(a1[stpos:edpos])
+                exmin = N.min(a1[stpos:edpos])
+                #gapth = sjl10*covfactor if strand=='+' else sjr10*covfactor
+                if gapmode=='i':
+                    gapth = exmax*covfactor
+                else:
+                    if direction=='>':
+                        gapth = exl10*covfactor
                     else:
-                        if direction=='>':
-                            gapth = exl10*covfactor
-                        else:
-                            gapth = exr10*covfactor
-                    if ((direction=='>')&(strand=='+'))|((direction!='>')&(strand=='-')):
-                        gap = find_maxgap(a1[stpos:edpos],exmin, exmax, gapth, win, gapmode)
-                    else:
-                        gap = find_maxgap(a1[stpos:edpos][::-1],exmin, exmax, gapth, win, gapmode)
-                    maxl = N.max(a1[:stpos])
-                    maxr = N.max(a1[edpos:])
-                    minl = N.min(a1[:stpos])
-                    minr = N.min(a1[edpos:])
-                    gapl,posl = find_firstgap(a1[:stpos][::-1],minl,maxl,gapth,win)
-                    gapr,posr = find_firstgap(a1[edpos:],minr,maxr,gapth,win)
-                    mp = float(N.sum(a1[stpos:edpos]>gapth))/(ed-st)
-                    if strand=='+':
-                        recs.append([_id,exmax,exmin,
-                                     maxl,minl,gapl,posl, 
-                                     maxr,minr,gapr,posr, 
-                                     exl10,sjl10,sdifl,
-                                     exr10,sjr10,sdifr, gap, mp]) #+[gaps[x] for x in cfs])
-                    else:
-                        recs.append([_id,exmax,exmin,
-                                     maxr,minr,gapr,posr, 
-                                     maxl,minl,gapl,posl, 
-                                     exr10,sjr10,sdifr,
-                                     exl10,sjl10,sdifl, gap, mp]) #+[gaps[x] for x in cfs])
+                        gapth = exr10*covfactor
+                if ((direction=='>')&(strand=='+'))|((direction!='>')&(strand=='-')):
+                    gap = find_maxgap(a1[stpos:edpos],exmin, exmax, gapth, win, gapmode)
+                else:
+                    gap = find_maxgap(a1[stpos:edpos][::-1],exmin, exmax, gapth, win, gapmode)
+                maxl = N.max(a1[:stpos])
+                maxr = N.max(a1[edpos:])
+                minl = N.min(a1[:stpos])
+                minr = N.min(a1[edpos:])
+                gapl,posl = find_firstgap(a1[:stpos][::-1],minl,maxl,gapth,win)
+                gapr,posr = find_firstgap(a1[edpos:],minr,maxr,gapth,win)
+                mp = float(N.sum(a1[stpos:edpos]>gapth))/(ed-st)
+                if strand=='+':
+                    recs.append([_id,exmax,exmin,
+                                 maxl,minl,gapl,posl, 
+                                 maxr,minr,gapr,posr, 
+                                 exl10,sjl10,sdifl,
+                                 exr10,sjr10,sdifr, gap, mp]) #+[gaps[x] for x in cfs])
+                else:
+                    recs.append([_id,exmax,exmin,
+                                 maxr,minr,gapr,posr, 
+                                 maxl,minl,gapl,posl, 
+                                 exr10,sjr10,sdifr,
+                                 exl10,sjl10,sdifl, gap, mp]) #+[gaps[x] for x in cfs])
     return recs
 
 def calc_flux_chr(exdf, bwp):
-    bws = make_bws(bwp)
-    ebw = bws['ex']
-    sbw = bws['sj']
+    # bws = make_bws(bwp)
+    sjexbw = A3.SjExBigWigs(bwp)
+
+    ebw = sjexbw.bws['ex']
+    sbw = sjexbw.bws['sj']
     recs = []
     cols = CALCFLUXCOLS
-    for strand in ['+','-','.']:
-        exdfsub = exdf[exdf['strand']==strand]
-        with ebw[strand]:
-            with sbw[strand]:
-                for chrom, st, ed, _id in exdf[['chr','st','ed', '_id']].values:
-                    ecov = ebw[strand].get(chrom,st-1,ed+1)
-                    scov = sbw[strand].get(chrom,st-1,ed+1)
-                    if strand=='+':
-                        sd = scov[-1]-scov[0]
-                        sin,sout = scov[0],scov[-1]
-                        ein,eout = ecov[0],ecov[-1]
-                        sdin= scov[1]-scov[0]
-                        sdout = scov[-1]-scov[-2]
-                    else:
-                        sd = scov[0]-scov[-1]
-                        sin,sout = scov[-1],scov[0]
-                        ein,eout = ecov[-1],ecov[0]
-                        sdout= -scov[1]+scov[0]
-                        sdin = -scov[-1]+scov[-2]
-                    recs.append([_id, sd, ecov.mean(), ecov.min(), ecov.max(),
-                                 sin,sout,ein,eout,sdin,sdout])
+    with sjexbw:
+        for strand in ['+','-','.']:
+            exdfsub = exdf[exdf['strand']==strand]
+            for chrom, st, ed, _id in exdf[['chr','st','ed', '_id']].values:
+                ecov = ebw[strand].get(chrom,st-1,ed+1)
+                scov = sbw[strand].get(chrom,st-1,ed+1)
+                if strand=='+':
+                    sd = scov[-1]-scov[0]
+                    sin,sout = scov[0],scov[-1]
+                    ein,eout = ecov[0],ecov[-1]
+                    sdin= scov[1]-scov[0]
+                    sdout = scov[-1]-scov[-2]
+                else:
+                    sd = scov[0]-scov[-1]
+                    sin,sout = scov[-1],scov[0]
+                    ein,eout = ecov[-1],ecov[0]
+                    sdout= -scov[1]+scov[0]
+                    sdin = -scov[-1]+scov[-2]
+                recs.append([_id, sd, ecov.mean(), ecov.min(), ecov.max(),
+                             sin,sout,ein,eout,sdin,sdout])
     return recs
