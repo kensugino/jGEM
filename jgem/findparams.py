@@ -228,9 +228,10 @@ class ParamFinder(object):
                ((a5idf['strand']=='+')&(a5idf['ed']==a5idf['b_ed']))
         idx3 = ((a3idf['strand']=='-')&(a3idf['st']==a3idf['b_st']))|\
                ((a3idf['strand']=='+')&(a3idf['ed']==a3idf['b_ed']))
-        self.e5i = a5idf[idx5].rename(columns={'name':'_id'})
-        self.e3i = a3idf[idx3].rename(columns={'name':'_id'})
-
+        self.e5i = a5idf[idx5].groupby('_id').first().reset_index()
+        self.e3i = a3idf[idx3].groupby('_id').first().reset_index()
+        LOG.info('#e5i={0}'.format(len(self.e5i)))
+        LOG.info('#e3i={0}'.format(len(self.e3i)))
     
     def calc_flux_mp(self, beddf, np=10):
         chroms = UT.chroms(self.genome)
