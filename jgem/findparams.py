@@ -303,10 +303,14 @@ class ParamFinder(object):
         fig,axr = P.subplots(2,3,figsize=(12,8),sharex=True,sharey=True)
         P.subplots_adjust(hspace=0.1,wspace=0.1)
         zoom = self.zoom
-        def _plt(Dsub, c, ax, dosdiffth=False):
+        def _plt(Dsub, c, ax, dosdiffth=False, removezero=False):
             # Dsub = D[K==k]
             x = N.log2(zoom*Dsub['sin']+1)
             y = N.log2(zoom*Dsub['sout']+1)
+            if removezero:
+                idx0 = (x>0)|(y>0)
+                x = x[idx0]
+                y = y[idx0]
             if dosdiffth:
                 idx = N.abs(x-y)>sdiffth
                 x = x[idx]
@@ -326,7 +330,7 @@ class ParamFinder(object):
             _plt(dicb['e5i'], 'r.', axr[0][1])
             _plt(dicb['e3i'], 'r.', axr[0][1])
             # 0,2
-            _plt(dicb['ne_i'], 'b.', axr[0][2])
+            _plt(dicb['ne_i'], 'b.', axr[0][2], removezero=True)
             # 1,0 Y
             _plt(D[Y==0], 'b.', axr[1][0])
             _plt(D[Y==1], 'r.', axr[1][0], True)

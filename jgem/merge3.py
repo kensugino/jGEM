@@ -415,10 +415,10 @@ class SJFilter(object):
             args.append((self.bwsjpre, self.statspath, c, csize, self.params))
         
         rslts = UT.process_mp(filter_sjpath, args, np=self.np, doreduce=False)
-        dstpath = self.bwsjpre+'.sjpath.filtered.bed.gz'
+        dstpath = self.bwsjpre+'.filtered.sjpath.bed.gz'
         with open(dstpath,'wb') as dst:
             for c in chroms:
-                srcpath =  self.bwsjpre+'.sjpath.{0}.filtered.bed.gz'.format(c)
+                srcpath =  self.bwsjpre+'.filtered.sjpath.{0}.bed.gz'.format(c)
                 with open(srcpath, 'rb') as src:
                     shutil.copyfileobj(src, dst)
 
@@ -426,9 +426,17 @@ class SJFilter(object):
         dstpath = self.bwsjpre+'.sjdf.filtered.txt.gz'
         with open(dstpath,'wb') as dst:
             for c in chroms:
-                srcpath =  self.bwsjpre+'.sjdf.{0}.filtered.txt.gz'.format(c)
+                srcpath =  self.bwsjpre+'.filtered.sjdf.{0}.txt.gz'.format(c)
                 with open(srcpath, 'rb') as src:
                     shutil.copyfileobj(src, dst)
+
+        # make sj.bw
+        sjfiltered2bw(self.bwsjpre, self.genome, self.np)
+        for s in ['p','n','u']:
+            src = self.bwsjpre + '.ex.{0}.bw'.format(s)
+            dst = self.bwsjpre + '.filtered.ex.{0}.bw'.format(s)
+            cmd = ['ln','-s', src, dst]
+            subprocess.call(cmd)
 
 
 
@@ -454,7 +462,7 @@ def filter_sjpath(bwsjpre, statspath, chrom, csize, params):
     dics = {f: UT.df2dict(stats, 'pc', f) for f in flds}
     # read sjpath
     fpath_chr =  bwsjpre+'.sjpath.{0}.bed.gz'.format(chrom)
-    dstpath = bwsjpre+'.sjpath.{0}.filtered.bed.gz'.format(chrom)
+    dstpath = bwsjpre+'.filtered.sjpath.{0}.bed.gz'.format(chrom)
     if os.path.exists(fpath_chr):
         sj = GGB.read_bed(fpath_chr)
     else:
@@ -504,7 +512,7 @@ def filter_sjdf(bwsjpre, statspath, chrom, csize, params):
     dics = {f: UT.df2dict(stats, 'pc', f) for f in flds}
     # read sjdf
     fpath_chr =  bwsjpre+'.sjdf.{0}.txt.gz'.format(chrom)
-    dstpath = bwsjpre+'.sjdf.{0}.filtered.txt.gz'.format(chrom)
+    dstpath = bwsjpre+'.filtered.sjdf.{0}.txt.gz'.format(chrom)
     if os.path.exists(fpath_chr):
         sj = UT.read_pandas(fpath_chr, names=A3.SJDFCOLS)
     else:
@@ -537,6 +545,47 @@ def filter_sjdf(bwsjpre, statspath, chrom, csize, params):
     sj['sjratio'] = [x/N.max(a[int(s):int(e)]) for x,s,e in sj[['tcnt','st','ed']].values]
     sj = sj[sj['sjratio']>params['th_sjratio']]
     UT.write_pandas(sj[A3.SJDFCOLS], dstpath, '')
+
+
+
+def sjfiltered2wig(bwpre, chrom, chromsize):
+    a = {'+':N.zeros(chromsize, dtype=N.float64),
+         '-':N.zeros(chromsize, dtype=N.float64),
+         '.':N.zeros(chromsize, dtype=N.float64)}
+    path = bwpre+'.sjdf.{0}.filtered.txt.gz'.format(chrom)
+    sjchr = UT.read_pandas(path, names=A3.SJDFCOLS)
+    for st,ed,v,strand in sjchr[['st','ed','tcnt','strand']].values:
+        a[strand[0]][st:ed] += v
+    for strand in a:
+        wig = bwpre+'.sjdf.{0}.{1}.filtered.wig'.format(chrom, strand)
+        cybw.array2wiggle_chr64(a[strand], chrom, wig)
+    return path
+
+def sjfiltered2bw(bwpre, genome, np=12):
+    chroms = UT.chroms(genome)
+    chromdf = UT.chromdf(genome).sort_values('size',ascending=False)
+    chroms = [x for x in chromdf['chr'] if x in chroms]
+    chromdic = UT.df2dict(chromdf, 'chr', 'size')
+    args = [(bwpre, c, chromdic[c]) for c in chroms]
+    rslts = UT.process_mp(sjfiltered2wig, args, np=np, doreduce=False)
+    S2N = {'+':'p','-':'n','.':'u'}
+    rmfiles = []
+    for strand in ['+','-','.']:
+        s = S2N[strand]
+        wigpath = bwpre+'.filtered.sj.{0}.wig'.format(s)
+        with open(wigpath, 'w') as dst:
+            for chrom in chroms:
+                f = bwpre+'.sjdf.{0}.{1}.filtered.wig'.format(chrom, strand)
+                with open(f,'r') as src:
+                    shutil.copyfileobj(src, dst)
+                rmfiles.append(f)
+        bwpath = bwpre+'.filtered.sj.{0}.bw'.format(s)
+        BT.wig2bw(wigpath, UT.chromsizes(genome), bwpath)
+        rmfiles.append(wigpath)
+    for f in rmfiles:
+        os.unlink(f)
+    os.unlink(wig)    
+    
 
 ############# Cov Estimator ######################################################
 

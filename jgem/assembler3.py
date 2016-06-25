@@ -1054,7 +1054,7 @@ class LocalAssembler(object):
         chrom,st,ed = self.chrom,self.st,self.ed
         # single bwpre
         if UT.isstring(self.bwpre):
-            chrfiltered = self.bwpre+'.sjpath.{0}.filtered.bed.gz'.format(chrom)
+            chrfiltered = self.bwpre+'.filtered.sjpath.{0}.bed.gz'.format(chrom)
             if os.path.exists(chrfiltered):
                 sj = GGB.read_bed(chrfiltered)
             else:
@@ -1220,8 +1220,12 @@ class LocalAssembler(object):
     
     def make_sjdf(self):
         if self.params['use_merged_sjdf']:
-            path = self.bwpre+'.sjdf.{0}.filtered.txt.gz'.format(self.chrom)
-            sj = UT.read_pandas(path, names=SJDFCOLS)
+            path = self.bwpre+'.filtered.sjdf.{0}.txt.gz'.format(self.chrom)
+            if os.path.exists(path):
+                sj = UT.read_pandas(path, names=SJDFCOLS)
+            else:
+                path = self.bwpre+'.sjdf.{0}.txt.gz'.format(self.chrom)
+                sj = UT.read_pandas(path, names=SJDFCOLS)
             sj = sj[(sj['chr']==self.chrom)&(sj['st']>=self.st)&(sj['ed']<=self.ed)].copy()
             sj['tst'] = sj['st'] # for sjpath compatibility
             sj['ted'] = sj['ed']
