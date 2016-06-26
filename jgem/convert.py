@@ -97,7 +97,8 @@ def as3exsj(dstpre, np=7):
     se = UT.read_pandas(dstpre+'.sedf.txt.gz', names=A3.EXDFCOLS)
     paths = UT.read_pandas(dstpre+'.paths.txt.gz', names=A3.PATHCOLS)
     #ex.loc[ex['strand'].isin(['.+','.-']),'strand'] = '.'
-    #sj.loc[sj['strand'].isin(['.+','.-']),'strand'] = '.'
+    # sj.loc[sj['strand']=='.+','strand'] = '+'
+    # sj.loc[sj['strand']=='.-','strand'] = '-'
     sj['st'] = sj['st']+1 
     cols = A3.EXDFCOLS
     ex = PD.concat([ex[cols],se[cols]],ignore_index=True)

@@ -1213,17 +1213,18 @@ class LocalAssembler(object):
         # internal case
         self.e53pos = {}
         sjdf = self.sjdf
+        o = int(self.st)
         for s in ['+','-']:
             sja = self.filled[s]
             exa = self.arrs['ex'][s]            
             df = detect_53(sja, exa, s, classifier=self.e53c)
             # make sure there are junctions connecting to them
             if s=='+':
-                pos5 = set(sjdf[(sjdf['strand'].isin(STRS[s]))]['st'].values)
-                pos3 = set(sjdf[(sjdf['strand'].isin(STRS[s]))]['ed'].values)
+                pos5 = set([x-o for x in sjdf[(sjdf['strand'].isin(STRS[s]))]['st'].values])
+                pos3 = set([x-o for x in sjdf[(sjdf['strand'].isin(STRS[s]))]['ed'].values])
             else:
-                pos3 = set(sjdf[(sjdf['strand'].isin(STRS[s]))]['st'].values)
-                pos5s = set(sjdf[(sjdf['strand'].isin(STRS[s]))]['ed'].values)
+                pos3 = set([x-o for x in sjdf[(sjdf['strand'].isin(STRS[s]))]['st'].values])
+                pos5s = set([x-o for x in sjdf[(sjdf['strand'].isin(STRS[s]))]['ed'].values])
             idx = ((df['kind']=='5')&df['pos'].isin(pos5))|((df['kind']=='3')&df['pos'].isin(pos3))
             self.e53pos[s] = df[idx].copy()
     
