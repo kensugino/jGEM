@@ -1212,11 +1212,20 @@ class LocalAssembler(object):
         # edge case
         # internal case
         self.e53pos = {}
+        sjdf = self.sjdf
         for s in ['+','-']:
             sja = self.filled[s]
             exa = self.arrs['ex'][s]            
-            self.e53pos[s] = detect_53(sja, exa, s, classifier=self.e53c)
-
+            df = detect_53(sja, exa, s, classifier=self.e53c)
+            # make sure there are junctions connecting to them
+            if s=='+':
+                pos5 = set(sjdf[(sjdf['strand'].isin(STRS[s]))]['st'].values)
+                pos3 = set(sjdf[(sjdf['strand'].isin(STRS[s]))]['ed'].values)
+            else:
+                pos3 = set(sjdf[(sjdf['strand'].isin(STRS[s]))]['st'].values)
+                pos5s = set(sjdf[(sjdf['strand'].isin(STRS[s]))]['ed'].values)
+            idx = ((df['kind']=='5')&df['pos'].isin(pos5))|((df['kind']=='3')&df['pos'].isin(pos3))
+            self.e53pos[s] = df[idx].copy()
     
     def make_sjdf(self):
         if self.params['use_merged_sjdf']:
