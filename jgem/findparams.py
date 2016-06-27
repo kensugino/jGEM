@@ -191,11 +191,11 @@ class ParamFinder(object):
         a3i = self.refpre + '.ex3-ovl-exi.txt.gz'
 
         nc = len(cols0)
-        # e5i0 = BT.calc_ovlratio(a5,ai,a5i,nc,nc)
-        # e3i0 = BT.calc_ovlratio(a3,ai,a3i,nc,nc)
+        e5i0 = BT.calc_ovlratio(a5,ai,a5i,nc,nc)
+        e3i0 = BT.calc_ovlratio(a3,ai,a3i,nc,nc)
 
-        # self.e5i = e5i = e5i0[e5i0['ovlratio']==1].rename(columns={'name':'_id'})
-        # self.e3i = e3i = e3i0[e3i0['ovlratio']==1].rename(columns={'name':'_id'})
+        self.e5ia = e5ia = e5i0[e5i0['ovlratio']==1].rename(columns={'name':'_id'})
+        self.e3ia = e3ia = e3i0[e3i0['ovlratio']==1].rename(columns={'name':'_id'})
 
         # find internal exons which shares st or ed with 5 or 3 exons
         a5i = BT.bedtoolintersect(ai, a5, a5i, wao=True)
@@ -233,7 +233,7 @@ class ParamFinder(object):
         # get parameters
         dic = {}
         zoom = self.zoom
-        for x in ['ne_i','ne_5','ne_3','e5i','e3i']:
+        for x in ['ne_i','ne_5','ne_3','e5i','e3i','e5ia','e3ia']:
             fpath = self.bwpre+'.{0}.{1}.flux.txt.gz'.format(self.refcode,x)
             if os.path.exists(fpath):
                 print('reading from cache {0}'.format(fpath))
@@ -245,7 +245,7 @@ class ParamFinder(object):
                 UT.write_pandas(dic[x], fpath,'h')
         dicb = {}
         FN0 = 0
-        for x in ['ne_5','ne_3','e5i','e3i']:
+        for x in ['ne_5','ne_3','e5i','e3i','e5ia','e3ia']:
             f = dic[x]
             f['kind'] = 1
             idx0 = N.abs(N.log2(zoom*f['sin']+1)-N.log2(zoom*f['sout']+1))>sdiffth
@@ -257,7 +257,7 @@ class ParamFinder(object):
         f['kind'] = 0
         idx = (f['ecovmax']>1)&((f['sdin']!=0)&(f['sdout']!=0)) # should have both in&out
         dicb['ne_i'] = f[idx]
-        D = PD.concat([dicb['ne_i'],dicb['ne_3'],dicb['ne_5']],ignore_index=True)
+        D = PD.concat([dicb[x] for x in ['ne_i','ne_3','ne_5','e5ia','e3ia']],ignore_index=True)
         D2 = PD.concat([dicb['ne_i'], dicb['e3i'],dicb['e5i']],ignore_index=True)
         # don't use e3i, e5i too many non-actives
 
