@@ -472,57 +472,135 @@ def mcore_allcomponents4(sj, me, filepre, np=4, depth=500, maxcnt=10000, chroms=
 
 # GENE FINDER ###############################################################
 
-def find_genes3(sj, ae, cachename=None, np=1, override=False, depth=140):
+# def find_genes3(sj, ae, cachename=None, np=1, override=False, depth=140):
+#     """ 
+#     Adds _gidx column to ae
+#     Connection: by junctions
+
+#     Returns genes [set([_id,..]), ...]
+#     """
+#     if '_id' not in ae.columns:
+#         LOG.debug('setting ex _id...')
+#         UT.set_ids(ae)
+#     if '_id' not in sj.columns:
+#         LOG.debug('setting sj _id...')
+#         UT.set_ids(sj)
+#     if 'cat' not in ae.columns:
+#         UT.set_exon_category(sj,ae)
+
+#     ### FIND GENES
+#     if cachename and os.path.exists(cachename) and not override:
+#         LOG.debug('loading cached genes (connected components)...')
+#         genes = pickle.load(open(cachename, 'rb'))
+#     else:
+#         LOG.debug('finding genes (connected components)...')
+#         _sttime = time.time()
+#         me, se = UT.mese(ae)
+#         genes = mcore_allcomponents3(sj, me, np, depth=depth)
+#         # genes = [set([_id's]),...]
+#         # SE genes
+#         genes += [set([x]) for x in se['_id']]
+#         if cachename:
+#             UT.makedirs(os.path.dirname(cachename))
+#             pickle.dump(genes, open(cachename,'wb'))
+#         LOG.debug(' time: {0:.3f}s'.format(time.time()-_sttime))
+    
+#     ### WRITE EXONS W/ GENE number
+#     LOG.debug('assigning gidx...')
+#     _sttime = time.time()
+#     # ae['_gidx'] = 0
+#     # ae.index = ae['_id']
+#     # for i, ids in enumerate(genes):
+#     #     ae.ix[ids, '_gidx'] = i+1
+#     i2g = {}
+#     for i, ids in enumerate(genes):
+#         for x in ids:
+#             i2g[x] = i+1
+#     ae['_gidx'] = [i2g[x] for x in ae['_id']]
+
+#     ## set sj _gidx, use acceptor=>_gidx map (exon a_id, sj a_id)
+#     a2g = dict(UT.izipcols(ae, ['a_id','_gidx']))
+#     d2g = dict(UT.izipcols(ae, ['d_id','_gidx']))
+#     sj['_gidx'] = [a2g.get(x,d2g.get(y,-1)) for x,y in UT.izipcols(sj,['a_id','d_id'])]
+
+    
+#     # This shouldn't happen
+#     nidx = ae['_gidx']==0
+#     if N.sum(nidx)>0:
+#         LOG.warning('###### WARNING!!!!!! exons with no gene assignment:{0}'.format(N.sum(nidx)))
+#         #ae.loc[nidx, '_gidx'] = N.arange(len(ae),len(ae)+N.sum(nidx))        
+        
+#     return genes
+
+def find_genes3(sj, ae, cachename=None, np=1, override=False, depth=500, separatese=True):
     """ 
     Adds _gidx column to ae
-    Connection: by junctions
+    Connection: 1) by junctions, 2) by overlap in the same strand
 
     Returns genes [set([_id,..]), ...]
     """
     if '_id' not in ae.columns:
-        LOG.debug('setting ex _id...')
+        LOG.info('setting ex _id...')
         UT.set_ids(ae)
     if '_id' not in sj.columns:
-        LOG.debug('setting sj _id...')
+        LOG.info('setting sj _id...')
         UT.set_ids(sj)
     if 'cat' not in ae.columns:
         UT.set_exon_category(sj,ae)
+    if 'a_id' not in ae.columns:
+        UT.set_ad_info(sj,ae)
 
     ### FIND GENES
     if cachename and os.path.exists(cachename) and not override:
-        LOG.debug('loading cached genes (connected components)...')
+        LOG.info('loading cached genes (connected components)...')
         genes = pickle.load(open(cachename, 'rb'))
     else:
-        LOG.debug('finding genes (connected components)...')
+        LOG.info('finding genes (connected components)...')
         _sttime = time.time()
-        me, se = UT.mese(ae)
-        genes = mcore_allcomponents3(sj, me, np, depth=depth)
+        if separatese:
+            me, se = UT.mese(ae)
+            genes = mcore_allcomponents3(sj, me, np, depth=depth)
+            # SE genes
+            genes += [set([x]) for x in se['_id']]
+        else:
+            genes = mcore_allcomponents3(sj, ae, np, depth=depth)
+        # version 4 graph: uses overlaps in addition to junctions to connect
         # genes = [set([_id's]),...]
-        # SE genes
-        genes += [set([x]) for x in se['_id']]
         if cachename:
             UT.makedirs(os.path.dirname(cachename))
             pickle.dump(genes, open(cachename,'wb'))
-        LOG.debug(' time: {0:.3f}s'.format(time.time()-_sttime))
+        LOG.info(' time: {0:.3f}s'.format(time.time()-_sttime))
     
     ### WRITE EXONS W/ GENE number
-    LOG.debug('assigning gidx...')
+    LOG.info('assigning gidx...')
     _sttime = time.time()
-    # ae['_gidx'] = 0
-    # ae.index = ae['_id']
-    # for i, ids in enumerate(genes):
-    #     ae.ix[ids, '_gidx'] = i+1
-    i2g = {}
+    i2g = {} # eid => _gidx
+    i2gn = {} # eidt => gname
+    g2gn = {}
+    i2s = dict(UT.izipcols(ae, ['_id','strand'])) # eid => strand
+    #i2c = dict(UT.izipcols(ae, ['_id','cat'])) # eid => category
+    s2n = {'+':'P','-':'N','.':'','.+':'','.-':''}
+    c2n = {'s':'S','i':'G','5':'G','3':'G'}
     for i, ids in enumerate(genes):
+        gid = i+1
+        strand = s2n[i2s[list(ids)[0]]]
+        cat = 'S' if len(ids)==1 else 'G'
+        if strand=='N': # negative strand
+            gid = -gid
+        gname = 'J{0}{1}{2}'.format(strand,cat,abs(gid))
+        g2gn[gid] = gname
         for x in ids:
-            i2g[x] = i+1
+            i2g[x] = gid
+            i2gn[x] = gname
+
     ae['_gidx'] = [i2g[x] for x in ae['_id']]
+    ae['gname'] = [i2gn[x] for x in ae['_id']]
 
     ## set sj _gidx, use acceptor=>_gidx map (exon a_id, sj a_id)
     a2g = dict(UT.izipcols(ae, ['a_id','_gidx']))
     d2g = dict(UT.izipcols(ae, ['d_id','_gidx']))
-    sj['_gidx'] = [a2g.get(x,d2g.get(y,-1)) for x,y in UT.izipcols(sj,['a_id','d_id'])]
-
+    sj['_gidx'] = [a2g.get(x,d2g.get(y,0)) for x,y in UT.izipcols(sj,['a_id','d_id'])]
+    sj['gname'] = [g2gn.get(x,'') for x in sj['_gidx']]
     
     # This shouldn't happen
     nidx = ae['_gidx']==0
@@ -531,6 +609,7 @@ def find_genes3(sj, ae, cachename=None, np=1, override=False, depth=140):
         #ae.loc[nidx, '_gidx'] = N.arange(len(ae),len(ae)+N.sum(nidx))        
         
     return genes
+
 
 def find_genes4(sj, ae, filepre, cachename=None, np=1, override=False, depth=500, separatese=True):
     """ 
