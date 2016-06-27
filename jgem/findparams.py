@@ -233,7 +233,13 @@ class ParamFinder(object):
         # get parameters
         dic = {}
         zoom = self.zoom
-        for x in ['ne_i','ne_5','ne_3','e5i','e3i','e5ia','e3ia']:
+        # seta = ['ne_i','ne_5','ne_3','e5i','e3i','e5ia','e3ia']
+        # setb = ['ne_5','ne_3','e5i','e3i','e5ia','e3ia']
+        # setc = ['ne_i','ne_3','ne_5','e5ia','e3ia']
+        seta = ['ne_i','ne_5','ne_3','e5i','e3i']
+        setb = ['ne_5','ne_3','e5i','e3i']
+        setc = ['ne_i','ne_3','ne_5']
+        for x in seta:
             fpath = self.bwpre+'.{0}.{1}.flux.txt.gz'.format(self.refcode,x)
             if os.path.exists(fpath):
                 print('reading from cache {0}'.format(fpath))
@@ -245,7 +251,7 @@ class ParamFinder(object):
                 UT.write_pandas(dic[x], fpath,'h')
         dicb = {}
         FN0 = 0
-        for x in ['ne_5','ne_3','e5i','e3i','e5ia','e3ia']:
+        for x in setb:
             f = dic[x]
             f['kind'] = 1
             idx0 = N.abs(N.log2(zoom*f['sin']+1)-N.log2(zoom*f['sout']+1))>sdiffth
@@ -257,7 +263,7 @@ class ParamFinder(object):
         f['kind'] = 0
         idx = (f['ecovmax']>1)&((f['sdin']!=0)&(f['sdout']!=0)) # should have both in&out
         dicb['ne_i'] = f[idx]
-        D = PD.concat([dicb[x] for x in ['ne_i','ne_3','ne_5','e5ia','e3ia']],ignore_index=True)
+        D = PD.concat([dicb[x] for x in setc],ignore_index=True)
         D2 = PD.concat([dicb['ne_i'], dicb['e3i'],dicb['e5i']],ignore_index=True)
         # don't use e3i, e5i too many non-actives
 
@@ -325,6 +331,8 @@ class ParamFinder(object):
             _plt(dicb['ne_i'], 'b.', axr[0][0])
             _plt(dicb['ne_5'], 'r.', axr[0][0])
             _plt(dicb['ne_3'], 'r.', axr[0][0])
+            # _plt(dicb['e5ia'], 'r.', axr[0][0])
+            # _plt(dicb['e3ia'], 'r.', axr[0][0])
             # 0,1 ne_i vs e5i,e3i
             #_plt(dicb['ne_i'], 'b.', axr[0][1])
             _plt(dicb['e5i'], 'r.', axr[0][1])
