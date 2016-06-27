@@ -108,11 +108,14 @@ def as3exsj(dstpre, np=7):
     # find genes (connected components) set '_gidx'
     graphpre = dstpre+str(uuid.uuid4())+'_'
     prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
-    genes = GP.find_genes4(sj,ex,
-        filepre=prefix,
+    # genes = GP.find_genes4(sj,ex,
+    #     filepre=prefix,
+    #     np=np,
+    #     override=False,
+    #     separatese=True)
+    genes = GP.find_genes3(sj,ex, # don't use exon overlap as connection
         np=np,
-        override=False,
-        separatese=True)
+        override=False)
     ex.loc[ex['kind']=='3','cat'] = '3'
     ex.loc[ex['kind']=='5','cat'] = '5'
     UT.write_pandas(ex, dstpre+'.ex.txt.gz', 'h')
