@@ -1212,6 +1212,7 @@ class LocalAssembler(object):
         # edge case
         # internal case
         self.e53pos = {}
+        self._e53pos0 = {} # debug
         sjdf = self.sjdf
         o = int(self.st)
         for s in ['+','-']:
@@ -1226,6 +1227,7 @@ class LocalAssembler(object):
                 pos3 = set([x-o for x in sjdf[(sjdf['strand'].isin(STRS[s]))]['st'].values])
                 pos5s = set([x-o for x in sjdf[(sjdf['strand'].isin(STRS[s]))]['ed'].values])
             idx = ((df['kind']=='5')&df['pos'].isin(pos5))|((df['kind']=='3')&df['pos'].isin(pos3))
+            self._e53pos0[s] = df
             self.e53pos[s] = df[idx].copy()
     
     def make_sjdf(self):
