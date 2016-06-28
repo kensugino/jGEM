@@ -1936,7 +1936,8 @@ class LocalAssembler(object):
         self.usedsj = sjpaths0[idxused]
         GGB.write_bed(self.unusedsj, pre+'.unused.sjpath.bed.gz', ncols=12)
 
-    def draw_covs(self, st, ed, strand, win=500, ax=None, logcov=False):
+    def draw_covs(self, st, ed, strand, win=500, ax=None, logcov=False, 
+        resolution=100,minbins=100):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=(15,3))
         offset = self.st
@@ -1958,13 +1959,15 @@ class LocalAssembler(object):
             y0 = N.log2(sjap1+1)
             ax.plot(y0, 'r-', alpha=0.8)
             ec =  N.log2(exap0[ipx]+1)
-            ax.fill_between(ipx, 0, ec, facecolor='m', alpha=0.3)
+            ipx1,ec1 = compress2(ipx, resolution, minbins)
+            ax.fill_between(ipx1, 0, ec1, facecolor='m', alpha=0.3)
             h0 = N.ceil(N.max(y0)*1.1)
         else:
             y0 = sjap1
             ax.plot(y0, 'r-', alpha=0.8)
             ec =  exap0[ipx]
-            ax.fill_between(ipx, 0, ec, facecolor='m', alpha=0.3)
+            ipx1,ec1 = compress2(ipx, resolution, minbins)
+            ax.fill_between(ipx1, 0, ec1, facecolor='m', alpha=0.3)
             h0 = N.ceil(N.max(y0)*1.1)
         self._h0 = h0
         self._hu = hu = h0/20
@@ -2203,6 +2206,23 @@ def draw_sjex(sj, ex, st, ed, win=500, ax=None, delta=500, sjcov='tcnt', excov='
     ax.set_frame_on(False)
     return ax
 
+def subsample(arr, n):
+    end =  n * int(len(arr)/n)
+    return N.mean(arr[:end].reshape(-1, n), 1)
+
+def compress2(x0, y0, window, minbins):
+    st,ed = x[0],x[-1]
+    nbins = (ed-st)/window
+    if nbins<minbins:
+        window = max(2, int(float(ed-st)/minbins))
+    nbins = (ed-st)/window
+    if nbins >= 4*len(wigs):
+        return x0, y0
+    win = N.ones(window)
+    y = subsample(y0, window)
+    x = N.arange(st, ed+window, window)[:len(y)]
+    print(len(x),len(x0))
+    return x,y
 
 class PathGenerator(object):
     # gene level path generator
