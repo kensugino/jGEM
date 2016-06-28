@@ -443,8 +443,8 @@ class ParamFinder(object):
             x1 = X1[:,0]
             y1 = X1[:,1]
             if ptyp != 'pdf':
-                ax.plot(x0,y0,'r.', ms=5, alpha=0.1)
-                ax.plot(x1,y1,'b.', ms=5, alpha=0.1)
+                ax.plot(x0,y0,'b.', ms=5, alpha=0.1)
+                ax.plot(x1,y1,'r.', ms=5, alpha=0.1)
             if ptyp != 'png':
                 ax.set_title(title)
             else:
