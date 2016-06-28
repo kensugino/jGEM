@@ -2216,7 +2216,7 @@ def compress2(x0, y0, window, minbins):
     if nbins<minbins:
         window = max(2, int(float(ed-st)/minbins))
     nbins = (ed-st)/window
-    if nbins >= 4*len(wigs):
+    if nbins >= 4*len(x0):
         return x0, y0
     win = N.ones(window)
     y = subsample(y0, window)
