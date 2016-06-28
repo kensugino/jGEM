@@ -91,7 +91,7 @@ def as2exsj(dstpre, np=7):
     ci = UT.chopintervals(ex, dstpre+'.ci.txt.gz')
     return sj, ex
 
-def as3exsj(dstpre, np=7):
+def as3exsj(dstpre, minelen=150, np=7):
     ex = UT.read_pandas(dstpre+'.exdf.txt.gz', names=A3.EXDFCOLS)
     sj = UT.read_pandas(dstpre+'.sjdf.txt.gz', names=A3.SJDFCOLS)
     se = UT.read_pandas(dstpre+'.sedf.txt.gz', names=A3.EXDFCOLS)
@@ -118,10 +118,19 @@ def as3exsj(dstpre, np=7):
         override=False)
     ex.loc[ex['kind']=='3','cat'] = '3'
     ex.loc[ex['kind']=='5','cat'] = '5'
-    UT.write_pandas(ex, dstpre+'.ex.txt.gz', 'h')
-    UT.write_pandas(sj, dstpre+'.sj.txt.gz', 'h')
+
+    # remove these with elen smaller than minelen
+    ex['len'] = ex['ed']-ex['st']
+    exsiz = ex.groupby('_gidx')['len'].sum()
+    rgidx = exsiz[exsiz<minelen].index.values
+    LOG.info('minelen filter #ex {0}=>{1}'.format(len(ex), len(ex)-len(rgidx)))
+    ex2 = ex[~ex['_gidx'].isin(rgidx)]
+    sj2 = sj[~sj['_gidx'].isin(rgidx)]
+    # write
+    UT.write_pandas(ex2, dstpre+'.ex.txt.gz', 'h')
+    UT.write_pandas(sj2, dstpre+'.sj.txt.gz', 'h')
     ci = UT.chopintervals(ex, dstpre+'.ci.txt.gz')
-    return sj, ex    
+    return sj2, ex2
 
 def as3genes(dstpre):
     # assume converted by as3exsj
