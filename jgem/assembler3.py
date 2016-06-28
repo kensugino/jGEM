@@ -1937,7 +1937,7 @@ class LocalAssembler(object):
         GGB.write_bed(self.unusedsj, pre+'.unused.sjpath.bed.gz', ncols=12)
 
     def draw_covs(self, st, ed, strand, win=500, ax=None, logcov=False, 
-        resolution=100,minbins=100):
+        resolution=50,minbins=100):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=(15,3))
         offset = self.st
@@ -2080,7 +2080,9 @@ class LocalAssembler(object):
             cl = cls[s].to_rgba(tcov)
             ls = lss[s]
             cargs = dict(facecolor=cb, edgecolor=cb)
-            ax.plot([tst-st0,ted-st0],[ymid,ymid],ls=ls, color=cl)
+            x0 = max(tst-st0,0)
+            x1 = min(ted-st0,ed0-st0)
+            ax.plot([x0,x1],[ymid,ymid],ls=ls, color=cl)
             yrange = (ymid-h/2., h)
             tmp = pc.split(',')
             if len(tmp[0].split('|'))==2:
@@ -2106,7 +2108,7 @@ class LocalAssembler(object):
             else:
                 exons = [[int(x) for x in y.split(',')] for y in tmppc.split('|')]
                 exons = [x[::-1] for x in exons[::-1]]
-            xranges = [(x-st0,y-x) for x,y in exons]
+            xranges = [(x-st0,y-x) for x,y in exons if ((x<ed0)&(y>st0))]
             bbhc = BrokenBarHCollection(xranges, yrange, **cargs)
             ax.add_collection(bbhc)
         ax.set_ylim(minypos-5, 5)
@@ -2222,7 +2224,6 @@ def compress2(x0, y0, window, minbins):
     nbins = (ed-st)/window
     if nbins >= 4*len(x0):
         return x0, y0
-    win = N.ones(window)
     y = subsample(y0, window)
     x = N.arange(st, ed+window, window)[:len(y)]
     print(len(x),len(x0))
