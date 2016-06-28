@@ -371,7 +371,7 @@ class ParamFinder(object):
             fig.savefig(spath)
 
 
-    def calc_53gap_params(self, covfactor=0, np=10, emaxth=1, sth=1):
+    def calc_53gap_params(self, covfactor=0, np=10, emaxth=1, eth=1):
         zoom = self.zoom
         d5path = self.bwpre+'.{0}.{1}.gap5params.txt.gz'.format(self.refcode, covfactor)
         d3path = self.bwpre+'.{0}.{1}.gap3params.txt.gz'.format(self.refcode, covfactor)
@@ -388,8 +388,8 @@ class ParamFinder(object):
             d3 = self.calc_params_mp(self.ne_3, win=8192, np=np, gapmode='53', direction='>', covfactor=covfactor)
             UT.write_pandas(d3, d3path, 'h')
 
-        i5 = (d5['sOut']>sth)&(d5['emax']>emaxth)
-        i3 = (d3['sIn']>sth)&(d3['emax']>emaxth)
+        i5 = (d5['eOut']>eth)&(d5['emax']>emaxth)
+        i3 = (d3['eIn']>eth)&(d3['emax']>emaxth)
         d50 = d5[i5]
         d30 = d3[i3]
         def _fitone(d0, x, y1, y2, rx='sin',lrx='lsin'):
