@@ -1959,14 +1959,14 @@ class LocalAssembler(object):
             y0 = N.log2(sjap1+1)
             ax.plot(y0, 'r-', alpha=0.8)
             ec =  N.log2(exap0[ipx]+1)
-            ipx1,ec1 = compress2(ipx, resolution, minbins)
+            ipx1,ec1 = compress2(ipx, ec, resolution, minbins)
             ax.fill_between(ipx1, 0, ec1, facecolor='m', alpha=0.3)
             h0 = N.ceil(N.max(y0)*1.1)
         else:
             y0 = sjap1
             ax.plot(y0, 'r-', alpha=0.8)
             ec =  exap0[ipx]
-            ipx1,ec1 = compress2(ipx, resolution, minbins)
+            ipx1,ec1 = compress2(ipx, ec, resolution, minbins)
             ax.fill_between(ipx1, 0, ec1, facecolor='m', alpha=0.3)
             h0 = N.ceil(N.max(y0)*1.1)
         self._h0 = h0
