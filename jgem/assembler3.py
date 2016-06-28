@@ -2211,7 +2211,7 @@ def subsample(arr, n):
     return N.mean(arr[:end].reshape(-1, n), 1)
 
 def compress2(x0, y0, window, minbins):
-    st,ed = x[0],x[-1]
+    st,ed = x0[0],x0[-1]
     nbins = (ed-st)/window
     if nbins<minbins:
         window = max(2, int(float(ed-st)/minbins))
