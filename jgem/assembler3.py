@@ -1954,19 +1954,23 @@ class LocalAssembler(object):
         n = len(exap0)
         ipx.update([x+1 for x in ipx if x<n-1])
         ipx.update([x-1 for x in ipx if x>1])
-        ipx = sorted(ipx)
+        ipx = sorted(set(ipx))
         if logcov:
             y0 = N.log2(sjap1+1)
             ax.plot(y0, 'r-', alpha=0.8)
-            ec =  N.log2(exap0[ipx]+1)
-            ipx1,ec1 = compress2(ipx, ec, resolution, minbins)
+            # ec =  N.log2(exap0[ipx]+1)
+            x0 = N.arange(len(exap0))
+            ec = N.log2(exap0+1)
+            ipx1,ec1 = compress2(x0, ec, resolution, minbins)
             ax.fill_between(ipx1, 0, ec1, facecolor='m', alpha=0.3)
             h0 = N.ceil(N.max(y0)*1.1)
         else:
             y0 = sjap1
             ax.plot(y0, 'r-', alpha=0.8)
-            ec =  exap0[ipx]
-            ipx1,ec1 = compress2(ipx, ec, resolution, minbins)
+            # ec =  exap0[ipx]
+            x0 = N.arange(len(exap0))
+            ec = exap0
+            ipx1,ec1 = compress2(x0, ec, resolution, minbins)
             ax.fill_between(ipx1, 0, ec1, facecolor='m', alpha=0.3)
             h0 = N.ceil(N.max(y0)*1.1)
         self._h0 = h0
