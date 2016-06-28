@@ -202,8 +202,8 @@ class GapEdgeFinder(object):
         self.c0 = -b0/a_lgap
         self.c1 = -a_lsin/a_lgap
         self.th = th
-        self.maxsize = json['maxsize']
-        self.maxgap = json.get('maxgap',600)
+        self.maxsize = json.get('maxsize',20000)
+        self.maxgap = json.get('maxgap',50)
         self.minecov = json.get('minecov',1)
         
     def find(self, sja, exa, direction):
@@ -886,20 +886,17 @@ LAPARAMS = dict(
 )
 MERGEPARAMS = LAPARAMS.copy()
 MERGEPARAMS.update(dict(
-     uth=0,
-     mth=5,
-     upperpathnum=50, # if num of paths larger than this increase stringency for sjs
-     tcovth=50,
-     tcovfactor=0.2,
-     maxraisecnt=2, 
+     tcovfactor=0.4,
+     maxraisecnt=1, 
      minvmimadiff=5,     
+     raisecntth=150,
      use_ef2=True, # whether to use slope edge detector
      edgedelta=1000000, # disable getting 53exons from extruded edges
      use_sja_for_exon_detection=True,
-     pathcheckth=300, # above this num of sjs check sc1(ucnt)==0 if >50% remove
      use_merged_sjdf=True,
      use_sjdf_for_check=True,
      use_iexon_from_path=False,
+     cmax=18,
 ))
 
 class LocalAssembler(object):
