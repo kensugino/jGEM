@@ -1240,7 +1240,7 @@ class LocalAssembler(object):
             else:
                 path = self.bwpre+'.sjdf.{0}.txt.gz'.format(self.chrom)
                 sj = UT.read_pandas(path, names=SJDFCOLS)
-            sj = sj[(sj['chr']==self.chrom)&(sj['st']>=self.st)&(sj['ed']<=self.ed)].copy()
+            self._sj = sj = sj[(sj['chr']==self.chrom)&(sj['st']>=self.st)&(sj['ed']<=self.ed)].copy()
             sj['tst'] = sj['st'] # for sjpath compatibility
             sj['ted'] = sj['ed']
             sj['sc1'] = sj['ucnt']
