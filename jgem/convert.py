@@ -129,7 +129,7 @@ def as3exsj(dstpre, minelen=150, np=7):
     # write
     UT.write_pandas(ex2, dstpre+'.ex.txt.gz', 'h')
     UT.write_pandas(sj2, dstpre+'.sj.txt.gz', 'h')
-    ci = UT.chopintervals(ex, dstpre+'.ci.txt.gz')
+    ci = UT.chopintervals(ex2, dstpre+'.ci.txt.gz')
     return sj2, ex2
 
 def as3genes(dstpre):
