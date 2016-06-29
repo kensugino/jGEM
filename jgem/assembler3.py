@@ -1934,14 +1934,17 @@ class LocalAssembler(object):
         GGB.write_bed(self.unusedsj, pre+'.unused.sjpath.bed.gz', ncols=12)
 
     def draw_covs(self, st, ed, strand, win=500, ax=None, logcov=False, 
-        resolution=50,minbins=100, usefilled=False):
+        resolution=50,minbins=100, usefilled=False, useexbw=False):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=(15,3))
         offset = self.st
         s0 = st-win-offset
         e0 = ed+win-offset
         sjap0 = self.arrs['sj'][strand][s0:e0]
-        exap0 = self.arrs['ex'][strand][s0:e0]
+        if useexbw and 'exbw' in self.arrs:
+            exap0 = self.arrs['exbw'][strand][s0:e0]
+        else:
+            exap0 = self.arrs['ex'][strand][s0:e0]
         if usefilled:
         # if hasattr(self, 'filled'): # for LocalEstimator
             sjap1 = self.filled[strand][s0:e0]
