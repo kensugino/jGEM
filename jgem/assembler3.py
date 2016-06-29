@@ -1614,10 +1614,13 @@ class LocalAssembler(object):
                 es = ex[(ex['st']>=st)&(ex['ed']<=ed)&(ex['strand'].isin(STRS[strand]))].copy()
                 # es = ex[idx].copy().sort_values(['st','ed']) # <== BUG!: sort after idx messes up relationship
                 idx = es.index.values # _eid's
-                es['tmpeid'] = N.arange(len(es))
-                ne = len(es)
+                es2 = es.groupby(['st','ed']).first().reset_index().sort_values(['st','ed']) 
+                # there could be duplicates (e.g. unstranded in '.+' and '.-')
+                # current scipy NNLS assigns the value to the 1st one and set the 2nd one zero
+                es2['tmpeid'] = N.arange(len(es2))
+                ne = len(es2)
                 if ne>1:
-                    ci = UT.chopintervals(es, idcol='tmpeid', sort=False)
+                    ci = UT.chopintervals(es2, idcol='tmpeid', sort=False)
                     ci['cov'] = [cov(s,e) for s,e in ci[['st','ed']].values]
                     ci['name1'] = ci['name'].astype(str).apply(lambda x: [int(y) for y in x.split(',')])    
                     nc = len(ci)
@@ -1626,7 +1629,9 @@ class LocalAssembler(object):
                         N.put(mat[i], N.array(n1), 1)
                     try:
                         ecov,err = nnls(mat, ci['cov'].values)
-                        ex.loc[idx,'ecov'] = ecov
+                        es2['ecov'] = ecov
+                        sted2ecov = dict([((x,y),z) for x,y,z in es2[['st','ed','ecov']].values])
+                        ex.loc[idx,'ecov'] = [sted2ecov[(x,y)] for x,y in ex[idx][['st','ed']].values]
                     except:
                         LOG.warning('!!!!!! Exception in NNLS (calculate_ecov) @{0}:{1}-{2}, setting to mean !!!!!!!!!'.format(self.chrom, st, ed))
                         ex.loc[idx,'ecov'] = cov(st,ed)
@@ -2135,6 +2140,73 @@ class LocalAssembler(object):
         ax.set_frame_on(False)
         return ax
 
+    def draw_exons(self, df, st, ed, strand, covfld='ecov', logcov=True, 
+        win=500, ax=None, delta=500, maxdisp=None, tmax=None):
+        if ax is None:
+            fig,ax = P.subplots(1,1,figsize=(15,3))
+        st0 = st-win
+        ed0 = ed+win
+        idx = (((df['st']>=st0)&(df['st']<=ed0))|\
+              ((df['ed']>=st0)&(df['ed']<=ed0)))&\
+              (df['strand'].isin(STRS[strand]))&(df['chr']==self.chrom)
+        if maxdisp is not None:            
+            df = df[idx].sort_values(covfld,ascending=False).iloc[:maxdisp].sort_values(['st','ed']).copy()
+        else:
+            df = df[idx].sort_values(['st','ed']).copy()
+        esiz = 100
+        h = 2
+        cnt = 0
+        cted = 0
+        minypos = 0
+        lss = {'+':'-','-':'-','.+':'--','.-':'--','.':'--'}
+        cbs = Colors('gray_r',1.,0.)
+        cls = {'+':Colors('R',1.,0.),'-':Colors('B',1.,0.),
+               '.+':Colors('gray_r',1.,0.),'.-':Colors('gray_r',1.,0.),
+               '.':Colors('gray_r',1.,0.)}
+        if covfld not in df.columns:
+            df[covfld] = 1.
+        if logcov:
+            df['ltcov'] = N.log2(df[covfld]+2)
+        else:
+            df['ltcov'] = df[covfld]
+        if tmax is None:
+            if logcov:
+                ltmax = N.log2(df[covfld].max()+2)
+            else:
+                ltmax = df[covfld].max()
+        else:
+            if logcov:
+                ltmax = N.log2(tmax+2)
+            else:
+                ltmax = tmax
+        df['tcovn'] = df['ltcov']/ltmax #df['ltcov'].max()
+        for pc, tst, ted, s, tcov in df[['name','st','ed','strand','tcovn']].values:
+            if cted+delta>tst:
+                cnt +=1
+            else:
+                cnt = 0
+            cted = max(ted, cted)
+            ymid = -cnt*(h+1)
+            minypos = min(ymid, minypos)
+            #cb = cbs.to_rgba(tcov)
+            cb = cls[s].to_rgba(tcov)
+            ls = lss[s]
+            cargs = dict(facecolor=cb, edgecolor=cb)
+            x0 = max(tst-st0,0)
+            x1 = min(ted-st0,ed0-st0)
+            #cl = cls[s].to_rgba(tcov)
+            #ax.plot([x0,x1],[ymid,ymid],ls=ls, color=cl)
+            yrange = (ymid-h/2., h)
+            xranges = [(tst-st0,ted-tst)]
+            bbhc = BrokenBarHCollection(xranges, yrange, **cargs)
+            ax.add_collection(bbhc)
+        ax.set_ylim(minypos-5, 5)
+        ax.set_xlim(0,ed0-st0)
+        ax.set_yticks([])
+        ax.set_xticks([])
+        ax.set_frame_on(False)
+        return ax
+              
     def drawspan2(self,st,ed,strand,df2, win=500, figsize=(15,6),  delta=500, df2cov='sc2', maxdisp=None,logcov=True):
         fig, axr = P.subplots(2,1,figsize=figsize,sharex=True)
         P.subplots_adjust(hspace=0)
