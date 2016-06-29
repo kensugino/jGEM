@@ -591,7 +591,7 @@ def sjfiltered2bw(bwpre, genome, np=12):
 
 class LocalEstimator(A3.LocalAssembler):
 
-    def __init__(self, modelpre, bwpre, chrom, st, ed, dstpre, tcovth, usegeom=True):
+    def __init__(self, modelpre, bwpre, chrom, st, ed, dstpre, tcovth, usegeom=False):
         self.modelpre = modelpre
         self.tcovth = tcovth
         self.usegeom = usegeom
@@ -1006,7 +1006,7 @@ def estimatecovs(modelpre, bwpre, dstpre, genome, tcovth=1, usegeom=True, np=6):
 
 class CovEstimator(object):
     
-    def __init__(self, modelpre, bwpre, dstpre, genome, tcovth=1, usegeom=True, np=6):
+    def __init__(self, modelpre, bwpre, dstpre, genome, tcovth=1, usegeom=False, np=6):
         self.modelpre = modelpre
         self.bwpre = bwpre
         self.dstpre = dstpre
