@@ -724,7 +724,7 @@ class EvalMatch(object):
             fig.suptitle('{1}/{0}'.format(p1c,p2c))
         return axr
 
-    def plot_ratio(self,axr=None,plotxlabel=True,label='',disp='both', ylim=(0.01,1000), alpha=0.1):
+    def plot_ratio(self,axr=None,plotxlabel=True,label='',disp='both', ylim=(0.01,1000), alpha=0.1, ms=1):
         """Plot length ratios of best matching exons """
         st = self.stats
         p1c = st['code1'] # gen4
@@ -745,9 +745,9 @@ class EvalMatch(object):
             y = xy['y'].values
             if disp!='pdf':
                 if w=='s':
-                    ax.plot(x,y,'.',ms=5, alpha=max(1,3*alpha))
+                    ax.plot(x,y,'.',ms=max(3,ms*3), alpha=max(1,3*alpha))
                 else:
-                    ax.plot(x,y,'.',ms=3, alpha=alpha)
+                    ax.plot(x,y,'.',ms=ms, alpha=alpha)
             #ax.plot(maxx,avgy,'ro-',ms=3,alpha=0.3)
             ax.set_yscale('log')
             ax.set_ylim(ylim)
