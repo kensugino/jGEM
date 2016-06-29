@@ -1961,7 +1961,9 @@ class LocalAssembler(object):
             ec = N.log2(exap0+1)
             ipx1,ec1 = compress2(x0, ec, resolution, minbins)
             ax.fill_between(ipx1, 0, ec1, facecolor='m', alpha=0.3)
-            h0 = N.ceil(N.max(y0)*1.1)
+            h0a = N.ceil(N.max(y0)*1.1)
+            h0b = N.ceil(N.max(ec)*1.1)
+            h0 = max(h0a,h0b)
         else:
             y0 = sjap1
             ax.plot(y0, 'r-', alpha=0.8)
@@ -1970,7 +1972,10 @@ class LocalAssembler(object):
             ec = exap0
             ipx1,ec1 = compress2(x0, ec, resolution, minbins)
             ax.fill_between(ipx1, 0, ec1, facecolor='m', alpha=0.3)
-            h0 = N.ceil(N.max(y0)*1.1)
+            h0a = N.ceil(N.max(y0)*1.1)
+            h0b = N.ceil(N.max(ec)*1.1)
+            h0 = max(h0a,h0b)
+
         self._h0 = h0
         self._hu = hu = h0/20
         # gspan
