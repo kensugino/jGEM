@@ -1755,7 +1755,7 @@ class LocalAssembler(object):
                 onames = set([y for x in df1b['name'] for y in x.split(',')[1:-1]])
                 for rec in df0b.values:
                     jc = rec[npos].split(',')[1]
-                    jcr = reversepathcode(rc)
+                    jcr = reversepathcode(jc)
                     if (jc not in ustnames) or (jcr not in onames):
                         yield rec
         df0n = PD.DataFrame([x for x in _gen_df0n()], columns=cols)
