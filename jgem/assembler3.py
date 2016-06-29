@@ -1630,8 +1630,8 @@ class LocalAssembler(object):
                     try:
                         ecov,err = nnls(mat, ci['cov'].values)
                         es2['ecov'] = ecov
-                        sted2ecov = dict([((x,y),z) for x,y,z in es2[['st','ed','ecov']].values])
-                        ex.loc[idx,'ecov'] = [sted2ecov[(x,y)] for x,y in ex[idx][['st','ed']].values]
+                        sted2ecov = dict([((int(x),int(y)),z) for x,y,z in es2[['st','ed','ecov']].values])
+                        ex.loc[idx,'ecov'] = [sted2ecov[(int(x),int(y))] for x,y in ex.loc[idx][['st','ed']].values]
                     except:
                         LOG.warning('!!!!!! Exception in NNLS (calculate_ecov) @{0}:{1}-{2}, setting to mean !!!!!!!!!'.format(self.chrom, st, ed))
                         ex.loc[idx,'ecov'] = cov(st,ed)
@@ -1732,15 +1732,42 @@ class LocalAssembler(object):
             pathsdf['tst'] = pathsdf['tst'].astype(int)
             pathsdf['ted'] = pathsdf['ted'].astype(int)            
             assert(all(pathsdf['tst']<pathsdf['ted']))
+            self.paths = self.filter_unstranded(pathsdf)
             self.paths = self.filter_ji3e(pathsdf)
         else:
             self.sjdf2 = None
             self.exdf2 = None
             self.paths = []
 
+    def filter_unstranded(self, df):
+        # remove 2 exon paths from unstranded junction which is used in a >2 exon path in the other strand
+        if '#j' not in df:
+            df['#j'] = [x.count('|') for x in df['name']]
+        df0 = df[df['#j']==1] # 2 exon paths
+        df1 = df[df['#j']!=1] # others
+        cols = list(df0.columns)
+        npos = cols.index('name') # pos of 'name' column
+        ustnames = set(self.sjdf[self.sjdf['strand'].isin(['.+','.-'])]['name'].values)
+        def _gen_df0n():
+            for s0,s1 in [('+','-'),('-','+')]:
+                df0b = df0[df0['strand'].isin(STRS[s0])]
+                df1b = df1[df1['strand'].isin(STRS[s1])]
+                onames = set([y for x in df1b['name'] for y in x.split(',')[1:-1]])
+                for rec in df0b.values:
+                    jc = rec[npos].split(',')[1]
+                    jcr = reversepathcode(rc)
+                    if (jc not in ustnames) or (jcr not in onames):
+                        yield rec
+        df0n = PD.DataFrame([x for x in _gen_df0n()], columns=cols)
+        dfn = PD.concat([df1, df0n], ignore_index=True)
+        dfn.sort_values(['chr','st','ed'], inplace=True)
+        return dfn
+
+
     def filter_ji3e(self, df): 
         # remove 2 exon paths whose junction is included in a 3'exon
-        df['#j'] = [x.count('|') for x in df['name']]
+        if '#j' not in df:
+            df['#j'] = [x.count('|') for x in df['name']]
         df0 = df[df['#j']==1] # 2 exon paths
         df1 = df[df['#j']!=1] # others
         cols = list(df0.columns)
@@ -1748,8 +1775,8 @@ class LocalAssembler(object):
         def _gen_df0n():
             ex3 = self.exdf[self.exdf['kind']=='3']
             for s0,s1 in [('+','-'),('-','+')]:
-                df0b = df0[df0['strand']==s0]
-                ex3b = ex3[ex3['strand']==s1]
+                df0b = df0[df0['strand'].isin(STRS[s0])]
+                ex3b = ex3[ex3['strand'].isin(STRS[s1])]
                 for rec in df0b.values:
                     n = rec[npos]
                     jst,jed = [int(x) for x in n.split(',')[1].split('|')] # junction st,ed
@@ -2640,7 +2667,11 @@ class PathGenerator53(object):
             return None
         pathsdf = PD.DataFrame(recs, columns=['name','st','ed','tcov'])
         # paths: st,ed,name,tcov
-        pathsdf['strand'] = self.strand
+        name2strand = UT.df2dict(self.sjdf, 'name', 'strand')
+        def _strand(name):
+            jids = name.split(',')[1:-1]
+            return Counter([name2strand.get(x,self.strand) for x in jids]).most_common()[0][0]
+        pathsdf['strand'] = [_strand(x) for x in pathsdf['name']] #self.strand
         for f in ['chr','tst','ted','tcov0','tcov0a','tcov0b','tcov0c']:
             pathsdf[f] = self.e5[f]
         return pathsdf[PATHCOLS]
