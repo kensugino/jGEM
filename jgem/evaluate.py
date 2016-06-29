@@ -744,7 +744,10 @@ class EvalMatch(object):
             x = xy['x'].values
             y = xy['y'].values
             if disp!='pdf':
-                ax.plot(x,y,'.',ms=3, alpha=alpha)
+                if w=='s':
+                    ax.plot(x,y,'.',ms=5, alpha=max(1,3*alpha))
+                else:
+                    ax.plot(x,y,'.',ms=3, alpha=alpha)
             #ax.plot(maxx,avgy,'ro-',ms=3,alpha=0.3)
             ax.set_yscale('log')
             ax.set_ylim(ylim)
