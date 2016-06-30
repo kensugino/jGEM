@@ -358,7 +358,7 @@ class SlopeEdgeFinder(object):
         l1 = len(eds1)
         if l1>0:
             x0 = eds1[0]
-            eds0 = [x for x in eds if x<x0] # only take before the rise
+            eds0 = [x for x in eds0 if x<x0] # only take before the rise
             l0 = len(eds0)
         else:
             eds1 = self.detect_low_level(v)
