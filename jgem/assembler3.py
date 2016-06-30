@@ -1887,7 +1887,9 @@ class LocalAssembler(object):
                 sjp2[f] = sjp2['sc1']
             dpos2apos = UT.df2dict(spanexdf[spanexdf['kind']=='5'],'dpos','apos')
             apos2dpos = UT.df2dict(spanexdf[spanexdf['kind']=='3'],'apos','dpos')
-            def _fix53(df): # fix 5'3'exon. st,ed,name
+            def _fix53(df, tst, ted): # fix 5'3'exon. st,ed,name
+                idx = (sjp2['tst']>=tst)&(sjp2['ted']<=ted)
+                df = df[idx].copy()
                 if strand in ['+','.+']:
                     df['st'] = [dpos2apos[x] for x in df['tst']]
                     df['ed'] = [apos2dpos[x] for x in df['ted']]
@@ -1906,8 +1908,8 @@ class LocalAssembler(object):
                 # preselect path
                 tst = gexdf['tst'].min()
                 ted = gexdf['ted'].max()
-                preselected = _fix53(sjp2[(sjp2['tst']>=tst)&(sjp2['ted']<=ted)])
-                print(preselected)
+                preselected = _fix53(sjp2, tst, ted)
+                self._preselected = preselected
                 LOG.info('presected:{0}'.format(len(preselected)))
             else:
                 preselected = []
