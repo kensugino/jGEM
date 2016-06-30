@@ -1882,6 +1882,17 @@ class LocalAssembler(object):
             idx = (sjp1['#j']>1)&(sjp1['sc1']>self.params['sjpath_53th'])&\
                   (sjp2['strand'].isin(STRS[strand]))
             sjp2 = sjp1[idx]
+            dpos2apos = UT.df2dict(spanexdf[spanexdf['kind']=='5'],'dpos','apos')
+            apos2dpos = UT.df2dict(spanexdf[spanexdf['kind']=='3'],'apos','dpos')
+            def _fix53(df): # fix 5'3'exon. st,ed,name
+                if strand=='+':
+                    df['st'] = [dpos2apos[x] for x in df['tst']]
+                    df['ed'] = [apos2dpos[x] for x in df['ted']]
+                    df['name'] = [','.join([s]+n.split(',')[1:-1]+[e]) for s,n,e in df[['st','name','ed']].values]
+                else:
+                    df['ed'] = [dpos2apos[x] for x in df['ted']]
+                    df['st'] = [apos2dpos[x] for x in df['tst']]
+                    df['name'] = [','.join([e]+n.split(',')[1:-1]+[s]) for s,n,e in df[['st','name','ed']].values]
         for gid in spanexdf['gid'].unique():
             gexdf = spanexdf[spanexdf['gid']==gid]
             gsjdf = spansjdf[spansjdf['gid']==gid]
@@ -1889,7 +1900,8 @@ class LocalAssembler(object):
                 # preselect path
                 tst = gexdf['tst'].min()
                 ted = gexdf['ted'].max()
-                preselected = sjp2[(sjp2['tst']>=tst)&(sjp2['ted']<=ted)]
+                preselected = _fix53(sjp2[(sjp2['tst']>=tst)&(sjp2['ted']<=ted)])
+
             else:
                 preselected = []
             self._pg = pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, sjpaths, preselected,
