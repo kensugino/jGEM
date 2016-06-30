@@ -2303,7 +2303,7 @@ class LocalAssembler(object):
         ax.set_frame_on(False)
         return ax
 
-    def draw_exons(self, df, st, ed, strand, covfld='ecov', logcov=True, 
+    def draw_exons(self, df, st, ed, strand, covfld='ecov', logcov=True, color='gray_r',
         win=500, ax=None, delta=500, maxdisp=None, tmax=None, stagger=True):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=(15,3))
@@ -2352,14 +2352,11 @@ class LocalAssembler(object):
         ctst = ed0-st0
         minypos = 0
         lss = {'+':'-','-':'-','.+':'--','.-':'--','.':'--'}
-        cbs = Colors('gray_r',1.,0.)
-        cls = {'+':Colors('R',1.,0.),'-':Colors('B',1.,0.),
-               '.+':Colors('gray_r',1.,0.),'.-':Colors('gray_r',1.,0.),
-               '.':Colors('gray_r',1.,0.)}
+        cbs = Colors(color,1.,0.)
         def _add2collection(cnt, pc, tst, ted, s, tcov):
             ymid = -cnt*(h+1)
             #cb = cbs.to_rgba(tcov)
-            cb = cls[s].to_rgba(tcov)
+            cb = cbs[s].to_rgba(tcov)
             ls = lss[s]
             cargs = dict(facecolor=cb, edgecolor=cb, linewidth=0)
             x0 = max(tst-st0,0)
