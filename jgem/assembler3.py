@@ -2303,7 +2303,7 @@ class LocalAssembler(object):
         ax.set_frame_on(False)
         return ax
 
-    def draw_exons(self, df, st, ed, strand, covfld='ecov', logcov=True, color='gray_r',
+    def draw_exons(self, df, st, ed, strand, covfld='ecov', logcov=True, color='gray_r', alpha=1,
         win=500, ax=None, delta=500, maxdisp=None, tmax=None, stagger=True):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=(15,3))
@@ -2357,7 +2357,7 @@ class LocalAssembler(object):
             ymid = -cnt*(h+1)
             cb = cbs.to_rgba(tcov)
             ls = lss[s]
-            cargs = dict(facecolor=cb, edgecolor=cb, linewidth=0)
+            cargs = dict(facecolor=cb, edgecolor=cb, linewidth=0, alpha=alpha)
             x0 = max(tst-st0,0)
             x1 = min(ted-st0,ed0-st0)
             #cl = cls[s].to_rgba(tcov)
