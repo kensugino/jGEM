@@ -1889,12 +1889,12 @@ class LocalAssembler(object):
                 idx = (df['tst']>=tst)&(df['ted']<=ted)
                 df = df[idx].copy()
                 if strand in ['+','.+']:
-                    df['st'] = [dpos2apos[x] for x in df['tst']]
-                    df['ed'] = [apos2dpos[x] for x in df['ted']]
+                    df['st'] = [dpos2apos[int(x)] for x in df['tst']]
+                    df['ed'] = [apos2dpos[int(x)] for x in df['ted']]
                     df['name'] = ['{0},{1},{2}'.format(s,n,e) for s,n,e in df[['st','name','ed']].values]
                 else:
-                    df['ed'] = [dpos2apos[x] for x in df['ted']]
-                    df['st'] = [apos2dpos[x] for x in df['tst']]
+                    df['ed'] = [dpos2apos[int(x)] for x in df['ted']]
+                    df['st'] = [apos2dpos[int(x)] for x in df['tst']]
                     df['name'] = ['{2},{1},{0}'.format(s,n,e) for s,n,e in df[['st','name','ed']].values]
                 if len(df)>0:
                     self._preselected = df
