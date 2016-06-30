@@ -2179,7 +2179,7 @@ class LocalAssembler(object):
         return ax
         
     def draw_path(self, pathdf, st, ed, strand, covfld='tcov',logcov=True,
-        win=500, ax=None, delta=500, maxdisp=None, tmax=None, stagger=True):
+        win=500, ax=None, delta=500, maxdisp=None, tmax=None, stagger=True, edgezero=False):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=(15,3))
         st0 = st-win
@@ -2265,6 +2265,9 @@ class LocalAssembler(object):
             else:
                 exons = [[int(x) for x in y.split(',')] for y in tmppc.split('|')]
                 exons = [x[::-1] for x in exons[::-1]]
+            if edgezero:
+                exons[0] = [exons[0][1]-1, exons[0][1]]
+                exons[-1] = [exons[-1], exons[-1]+1]
             xranges = [(x-st0,y-x) for x,y in exons if ((x<ed0)&(y>st0))]
             bbhc = BrokenBarHCollection(xranges, yrange, **cargs)
             ax.add_collection(bbhc)
