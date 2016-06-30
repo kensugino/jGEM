@@ -2667,11 +2667,13 @@ class PathGenerator53(object):
             return None
         pathsdf = PD.DataFrame(recs, columns=['name','st','ed','tcov'])
         # paths: st,ed,name,tcov
-        name2strand = UT.df2dict(self.sjdf, 'name', 'strand')
-        def _strand(name):
-            jids = name.split(',')[1:-1]
-            return Counter([name2strand.get(x,self.strand) for x in jids]).most_common()[0][0]
-        pathsdf['strand'] = [_strand(x) for x in pathsdf['name']] #self.strand
+        # name2strand = UT.df2dict(self.sjdf, 'name', 'strand')
+        # def _strand(name):
+        #     jids = name.split(',')[1:-1]
+        #     return Counter([name2strand.get(x,self.strand) for x in jids]).most_common()[0][0]
+        # pathsdf['strand'] = [_strand(x) for x in pathsdf['name']] #self.strand
+        pathsdf['strand'] = self.e5['strand']
+        # pathsdf['strand'] = self.strand
         for f in ['chr','tst','ted','tcov0','tcov0a','tcov0b','tcov0c']:
             pathsdf[f] = self.e5[f]
         return pathsdf[PATHCOLS]
