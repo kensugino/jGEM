@@ -888,7 +888,7 @@ LAPARAMS = dict(
      use_sja_for_exon_detection=False,
      use_merged_sjdf=False,
      sjpath_53th=1000,
-     preselect_th=5000,
+     preselect_th=2000,
      use_sjdf_for_check=False,
      use_iexon_from_path=True,
      cmax=9,
@@ -905,8 +905,6 @@ MERGEPARAMS.update(dict(
      use_merged_sjdf=True,
      use_sjdf_for_check=True,
      use_iexon_from_path=False,
-     sjpath_53th=1000,
-     preselect_th=5000,
      cmax=18,
 ))
 
