@@ -2163,9 +2163,10 @@ class LocalAssembler(object):
 
         ax.set_xlim(0,e0-s0)
         if onlycov:
-            ax.set_ylim(-2,h0+hu)
+            ax.set_ylim(0,h0+hu)
         else:
-            ax.set_ylim(-2,h0+12*hu)
+            ax.set_ylim(0,h0+12*hu)
+        ax.locator_params(nbins=4)
         # ax.set_yticks([0,5,9])
         ax.set_xticks([])
         txt = '{0}:{1}-{2}:{3}'.format(self.chrom, st-win, ed+win, strand)
