@@ -1881,7 +1881,9 @@ class LocalAssembler(object):
                 sjp1['#j'] = [x.count('|') for x in sjp1['name']]
             idx = (sjp1['#j']>1)&(sjp1['sc1']>self.params['sjpath_53th'])&\
                   (sjp1['strand'].isin(STRS[strand]))
-            sjp2 = sjp1[idx]
+            sjp2 = sjp1[idx].copy()
+            for f in ['tcov','tcov0','tcov0a','tcov0b','tcov0c']:
+                sjp2[f] = sjp2['sc1']
             dpos2apos = UT.df2dict(spanexdf[spanexdf['kind']=='5'],'dpos','apos')
             apos2dpos = UT.df2dict(spanexdf[spanexdf['kind']=='3'],'apos','dpos')
             def _fix53(df): # fix 5'3'exon. st,ed,name
