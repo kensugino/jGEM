@@ -2187,9 +2187,9 @@ class LocalAssembler(object):
         dfp['1/cov'] = 1/dfp[covfld]
         dfn['1/cov'] = 1/dfn[covfld]
         dfp.sort_values(['tst','ted','1/cov'],inplace=True, ascending=True)
-        dfn.sort_values(['ted','tst','cov'],inplace=True, ascending=False)
+        dfn.sort_values(['ted','tst',covfld],inplace=True, ascending=False)
         df = PD.concat([dfp,dfn],ignore_index=True)
-        
+
         esiz = 100
         h = 2
         cnt = 0
