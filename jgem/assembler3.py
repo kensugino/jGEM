@@ -439,15 +439,20 @@ class SlopeEdgeFinder(object):
         # only detect rise in right side
         ma = N.max(v)
         mima = N.min(v)/ma
+        print('mima', mima)
         if mima<self.mimath:
+            print('mimath')
             th1 = ma*self.mimath
             th2 = th1*self.triggerth
         elif mima<self.mimath2:
+            print('mimath2')
             th1 = ma*self.mimath2
             # th2 = th1+(ma*self.mimath)
             th2 = th1*self.triggerth
         else:
+            print('mima out of range')
             return []
+        print('th1,th2=',th1,th2)
         idx = N.nonzero(v<th1)
         if len(idx[0])==0:
             return []
@@ -480,10 +485,10 @@ class SlopeEdgeFinder(object):
             th2 = th1+(ma*self.mimath)
         else:
             return []
-        idx = N.nonzero(v>=th1)
+        idx = N.nonzero(v>=th1)# <=== different from detect_rise
         if len(idx)==0:
             return []
-        ist = idx[0][0] # <=== different from detect_rise
+        ist = idx[0][0] 
         mis = self.minintsize
         if (ist<mis) or (len(v)-ist<mis):
             return []
