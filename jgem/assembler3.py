@@ -1949,8 +1949,8 @@ class LocalAssembler(object):
             # e0 = max(0, e-o-1)
             return max(0, sja[e-o-1]-sja[e-o])
 
-        # self._pg = pg = spanexs.groupby('id53').first().sort_values(['tst','ted'])[['chr','tst','ted']]
-        self._pg = pg = spanexs.groupby(['tst','ted']).first().reset_index().sort_values(['tst','ted'])[['chr','tst','ted']]
+        self._pg = pg = spanexs.groupby('id53').first().sort_values(['tst','ted'])[['chr','tst','ted']]
+        # self._pg = pg = spanexs.groupby(['tst','ted']).first().reset_index().sort_values(['tst','ted'])[['chr','tst','ted']]
         ne = len(pg)
         if ne>1:
             pg.rename(columns={'tst':'st','ted':'ed'}, inplace=True)
