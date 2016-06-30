@@ -2480,7 +2480,7 @@ class PathGenerator(object):
                     raised = True
             if len(l)>0:
                 paths = PD.concat(l, ignore_index=True)
-                paths.sort_values('tcov', ascending=False)
+                paths.sort_values('tcov', ascending=False, inplace=True)
                 for rec in paths.values:
                     yield rec
             # else: # speed up?
