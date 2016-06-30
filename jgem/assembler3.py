@@ -2304,7 +2304,7 @@ class LocalAssembler(object):
         return ax
 
     def draw_exons(self, df, st, ed, strand, covfld='ecov', logcov=True, color='gray_r', alpha=1,
-        win=500, ax=None, delta=500, maxdisp=None, tmax=None, stagger=True):
+        win=500, ax=None, delta=500, maxdisp=None, tmax=None, stagger=True, ypos=0):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=(15,3))
         st0 = st-win
@@ -2347,7 +2347,7 @@ class LocalAssembler(object):
 
         esiz = 100
         h = 2
-        cnt = 0
+        cnt = ypos
         cted = 0
         ctst = ed0-st0
         minypos = 0
@@ -2377,7 +2377,7 @@ class LocalAssembler(object):
                 cted = max(ted, cted)
             minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
         if (not stagger) and len(dfp)>0:
-            cnt =1
+            cnt = ypos + 1
         for pc, tst, ted, s, tcov in dfn[['name','st','ed','strand','tcovn']].values:
             if stagger:
                 if ctst-delta<ted:
