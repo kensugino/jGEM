@@ -2290,26 +2290,31 @@ class LocalAssembler(object):
         self.draw_path(df2, st,ed,'-', ax=axr[3], covfld=df2cov, win=win, delta=delta, maxdisp=maxdisp)
 
     def drawspan3(self,st,ed,strand,df2,df3,win=500, figsize=(15,9), delta=500, 
-        df2cov='sc2', df3cov='tcov', maxdisp=None, logcov=True, usefilled=False, useexbw=False):
+        df2cov='sc2', df3cov='tcov', maxdisp=None, logcov=True, usefilled=False, 
+        useexbw=False, resolution=10):
         fig, axr = P.subplots(3,1,figsize=figsize,sharex=True)
         P.subplots_adjust(hspace=0)
-        self.draw_covs(st,ed,strand, ax=axr[0], win=win, logcov=logcov, usefilled=usefilled, useexbw=useexbw)
+        self.draw_covs(st,ed,strand, ax=axr[0], win=win, logcov=logcov, usefilled=usefilled, useexbw=useexbw, 
+            resolution=resolution)
         self.draw_path(df2, st,ed,strand, ax=axr[1], covfld=df2cov, win=win, delta=delta, maxdisp=maxdisp)
         self.draw_path(df3, st,ed,strand, ax=axr[2], win=win, delta=delta, covfld=df3cov, maxdisp=maxdisp)
 
     def drawspan3pn(la,st,ed,win=10000, figsize=(15,6), df2=None, df3=None, delta=500,
-        df2cov='sc2', df3cov='tcov', maxdisp=None, logcov=True, usefilled=False, useexbw=False):
+        df2cov='sc2', df3cov='tcov', maxdisp=None, logcov=True, usefilled=False, 
+        useexbw=False,resolution=10):
         o = la.st
         fig, axr = P.subplots(6,1,figsize=figsize,sharex=True)
         P.subplots_adjust(hspace=0)
         strand = '+'
-        la.draw_covs(st,ed,strand, ax=axr[0], win=win, logcov=logcov, usefilled=usefilled, useexbw=useexbw)
+        la.draw_covs(st,ed,strand, ax=axr[0], win=win, logcov=logcov, usefilled=usefilled, useexbw=useexbw,
+            resolution=resolution)
         if df2 is not None:
             la.draw_path(df2, st,ed,strand, ax=axr[1], covfld=df2cov, win=win, delta=delta, maxdisp=maxdisp)
         if df3 is not None:
             la.draw_path(df3, st,ed,strand, ax=axr[2], win=win, delta=delta, covfld=df3cov, maxdisp=maxdisp)
         strand = '-'
-        la.draw_covs(st,ed,strand, ax=axr[3], win=win, logcov=logcov, usefilled=usefilled, useexbw=useexbw)
+        la.draw_covs(st,ed,strand, ax=axr[3], win=win, logcov=logcov, usefilled=usefilled, useexbw=useexbw,
+            resolution=resolution)
         if df2 is not None:
             la.draw_path(df2, st,ed,strand, ax=axr[4], covfld=df2cov, win=win, delta=delta, maxdisp=maxdisp)
         if df3 is not None:
