@@ -608,7 +608,8 @@ class SlopeEdgeFinder(object):
             ax.set_xlim(xlim)
 
         for i,x1 in enumerate(eposs):
-            x1 = abs(x1)
+            if direction=='<':
+                x1 = len(exa)+x1
             ax.plot([x1,x1],ylim,'r--')
             ax.text(x1+1,ylim[1]*0.9,'{0}'.format(i))
 
@@ -1523,6 +1524,7 @@ class LocalAssembler(object):
                 st0 = int(st-o-pos0)
                 ed0 = int(ed-o-pos0)
                 exa1[st0:ed0] = exa1[st0:ed0]-(sja1[st0]-sja1[st0+1]) # st0-1 but array itself is offset by 1
+                exa1[exa1<0]=0
             return sja1[1:], exa1 # same length
         # direction >
         # find exons between pos=>pos0, subtract sja corresponding to further
@@ -1534,6 +1536,7 @@ class LocalAssembler(object):
             st0 = int(st-o-pos+1)
             ed0 = int(ed-o-pos+1)
             exa1[st0:ed0] = exa1[st0:ed0]-(sja1[ed0+1]-sja1[ed0])
+            exa1[exa1<0]=0
         return sja1[:len(exa1)], exa1 # same length
 
     def find_53edges(self):
@@ -1548,6 +1551,7 @@ class LocalAssembler(object):
         c2 = cols+['apos','dpos']
         chrom = self.chrom
         o = self.st
+        exdf = self.exdf
         def _gen():
             for strand in ['+','-']:
                 sja = self.arrs['sj'][strand]
@@ -1558,7 +1562,7 @@ class LocalAssembler(object):
                     for pos1 in exs[POS[strand][kind]].values:
                         pos = pos1-o
                         pos0 = self._find_pos0(pos, strand, direction)
-                        sja1, exa1 = self._subtract_exons(pos, pos0, sja, exa, exs, direction)
+                        sja1, exa1 = self._subtract_exons(pos, pos0, sja, exa, exdf, direction)
                         eposs = EF[kind].find(sja1,exa1,direction)
                         if len(eposs)==0:
                             LOG.warning('no edge found {0}:{1}:{2}:{3}'.format(chrom,pos1,strand,kind))
@@ -1598,6 +1602,7 @@ class LocalAssembler(object):
         e53df = e53df[(e53df['strand'].isin(STRS[strand]))&(e53df['st']>=st)&(e53df['ed']<=ed)]
         sja = self.arrs['sj'][strand]
         exa = self.arrs['ex'][strand]
+        exdf = self.exdf
         self.draw_covs(st,ed,strand,win=0,ax=ax)
         y = self._h0
         for kind in ['5','3']: 
@@ -1606,7 +1611,7 @@ class LocalAssembler(object):
             for pos1 in exs[POS[strand][kind]].values:
                 pos = pos1-o
                 pos0 = self._find_pos0(pos, strand, direction)
-                sja1, exa1 = self._subtract_exons(pos, pos0, sja, exa, exs, direction)
+                sja1, exa1 = self._subtract_exons(pos, pos0, sja, exa, exdf, direction)
                 print('#### pos1:{0}, pos0:{1}, kind:{2}'.format(pos1, pos0, kind))
                 eposs = EF[kind].find(sja1,exa1,direction, verbose=True)
                 for epos in eposs:
