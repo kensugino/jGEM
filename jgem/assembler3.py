@@ -1878,7 +1878,7 @@ class LocalAssembler(object):
         sjp1 = self.sjpaths1
         if self.params['use_merged_sjdf']:
             if '#j' not in sjp1:
-                sjp1['#j'] = [[x.count('|') for x in sjp1['name']]
+                sjp1['#j'] = [x.count('|') for x in sjp1['name']]
             idx = (sjp1['#j']>1)&(sjp1['sc1']>self.params['sjpath_53th'])&\
                   (sjp2['strand'].isin(STRS[strand]))
             sjp2 = sjp1[idx]
