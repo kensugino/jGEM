@@ -2278,13 +2278,13 @@ class LocalAssembler(object):
         idx = (((df['st']>=st0)&(df['st']<=ed0))|\
               ((df['ed']>=st0)&(df['ed']<=ed0)))&\
               (df['strand'].isin(STRS[strand]))&(df['chr']==self.chrom)
-        pathdf = pathdf[idx]
+        df = df[idx]
         if maxdisp is not None:            
-            pathdf = pathdf.sort_values(covfld,ascending=False).iloc[:maxdisp]
-        idxp = pathdf['strand'].isin(['+','.+'])
-        dfp = pathdf[idxp].copy()
-        dfn = pathdf[~idxp].copy()
-        if covfld not in pathdf:
+            df = df.sort_values(covfld,ascending=False).iloc[:maxdisp]
+        idxp = df['strand'].isin(['+','.+'])
+        dfp = df[idxp].copy()
+        dfn = df[~idxp].copy()
+        if covfld not in df:
             dfp[covfld] = 1.
             dfn[covfld] = 1.
         dfp['1/cov'] = 1/dfp[covfld]
