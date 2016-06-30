@@ -608,6 +608,7 @@ class SlopeEdgeFinder(object):
             ax.set_xlim(xlim)
 
         for i,x1 in enumerate(eposs):
+            x1 = abs(x1)
             ax.plot([x1,x1],ylim,'r--')
             ax.text(x1+1,ylim[1]*0.9,'{0}'.format(i))
 
