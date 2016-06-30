@@ -1875,10 +1875,24 @@ class LocalAssembler(object):
             sjpaths = self.sjdf
         else:
             sjpaths = self.sjpaths1
+        sjp1 = self.sjpaths1
+        if self.params['use_merged_sjdf']:
+            if '#j' not in sjp1:
+                sjp1['#j'] = [[x.count('|') for x in sjp1['name']]
+            idx = (sjp1['#j']>1)&(sjp1['sc1']>self.params['sjpath_53th'])&\
+                  (sjp2['strand'].isin(STRS[strand]))
+            sjp2 = sjp1[idx]
         for gid in spanexdf['gid'].unique():
             gexdf = spanexdf[spanexdf['gid']==gid]
             gsjdf = spansjdf[spansjdf['gid']==gid]
-            self._pg = pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, sjpaths, 
+            if self.params['use_merged_sjdf']:
+                # preselect path
+                tst = gexdf['tst'].min()
+                ted = gexdf['ted'].max()
+                preselected = sjp2[(sjp2['tst']>=tst)&(sjp2['ted']<=ted)]
+            else:
+                preselected = []
+            self._pg = pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, sjpaths, preselected,
                 self.params['upperpathnum'], self.params['maxraisecnt'], 
                 self.params['minvmimadiff'], self.params['trimth'], self.params['raisecntth'])
             paths.append(pg.select_paths(self.params['tcovth'], self.params['tcovfactor']))
@@ -2411,9 +2425,10 @@ def compress2(x0, y0, window, minbins):
 class PathGenerator(object):
     # gene level path generator
 
-    def __init__(self, gg, gsjdf, gexdf, chrom, strand, sjpaths, 
+    def __init__(self, gg, gsjdf, gexdf, chrom, strand, sjpaths, preselected,
         upperpathnum=100, maxraisecnt=10,minvmimadiff=0.5,trimth=150,raisecntth=50):
         self.gg = gg # GeneGraph
+        self.preselected = preselected
         self.gexdf = gexdf # gene exons
         self.gsjdf = gsjdf # gene junctions
         self.gid = gexdf['gid'].values[0]
@@ -2539,7 +2554,8 @@ class PathGenerator(object):
         npos = PATHCOLS.index('name')
         tpos = PATHCOLS.index('tcov')
         ipos = -1 # pgid position
-        paths = []   
+        # paths = []   
+        paths = self.preselected[PATHCOLS].values
         def _select(sjp):
             sjnames = list(sjp['name'].values)
             nsj = len(sjnames)
