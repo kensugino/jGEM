@@ -1887,21 +1887,23 @@ class LocalAssembler(object):
             self._a2d = a2d = UT.df2dict(spanexdf[spanexdf['kind']=='3'],'apos','dpos')
             def _fix53(df, tst, ted): # fix 5'3'exon. st,ed,name
                 idx = (df['tst']>=tst)&(df['ted']<=ted)
-                df = df[idx]
+                df1 = df[idx]
+                if len(df1)==0:
+                    return []
                 if strand in ['+','.+']:
-                    df = df[[(int(x) in d2a)&(int(y) in a2d) for x,y in df[['tst','ted']].values]].copy()
-                    df['st'] = [d2a[int(x)] for x in df['tst']]
-                    df['ed'] = [a2d[int(x)] for x in df['ted']]
-                    df['name'] = ['{0},{1},{2}'.format(s,n,e) for s,n,e in df[['st','name','ed']].values]
+                    df2 = df1[[(int(x) in d2a)&(int(y) in a2d) for x,y in df1[['tst','ted']].values]].copy()
+                    df2['st'] = [d2a[int(x)] for x in df2['tst']]
+                    df2['ed'] = [a2d[int(x)] for x in df2['ted']]
+                    df2['name'] = ['{0},{1},{2}'.format(s,n,e) for s,n,e in df2[['st','name','ed']].values]
                 else:
-                    df = df[[(int(x) in a2d)&(int(y) in d2a) for x,y in df[['tst','ted']].values]].copy()
-                    df['ed'] = [d2a[int(x)] for x in df['ted']]
-                    df['st'] = [a2d[int(x)] for x in df['tst']]
-                    df['name'] = ['{2},{1},{0}'.format(s,n,e) for s,n,e in df[['st','name','ed']].values]
-                if len(df)>0:
-                    self._preselected = df
-                    df.sort_values('sc1',ascending=False, inplace=True)
-                    return df.iloc[:2] # up to two
+                    df2 = df1[[(int(x) in a2d)&(int(y) in d2a) for x,y in df1[['tst','ted']].values]].copy()
+                    df2['ed'] = [d2a[int(x)] for x in df2['ted']]
+                    df2['st'] = [a2d[int(x)] for x in df2['tst']]
+                    df2['name'] = ['{2},{1},{0}'.format(s,n,e) for s,n,e in df2[['st','name','ed']].values]
+                if len(df2)>0:
+                    self._preselected = df2
+                    df2.sort_values('sc1',ascending=False, inplace=True)
+                    return df2.iloc[:2] # up to two
                 return []
         for gid in spanexdf['gid'].unique():
             gexdf = spanexdf[spanexdf['gid']==gid]
