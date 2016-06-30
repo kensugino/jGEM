@@ -2278,7 +2278,7 @@ class LocalAssembler(object):
             minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
 
 
-        ax.set_ylim(minypos0-5, 5)
+        ax.set_ylim(minypos-5, 5)
         ax.set_xlim(0,ed0-st0)
         ax.set_yticks([])
         ax.set_xticks([])
