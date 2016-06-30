@@ -2193,17 +2193,6 @@ class LocalAssembler(object):
         dfp.sort_values(['tst','ted','1/cov'],inplace=True, ascending=True)
         dfn.sort_values(['ted','tst', covfld],inplace=True, ascending=False)
         df = PD.concat([dfp,dfn],ignore_index=True)
-
-        esiz = 100
-        h = 2
-        cnt = 0
-        cted = 0
-        minypos = 0
-        lss = {'+':'-','-':'-','.+':'--','.-':'--','.':'--'}
-        cbs = Colors('gray_r',1.,0.)
-        cls = {'+':Colors('R',1.,0.),'-':Colors('B',1.,0.),
-               '.+':Colors('gray_r',1.,0.),'.-':Colors('gray_r',1.,0.),
-               '.':Colors('gray_r',1.,0.)}
         if logcov:
             df['ltcov'] = N.log2(df[covfld]+2)
         else:
@@ -2219,23 +2208,33 @@ class LocalAssembler(object):
             else:
                 ltmax = tmax
         df['tcovn'] = df['ltcov']/ltmax #df['ltcov'].max()
-        for pc, tst, ted, s, tcov in df[['name','tst','ted','strand','tcovn']].values:
-            if cted+delta>tst:
-                cnt +=1
-            else:
-                cnt = 0
-            cted = max(ted, cted)
+        idxp = df['strand'].isin(['+','.+'])
+        dfp = df[idxp]
+        dfn = df[~idxp]
+
+        esiz = 100
+        h = 2
+        cnt = 0
+        cted = 0
+        ctst = ed0-st0
+        minypos = 0
+        lss = {'+':'-','-':'-','.+':'--','.-':'--','.':'--'}
+        cbs = Colors('gray_r',1.,0.)
+        cls = {'+':Colors('R',1.,0.),'-':Colors('B',1.,0.),
+               '.+':Colors('gray_r',1.,0.),'.-':Colors('gray_r',1.,0.),
+               '.':Colors('gray_r',1.,0.)}
+        def _add2collection(cnt,pc,tst,ted,s,tcov):
             ymid = -cnt*(h+1)
             minypos = min(ymid, minypos)
             cb = cbs.to_rgba(tcov)
             cl = cls[s].to_rgba(tcov)
             ls = lss[s]
             cargs = dict(facecolor=cb, edgecolor=cb)
+            yrange = (ymid-h/2., h)
+            tmp = pc.split(',')
             x0 = max(tst-st0,0)
             x1 = min(ted-st0,ed0-st0)
             ax.plot([x0,x1],[ymid,ymid],ls=ls, color=cl)
-            yrange = (ymid-h/2., h)
-            tmp = pc.split(',')
             if len(tmp[0].split('|'))==2:
                 # pathcode = dpos0|apos1,dpos1|apos2,...dpos(n-1)|aposn
                 tst = int(tmp[0].split('|')[0])
@@ -2262,6 +2261,23 @@ class LocalAssembler(object):
             xranges = [(x-st0,y-x) for x,y in exons if ((x<ed0)&(y>st0))]
             bbhc = BrokenBarHCollection(xranges, yrange, **cargs)
             ax.add_collection(bbhc)
+
+        for pc, tst, ted, s, tcov in dfp[['name','st','ed','strand','tcovn']].values:
+            if cted+delta>tst:
+                cnt +=1
+            else:
+                cnt = 0
+            cted = max(ted, cted)
+            _add2collection(cnt,pc,tst,ted,s,tcov)
+        for pc, tst, ted, s, tcov in dfn[['name','st','ed','strand','tcovn']].values:
+            if ctst-delta<ted:
+                cnt +=1
+            else:
+                cnt = 0
+            ctst = min(tst, ctst)
+            _add2collection(cnt,pc,tst,ted,s,tcov)
+
+
         ax.set_ylim(minypos-5, 5)
         ax.set_xlim(0,ed0-st0)
         ax.set_yticks([])
@@ -2292,19 +2308,6 @@ class LocalAssembler(object):
         dfp.sort_values(['st','ed','1/cov'],inplace=True, ascending=True)
         dfn.sort_values(['ed','st', covfld],inplace=True, ascending=False)
         df = PD.concat([dfp,dfn],ignore_index=True)
-
-        esiz = 100
-        h = 2
-        cnt = 0
-        cted = 0
-        minypos = 0
-        lss = {'+':'-','-':'-','.+':'--','.-':'--','.':'--'}
-        cbs = Colors('gray_r',1.,0.)
-        cls = {'+':Colors('R',1.,0.),'-':Colors('B',1.,0.),
-               '.+':Colors('gray_r',1.,0.),'.-':Colors('gray_r',1.,0.),
-               '.':Colors('gray_r',1.,0.)}
-        if covfld not in df.columns:
-            df[covfld] = 1.
         if logcov:
             df['ltcov'] = N.log2(df[covfld]+2)
         else:
@@ -2320,12 +2323,22 @@ class LocalAssembler(object):
             else:
                 ltmax = tmax
         df['tcovn'] = df['ltcov']/ltmax #df['ltcov'].max()
-        for pc, tst, ted, s, tcov in df[['name','st','ed','strand','tcovn']].values:
-            if cted+delta>tst:
-                cnt +=1
-            else:
-                cnt = 0
-            cted = max(ted, cted)
+        idxp = df['strand'].isin(['+','.+'])
+        dfp = df[idxp]
+        dfn = df[~idxp]
+
+        esiz = 100
+        h = 2
+        cnt = 0
+        cted = 0
+        ctst = ed0-st0
+        minypos = 0
+        lss = {'+':'-','-':'-','.+':'--','.-':'--','.':'--'}
+        cbs = Colors('gray_r',1.,0.)
+        cls = {'+':Colors('R',1.,0.),'-':Colors('B',1.,0.),
+               '.+':Colors('gray_r',1.,0.),'.-':Colors('gray_r',1.,0.),
+               '.':Colors('gray_r',1.,0.)}
+        def _add2collection(cnt, pc, tst, ted, s, tcov):
             ymid = -cnt*(h+1)
             minypos = min(ymid, minypos)
             #cb = cbs.to_rgba(tcov)
@@ -2339,7 +2352,23 @@ class LocalAssembler(object):
             yrange = (ymid-h/2., h)
             xranges = [(tst-st0,ted-tst)]
             bbhc = BrokenBarHCollection(xranges, yrange, **cargs)
-            ax.add_collection(bbhc)
+            ax.add_collection(bbhc)  
+
+        for pc, tst, ted, s, tcov in dfp[['name','st','ed','strand','tcovn']].values:
+            if cted+delta>tst:
+                cnt +=1
+            else:
+                cnt = 0
+            cted = max(ted, cted)
+            _add2collection(cnt,pc,tst,ted,s,tcov)
+        for pc, tst, ted, s, tcov in dfn[['name','st','ed','strand','tcovn']].values:
+            if ctst-delta<ted:
+                cnt +=1
+            else:
+                cnt = 0
+            ctst = min(tst, ctst)
+            _add2collection(cnt,pc,tst,ted,s,tcov)
+
         ax.set_ylim(minypos-5, 5)
         ax.set_xlim(0,ed0-st0)
         ax.set_yticks([])
