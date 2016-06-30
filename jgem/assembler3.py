@@ -1597,7 +1597,8 @@ class LocalAssembler(object):
             LOG.warning('#st==ed:{0}'.format(n0-n1))
         set_ad_pos(e53fixed, 'ex')
         self.e53fixed = e53fixed
-        self.exdf = PD.concat([exdfi[c2], e53fixed[c2]], ignore_index=True)
+        exdf = PD.concat([exdfi[c2], e53fixed[c2]], ignore_index=True)
+        self.exdf = exdf.groupby(['chr','st','ed','strand','kind']).first().reset_index() 
         self._get_spans('+', recalc=True)
 
     def plot_53edges(self, st, ed, strand, ax=None, figsize=(15,6)):
