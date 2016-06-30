@@ -2278,7 +2278,7 @@ class LocalAssembler(object):
                     cnt = 0
                 cted = max(ted, cted)
             minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
-        if not stagger:
+        if (not stagger) and len(dfp)>0:
             cnt = 1
         for pc, tst, ted, s, tcov in dfn[['name','st','ed','strand','tcovn']].values:
             if stagger:
@@ -2374,7 +2374,7 @@ class LocalAssembler(object):
                     cnt = 0
                 cted = max(ted, cted)
             minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
-        if not stagger:
+        if (not stagger) and len(dfp)>0:
             cnt =1
         for pc, tst, ted, s, tcov in dfn[['name','st','ed','strand','tcovn']].values:
             if stagger:
