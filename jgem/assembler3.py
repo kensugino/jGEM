@@ -1949,7 +1949,8 @@ class LocalAssembler(object):
             # e0 = max(0, e-o-1)
             return max(0, sja[e-o-1]-sja[e-o])
 
-        self._pg = pg = spanexs.groupby('id53').first().sort_values(['tst','ted'])[['chr','tst','ted']]
+        # self._pg = pg = spanexs.groupby('id53').first().sort_values(['tst','ted'])[['chr','tst','ted']]
+        self._pg = pg = spanexs.groupby(['tst','ted']).first().reset_index().sort_values(['tst','ted'])[['chr','tst','ted']]
         ne = len(pg)
         if ne>1:
             pg.rename(columns={'tst':'st','ted':'ed'}, inplace=True)
@@ -2671,7 +2672,10 @@ class PathGenerator(object):
                                 r = rec.copy()
                                 r[npos] = '{0}|{1}'.format(name0,e)
                                 r[pos] = int(e.split(',')[-1]) # fix the other end
-                                r[tpos] = rec[tpos]*e2c[e]/e2c[e3id]
+                                if e2c[e3id]<1e-6:
+                                    r[tpos] = 0
+                                else:
+                                    r[tpos] = rec[tpos]*e2c[e]/e2c[e3id]
                                 yield r
                         else:
                             yield rec
@@ -2704,7 +2708,10 @@ class PathGenerator(object):
                                 r = rec.copy()
                                 r[npos] = '{0}|{1}'.format(e,name0)
                                 r[pos] = int(e.split(',')[0])
-                                r[tpos] = rec[tpos]*e2c[e]/e2c[e5id]
+                                if e2c[e5id]<1e-6:
+                                    r[tpos] = 0
+                                else:
+                                    r[tpos] = rec[tpos]*e2c[e]/e2c[e5id]
                                 yield r
                         else:
                             yield rec
