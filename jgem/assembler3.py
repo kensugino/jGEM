@@ -1523,7 +1523,8 @@ class LocalAssembler(object):
             for st,ed in ex[['st','ed']].values:
                 st0 = int(st-o-pos0)
                 ed0 = int(ed-o-pos0)
-                exa1[st0:ed0] = exa1[st0:ed0]-(sja1[st0]-sja1[st0+1]) # st0-1 but array itself is offset by 1
+                sin = abs(sja[st-o-1]-sja[st-o])
+                exa1[st0:ed0] = exa1[st0:ed0]-sin 
                 exa1[exa1<0]=0
             return sja1[1:], exa1 # same length
         # direction >
@@ -1535,7 +1536,8 @@ class LocalAssembler(object):
         for st,ed in ex[['st','ed']].values:
             st0 = int(st-o-pos+1)
             ed0 = int(ed-o-pos+1)
-            exa1[st0:ed0] = exa1[st0:ed0]-(sja1[ed0+1]-sja1[ed0])
+            sin = abs(sja[ed-o]-sja[ed-o+1])
+            exa1[st0:ed0] = exa1[st0:ed0]-sin
             exa1[exa1<0]=0
         return sja1[:len(exa1)], exa1 # same length
 
