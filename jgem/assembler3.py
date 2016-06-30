@@ -2573,7 +2573,7 @@ class PathGenerator(object):
         ipos = -1 # pgid position
         paths = []   
         if len(self.preselected)>0:
-            paths = [list(x) for x in self.preselected[PATHCOLS].values]
+            paths = list(self.preselected[PATHCOLS].values)
         def _select(sjp):
             sjnames = list(sjp['name'].values)
             nsj = len(sjnames)
