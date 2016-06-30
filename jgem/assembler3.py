@@ -1898,7 +1898,8 @@ class LocalAssembler(object):
                     df['name'] = ['{2},{1},{0}'.format(s,n,e) for s,n,e in df[['st','name','ed']].values]
                 if len(df)>0:
                     self._preselected = df
-                    return df
+                    df.sort_values('sc1',ascending=False, inplace=True)
+                    return df.iloc[:2] # up to two
                 return []
         for gid in spanexdf['gid'].unique():
             gexdf = spanexdf[spanexdf['gid']==gid]
