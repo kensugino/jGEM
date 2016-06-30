@@ -1576,7 +1576,9 @@ class LocalAssembler(object):
                             if st==ed: # ignore st==ed
                                 LOG.warning('edge not found (st==ed) {0}:{1}:{2}:{3}'.format(chrom,pos1,strand,kind))
                             elif st>ed:
-                                LOG.warning('edge wrong direction {0},pos1:{5},st:{1},ed:{2},strand:{3},kind:{4}'.format(chrom,st,ed,strand,kind,pos1))
+                                LOG.warning('edge wrong direction {0},pos1:{5},st:{1},ed:{2},strand:{3},kind:{4},epos:{6}'.format(chrom,st,ed,strand,kind,pos1,epos))
+                                self._debug = locals()
+                                raise
                             else: # st<ed
                                 name = _pc(st,ed,strand,',')
                                 yield (chrom,st,ed,strand,name,kind)
@@ -1681,7 +1683,7 @@ class LocalAssembler(object):
                 elif ne==1:
                     s,e = es.iloc[0][['st','ed']]
                     ex.loc[idx,'ecov'] = cov(s,e)
-        self.exdfi = ex.set_index('name')
+        # self.exdfi = ex.set_index('name')
         self.eed2cov = {}
         self.est2cov = {}
         for strand in ['+','-']:
