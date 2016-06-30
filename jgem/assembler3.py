@@ -1396,7 +1396,7 @@ class LocalAssembler(object):
                             yield (chrom,int(st),int(ed),strand,e3,'3')
                             adpos.add((apos,strand[-1]))
             e53df1b = PD.DataFrame([x for x in _e53gen3()], columns=cols)
-            e53df1b['origin'] = 'path'
+            e53df1b['origin'] = 'hcovpath'
             set_ad_pos(e53df1b, 'ex')
             e53df1 = PD.concat([e53df1a[c3], e53df1b[c3]], ignore_index=True)
         else:
