@@ -2061,7 +2061,7 @@ class LocalAssembler(object):
         self.usedsj = sjpaths0[idxused]
         GGB.write_bed(self.unusedsj, pre+'.unused.sjpath.bed.gz', ncols=12)
 
-    def draw_covs(self, st, ed, strand, win=500, ax=None, logcov=False, 
+    def draw_covs(self, st, ed, strand, win=500, ax=None, logcov=False, yticks=True,
         resolution=50,minbins=100, usefilled=False, useexbw=False, ymax=None, onlycov=False):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=(15,3))
@@ -2170,6 +2170,8 @@ class LocalAssembler(object):
         else:
             ax.set_ylim(0,h0+12*hu)
         ax.locator_params(nbins=4)
+        if not yticks:
+            ax.set_yticks([])
         # ax.set_yticks([0,5,9])
         ax.set_xticks([])
         txt = '{0}:{1}-{2}:{3}'.format(self.chrom, st-win, ed+win, strand)
