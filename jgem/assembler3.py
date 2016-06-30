@@ -2570,7 +2570,7 @@ class PathGenerator(object):
         tpos = PATHCOLS.index('tcov')
         ipos = -1 # pgid position
         paths = []   
-        if self.preselected:
+        if len(self.preselected)>0:
             paths = self.preselected[PATHCOLS].values
         def _select(sjp):
             sjnames = list(sjp['name'].values)
