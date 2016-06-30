@@ -1690,7 +1690,7 @@ class LocalAssembler(object):
                 elif ne==1:
                     s,e = es.iloc[0][['st','ed']]
                     ex.loc[idx,'ecov'] = cov(s,e)
-        # self.exdfi = ex.set_index('name')
+        self.exdfi = ex.set_index('name')  # exdfi used in merge3 <== bad programming
         self.eed2cov = {}
         self.est2cov = {}
         for strand in ['+','-']:
