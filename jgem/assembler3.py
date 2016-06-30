@@ -1895,6 +1895,7 @@ class LocalAssembler(object):
                     df['st'] = [apos2dpos[x] for x in df['tst']]
                     df['name'] = [','.join([str(e)]+n.split(',')[1:-1]+[str(s)]) for\
                                      s,n,e in df[['st','name','ed']].values]
+                return df
         for gid in spanexdf['gid'].unique():
             gexdf = spanexdf[spanexdf['gid']==gid]
             gsjdf = spansjdf[spansjdf['gid']==gid]
@@ -1903,7 +1904,7 @@ class LocalAssembler(object):
                 tst = gexdf['tst'].min()
                 ted = gexdf['ted'].max()
                 preselected = _fix53(sjp2[(sjp2['tst']>=tst)&(sjp2['ted']<=ted)])
-
+                LOG.info('presected:{0}'.format(len(preselected)))
             else:
                 preselected = []
             self._pg = pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, sjpaths, preselected,
