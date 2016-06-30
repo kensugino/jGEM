@@ -423,7 +423,7 @@ class SJFilter(object):
                     shutil.copyfileobj(src, dst)
 
         rslts = UT.process_mp(filter_sjdf, args, np=self.np, doreduce=False)
-        dstpath = self.bwsjpre+'.sjdf.filtered.txt.gz'
+        dstpath = self.bwsjpre+'.filtered.sjdf.txt.gz'
         with open(dstpath,'wb') as dst:
             for c in chroms:
                 srcpath =  self.bwsjpre+'.filtered.sjdf.{0}.txt.gz'.format(c)
@@ -552,12 +552,12 @@ def sjfiltered2wig(bwpre, chrom, chromsize):
     a = {'+':N.zeros(chromsize, dtype=N.float64),
          '-':N.zeros(chromsize, dtype=N.float64),
          '.':N.zeros(chromsize, dtype=N.float64)}
-    path = bwpre+'.sjdf.{0}.filtered.txt.gz'.format(chrom)
+    path = bwpre+'.filtered.sjdf.{0}.txt.gz'.format(chrom)
     sjchr = UT.read_pandas(path, names=A3.SJDFCOLS)
     for st,ed,v,strand in sjchr[['st','ed','tcnt','strand']].values:
         a[strand[0]][st:ed] += v
     for strand in a:
-        wig = bwpre+'.sjdf.{0}.{1}.filtered.wig'.format(chrom, strand)
+        wig = bwpre+'.filtered.sjdf.{0}.{1}.wig'.format(chrom, strand)
         cybw.array2wiggle_chr64(a[strand], chrom, wig)
     return path
 
@@ -575,7 +575,7 @@ def sjfiltered2bw(bwpre, genome, np=12):
         wigpath = bwpre+'.filtered.sj.{0}.wig'.format(s)
         with open(wigpath, 'w') as dst:
             for chrom in chroms:
-                f = bwpre+'.sjdf.{0}.{1}.filtered.wig'.format(chrom, strand)
+                f = bwpre+'.filtered.sjdf.{0}.{1}.wig'.format(chrom, strand)
                 with open(f,'r') as src:
                     shutil.copyfileobj(src, dst)
                 rmfiles.append(f)
@@ -605,7 +605,7 @@ class LocalEstimator(A3.LocalAssembler):
         for n in self.paths['name']:
             eids.update(n.split('|'))
             sids.update(n.split(',')[1:-1])
-        tgt1 = bwpre+'.{0}.filtered.bed.gz'.format(chrom)
+        tgt1 = bwpre+'.filtered.{0}.bed.gz'.format(chrom)
         tgt2 = bwpre+'.{0}.bed.gz'.format(chrom)
         tgt3 = bwpre+'.sjpath.bed.gz'
         if os.path.exists(tgt1):
@@ -654,59 +654,6 @@ class LocalEstimator(A3.LocalAssembler):
         sj['ucnt'] = [N.sum([x[0] for x in y]) for y in tmp]
         sj['tcnt'] = [N.sum([x[1] for x in y]) for y in tmp]
         self.sjdfi = sj.set_index('name')
-
-    # def calculate_ecovs(self):
-    #     ex = self.exdf
-    #     o = int(self.st)
-    #     if len(ex)==0:
-    #         return
-    #     if '_eid' not in ex:
-    #         ex.sort_values(['chr','st','ed'], inplace=True)
-    #         ex['_eid'] = N.arange(len(ex))
-    #     ex.set_index('_eid', inplace=True)
-    #     ex['ecov'] = N.nan
-    #     if self.stranded:
-    #         tgts = ['+','-']
-    #     else:
-    #         tgts = ['a']
-    #     for strand in tgts: #['+','-']:
-    #         exa = self.arrs['ex'][strand]
-    #         def cov(s,e):
-    #             return N.mean(exa[int(s)-o:int(e)-o])
-    #         spans = self._get_spans(strand)
-    #         for st,ed in spans:
-    #             es = ex[(ex['st']>=st)&(ex['ed']<=ed)&(ex['strand'].isin(A3.STRS[strand]))].copy()
-    #             # es = ex[idx].copy().sort_values(['st','ed']) # <== BUG!: sort after idx messes up relationship
-    #             idx = es.index.values # _eid's
-    #             es['tmpeid'] = N.arange(len(es))
-    #             ne = len(es)
-    #             if ne>1:
-    #                 ci = UT.chopintervals(es, idcol='tmpeid', sort=False)
-    #                 ci['cov'] = [cov(s,e) for s,e in ci[['st','ed']].values]
-    #                 ci['name1'] = ci['name'].astype(str).apply(lambda x: [int(y) for y in x.split(',')])    
-    #                 nc = len(ci)
-    #                 mat = N.zeros((nc,ne))
-    #                 for i,n1 in enumerate(ci['name1'].values):# fill in rows
-    #                     N.put(mat[i], N.array(n1), 1)
-    #                 try:
-    #                     ecov,err = nnls(mat, ci['cov'].values)
-    #                     ex.loc[idx,'ecov'] = ecov
-    #                 except:
-    #                     LOG.warning('!!!!!! Exception in NNLS (calculate_ecov) @{0}:{1}-{2}, setting to mean !!!!!!!!!'.format(self.chrom, st, ed))
-    #                     ex.loc[idx,'ecov'] = cov(st,ed)
-    #             elif ne==1:
-    #                 s,e = es.iloc[0][['st','ed']]
-    #                 ex.loc[idx,'ecov'] = cov(s,e)
-    #     self.exdfi = ex.set_index('name')
-    #     self.eed2cov = {}
-    #     self.est2cov = {}
-    #     for strand in ['+','-']:
-    #         exsub = ex[ex['strand'].isin(A3.STRS[strand])]
-    #         exged = exsub.groupby('ed')['ecov'].sum()
-    #         self.eed2cov[strand] = UT.series2dict(exged)
-    #         exgst = exsub.groupby('st')['ecov'].sum()
-    #         self.est2cov[strand] = UT.series2dict(exgst)
-            
 
     def calculate_branchp(self, jids, eids):
         sj0 = self.sjdfi
@@ -1074,7 +1021,7 @@ class CovEstimator(object):
 
 class CovCollector(object):
     
-    def __init__(self, covpres, dstpre, np=14):
+    def __init__(self, covpres, dstpre, np=7):
         self.covpres = covpres
         self.modelpre = covpres[0]
         self.dstpre = dstpre
