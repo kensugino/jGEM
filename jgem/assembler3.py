@@ -590,7 +590,7 @@ class SlopeEdgeFinder(object):
     def plotone(self,sja,exa,direction, ylim=None, xlim=None, ax=None, figsize=(15,3)):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=figsize)
-        tmp, dtmp, th, sm, mima = self.calc_stats(exa)
+        tmp, dtmp, th, sm, mima = self.calc_stats(exa, direction)
         eposs = self.find(sja,exa,direction)
 
         ltmp = N.log2(tmp+1)
