@@ -1883,18 +1883,20 @@ class LocalAssembler(object):
             sjp2 = sjp1[idx].copy()
             for f in ['tcov','tcov0','tcov0a','tcov0b','tcov0c']:
                 sjp2[f] = sjp2['sc1']
-            self._d2a = dpos2apos = UT.df2dict(spanexdf[spanexdf['kind']=='5'],'dpos','apos')
-            self._a2d = apos2dpos = UT.df2dict(spanexdf[spanexdf['kind']=='3'],'apos','dpos')
+            self._d2a = d2a = UT.df2dict(spanexdf[spanexdf['kind']=='5'],'dpos','apos')
+            self._a2d = a2d = UT.df2dict(spanexdf[spanexdf['kind']=='3'],'apos','dpos')
             def _fix53(df, tst, ted): # fix 5'3'exon. st,ed,name
                 idx = (df['tst']>=tst)&(df['ted']<=ted)
-                df = df[idx].copy()
+                df = df[idx]
                 if strand in ['+','.+']:
-                    df['st'] = [dpos2apos[int(x)] for x in df['tst']]
-                    df['ed'] = [apos2dpos[int(x)] for x in df['ted']]
+                    df = df[[(int(x) in d2a)&(int(y) in a2d) for x,y in df[['tst','ted']].values]].copy()
+                    df['st'] = [d2a[int(x)] for x in df['tst']]
+                    df['ed'] = [a2d[int(x)] for x in df['ted']]
                     df['name'] = ['{0},{1},{2}'.format(s,n,e) for s,n,e in df[['st','name','ed']].values]
                 else:
-                    df['ed'] = [dpos2apos[int(x)] for x in df['ted']]
-                    df['st'] = [apos2dpos[int(x)] for x in df['tst']]
+                    df = df[[(int(x) in a2d)&(int(y) in d2a) for x,y in df[['tst','ted']].values]].copy()
+                    df['ed'] = [d2a[int(x)] for x in df['ted']]
+                    df['st'] = [a2d[int(x)] for x in df['tst']]
                     df['name'] = ['{2},{1},{0}'.format(s,n,e) for s,n,e in df[['st','name','ed']].values]
                 if len(df)>0:
                     self._preselected = df
