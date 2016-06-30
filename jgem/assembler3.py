@@ -1889,7 +1889,7 @@ class LocalAssembler(object):
             self._d2a = dpos2apos = UT.df2dict(spanexdf[spanexdf['kind']=='5'],'dpos','apos')
             self._a2d = apos2dpos = UT.df2dict(spanexdf[spanexdf['kind']=='3'],'apos','dpos')
             def _fix53(df, tst, ted): # fix 5'3'exon. st,ed,name
-                idx = (sjp2['tst']>=tst)&(sjp2['ted']<=ted)
+                idx = (df['tst']>=tst)&(df['ted']<=ted)
                 df = df[idx].copy()
                 if strand in ['+','.+']:
                     df['st'] = [dpos2apos[x] for x in df['tst']]
