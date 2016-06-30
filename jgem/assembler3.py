@@ -1893,13 +1893,11 @@ class LocalAssembler(object):
                 if strand in ['+','.+']:
                     df['st'] = [dpos2apos[x] for x in df['tst']]
                     df['ed'] = [apos2dpos[x] for x in df['ted']]
-                    df['name'] = [','.join([str(s)]+n.split(',')[1:-1]+[str(e)]) for\
-                                     s,n,e in df[['st','name','ed']].values]
+                    df['name'] = ['{0},{1},{2}'.format(s,n,e) for s,n,e in df[['st','name','ed']].values]
                 else:
                     df['ed'] = [dpos2apos[x] for x in df['ted']]
                     df['st'] = [apos2dpos[x] for x in df['tst']]
-                    df['name'] = [','.join([str(e)]+n.split(',')[1:-1]+[str(s)]) for\
-                                     s,n,e in df[['st','name','ed']].values]
+                    df['name'] = ['{2},{1},{0}'.format(s,n,e) for s,n,e in df[['st','name','ed']].values]
                 if len(df)>0:
                     self._preselected = df
                     return df
