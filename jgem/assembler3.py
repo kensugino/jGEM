@@ -2180,9 +2180,16 @@ class LocalAssembler(object):
               ((pathdf['ted']>=st0)&(pathdf['ted']<=ed0)))&\
               (pathdf['strand'].isin(STRS[strand]))&(pathdf['chr']==self.chrom)
         if maxdisp is not None:            
-            df = pathdf[idx].sort_values(covfld,ascending=False).iloc[:maxdisp].sort_values(['tst','ted']).copy()
-        else:
-            df = pathdf[idx].sort_values(['tst','ted']).copy()
+            pathdf = pathdf[idx].sort_values(covfld,ascending=False).iloc[:maxdisp]
+        idxp = pathdf['strand'].isin(['+','.+'])
+        dfp = pathdf[idxp].copy()
+        dfn = pathdf[~idxp].copy()
+        dfp['1/cov'] = 1/dfp[covfld]
+        dfn['1/cov'] = 1/dfn[covfld]
+        dfp.sort_values(['tst','ted','1/cov'],inplace=True, ascending=True)
+        dfn.sort_values(['ted','tst','cov'],inplace=True, ascending=False)
+        df = PD.concat([dfp,dfn],ignore_index=True)
+        
         esiz = 100
         h = 2
         cnt = 0
