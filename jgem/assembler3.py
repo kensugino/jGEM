@@ -1885,8 +1885,8 @@ class LocalAssembler(object):
             sjp2 = sjp1[idx].copy()
             for f in ['tcov','tcov0','tcov0a','tcov0b','tcov0c']:
                 sjp2[f] = sjp2['sc1']
-            dpos2apos = UT.df2dict(spanexdf[spanexdf['kind']=='5'],'dpos','apos')
-            apos2dpos = UT.df2dict(spanexdf[spanexdf['kind']=='3'],'apos','dpos')
+            self._d2a = dpos2apos = UT.df2dict(spanexdf[spanexdf['kind']=='5'],'dpos','apos')
+            self._a2d = apos2dpos = UT.df2dict(spanexdf[spanexdf['kind']=='3'],'apos','dpos')
             def _fix53(df, tst, ted): # fix 5'3'exon. st,ed,name
                 idx = (sjp2['tst']>=tst)&(sjp2['ted']<=ted)
                 df = df[idx].copy()
