@@ -1519,26 +1519,26 @@ class LocalAssembler(object):
         if direction=='<':
             sja1 = sja[pos0-1:pos+1].copy() # index offset by 1
             exa1 = exa[pos0:pos+1].copy()
-            ex = exs[(exs['st']>=pos0+o)&(exs['ed']<pos+1+o)]
-            for st,ed in ex[['st','ed']].values:
-                st0 = int(st-o-pos0)
-                ed0 = int(ed-o-pos0)
-                sin = abs(sja[st-o-1]-sja[st-o])
-                exa1[st0:ed0] = exa1[st0:ed0]-sin 
-                exa1[exa1<0]=0
+            # ex = exs[(exs['st']>=pos0+o)&(exs['ed']<pos+1+o)]
+            # for st,ed in ex[['st','ed']].values:
+            #     st0 = int(st-o-pos0)
+            #     ed0 = int(ed-o-pos0)
+            #     sin = abs(sja[st-o-1]-sja[st-o])
+            #     exa1[st0:ed0] = exa1[st0:ed0]-sin 
+            #     exa1[exa1<0]=0
             return sja1[1:], exa1 # same length
         # direction >
         # find exons between pos=>pos0, subtract sja corresponding to further
         # edge of the exon (at position ed)
         sja1 = sja[pos-1:pos0+2].copy() # same index but get one more on right
         exa1 = exa[pos-1:pos0].copy()
-        ex = exs[(exs['st']>=pos-1+o)&(exs['ed']<pos0+o)] # don't include = for ed
-        for st,ed in ex[['st','ed']].values:
-            st0 = int(st-o-pos+1)
-            ed0 = int(ed-o-pos+1)
-            sin = abs(sja[ed-o]-sja[ed-o+1])
-            exa1[st0:ed0] = exa1[st0:ed0]-sin
-            exa1[exa1<0]=0
+        # ex = exs[(exs['st']>=pos-1+o)&(exs['ed']<pos0+o)] # don't include = for ed
+        # for st,ed in ex[['st','ed']].values:
+        #     st0 = int(st-o-pos+1)
+        #     ed0 = int(ed-o-pos+1)
+        #     sin = abs(sja[ed-o]-sja[ed-o+1])
+        #     exa1[st0:ed0] = exa1[st0:ed0]-sin
+        #     exa1[exa1<0]=0
         return sja1[:len(exa1)], exa1 # same length
 
     def find_53edges(self):
