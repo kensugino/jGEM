@@ -2185,6 +2185,9 @@ class LocalAssembler(object):
         idxp = pathdf['strand'].isin(['+','.+'])
         dfp = pathdf[idxp].copy()
         dfn = pathdf[~idxp].copy()
+        if covfld not in pathdf:
+            dfp[covfld] = 1.
+            dfn[covfld] = 1.
         dfp['1/cov'] = 1/dfp[covfld]
         dfn['1/cov'] = 1/dfn[covfld]
         dfp.sort_values(['tst','ted','1/cov'],inplace=True, ascending=True)
@@ -2201,8 +2204,6 @@ class LocalAssembler(object):
         cls = {'+':Colors('R',1.,0.),'-':Colors('B',1.,0.),
                '.+':Colors('gray_r',1.,0.),'.-':Colors('gray_r',1.,0.),
                '.':Colors('gray_r',1.,0.)}
-        if covfld not in df.columns:
-            df[covfld] = 1.
         if logcov:
             df['ltcov'] = N.log2(df[covfld]+2)
         else:
@@ -2277,10 +2278,21 @@ class LocalAssembler(object):
         idx = (((df['st']>=st0)&(df['st']<=ed0))|\
               ((df['ed']>=st0)&(df['ed']<=ed0)))&\
               (df['strand'].isin(STRS[strand]))&(df['chr']==self.chrom)
+        pathdf = pathdf[idx]
         if maxdisp is not None:            
-            df = df[idx].sort_values(covfld,ascending=False).iloc[:maxdisp].sort_values(['st','ed']).copy()
-        else:
-            df = df[idx].sort_values(['st','ed']).copy()
+            pathdf = pathdf.sort_values(covfld,ascending=False).iloc[:maxdisp]
+        idxp = pathdf['strand'].isin(['+','.+'])
+        dfp = pathdf[idxp].copy()
+        dfn = pathdf[~idxp].copy()
+        if covfld not in pathdf:
+            dfp[covfld] = 1.
+            dfn[covfld] = 1.
+        dfp['1/cov'] = 1/dfp[covfld]
+        dfn['1/cov'] = 1/dfn[covfld]
+        dfp.sort_values(['st','ed','1/cov'],inplace=True, ascending=True)
+        dfn.sort_values(['ed','st', covfld],inplace=True, ascending=False)
+        df = PD.concat([dfp,dfn],ignore_index=True)
+
         esiz = 100
         h = 2
         cnt = 0
