@@ -887,7 +887,7 @@ LAPARAMS = dict(
      minsearchsize=500,
      use_sja_for_exon_detection=False,
      use_merged_sjdf=False,
-     sjpath_53th=5000,
+     sjpath_53th=1000,
      use_sjdf_for_check=False,
      use_iexon_from_path=True,
      cmax=9,
@@ -904,8 +904,8 @@ MERGEPARAMS.update(dict(
      use_merged_sjdf=True,
      use_sjdf_for_check=True,
      use_iexon_from_path=False,
-     sjpath_53th=5000,
-     # preselect_th=5000,
+     sjpath_53th=1000,
+     preselect_th=5000,
      cmax=18,
 ))
 
@@ -1880,7 +1880,7 @@ class LocalAssembler(object):
         if self.params['use_merged_sjdf']:
             if '#j' not in sjp1:
                 sjp1['#j'] = [x.count('|') for x in sjp1['name']]
-            idx = (sjp1['#j']>1)&(sjp1['sc1']>self.params['sjpath_53th'])&\
+            idx = (sjp1['#j']>1)&(sjp1['sc1']>self.params['preselect_th'])&\
                   (sjp1['strand'].isin(STRS[strand]))
             sjp2 = sjp1[idx].copy()
             for f in ['tcov','tcov0','tcov0a','tcov0b','tcov0c']:
