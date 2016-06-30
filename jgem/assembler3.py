@@ -1779,6 +1779,7 @@ class LocalAssembler(object):
         if '#j' not in df:
             df['#j'] = [x.count('|') for x in df['name']]
         df0 = df[df['#j']==1] # 2 exon paths
+        n0 = len(df0)
         df1 = df[df['#j']!=1] # others
         cols = list(df0.columns)
         npos = cols.index('name') # pos of 'name' column
@@ -1794,6 +1795,8 @@ class LocalAssembler(object):
                     if (jc not in ustnames) or (jcr not in onames):
                         yield rec
         df0n = PD.DataFrame([x for x in _gen_df0n()], columns=cols)
+        n1 = len(df0n)
+        LOG.info('#filter_unstranded:{0}=>{1}'.format(n0,n1))
         dfn = PD.concat([df1, df0n], ignore_index=True)
         dfn.sort_values(['chr','st','ed'], inplace=True)
         return dfn
@@ -1804,6 +1807,7 @@ class LocalAssembler(object):
         if '#j' not in df:
             df['#j'] = [x.count('|') for x in df['name']]
         df0 = df[df['#j']==1] # 2 exon paths
+        n0 = len(df0)
         df1 = df[df['#j']!=1] # others
         cols = list(df0.columns)
         npos = cols.index('name') # pos of 'name' column
@@ -1819,6 +1823,8 @@ class LocalAssembler(object):
                     if N.sum(idx)==0: # not contained in 3'exons
                         yield rec
         df0n = PD.DataFrame([x for x in _gen_df0n()], columns=cols)
+        n1 = len(df0n)
+        LOG.info('#filter_ji3e:{0}=>{1}'.format(n0,n1))
         dfn = PD.concat([df1, df0n], ignore_index=True)
         dfn.sort_values(['chr','st','ed'], inplace=True)
         return dfn
