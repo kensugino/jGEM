@@ -1880,7 +1880,7 @@ class LocalAssembler(object):
             if '#j' not in sjp1:
                 sjp1['#j'] = [x.count('|') for x in sjp1['name']]
             idx = (sjp1['#j']>1)&(sjp1['sc1']>self.params['sjpath_53th'])&\
-                  (sjp2['strand'].isin(STRS[strand]))
+                  (sjp1['strand'].isin(STRS[strand]))
             sjp2 = sjp1[idx]
             dpos2apos = UT.df2dict(spanexdf[spanexdf['kind']=='5'],'dpos','apos')
             apos2dpos = UT.df2dict(spanexdf[spanexdf['kind']=='3'],'apos','dpos')
