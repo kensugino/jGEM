@@ -887,7 +887,7 @@ LAPARAMS = dict(
      minsearchsize=500,
      use_sja_for_exon_detection=False,
      use_merged_sjdf=False,
-     sjpath_53th=1000,
+     sjpath_53th=5000,
      use_sjdf_for_check=False,
      use_iexon_from_path=True,
      cmax=9,
@@ -904,7 +904,8 @@ MERGEPARAMS.update(dict(
      use_merged_sjdf=True,
      use_sjdf_for_check=True,
      use_iexon_from_path=False,
-     sjpath_53th=1000,
+     sjpath_53th=5000,
+     # preselect_th=5000,
      cmax=18,
 ))
 
@@ -1887,7 +1888,7 @@ class LocalAssembler(object):
             dpos2apos = UT.df2dict(spanexdf[spanexdf['kind']=='5'],'dpos','apos')
             apos2dpos = UT.df2dict(spanexdf[spanexdf['kind']=='3'],'apos','dpos')
             def _fix53(df): # fix 5'3'exon. st,ed,name
-                if strand=='+':
+                if strand in ['+','.+']:
                     df['st'] = [dpos2apos[x] for x in df['tst']]
                     df['ed'] = [apos2dpos[x] for x in df['ted']]
                     df['name'] = [','.join([str(s)]+n.split(',')[1:-1]+[str(e)]) for\
@@ -1906,6 +1907,7 @@ class LocalAssembler(object):
                 tst = gexdf['tst'].min()
                 ted = gexdf['ted'].max()
                 preselected = _fix53(sjp2[(sjp2['tst']>=tst)&(sjp2['ted']<=ted)])
+                print(preselected)
                 LOG.info('presected:{0}'.format(len(preselected)))
             else:
                 preselected = []
