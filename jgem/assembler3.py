@@ -1877,9 +1877,8 @@ class LocalAssembler(object):
             sjpaths = self.sjpaths1
         sjp1 = self.sjpaths1
         if self.params['use_merged_sjdf']:
-            if '#j' not in sjp1:
-                sjp1['#j'] = [x.count('|') for x in sjp1['name']]
-            idx = (sjp1['#j']>1)&(sjp1['sc1']>self.params['preselect_th'])&\
+            nj = N.array([x.count('|')>1 for x in sjp1['name']], dtype=bol)
+            idx = (nj)&(sjp1['sc1']>self.params['preselect_th'])&\
                   (sjp1['strand'].isin(STRS[strand]))
             sjp2 = sjp1[idx].copy()
             for f in ['tcov','tcov0','tcov0a','tcov0b','tcov0c']:
