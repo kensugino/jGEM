@@ -2059,7 +2059,7 @@ class LocalAssembler(object):
         GGB.write_bed(self.unusedsj, pre+'.unused.sjpath.bed.gz', ncols=12)
 
     def draw_covs(self, st, ed, strand, win=500, ax=None, logcov=False, 
-        resolution=50,minbins=100, usefilled=False, useexbw=False):
+        resolution=50,minbins=100, usefilled=False, useexbw=False, ymax=None, onlycov=False):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=(15,3))
         offset = self.st
@@ -2108,14 +2108,15 @@ class LocalAssembler(object):
         self._h0 = h0
         self._hu = hu = h0/20
         # gspan
-        gspan = self._get_spans(strand)
-        for i, (s1,e1) in enumerate(gspan):
-            if (e1-offset>s0)&(s1-offset<e0):
-                # print('gspan {0}:{1}-{2}'.format(i,s1,e1))
-                gx1,gx2 = s1-s0-offset,e1-s0-offset
-                ax.plot([gx1,gx2],[h0+2*hu,h0+2*hu], 'c')
-                gx0 = max(min((gx1+gx2)/2., e0-s0), 0)
-                ax.text(gx0, h0-2*hu, '{0}'.format(i))
+        if not onlycov:
+            gspan = self._get_spans(strand)
+            for i, (s1,e1) in enumerate(gspan):
+                if (e1-offset>s0)&(s1-offset<e0):
+                    # print('gspan {0}:{1}-{2}'.format(i,s1,e1))
+                    gx1,gx2 = s1-s0-offset,e1-s0-offset
+                    ax.plot([gx1,gx2],[h0+2*hu,h0+2*hu], 'c')
+                    gx0 = max(min((gx1+gx2)/2., e0-s0), 0)
+                    ax.text(gx0, h0-2*hu, '{0}'.format(i))
         # 53
         if hasattr(self, 'e53pos'):
             e53p = self.e53pos[strand]
@@ -2129,7 +2130,7 @@ class LocalAssembler(object):
                 ax.plot(i3p, y0[i3p], 'mv')
 
         # exons
-        if hasattr(self, 'exons'):
+        if hasattr(self, 'exons') and (not onlycov):
             ex = self.exons[strand]
             ex = ex[(ex['ost']>s0)&(ex['oed']<e0)]
             ymid = h0+5*hu
@@ -2148,12 +2149,12 @@ class LocalAssembler(object):
             cargs = dict(facecolor=c, edgecolor=c, alpha=alpha)#, linewidth=0.2)
             bbhc = BrokenBarHCollection(xranges, yrange, **cargs)
             ax.add_collection(bbhc)
-        if hasattr(self, 'exdfi'):
+        if hasattr(self, 'exdfi') and (not onlycov):
             _plt_ex(self.exdfi, h0+2*hu, 'g')
-        if hasattr(self, 'e53fixed'):
+        if hasattr(self, 'e53fixed') and (not onlycov):
             _plt_ex(self.e53fixed[self.e53fixed['kind']=='5'], h0+2*hu, 'r')
             _plt_ex(self.e53fixed[self.e53fixed['kind']=='3'], h0+2*hu, 'b')
-        if hasattr(self, 'e53df'):
+        if hasattr(self, 'e53df') and (not onlycov):
             e = self.e53df
             _plt_ex(e[(e['kind']=='5')&(e['origin']=='path')], h0, 'r', 1)
             _plt_ex(e[(e['kind']=='3')&(e['origin']=='path')], h0, 'b', 1)
@@ -2161,7 +2162,10 @@ class LocalAssembler(object):
             _plt_ex(e[(e['kind']=='3')&(e['origin']=='flow')], h0, 'c', 1)
 
         ax.set_xlim(0,e0-s0)
-        ax.set_ylim(-2,h0+12*hu)
+        if onlycov:
+            ax.set_ylim(-2,h0+hu)
+        else:
+            ax.set_ylim(-2,h0+12*hu)
         # ax.set_yticks([0,5,9])
         ax.set_xticks([])
         txt = '{0}:{1}-{2}:{3}'.format(self.chrom, st-win, ed+win, strand)
