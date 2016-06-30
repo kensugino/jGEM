@@ -1371,9 +1371,9 @@ class LocalAssembler(object):
             set_ad_pos(e53df1a, 'ex')
             def _e53gen3(): # 
                 adpos = set()
-                ap = ap[ap['sc1']>self.params['sjpath_53th']]
+                ap1 = ap[ap['sc1']>self.params['sjpath_53th']]
                 for strand in ['+', '-']:
-                    for pc in ap[ap['strand']==strand]['pathcode'].values:
+                    for pc in ap1[ap1['strand']==strand]['pathcode'].values:
                         tmp = pc.split('|')
                         e5 = tmp[0]
                         apos,dpos = [int(y) for y in e5.split(',')]
