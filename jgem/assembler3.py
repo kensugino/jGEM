@@ -2355,8 +2355,7 @@ class LocalAssembler(object):
         cbs = Colors(color,1.,0.)
         def _add2collection(cnt, pc, tst, ted, s, tcov):
             ymid = -cnt*(h+1)
-            #cb = cbs.to_rgba(tcov)
-            cb = cbs[s].to_rgba(tcov)
+            cb = cbs.to_rgba(tcov)
             ls = lss[s]
             cargs = dict(facecolor=cb, edgecolor=cb, linewidth=0)
             x0 = max(tst-st0,0)
