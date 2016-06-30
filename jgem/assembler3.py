@@ -1775,7 +1775,7 @@ class LocalAssembler(object):
             pathsdf['tst'] = pathsdf['tst'].astype(int)
             pathsdf['ted'] = pathsdf['ted'].astype(int)            
             assert(all(pathsdf['tst']<pathsdf['ted']))
-            self.paths = self.filter_unstranded(pathsdf)
+            pathsdf = self.filter_unstranded(pathsdf)
             self.paths = self.filter_ji3e(pathsdf)
         else:
             self.sjdf2 = None
