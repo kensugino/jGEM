@@ -448,7 +448,6 @@ class SlopeEdgeFinder(object):
             th2 = th1*self.triggerth
         else:
             return []
-        print('th1,th2=',th1,th2)
         idx = N.nonzero(v<th1)
         if len(idx[0])==0:
             return []
