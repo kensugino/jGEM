@@ -1877,7 +1877,7 @@ class LocalAssembler(object):
             sjpaths = self.sjpaths1
         sjp1 = self.sjpaths1
         if self.params['use_merged_sjdf']:
-            nj = N.array([x.count('|')>1 for x in sjp1['name']], dtype=bol)
+            nj = N.array([x.count('|')>1 for x in sjp1['name']], dtype=bool)
             idx = (nj)&(sjp1['sc1']>self.params['preselect_th'])&\
                   (sjp1['strand'].isin(STRS[strand]))
             sjp2 = sjp1[idx].copy()
