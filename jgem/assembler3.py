@@ -1909,7 +1909,8 @@ class LocalAssembler(object):
                 tst = gexdf['tst'].min()
                 ted = gexdf['ted'].max()
                 preselected = _fix53(sjp2, tst, ted)
-                LOG.info('preselected:{0}'.format(len(preselected)))
+                if len(preselected)>0:
+                    LOG.info('preselected:{0}'.format(len(preselected)))
             else:
                 preselected = []
             self._pg = pg = PathGenerator(gg, gsjdf, gexdf, chrom, strand, sjpaths, preselected,
