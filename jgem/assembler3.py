@@ -2171,7 +2171,7 @@ class LocalAssembler(object):
         return ax
         
     def draw_path(self, pathdf, st, ed, strand, covfld='tcov',logcov=True,
-        win=500, ax=None, delta=500, maxdisp=None, tmax=None):
+        win=500, ax=None, delta=500, maxdisp=None, tmax=None, stagger=True):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=(15,3))
         st0 = st-win
@@ -2263,18 +2263,22 @@ class LocalAssembler(object):
             return min(ymid, minypos)
 
         for pc, tst, ted, s, tcov in dfp[['name','st','ed','strand','tcovn']].values:
-            if cted+delta>tst:
-                cnt +=1
-            else:
-                cnt = 0
-            cted = max(ted, cted)
+            if stagger:
+                if cted+delta>tst:
+                    cnt +=1
+                else:
+                    cnt = 0
+                cted = max(ted, cted)
             minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
+        if not stagger:
+            cnt = 1
         for pc, tst, ted, s, tcov in dfn[['name','st','ed','strand','tcovn']].values:
-            if ctst-delta<ted:
-                cnt +=1
-            else:
-                cnt = 0
-            ctst = min(tst, ctst)
+            if stagger:
+                if ctst-delta<ted:
+                    cnt +=1
+                else:
+                    cnt = 0
+                ctst = min(tst, ctst)
             minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
 
 
@@ -2286,7 +2290,7 @@ class LocalAssembler(object):
         return ax
 
     def draw_exons(self, df, st, ed, strand, covfld='ecov', logcov=True, 
-        win=500, ax=None, delta=500, maxdisp=None, tmax=None):
+        win=500, ax=None, delta=500, maxdisp=None, tmax=None, stagger=True):
         if ax is None:
             fig,ax = P.subplots(1,1,figsize=(15,3))
         st0 = st-win
@@ -2355,18 +2359,22 @@ class LocalAssembler(object):
             return min(ymid, minypos)
 
         for pc, tst, ted, s, tcov in dfp[['name','st','ed','strand','tcovn']].values:
-            if cted+delta>tst:
-                cnt +=1
-            else:
-                cnt = 0
-            cted = max(ted, cted)
+            if stagger:
+                if cted+delta>tst:
+                    cnt +=1
+                else:
+                    cnt = 0
+                cted = max(ted, cted)
             minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
+        if not stagger:
+            cnt =1
         for pc, tst, ted, s, tcov in dfn[['name','st','ed','strand','tcovn']].values:
-            if ctst-delta<ted:
-                cnt +=1
-            else:
-                cnt = 0
-            ctst = min(tst, ctst)
+            if stagger:
+                if ctst-delta<ted:
+                    cnt +=1
+                else:
+                    cnt = 0
+                ctst = min(tst, ctst)
             minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
 
         ax.set_ylim(minypos-5, 5)
