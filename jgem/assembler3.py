@@ -444,7 +444,8 @@ class SlopeEdgeFinder(object):
             th2 = th1*self.triggerth
         elif mima<self.mimath2:
             th1 = ma*self.mimath2
-            th2 = th1+(ma*self.mimath)
+            # th2 = th1+(ma*self.mimath)
+            th2 = th1*self.triggerth
         else:
             return []
         idx = N.nonzero(v<th1)
@@ -886,7 +887,7 @@ LAPARAMS = dict(
      minsearchsize=500,
      use_sja_for_exon_detection=False,
      use_merged_sjdf=False,
-     sjpath_53th=500,
+     sjpath_53th=1000,
      use_sjdf_for_check=False,
      use_iexon_from_path=True,
      cmax=9,
@@ -903,6 +904,7 @@ MERGEPARAMS.update(dict(
      use_merged_sjdf=True,
      use_sjdf_for_check=True,
      use_iexon_from_path=False,
+     sjpath_53th=1000,
      cmax=18,
 ))
 
@@ -1581,8 +1583,8 @@ class LocalAssembler(object):
                                 LOG.warning('edge not found (st==ed) {0}:{1}:{2}:{3}'.format(chrom,pos1,strand,kind))
                             elif st>ed:
                                 LOG.warning('edge wrong direction {0},pos1:{5},st:{1},ed:{2},strand:{3},kind:{4},epos:{6}'.format(chrom,st,ed,strand,kind,pos1,epos))
-                                self._debug = locals()
-                                raise
+                                # self._debug = locals()
+                                # raise
                             else: # st<ed
                                 name = _pc(st,ed,strand,',')
                                 yield (chrom,st,ed,strand,name,kind)
