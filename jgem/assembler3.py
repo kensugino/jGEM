@@ -2234,7 +2234,7 @@ class LocalAssembler(object):
             cb = cbs.to_rgba(tcov)
             cl = cls[s].to_rgba(tcov)
             ls = lss[s]
-            cargs = dict(facecolor=cb, edgecolor=cb)
+            cargs = dict(facecolor=cb, edgecolor=cb, linewidth=0)
             yrange = (ymid-h/2., h)
             tmp = pc.split(',')
             x0 = max(tst-st0,0)
