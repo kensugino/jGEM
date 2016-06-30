@@ -2355,7 +2355,7 @@ class LocalAssembler(object):
             #cb = cbs.to_rgba(tcov)
             cb = cls[s].to_rgba(tcov)
             ls = lss[s]
-            cargs = dict(facecolor=cb, edgecolor=cb)
+            cargs = dict(facecolor=cb, edgecolor=cb, linewidth=0)
             x0 = max(tst-st0,0)
             x1 = min(ted-st0,ed0-st0)
             #cl = cls[s].to_rgba(tcov)
