@@ -447,7 +447,7 @@ class SlopeEdgeFinder(object):
         if len(idx[0])==0:
             return []
 
-        # ist = idx[0][0]
+        ist = idx[0][0]
         # mis = self.minintsize
         # if (ist<mis) or (len(v)-ist<mis):
         #     return []
