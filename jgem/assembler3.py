@@ -1888,11 +1888,13 @@ class LocalAssembler(object):
                 if strand=='+':
                     df['st'] = [dpos2apos[x] for x in df['tst']]
                     df['ed'] = [apos2dpos[x] for x in df['ted']]
-                    df['name'] = [','.join([s]+n.split(',')[1:-1]+[e]) for s,n,e in df[['st','name','ed']].values]
+                    df['name'] = [','.join([str(s)]+n.split(',')[1:-1]+[str(e)]) for\
+                                     s,n,e in df[['st','name','ed']].values]
                 else:
                     df['ed'] = [dpos2apos[x] for x in df['ted']]
                     df['st'] = [apos2dpos[x] for x in df['tst']]
-                    df['name'] = [','.join([e]+n.split(',')[1:-1]+[s]) for s,n,e in df[['st','name','ed']].values]
+                    df['name'] = [','.join([str(e)]+n.split(',')[1:-1]+[str(s)]) for\
+                                     s,n,e in df[['st','name','ed']].values]
         for gid in spanexdf['gid'].unique():
             gexdf = spanexdf[spanexdf['gid']==gid]
             gsjdf = spansjdf[spansjdf['gid']==gid]
