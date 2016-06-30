@@ -447,10 +447,10 @@ class SlopeEdgeFinder(object):
         if len(idx[0])==0:
             return []
 
-        ist = idx[0][0]
-        mis = self.minintsize
-        if (ist<mis) or (len(v)-ist<mis):
-            return []
+        # ist = idx[0][0]
+        # mis = self.minintsize
+        # if (ist<mis) or (len(v)-ist<mis):
+        #     return []
         #LOG.debug('detect_rise startidx:{0}'.format(ist))
         cmin = v[ist]
         imin = ist
