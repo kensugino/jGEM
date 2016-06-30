@@ -2225,7 +2225,6 @@ class LocalAssembler(object):
                '.':Colors('gray_r',1.,0.)}
         def _add2collection(cnt,pc,tst,ted,s,tcov):
             ymid = -cnt*(h+1)
-            minypos = min(ymid, minypos)
             cb = cbs.to_rgba(tcov)
             cl = cls[s].to_rgba(tcov)
             ls = lss[s]
@@ -2261,6 +2260,7 @@ class LocalAssembler(object):
             xranges = [(x-st0,y-x) for x,y in exons if ((x<ed0)&(y>st0))]
             bbhc = BrokenBarHCollection(xranges, yrange, **cargs)
             ax.add_collection(bbhc)
+            return min(ymid, minypos)
 
         for pc, tst, ted, s, tcov in dfp[['name','st','ed','strand','tcovn']].values:
             if cted+delta>tst:
@@ -2268,17 +2268,17 @@ class LocalAssembler(object):
             else:
                 cnt = 0
             cted = max(ted, cted)
-            _add2collection(cnt,pc,tst,ted,s,tcov)
+            minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
         for pc, tst, ted, s, tcov in dfn[['name','st','ed','strand','tcovn']].values:
             if ctst-delta<ted:
                 cnt +=1
             else:
                 cnt = 0
             ctst = min(tst, ctst)
-            _add2collection(cnt,pc,tst,ted,s,tcov)
+            minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
 
 
-        ax.set_ylim(minypos-5, 5)
+        ax.set_ylim(minypos0-5, 5)
         ax.set_xlim(0,ed0-st0)
         ax.set_yticks([])
         ax.set_xticks([])
@@ -2340,7 +2340,6 @@ class LocalAssembler(object):
                '.':Colors('gray_r',1.,0.)}
         def _add2collection(cnt, pc, tst, ted, s, tcov):
             ymid = -cnt*(h+1)
-            minypos = min(ymid, minypos)
             #cb = cbs.to_rgba(tcov)
             cb = cls[s].to_rgba(tcov)
             ls = lss[s]
@@ -2353,6 +2352,7 @@ class LocalAssembler(object):
             xranges = [(tst-st0,ted-tst)]
             bbhc = BrokenBarHCollection(xranges, yrange, **cargs)
             ax.add_collection(bbhc)  
+            return min(ymid, minypos)
 
         for pc, tst, ted, s, tcov in dfp[['name','st','ed','strand','tcovn']].values:
             if cted+delta>tst:
@@ -2360,14 +2360,14 @@ class LocalAssembler(object):
             else:
                 cnt = 0
             cted = max(ted, cted)
-            _add2collection(cnt,pc,tst,ted,s,tcov)
+            minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
         for pc, tst, ted, s, tcov in dfn[['name','st','ed','strand','tcovn']].values:
             if ctst-delta<ted:
                 cnt +=1
             else:
                 cnt = 0
             ctst = min(tst, ctst)
-            _add2collection(cnt,pc,tst,ted,s,tcov)
+            minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
 
         ax.set_ylim(minypos-5, 5)
         ax.set_xlim(0,ed0-st0)
