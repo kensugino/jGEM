@@ -1368,7 +1368,7 @@ class LocalAssembler(object):
                                 adpos.add((apos,strand[-1]))
             e53df1a = PD.DataFrame([x for x in _e53gen1()], columns=cols)
             e53df1a['origin'] = 'sjdf'
-            e53df1a = d53df1a[c3]
+            e53df1a = e53df1a[c3]
             set_ad_pos(e53df1a, 'ex')
             def _e53gen3(): # 
                 adpos = set()
