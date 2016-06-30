@@ -2268,7 +2268,7 @@ class LocalAssembler(object):
             if edgezero:
                 exons[0] = [exons[0][1]-1, exons[0][1]]
                 exons[-1] = [exons[-1][0], exons[-1][0]+1]
-                cargs = dict(facecolor=cb, edgecolor=cb, linewidth=0.1)
+                cargs = dict(facecolor=cb, edgecolor=cb, linewidth=0.5)
             xranges = [(x-st0,y-x) for x,y in exons if ((x<ed0)&(y>st0))]
             bbhc = BrokenBarHCollection(xranges, yrange, **cargs)
             ax.add_collection(bbhc)
