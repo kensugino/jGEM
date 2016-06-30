@@ -1576,7 +1576,7 @@ class LocalAssembler(object):
                             if st==ed: # ignore st==ed
                                 LOG.warning('edge not found (st==ed) {0}:{1}:{2}:{3}'.format(chrom,pos1,strand,kind))
                             elif st>ed:
-                                LOG.warning('edge wrong direction {0}:{1}:{2}:{3}'.format(chrom,pos1,strand,kind))
+                                LOG.warning('edge wrong direction {0},pos1:{5},st:{1},ed:{2},strand:{3},kind:{4}'.format(chrom,st,ed,strand,kind,pos1))
                             else: # st<ed
                                 name = _pc(st,ed,strand,',')
                                 yield (chrom,st,ed,strand,name,kind)
