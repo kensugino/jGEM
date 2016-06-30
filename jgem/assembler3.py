@@ -305,7 +305,7 @@ SEDJSON = dict(
     minth=0.5,# minth (float):  (default 0.5)
     sigmath=3,# sigmath (float): sigma threshold (default 3)
     mimath=0.3,# mimath (float): min, max threshold (default 0.15)
-    mimath2=0.5,# mimath2 (float): (default None)
+    mimath2=0.5,# mimath2 (float): (default None)   
     triggerth=2,# triggerth (float): (default 2)
     covth=0.005,# covth (float): (default 0.005)
     covratio=0.1,# covratio (float): (default 0.1)
@@ -439,18 +439,14 @@ class SlopeEdgeFinder(object):
         # only detect rise in right side
         ma = N.max(v)
         mima = N.min(v)/ma
-        print('mima', mima)
         if mima<self.mimath:
-            print('mimath')
             th1 = ma*self.mimath
             th2 = th1*self.triggerth
         elif mima<self.mimath2:
-            print('mimath2')
             th1 = ma*self.mimath2
             # th2 = th1+(ma*self.mimath)
             th2 = th1*self.triggerth
         else:
-            print('mima out of range')
             return []
         print('th1,th2=',th1,th2)
         idx = N.nonzero(v<th1)
