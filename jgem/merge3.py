@@ -584,7 +584,6 @@ def sjfiltered2bw(bwpre, genome, np=12):
         rmfiles.append(wigpath)
     for f in rmfiles:
         os.unlink(f)
-    os.unlink(wig)    
     
 
 ############# Cov Estimator ######################################################
