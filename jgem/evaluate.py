@@ -681,17 +681,17 @@ class EvalMatch(object):
         st = self.stats
         ax.set_title('{0}/{1}'.format(st['code1'],st['code2']))
 
-    def plot_sensitivity(self, color='b.-', ypos=0, xpos=0, axr=None, lineonly=False, ws = WSDEFAULT):
+    def plot_sensitivity(self, color='b', ptyp='.-', ypos=0, xpos=0, axr=None, lineonly=False, ws = WSDEFAULT):
         st = self.stats
         p1c = st['code1'] # gen4
         p2c = st['code2']
 
-        def _plot_one(ax, which, label, color, ypos=0, xpos=0):
+        def _plot_one(ax, which, label, color, ptyp, ypos=0, xpos=0):
             s = self.stats[which]
             x = N.concatenate([N.array(s['maxx']),[0]])
             y = N.concatenate([100*N.array(s['avgy']),[0]])
             # ax.plot(s['maxx'],100*N.array(s['avgy']),color+'.-',ms=5, label=label)
-            ax.plot(x,y,color,ms=5, label=label)
+            ax.plot(x,y,ptyp,ms=5, label=label,color=color)
             ma = N.ceil(N.max(s['maxx']))+0.5
             ax.set_xlim([-0.5,ma])
             ax.text(0.25+0.35*xpos,0.07*(1+ypos),'{0}: {1:.2f}'.format(label,s['auc']),
@@ -707,11 +707,11 @@ class EvalMatch(object):
         for i,w in enumerate(ws):
             ax = axr[i]
             if isinstance(w, tuple):
-                _plot_one(ax, w[0], p2c, color, ypos, 0)
-                _plot_one(ax, w[1], '- -', color+'-', ypos, 1)
+                _plot_one(ax, w[0], p2c, color,ptyp, ypos, 0)
+                _plot_one(ax, w[1], '- -', color,ptyp+'-', ypos, 1)
                 w = w[0]
             else:
-                _plot_one(ax, w, p2c, color, ypos)
+                _plot_one(ax, w, p2c, color,ptyp, ypos)
             if not lineonly:
                 ax.set_title(self.abbr[w])
                 if w!='j':
