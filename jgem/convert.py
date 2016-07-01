@@ -36,7 +36,9 @@ def gtf_from_bed12(modelpre, dstpath=None, source='.'):
     ex['id'] = ex['chr']+':'+ex['name']
     n2gn = UT.df2dict(ex, 'id', 'gname')
     # n2gn = UT.df2dict(ex, 'name', 'gname') # there may be same st,ed in different chromosome
-    paths['gname'] = [n2gn[x.split('|')[0]] for x in paths['name']]
+    paths['id'] = paths['chr']+':'+paths['name']
+    paths['id0'] = paths['chr']+':'+paths['name'].str.split('|').str[0]
+    paths['gname'] = [n2gn[x] for x in paths['id0']]
     g2cnt = {}
     tnames = []
     for x in paths['gname']:
@@ -59,7 +61,7 @@ def gtf_from_bed12(modelpre, dstpath=None, source='.'):
     if dstpath is None:
         dstpath = bedpath.replace('.bed','.gtf')
     GGB.write_gtf(df, dstpath)
-    paths['id'] = paths['chr']+':'+paths['name']
+    
     idf = paths[['id','chr','name','tname','gname']]
     UT.write_pandas(idf, mdstpre+'.idmap.txt.gz','h')
     return df
