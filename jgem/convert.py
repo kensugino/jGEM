@@ -63,7 +63,7 @@ def gtf_from_bed12(modelpre, dstpath=None, source='.'):
     GGB.write_gtf(df, dstpath)
     
     idf = paths[['id','chr','name','tname','gname']]
-    UT.write_pandas(idf, mdstpre+'.idmap.txt.gz','h')
+    UT.write_pandas(idf, modelpre+'.idmap.txt.gz','h')
     return df
 
 
