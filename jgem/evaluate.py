@@ -599,7 +599,7 @@ class EvalMatch(object):
                              'avgy':list(avgy),
                              'xth':xth}
 
-    def _plot(self, x, y, ax, ca='go-', cf='r.-', cd='b.',pw='dfat',
+    def _plot(self, x, y, ax, ca='go-', cf='r.-', cd='b.',pw='dfat',color=None,
         binsize=25,xlim=(0,7),yth=0.99,scale=100,label='', alpha=0.1, which=None):
         """Plot dots or sigmoid fit or binned average.
 
@@ -630,7 +630,10 @@ class EvalMatch(object):
             else:
                 st = self.stats[which]
                 maxx,avgy = N.array(st['maxx']),N.array(st['avgy'])
-            ax.plot(maxx,scale*avgy, ca, label=label)
+            if color is None:
+                ax.plot(maxx,scale*avgy, ca, label=label)
+            else:
+                ax.plot(maxx,scale*avgy, ca, label=label, color=color)
         if 't' in pw: # threshold
             if which is not None:
                 xth = self.stats[which]['xth']
