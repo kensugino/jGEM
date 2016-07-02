@@ -1239,6 +1239,7 @@ def fix_i53completematch(exdf, paths):
         # make old name => new name map
         im5 = (imleft|imright)&idx5
         im3 = (imleft|imright)&idx3
+        LOG.info('{0} 5exon fixed, {1} 3exon fixed'.format(N.sum(im5),N.sum(im3)))
         tmp = exdf[im5][['chr','name','st','ed','strand']].values
         n2n5 = dict([('{0}:{1}'.format(c,n),A3._pc(s,e,strand,',')) for c,n,s,e,strand in tmp])
         tmp = exdf[im3][['chr','name','st','ed','strand']].values
