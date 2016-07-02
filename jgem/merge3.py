@@ -639,7 +639,7 @@ class LocalEstimator(A3.LocalAssembler):
         # filled
         self.filled = {}
         sjs = self.sjdf
-        exs = self.exdf
+        exs = self.exdf[self.exdf['kind']=='i']
         exs['ost'] = exs['st']-self.st
         exs['oed'] = exs['ed']-self.st
         for s in ['+','-']:
