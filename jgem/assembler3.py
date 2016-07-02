@@ -2204,7 +2204,7 @@ class LocalAssembler(object):
         ed0 = ed+win
         idx = (((pathdf['tst']>=st0)&(pathdf['tst']<=ed0))|\
               ((pathdf['ted']>=st0)&(pathdf['ted']<=ed0)))&\
-              (pathdf['strand'].isin(STRS[strand]))&(pathdf['chr']==self.chrom)
+              (pathdf['strand'].isin(STRS[strand]))
         pathdf = pathdf[idx]
         if maxdisp is not None:            
             pathdf = pathdf.sort_values(covfld,ascending=False).iloc[:maxdisp]
@@ -2327,7 +2327,7 @@ class LocalAssembler(object):
         ed0 = ed+win
         idx = (((df['st']>=st0)&(df['st']<=ed0))|\
               ((df['ed']>=st0)&(df['ed']<=ed0)))&\
-              (df['strand'].isin(STRS[strand]))&(df['chr']==self.chrom)
+              (df['strand'].isin(STRS[strand]))
         df = df[idx]
         if maxdisp is not None:            
             df = df.sort_values(covfld,ascending=False).iloc[:maxdisp]
