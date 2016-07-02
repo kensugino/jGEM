@@ -1227,7 +1227,7 @@ def fix_i53completematch(exdf, paths):
     idxi = exdf['kind']=='i'
     ileft = (idxp&idx5)|(~idxp&idx3)
     iright = (idxp&idx3)|(~idxp&idx5)
-    steds = set([(c,x,y) for x,y in exdf[idxi][['chr','st','ed']].values])
+    steds = set([(c,x,y) for c,x,y in exdf[idxi][['chr','st','ed']].values])
 
     idxm = N.array([(c,x,y) in steds for c,x,y in exdf[['chr','st','ed']].values], dtype=bool)
     imleft = ileft&idxm
