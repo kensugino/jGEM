@@ -647,7 +647,7 @@ class LocalEstimator(A3.LocalAssembler):
             sj = sjs[sjs['strand'].isin(A3.STRS[s])]
             ex = exs[exs['strand'].isin(A3.STRS[s])]
             self.filled[s] = A3.fill_gap(sja, sj, ex, s, self.st)
-        fix_i53completematch(self.exdf) # extend 5'3' exons completely matched internal exons
+        fix_i53completematch(self.exdf, self.paths) # extend 5'3' exons completely matched internal exons
 
 
     def process(self):
