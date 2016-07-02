@@ -1273,7 +1273,7 @@ def fix_i53completematch(exdf, paths):
         paths.loc[pidx,'ed'] = [_ed(n) for n in paths[pidx]['name']]
         # fix exdf name
         exdf.loc[im5, 'name'] = [_fix5(c,n,n2n5) for c,n in exdf[im5][['chr','name']].values]
-        exdf.loc[im3, 'name'] = [_fix3(c,n,n2n3) for c,n in exdf[im5][['chr','name']].values]
+        exdf.loc[im3, 'name'] = [_fix3(c,n,n2n3) for c,n in exdf[im3][['chr','name']].values]
 
         idxm = N.array([(c,x,y) in steds for c,x,y in exdf[['chr','st','ed']].values], dtype=bool)
         imleft = ileft&idxm
