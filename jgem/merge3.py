@@ -1233,8 +1233,8 @@ def fix_i53completematch(exdf):
     imleft = ileft&idxm
     imright = iright&idxm
     while (N.sum(imleft)+N.sum(imright))>0:
-        exdf.loc[i53left,'st'] = exdf[i53left]['st']-10
-        exdf.loc[i53right, 'ed'] = exdf[i53right]['ed']+10
+        exdf.loc[imleft,'st'] = exdf[imleft]['st']-10
+        exdf.loc[imright, 'ed'] = exdf[imright]['ed']+10
         idxm = N.array([(x,y) in steds for x,y in exdf[['st','ed']].values], dtype=bool)
         imleft = ileft&idxm
         imright = iright&idxm
