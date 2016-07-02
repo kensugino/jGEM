@@ -1212,6 +1212,7 @@ def _concatenate_subsets(modelpre, dstpre, subids, which, chrom):
         ex1chr = UT.read_pandas(dstpath0,names=ex0chr.index,index_col=[0]).T
         df = PD.concat([ex0chr, ex1chr],axis=1)
         UT.write_pandas(df, dstpath1, 'h')
+        files.append(dstpath0)
         #os.unlink(dstpath0)
     for f in files:
         if os.path.exists(f):
