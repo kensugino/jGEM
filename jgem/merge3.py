@@ -1223,8 +1223,8 @@ def fix_i53completematch(exdf):
     idx5 = exdf['kind']=='5'
     idx3 = exdf['kind']=='3'
     idxi = exdf['kind']=='i'
-    ileft = ((idxp&idx5)|(~idxp&idx3))
-    iright = ((idxp&idx3)|(~idxp&idx5)])
+    ileft = (idxp&idx5)|(~idxp&idx3)
+    iright = (idxp&idx3)|(~idxp&idx5)
     steds = set([(x,y) for x,y in exdf[idxi][['st','ed']].values])
 
     idxm = N.array([(x,y) in steds for x,y in exdf[['st','ed']].values], dtype=bool)
