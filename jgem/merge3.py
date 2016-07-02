@@ -1219,7 +1219,7 @@ def _concatenate_subsets(modelpre, dstpre, subids, which, chrom):
             
 
 
-def fix_i53completematch(exdf):
+def fix_i53completematch(exdf, paths):
     # extend edge of 5'3' exons if they completely match to internal exons
     idxp = exdf['strand'].isin(A3.STRS['+'])
     idx5 = exdf['kind']=='5'
@@ -1227,15 +1227,55 @@ def fix_i53completematch(exdf):
     idxi = exdf['kind']=='i'
     ileft = (idxp&idx5)|(~idxp&idx3)
     iright = (idxp&idx3)|(~idxp&idx5)
-    steds = set([(x,y) for x,y in exdf[idxi][['st','ed']].values])
+    steds = set([(c,x,y) for x,y in exdf[idxi][['chr','st','ed']].values])
 
-    idxm = N.array([(x,y) in steds for x,y in exdf[['st','ed']].values], dtype=bool)
+    idxm = N.array([(c,x,y) in steds for c,x,y in exdf[['chr','st','ed']].values], dtype=bool)
     imleft = ileft&idxm
     imright = iright&idxm
     while (N.sum(imleft)+N.sum(imright))>0:
+        # fix exdf st,ed
         exdf.loc[imleft,'st'] = exdf[imleft]['st']-10
         exdf.loc[imright, 'ed'] = exdf[imright]['ed']+10
-        idxm = N.array([(x,y) in steds for x,y in exdf[['st','ed']].values], dtype=bool)
+        # make old name => new name map
+        im5 = (imleft|imright)&idx5
+        im3 = (imleft|imright)&idx3
+        tmp = exdf[im5][['chr','name','st','ed','strand']].values
+        n2n5 = dict([('{0}:{1}'.format(c,n),A3._pc(s,e,strand,',')) for c,n,s,e,strand in tmp])
+        tmp = exdf[im3][['chr','name','st','ed','strand']].values
+        n2n3 = dict([('{0}:{1}'.format(c,n),A3._pc(s,e,strand,',')) for c,n,s,e,strand in tmp])
+        # fix path name, st, ed
+        p5ids = ['{0}:{1}'.format(c,n.split('|')[0]) for c,n in paths[['chr','name']].values]
+        p3ids = ['{0}:{1}'.format(c,n.split('|')[-1]) for c,n in paths[['chr','name']].values]
+        p5idx = N.array([x in n2n5 for x in p5ids], dtype=bool)
+        p3idx = N.array([x in n2n3 for x in p3ids], dtype=bool)
+        def _fix5(c,n,n2n5):
+            tmp = n.split('|')
+            n5 = n2n5['{0}:{1}'.format(c,tmp[0])]
+            return '|'.join([n5]+tmp[1:])
+        def _fix3(c,n,n2n3):
+            tmp = n.split('|')
+            n3 = n2n3['{0}:{1}'.format(c,tmp[-1])]
+            return '|'.join(tmp[:-1]+[n3])
+        paths.loc[p5idx,'name'] = [_fix5(c,n,n2n5) for c,n in paths[p5idx][['chr','name']].values]
+        paths.loc[p3idx,'name'] = [_fix3(c,n,n2n3) for c,n in paths[p3idx][['chr','name']].values]
+        pidx = p5idx|p3idx
+        def _st(n):
+            tmp = n.split(',')
+            st0 = int(tmp[0])
+            ed0 = int(tmp[-1])
+            return min(st0,ed0)
+        def _ed(n):
+            tmp = n.split(',')
+            st0 = int(tmp[0])
+            ed0 = int(tmp[-1])
+            return max(st0,ed0)
+        paths.loc[pidx,'st'] = [_st(n) for n in paths[pidx]['name']]
+        paths.loc[pidx,'ed'] = [_ed(n) for n in paths[pidx]['name']]
+        # fix exdf name
+        exdf.loc[im5, 'name'] = [_fix5(c,n,n2n5) for c,n in exdf[im5][['chr','name']].values]
+        exdf.loc[im3, 'name'] = [_fix3(c,n,n2n3) for c,n in exdf[im5][['chr','name']].values]
+
+        idxm = N.array([(c,x,y) in steds for c,x,y in exdf[['chr','st','ed']].values], dtype=bool)
         imleft = ileft&idxm
         imright = iright&idxm
 
