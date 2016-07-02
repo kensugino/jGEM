@@ -636,6 +636,16 @@ class LocalEstimator(A3.LocalAssembler):
         self.exdf = exdf.groupby(['chr','st','ed','strand','kind']).first().reset_index()
         A3.set_ad_pos(self.sjdf, 'sj')
         A3.set_ad_pos(self.exdf, 'ex')
+        # filled
+        self.filled = {}
+        sjs = self.sjdf
+        exs = self.exdf
+        for s in ['+','-']:
+            sja = self.arrs['sj'][s]
+            sj = sjs[sjs['strand'].isin(A3.STRS[s])]
+            ex = exs[exs['starnd'].isin(A3.STRS[s])]
+            self.filled[s] = A3.fill_gap(sja, sj, ex, s, self.st)
+        fix_i53completematch(self.exdf) # extend 5'3' exons completely matched internal exons
 
 
     def process(self):
@@ -695,7 +705,8 @@ class LocalEstimator(A3.LocalAssembler):
         pg['strand'] = strand
         ne = len(pg)
         exa = self.arrs['ex'][strand]
-        sja = self.arrs['sj'][strand]
+        # sja = self.arrs['sj'][strand]
+        sja = self.filled[strand]
         def cov0(s,e):
             # return N.sum(sja[s-o:e-o]+exa[s-o:e-o])/(e-s)
             return N.mean(sja[s-o:e-o])
@@ -1204,3 +1215,35 @@ def _concatenate_subsets(modelpre, dstpre, subids, which, chrom):
             os.unlink(f)
     return dstpath1
             
+
+
+def fix_i53completematch(exdf):
+    # extend edge of 5'3' exons if they completely match to internal exons
+    idxp = exdf['strand'].isin(A3.STRS['+'])
+    idx5 = exdf['kind']=='5'
+    idx3 = exdf['kind']=='3'
+    idxi = exdf['kind']=='i'
+    ileft = ((idxp&idx5)|(~idxp&idx3))
+    iright = ((idxp&idx3)|(~idxp&idx5)])
+    steds = set([(x,y) for x,y in exdf[idxi][['st','ed']].values])
+
+    idxm = N.array([(x,y) in steds for x,y in exdf[['st','ed']].values], dtype=bool)
+    imleft = ileft&idxm
+    imright = iright&idxm
+    while (N.sum(imleft)+N.sum(imright))>0:
+        exdf.loc[i53left,'st'] = exdf[i53left]['st']-10
+        exdf.loc[i53right, 'ed'] = exdf[i53right]['ed']+10
+        idxm = N.array([(x,y) in steds for x,y in exdf[['st','ed']].values], dtype=bool)
+        imleft = ileft&idxm
+        imright = iright&idxm
+
+
+
+
+
+
+
+
+
+
+

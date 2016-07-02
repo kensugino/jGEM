@@ -1564,6 +1564,7 @@ class LocalAssembler(object):
             for strand in ['+','-']:
                 sja = self.arrs['sj'][strand]
                 exa = self.arrs['ex'][strand]
+                steds = set([(x,y) for x,y in exdfi[exdfi['strand'].isin(STRS[strand])][['st','ed']].values])
                 for kind in ['5','3']: 
                     exs = e53df[(e53df['strand'].isin(STRS[strand]))&(e53df['kind']==kind)]
                     direction = DIREC[strand][kind]
@@ -1586,6 +1587,12 @@ class LocalAssembler(object):
                                 # self._debug = locals()
                                 # raise
                             else: # st<ed
+                                if (st,ed) in steds: # if there are (st,ed) matches to internal exons 
+                                    # mod by 5~10bp ==> this is make ecov estimation work
+                                    if direction=='<': # fix st
+                                        st = st-10
+                                    else:
+                                        ed = ed+10
                                 name = _pc(st,ed,strand,',')
                                 yield (chrom,st,ed,strand,name,kind)
         e53fixed = PD.DataFrame([x for x in _gen()], columns=cols)
@@ -1667,7 +1674,8 @@ class LocalAssembler(object):
                 # es = ex[idx].copy().sort_values(['st','ed']) # <== BUG!: sort after idx messes up relationship
                 idx = es.index.values # _eid's
                 es2 = es.groupby(['st','ed']).first().reset_index().sort_values(['st','ed']) 
-                # there could be duplicates (e.g. unstranded in '.+' and '.-')
+                # there could be duplicates (e.g. unstranded in '.+' and '.-') 
+                # or 5' 3' exon overlapping i exon ===> remove these matches by extending 5',3' edge
                 # current scipy NNLS assigns the value to the 1st one and set the 2nd one zero
                 es2['tmpeid'] = N.arange(len(es2))
                 ne = len(es2)
@@ -1693,12 +1701,14 @@ class LocalAssembler(object):
         self.exdfi = ex.set_index('name')  # exdfi used in merge3 <== bad programming
         self.eed2cov = {}
         self.est2cov = {}
+        S2K = {'+':{'st':'3','ed':'5'}, '-':{'st':'5','ed':'3'}}
         for strand in ['+','-']:
             exsub = ex[ex['strand'].isin(STRS[strand])]
-            exged = exsub.groupby('ed')['ecov'].sum()
+            exged = exsub[exsub['kind']==S2K[strand]['ed']].groupby('ed')['ecov'].sum()
+            # if + strand 5'exons group at ed
             idx = exged.notnull()
             self.eed2cov[strand] = UT.series2dict(exged[idx])
-            exgst = exsub.groupby('st')['ecov'].sum()
+            exgst = exsub[exsub['kind']==S2K[strand]['st']].groupby('st')['ecov'].sum()
             idx = exgst.notnull()
             self.est2cov[strand] = UT.series2dict(exgst[idx])
 
@@ -1785,7 +1795,7 @@ class LocalAssembler(object):
             pathsdf['ted'] = pathsdf['ted'].astype(int)            
             assert(all(pathsdf['tst']<pathsdf['ted']))
             pathsdf = self.filter_unstranded(pathsdf)
-            self.paths = self.filter_ji3e(pathsdf)
+            self.paths = self.filter_jie(pathsdf)
         else:
             self.sjdf2 = None
             self.exdf2 = None
@@ -1819,7 +1829,7 @@ class LocalAssembler(object):
         return dfn
 
 
-    def filter_ji3e(self, df): 
+    def filter_jie(self, df): 
         # remove 2 exon paths whose junction is included in a 3'exon
         if '#j' not in df:
             df['#j'] = [x.count('|') for x in df['name']]
@@ -1829,7 +1839,8 @@ class LocalAssembler(object):
         cols = list(df0.columns)
         npos = cols.index('name') # pos of 'name' column
         def _gen_df0n():
-            ex3 = self.exdf[self.exdf['kind']=='3']
+            # ex3 = self.exdf[self.exdf['kind']=='3']
+            ex3 = df1[df['#j']>1] #self.exdf[self.exdf['kind']=='3']
             for s0,s1 in [('+','-'),('-','+')]:
                 df0b = df0[df0['strand'].isin(STRS[s0])]
                 ex3b = ex3[ex3['strand'].isin(STRS[s1])]
@@ -1926,7 +1937,8 @@ class LocalAssembler(object):
     def calc_span_tcov(self, spansjs, spanexs, strand):
         o = int(self.st)
         exa = self.arrs['ex'][strand]
-        sja = self.arrs['sj'][strand]
+        # sja = self.arrs['sj'][strand]
+        sja = self.filled[strand]
         # ne2ecov = self._ne2ecov
         def cov0(s,e):
             return N.mean(sja[s-o:e-o])
@@ -3892,6 +3904,38 @@ class SampleAssembler(object):
 
 
 
-
-
+def make_idmap(mdstpre):
+    ex = UT.read_pandas(mdstpre+'.ex.txt.gz')
+    paths = GGB.read_bed(mdstpre+'.paths.withse.bed.gz')
+    ex['id'] = ex['chr']+':'+ex['name']
+    i2gn = UT.df2dict(ex, 'id', 'gname')
+    paths['id'] = paths['chr']+':'+paths['name']
+    paths['id0'] = paths['chr']+':'+paths['name'].str.split('|').str[0]
+    #paths['gname'] = [i2gn[c+':'+x.split('|')[0]] for c,x in paths[['chr','name']].values]
+    paths['gname'] = [i2gn[x] for x in paths['id0']]
+    g2cnt = {}
+    tnames = []
+    for x in paths['gname']:
+        i = g2cnt.get(x,1)
+        tnames.append('{0}.{1}'.format(x,i))
+        g2cnt[x] = i+1
+    paths['tname'] = tnames    
+    idf = paths[['id','chr','name','tname','gname']]
+    UT.write_pandas(idf, mdstpre+'.idmap.txt.gz', 'h')
+    return idf
+    
+    
+def read_paths(mdstpre):
+    jg = GGB.read_bed(mdstpre+'.paths.withse.bed.gz')
+    if os.path.exists(mdstpre+'.idmap.txt.gz'):
+        idf = UT.read_pandas(mdstpre+'.idmap.txt.gz')
+        idf = idf.set_index('id')
+    else:
+        idf = make_idmap(mdstpre)
+    jg['id'] = jg['chr']+':'+jg['name']
+    jg['pc'] = jg['name']
+    jg['ic'] = [','.join(x.split(',')[1:-1]) for x in jg['pc']] # intron chain
+    jg['gname'] = idf.ix[jg['id'].values]['gname'].values
+    jg['name'] = idf.ix[jg['id'].values]['tname'].values
+    return jg
 
