@@ -857,6 +857,8 @@ STRS = {'+':['+','.+','.'],
 EXDFCOLS = ['chr','st','ed','strand','name','kind','ecov']
 SJDFCOLS = ['chr','st','ed','strand','name','kind','tcnt','ucnt' ]#,'donor','acceptor','dp','ap']
 PATHCOLS = ['chr','st','ed','name','strand','tst','ted','tcov','tcov0','tcov0a','tcov0b','tcov0c']
+EXDF2COLS = EXDFCOLS +['gid','id5','id53','tst','ted','pa','pd','tcov0','tcov0a','tcov0b','tcov0c']
+SJDF2COLS = SJDFCOLS +['gid','id5','id53','tst','ted','p','tcov0','tcov0a','tcov0b','tcov0c']   
 
 LAPARAMS = dict(
      refcode='rfsq',
