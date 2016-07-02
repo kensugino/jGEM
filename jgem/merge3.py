@@ -1234,7 +1234,7 @@ def collect_sjcnts_worker(idf, subsi, acode, which, dstpath):
         sjpaths['tcnt'] = sjpaths['sc2']
         sjpaths['jids'] = sjpaths['name'].str.split(',')
         sj = UT.flattendf(sjpaths, 'jids')
-        sj['sted'] = [[int(y) for y in x] for x in sj['name'].str.split('|')]
+        sj['sted'] = [[int(y) for y in x.split(',')] for x in sj['name'].str.split('|')]
         idxp = sj['strand'].isin(['+','.'])
         sj['st'] = [min(x) for x in sj['sted']]
         sj['ed'] = [max(x) for x in sj['sted']]
