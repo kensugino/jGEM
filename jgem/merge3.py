@@ -827,23 +827,23 @@ class LocalEstimator(A3.LocalAssembler):
         idx = (p['strand'].isin(A3.STRS[strand]))&(p['tst']==tst)&(p['ted']==ted)
         if N.sum(idx)==0:
             return
-        if N.sum(idx)>1:
-            # calculate branchp within this group
-            jids = set()
-            eids = set()
-            for n in p[idx]['name']:
-                jids.update(n.split(',')[1:-1])
-                eids.update(n.split('|'))
-            j2p, e2ap, e2dp = self.calculate_branchp(jids, eids)
-            def _prob(y):
-                epath0 = y.split('|')
-                e5 = epath0[0] # use donor p
-                epath = epath0[1:] # use acceptor p
-                jpath = y.split(',')[1:-1]
-                return e2dp[e5]*N.prod([e2ap[x] for x in epath])*N.prod([j2p[x] for x in jpath])
-            p.loc[idx,'tcov'] = [tcov0*_prob(y) for y in p[idx]['name']]
-        else:
-            p.loc[idx,'tcov'] = tcov0
+        # if N.sum(idx)>1:
+        # calculate branchp within this group
+        jids = set()
+        eids = set()
+        for n in p[idx]['name']:
+            jids.update(n.split(',')[1:-1])
+            eids.update(n.split('|'))
+        j2p, e2ap, e2dp = self.calculate_branchp(jids, eids)
+        def _prob(y):
+            epath0 = y.split('|')
+            e5 = epath0[0] # use donor p
+            epath = epath0[1:] # use acceptor p
+            jpath = y.split(',')[1:-1]
+            return e2dp[e5]*N.prod([e2ap[x] for x in epath])*N.prod([j2p[x] for x in jpath])
+        p.loc[idx,'tcov'] = [tcov0*_prob(y) for y in p[idx]['name']]
+        # else:
+        #     p.loc[idx,'tcov'] = tcov0
 
     def estimate_abundance(self):
         # 1) 5-3 group by NNLS
