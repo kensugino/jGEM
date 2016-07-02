@@ -640,6 +640,8 @@ class LocalEstimator(A3.LocalAssembler):
         self.filled = {}
         sjs = self.sjdf
         exs = self.exdf
+        exs['ost'] = exs['st']-self.st
+        exs['oed'] = exs['ed']-self.st
         for s in ['+','-']:
             sja = self.arrs['sj'][s]
             sj = sjs[sjs['strand'].isin(A3.STRS[s])]
