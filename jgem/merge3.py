@@ -1354,10 +1354,160 @@ def fix_i53completematch(exdf, paths):
 
 
 
+###################  5gr,53gr cov 
 
 
+def heads(paths, chrom, strand):
+    #if 'id' not in paths:
+    #    paths['id']= paths['chr']+':'+paths['name'] #N.arange(len(paths))
+    p = paths[(paths['strand'].isin(A3.STRS[strand]))&(paths['chr']==chrom)]
+    if 'pc' in paths:
+        heads = [([int(y) for y in x.split('|')[0].split(',')], i) for i,x in p[['id','pc']].values]
+    else:
+        heads = [([int(y) for y in x.split('|')[0].split(',')], i) for i,x in p[['id','name']].values]
+    if strand in ['-','.-']:
+        heads = [(x[0][::-1],x[1]) for x in heads]
+    return heads
+
+def headgroups(heads):
+    heads = sorted(heads)
+    def _gen():
+        cids = [heads[0][1]]
+        cst,ced = heads[0][0]
+        for (st,ed), nid in heads[1:]:
+            if st<ced: # overlap
+                # add to current group
+                cids.append(nid)
+                # expand 
+                ced = max(ced, ed)
+            else: # yield current group and make new
+                yield ([cst,ced], cids)
+                cst,ced = st,ed
+                cids = [nid]
+        yield ([cst,ced],cids)
+    return [x for x in _gen()]
+
+def find_all_5groups(paths):
+    hgs = {} # head groups
+    i2g = {} # id => group map
+    if 'pc' in paths:
+        idxme = paths['pc'].str.contains('\|')
+        paths['id'] = paths['chr']+':'+paths['pc']
+    else:
+        idxme = paths['name'].str.contains('\|')
+        paths['id'] = paths['chr']+':'+paths['name']
+    mepaths = paths[idxme]
+    sepaths = paths[~idxme]
+    for chrom in paths['chr'].unique():
+        hgs[chrom] = {}
+        for strand in ['+','-']:
+            h = heads(mepaths, chrom, strand)
+            hg = headgroups(h)
+            print('{0}:{1}:#hg={2}'.format(chrom,strand,len(hg)))
+            hgs[chrom][strand] = hg
+            for (st,ed),ids in hg:
+                g = '{0}:{1}-{2}:{3}'.format(chrom,st,ed,strand) # group id
+                for i in ids:
+                    i2g[i] = g
+    for chrom,st,ed,i in sepaths[['chr','st','ed','id']].values:
+        i2g[i] = '{0}:{1}-{2}:s'.format(chrom,st,ed)
+    return i2g, hgs
+
+# paths = GGB.read_bed(rdstpre+'.paths.withse.bed.gz')
+def make_idmap(mdstpre):
+    ex = UT.read_pandas(mdstpre+'.ex.txt.gz')
+    paths = GGB.read_bed(mdstpre+'.paths.withse.bed.gz')
+    ex['id'] = ex['chr']+':'+ex['name']
+    i2gn = UT.df2dict(ex, 'id', 'gname')
+    paths['id'] = paths['chr']+':'+paths['name']
+    paths['id0'] = paths['chr']+':'+paths['name'].str.split('|').str[0]
+    #paths['gname'] = [i2gn[c+':'+x.split('|')[0]] for c,x in paths[['chr','name']].values]
+    paths['gname'] = [i2gn[x] for x in paths['id0']]
+    g2cnt = {}
+    tnames = []
+    for x in paths['gname']:
+        i = g2cnt.get(x,1)
+        tnames.append('{0}.{1}'.format(x,i))
+        g2cnt[x] = i+1
+    paths['tname'] = tnames    
+    i2gn = UT.df2dict(paths, 'id', 'gname')
+    i2tn = UT.df2dict(paths, 'id', 'tname')
+    idf = PD.DataFrame({'gname':i2gn, 'tname':i2tn})
+    idf.index.name = 'id'
+    UT.write_pandas(idf, mdstpre+'.idmap.txt.gz', 'ih')
+    return idf
+    
+    
+def read_paths(mdstpre):
+    jg = GGB.read_bed(mdstpre+'.paths.withse.bed.gz')
+    if os.path.exists(mdstpre+'.idmap.txt.gz'):
+        idf = UT.read_pandas(mdstpre+'.idmap.txt.gz')
+        idf = idf.set_index('id')
+    else:
+        idf = make_idmap(mdstpre)
+    jg['id'] = jg['chr']+':'+jg['name']
+    jg['pc'] = jg['name']
+    jg['ic'] = [','.join(x.split(',')[1:-1]) for x in jg['pc']] # intron chain
+    jg['gname'] = idf.ix[jg['id'].values]['gname'].values
+    jg['name'] = idf.ix[jg['id'].values]['tname'].values
+    return jg
 
 
+# chromwise tcov => chromwise gcov5, gcov53 => concat
+
+
+def calc_gcovs_chrom(covpre,chrom,i2g,tcov0cols):
+    tgt = covpre+'.tcovs.{0}.txt.gz'.format(chrom)
+    df = UT.read_pandas(tgt)
+    df['id'] = df['chr']+':'+df['name']
+    df1 = df.groupby('id').first()
+    tcov0_g53 = df1.groupby(['chr','tst','ted','strand'])[tcov0cols].first()
+    tcov0_g5 = df1.reset_index().groupby(['chr','tst','ted','strand']).first().\
+                set_index('id').groupby(i2g)[tcov0cols].sum()
+    g53dst = covpre+'.tcov53.{0}.txt.gz'.format(chrom)
+    g5dst = covpre+'.tcov5.{0}.txt.gz'.format(chrom)
+    UT.write_pandas(tcov0_g53.reset_index(), g53dst, '')
+    UT.write_pandas(tcov0_g5.reset_index(), g5dst,'')
+    return (g5dst, g53dst)
+    
+def calc_gcovs(covpre,modelpre,snames,acode,np=7,deletechromfiles=True):
+    paths = read_paths(modelpre) #+'.paths.withse.bed.gz')
+    i2g,hgs = find_all_5groups(paths)
+    tcov0cols = ['{0}.{1}.tcov0'.format(x,acode) for x in snames]
+    chroms = paths['chr'].unique()
+    args = [(covpre,c,i2g,tcov0cols) for c in chroms]
+    rslts = UT.process_mp2(calc_gcovs_chrom, args, np=np, doreduce=False)
+    # concatenate chrom files
+    g5dst0 = covpre+'.tcov5.txt.gz'
+    g53dst0 = covpre+'.tcov53.txt.gz'
+    files = []
+    with open(g5dst0,'wb') as dst:
+        for c in chroms:
+            g5dst = covpre+'.tcov5.{0}.txt.gz'.format(c)
+            with open(g5dst,'rb') as src:
+                shutil.copyfileobj(src,dst)
+            files.append(g5dst)
+    with open(g53dst0,'wb') as dst:
+        for c in chroms:
+            g53dst = covpre+'.tcov53.{0}.txt.gz'.format(c)
+            with open(g53dst,'rb') as src:
+                shutil.copyfileobj(src,dst)
+            files.append(g53dst)
+    # add header, tname columns
+    g53names = paths.groupby(['chr','tst','ted','strand'])['name'].apply(lambda x:','.join(x)).to_frame()
+    g5names = paths.set_index('id').groupby(i2g)['name'].apply(lambda x:','.join(x)).to_frame()
+    
+    df = UT.read_pandas(g5dst0, names=['g5id']+tcov0cols)
+    df['tnames'] = g5names.ix[df['g5id'].values]['name'].values
+    UT.write_pandas(df, g5dst0)
+    
+    df = UT.read_pandas(g53dst0, names=['chr','tst','ted','strand']+tcov0cols)
+    ids = [tuple(x) for x in df[['chr','tst','ted','strand']].values]
+    df['tnames'] = g53names.ix[ids]['name'].values
+    UT.write_pandas(df, g53dst0)
+    if deletechromfiles:
+        for f in files:
+            os.unlink(f)
 
 
 

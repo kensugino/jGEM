@@ -831,6 +831,9 @@ def name2gidx(s):
     if s[:2]=='JS':
         return int(s[2:])
 
+def tname2gidx(tname):
+    gname = tname.split('.')[0]
+    return name2gidx(gname)
 
 #### multiprocessing ##################################################
 
