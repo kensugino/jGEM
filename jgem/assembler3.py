@@ -2314,7 +2314,7 @@ class LocalAssembler(object):
                     cnt = 0
                 ctst = min(tst, ctst)
             minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
-
+        print('cnt={0}'.format(cnt))
 
         ax.set_ylim(minypos-5, 5)
         ax.set_xlim(0,ed0-st0)
