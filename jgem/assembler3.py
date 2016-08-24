@@ -2205,7 +2205,7 @@ class LocalAssembler(object):
         ed0 = ed+win
         idx = (((pathdf['tst']>=st0)&(pathdf['tst']<=ed0))|\
               ((pathdf['ted']>=st0)&(pathdf['ted']<=ed0)))&\
-              (pathdf['strand'].isin(STRS[strand]))
+              (pathdf['strand'].isin(STRS[strand]))&(pathdf['chr']==self.chrom)
         pathdf = pathdf[idx]
         if len(pathdf)==0:
             print('nothing to plot')
@@ -2245,8 +2245,8 @@ class LocalAssembler(object):
         esiz = 100
         h = 2
         cnt = 0
-        cted = 0
-        ctst = ed0-st0
+        cted = st0
+        ctst = ed0
         minypos = 0
         lss = {'+':'-','-':'-','.+':'--','.-':'--','.':'--'}
         cbs = Colors('gray_r',1.,0.)
@@ -2296,24 +2296,34 @@ class LocalAssembler(object):
             ax.add_collection(bbhc)
             return min(ymid, minypos)
 
-        for pc, tst, ted, s, tcov in dfp[['name','st','ed','strand','tcovn']].values:
-            if stagger:
-                if cted+delta>tst:
-                    cnt +=1
-                else:
-                    cnt = 0
-                cted = max(ted, cted)
-            minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
-        if (not stagger) and len(dfp)>0:
-            cnt = 1
-        for pc, tst, ted, s, tcov in dfn[['name','st','ed','strand','tcovn']].values:
-            if stagger:
-                if ctst-delta<ted:
-                    cnt +=1
-                else:
-                    cnt = 0
-                ctst = min(tst, ctst)
-            minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
+        if len(dfp)>0 and len(dfn)>0:
+            for pc, tst, ted, s, tcov in df[['name','st','ed','strand','tcovn']].values:
+                if stagger:
+                    if cted+delta>tst:
+                        cnt +=1
+                    else:
+                        cnt = 0
+                    cted = max(ted, cted)
+                minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
+        else:
+            for pc, tst, ted, s, tcov in dfp[['name','st','ed','strand','tcovn']].values:
+                if stagger:
+                    if cted+delta>tst:
+                        cnt +=1
+                    else:
+                        cnt = 0
+                    cted = max(ted, cted)
+                minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
+            if (not stagger) and len(dfp)>0:
+                cnt = 1
+            for pc, tst, ted, s, tcov in dfn[['name','st','ed','strand','tcovn']].values:
+                if stagger:
+                    if ctst-delta<ted:
+                        cnt +=1
+                    else:
+                        cnt = 0
+                    ctst = min(tst, ctst)
+                minypos = _add2collection(cnt,pc,tst,ted,s,tcov)
         print('cnt={0}'.format(cnt))
 
         ax.set_ylim(minypos-5, 5)
@@ -3069,16 +3079,18 @@ class GeneGraph(object):
             exs['eid'] = N.arange(1,len(exs)+1)
             sjs['sid'] = N.arange(1,len(sjs)+1)
 
-        if strand=='+':
-            sjs['apos'] = sjs['ed']
-            sjs['dpos'] = sjs['st']
-            exs['apos'] = exs['st']
-            exs['dpos'] = exs['ed']
-        else:
-            sjs['apos'] = sjs['st']
-            sjs['dpos'] = sjs['ed']
-            exs['apos'] = exs['ed']
-            exs['dpos'] = exs['st']
+        if ('apos' not in ex.columns) or ('apos' not in sj.columns):
+            if strand=='+':
+                sjs['apos'] = sjs['ed']
+                sjs['dpos'] = sjs['st']
+                exs['apos'] = exs['st']
+                exs['dpos'] = exs['ed']
+            else:
+                sjs['apos'] = sjs['st']
+                sjs['dpos'] = sjs['ed']
+                exs['apos'] = exs['ed']
+                exs['dpos'] = exs['st']
+
         etbl = exs[['apos','eid','dpos','kind']]
         stbl = sjs[['apos','sid','dpos']]
         etbl1 = etbl.rename(columns={'apos':'apos1','eid':'eid1'})
