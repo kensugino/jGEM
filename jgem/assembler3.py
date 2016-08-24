@@ -3079,7 +3079,7 @@ class GeneGraph(object):
             exs['eid'] = N.arange(1,len(exs)+1)
             sjs['sid'] = N.arange(1,len(sjs)+1)
 
-        if ('apos' not in ex.columns) or ('apos' not in sj.columns):
+        if ('apos' not in exs.columns) or ('apos' not in sjs.columns):
             if strand=='+':
                 sjs['apos'] = sjs['ed']
                 sjs['dpos'] = sjs['st']
