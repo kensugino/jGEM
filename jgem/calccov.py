@@ -70,11 +70,13 @@ def calc_cov_ovl_mp(srcname, bwname, dstname, np=1, covciname=None,
             ci = UT.chopintervals(exons, ciname)
         else:
             ci = UT.read_pandas(ciname, names=['chr','st','ed','name','id'])
+            ci['name'] = ci['name'].astype(str)
         covci = calc_cov_mp(ci,bwname,covciname,np)
         LOG.debug(' time: {0:.3f}s'.format(time.time()-_sttime))
     else:
         LOG.debug('loading cached covci...')
         covci = UT.read_pandas(covciname)
+    covci['name'] = covci['name'].astype(str)
 
     # covci: chopped interval's cov => reverse
     # ci => exon id ====> revers exon => ci indices
