@@ -586,7 +586,7 @@ def process_mapbed(bedpath, dstpre, genome, chromdir, stranded='.', np=10):
     files0 = [dstpre+'.{0}.bed'.format(c) for c  in chromdf['chr'].values] # to be deleted
     args = [(dstpre, x, genome, chromdir, stranded) for x in chroms]
     # spread to CPUs
-    rslts = UT.process_mp(_process_mapbed_chr, args, np=np, doreduce=False)
+    rslts = UT.process_mp2(_process_mapbed_chr, args, np=np, doreduce=False)
     # concatenate chr files
     files1 = []
     dstpath = dstpre+'.sjpath.bed'
