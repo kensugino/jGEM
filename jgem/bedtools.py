@@ -692,7 +692,7 @@ def _process_mapbed_chr(dstpre, chrom, genome, chromdir, stranded):
         sj['estarts'] = ['{0},'.format(','.join([str(y) for y in x])) for x in sj['ests']]
         sj['esizes'] = ['{0},'.format(','.join([str(y) for y in x])) for x in esizes]
         sj['name'] = sj.index
-        sj = sj.reset_index()
+        # sj = sj.reset_index()
         with open(sjbed12, 'w') as f:
             sj[GGB.BEDCOLS].to_csv(f, index=False, header=False, sep='\t', quoting=csv.QUOTE_NONE)
             
