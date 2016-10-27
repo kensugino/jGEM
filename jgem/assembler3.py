@@ -1842,7 +1842,8 @@ class LocalAssembler(object):
         npos = cols.index('name') # pos of 'name' column
         def _gen_df0n():
             # ex3 = self.exdf[self.exdf['kind']=='3']
-            ex3 = df1[df['#j']>1] #self.exdf[self.exdf['kind']=='3']
+            #ex3 = df1[df['#j']>1] #self.exdf[self.exdf['kind']=='3']
+            ex3 = df1[df1['#j']>1] # >2 exon
             for s0,s1 in [('+','-'),('-','+')]:
                 df0b = df0[df0['strand'].isin(STRS[s0])]
                 ex3b = ex3[ex3['strand'].isin(STRS[s1])]
