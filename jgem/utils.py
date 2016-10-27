@@ -127,6 +127,7 @@ def make_dict(df,f1,f2):
     dic = {}
     for k,v in df[[f1,f2]].values:
         dic.setdefault(k,set()).add(v)
+    dic = {k:list(dic[k]) for k in dic}
     return dic
 
 def subdict(dic, keys):
