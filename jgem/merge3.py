@@ -1223,71 +1223,83 @@ def _concatenate_subsets(modelpre, dstpre, subids, which, chrom):
 
 ############# SJ count Collector ####################################################
 
-# not working : sjdf counts already collected above
-# def collect_sjcnts_worker(idf, subsi, acode, which, dstpath):
-#     # which tcnt, ucnt
-#     # idf ['_id', 'locus']
-#     idf = idf.set_index('_id')
-#     cols = []
-#     for sname, bwpre in subsi[['name','bwpre']].values:
-#         # sj = GGB.read_sj(sjpath)
-#         sjpaths = GGB.read_bed(bwpre+'.sjpath.bed.gz')
-#         sjpaths['ucnt'] = sjpaths['sc1']
-#         sjpaths['tcnt'] = sjpaths['sc2']
-#         sjpaths['jids'] = sjpaths['name'].str.split(',')
-#         sj = UT.flattendf(sjpaths, 'jids')
-#         sj['sted'] = [[int(y) for y in x.split('|')] for x in sj['jids']]
-#         idxp = sj['strand'].isin(['+','.'])
-#         sj['st'] = [min(x) for x in sj['sted']]
-#         sj['ed'] = [max(x) for x in sj['sted']]
-#         sj['locus'] = UT.calc_locus_strand(sj)
-#         l2u = UT.df2dict(sj, 'locus', which)
-#         idf[sname] = [l2u.get(x,0) for x in idf['locus']]        
-#         cols.append(sname)
-#     UT.write_pandas(idf[cols], dstpath, 'ih') # don't want non-sample columns
-#     return dstpath
+import os
+from jgem import gtfgffbed as GGB
 
-# def collect_sjcnts(dataset_code, si, assembly_code, modelpre, which, outdir, np=7):
-#     """
-#     Args:
-#         dataset_code: identifier to indicate dataset
-#         si: dataset sampleinfo dataframe 
-#          (required cololums: name, sjbed_path=path to (converted) raw juncton count file)
-#         assembly_code: identifier for assembly
-#         sjexpre: assembly sjex path prefix
-#         which: ucnt, mcnt, jcnt=ucnt or mcnt (when ucnt=0)
-#         outdir: output directory
 
-#     """    
-#     sj = UT.read_pandas(modelpre+'.sj.txt.gz')
-#     sj['locus'] = UT.calc_locus_strand(sj)
-#     idf = sj[['_id', 'locus']].copy()
-#     dstpre = os.path.join(outdir, '{0}.{1}'.format(dataset_code, assembly_code))
-#     batchsize = int(N.ceil(len(si)/float(np)))
-#     args = []
-#     files = []
-#     si1 = si[['name','bwpre']]
-#     for i in range(np):
-#         subsi = si1.iloc[i*batchsize:(i+1)*batchsize].copy()
-#         dstpath = dstpre+'.{0}.part{1}.txt.gz'.format(which, i)
-#         files.append(dstpath)
-#         args.append((idf, subsi, assembly_code, which, dstpath))
+import os
+from jgem import gtfgffbed as GGB
 
-#     rslts = UT.process_mp(collect_sjcnts_worker, args, np=np, doreduce=False)
 
-#     # concat part files
-#     dfs = []
-#     for fpath in files:
-#         dfs.append(UT.read_pandas(fpath, index_col=[0]))
-#     df = PD.concat(dfs, axis=1)
-
-#     dstpath = dstpre+'.{0}.txt.gz'.format(which)
-#     UT.write_pandas(df, dstpath, 'ih')
+def collect_one(bwpre):
+    # because of unstranded data name (jid) cannot be trusted
+    # just use locus (chr:st-ed) (st<ed)
+    sjpaths = GGB.read_bed(bwpre+'.sjpath.bed.gz')
+    sjpaths['ucnt'] = sjpaths['sc1']
+    sjpaths['tcnt'] = sjpaths['sc2']
+    sjpaths['jids'] = sjpaths['name'].str.split(',')
+    sj = UT.flattendf(sjpaths, 'jids')
+    sj['sted'] = [[int(y) for y in x.split('|')] for x in sj['jids']]
+    #idxp = sj['strand'].isin(['+','.'])
+    sj['st'] = [min(x) for x in sj['sted']]
+    sj['ed'] = [max(x) for x in sj['sted']]
+    sj['locus'] = UT.calc_locus(sj)
+    l2u = UT.df2dict(sj, 'locus', which)
+    return l2u
     
-#     for fpath in files:
-#         os.unlink(fpath)
-    
+def collect_sjcnts_worker(idf, subsi, acode, which, dstpath):
+    # which tcnt, ucnt
+    # idf ['locus']
+    cols = []
+    for sname, bwpre in subsi[['name','bwpre']].values:
+        l2u = collect_one(bwpre)
+        idf[sname] = [l2u.get(x,0) for x in idf['locus']]        
+        cols.append(sname)
+    UT.write_pandas(idf[cols], dstpath, 'ih') # don't want non-sample columns
+    return dstpath
 
+def collect_sjcnts(dataset_code, si, assembly_code, modelpre, which, outdir, np=7):
+    """
+    Args:
+        dataset_code: identifier to indicate dataset
+        si: dataset sampleinfo dataframe 
+         (required cololums: name, sjbed_path=path to (converted) raw juncton count file)
+        assembly_code: identifier for assembly
+        sjexpre: assembly sjex path prefix
+        which: ucnt, mcnt, jcnt=ucnt or mcnt (when ucnt=0)
+        outdir: output directory
+
+    """    
+    sj = UT.read_pandas(modelpre+'.sj.txt.gz')
+    #sj['st'] = sj['st-1'] # old format
+    sj['locus'] = UT.calc_locus(sj,'chr','st-1','ed')
+    #sj['uid'] = sj['chr']+':'+sj['name']
+    idf = sj[['_id', 'locus']].set_index('_id')
+    #idf = sj[['_id', 'uid']].copy()
+    dstpre = os.path.join(outdir, '{0}.{1}'.format(dataset_code, assembly_code))
+    batchsize = int(N.ceil(len(si)/float(np)))
+    args = []
+    files = []
+    si1 = si[['name','bwpre']]
+    for i in range(np):
+        subsi = si1.iloc[i*batchsize:(i+1)*batchsize].copy()
+        dstpath = dstpre+'.{0}.part{1}.txt.gz'.format(which, i)
+        files.append(dstpath)
+        args.append((idf, subsi, assembly_code, which, dstpath))
+
+    rslts = UT.process_mp(collect_sjcnts_worker, args, np=np, doreduce=False)
+
+    # concat part files
+    dfs = [UT.read_pandas(fpath, index_col=[0]) for fpath in files]
+    df = PD.concat(dfs, axis=1)
+    dstpath = dstpre+'.{0}s.txt.gz'.format(which)
+    UT.write_pandas(df, dstpath, 'ih')
+    
+    for fpath in files:
+        os.unlink(fpath)
+    
+    return df
+    
 
 
 ################### 
