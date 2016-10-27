@@ -220,7 +220,7 @@ class ParamFinder(object):
             if len(bedc)>0:
                 # args.append((bedc, self.bwpaths.copy()))
                 args.append((bedc, self.bwpre))
-        rslts = UT.process_mp(calc_flux_chr, args, np=np, doreduce=True)
+        rslts = UT.process_mp2(calc_flux_chr, args, np=np, doreduce=True)
         df = PD.DataFrame(rslts, columns=CALCFLUXCOLS)
         exdfi = beddf.set_index('_id').ix[df['_id'].values]
         for f in COPYCOLS:
@@ -621,7 +621,7 @@ class ParamFinder(object):
             if len(bedc)>0:
                 # args.append((bedc, self.bwpaths.copy(), win, siz, direction, gapmode, covfactor))
                 args.append((bedc, self.bwpre, win, siz, direction, gapmode, covfactor))
-        rslts = UT.process_mp(calc_params_chr, args, np=np, doreduce=True)
+        rslts = UT.process_mp2(calc_params_chr, args, np=np, doreduce=True)
         df = PD.DataFrame(rslts, columns=CALCPARAMCOLS)
         exdfi = beddf.set_index('_id').ix[df['_id'].values]
         for f in COPYCOLS:
