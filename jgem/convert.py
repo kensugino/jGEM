@@ -175,7 +175,7 @@ def gtf2exonsj(gtf, np=12, graphpre=None):
     ex_s = exons.groupby('transcript_id').size()
     tid_s = ex_s[ex_s==1].index
     id_m = ex_s[ex_s>1].index
-    ex_m = exons[exons['transcript_id'].isin(id_m)]
+    ex_m = exons[exons['transcript_id'].isin(id_m)].copy()
     ex_m.sort_values(['transcript_id','st','ed'], inplace=True)
     ex_f = ex_m.groupby('transcript_id').first()
     ex_l = ex_m.groupby('transcript_id').last()
@@ -306,100 +306,122 @@ def gtf2exonsj(gtf, np=12, graphpre=None):
 
 #     return sj, ex
 
-# def bed2exonsj(bed12, np=4, graphpre=None):
-#     """Extract exons and junctions from BED12
+def bed2exonsj(bed12, np=4, graphpre=None):
+    """Extract exons and junctions from BED12
 
-#     Args:
-#         bed12: Pandas.DataFrame containing BED12 data
+    Args:
+        bed12: Pandas.DataFrame containing BED12 data
 
-#     Returns:
-#         sj, ex: Pandas.DataFrames containing junction and exons
+    Returns:
+        sj, ex: Pandas.DataFrames containing junction and exons
 
-#     """
-#     esizes = bed12['esizes'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
-#     estarts0 = bed12['estarts'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
-#     bed12['_estarts'] = bed12['st'] + estarts0
-#     bed12['_eends'] = bed12['_estarts']+esizes
-#     #istarts = eends[:-1]
-#     #iends = estarts[1:]
-#     cols =['chr','st','ed','tname','strand']
-#     def _egen():
-#         for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_estarts','_eends']):
-#             #for st,ed in izip(est,eed):
-#             for st,ed in izip(est,eed):
-#                 yield (chrom,st,ed,tname,0,strand)
-#     def _igen():
-#         for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_estarts','_eends']):
-#             #for st,ed in izip(eed[:-1],est[1:]):
-#             for st,ed in izip(eed[:-1],est[1:]):
-#                 yield (chrom,st+1,ed,tname,0,strand)
-#                 # add 1 to match STAR SJ.tab.out 
-#     ex = PD.DataFrame([x for x in _egen()], columns=GGB.BEDCOLS[:6])
-#     ex['locus'] = UT.calc_locus_strand(ex)
-#     ex = ex.groupby('locus').first().reset_index()
-#     sj = PD.DataFrame([x for x in _igen()], columns=GGB.BEDCOLS[:6])
-#     sj['locus'] = UT.calc_locus_strand(sj)
-#     sj = sj.groupby('locus').first().reset_index()
+    """
+    esizes = bed12['esizes'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
+    estarts0 = bed12['estarts'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
+    bed12['_estarts'] = bed12['st'] + estarts0
+    bed12['_eends'] = bed12['_estarts']+esizes
+    #istarts = eends[:-1]
+    #iends = estarts[1:]
+    cols =['chr','st','ed','tname','strand']
+    def _egen():
+        for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_estarts','_eends']):
+            if len(est)==1:
+                yield (chrom,st,ed,tname,0,strand,'s')
+            else:
+                if strand=='+':
+                    yield (chrom,est[0],eed[0],tname,0,strand,'5')
+                    for st,ed in izip(est[1:-1],eed[1:-1]):
+                        yield (chrom,st,ed,tname,0,strand,'i')
+                    yield (chrom,est[-1],eed[-1],tname,0,strand,'3')
+                else: #'-'
+                    yield (chrom,est[0],eed[0],tname,0,strand,'3')
+                    for st,ed in izip(est[1:-1],eed[1:-1]):
+                        yield (chrom,st,ed,tname,0,strand,'i')
+                    yield (chrom,est[-1],eed[-1],tname,0,strand,'5')
+    def _igen():
+        for chrom,tname,strand,est,eed in UT.izipcols(bed12,['chr','name','strand','_estarts','_eends']):
+            #for st,ed in izip(eed[:-1],est[1:]):
+            for st,ed in izip(eed[:-1],est[1:]):
+                yield (chrom,st+1,ed,tname,0,strand,'j')
+                # add 1 to match STAR SJ.tab.out 
+    ex = PD.DataFrame([x for x in _egen()], columns=GGB.BEDCOLS[:6]+['kind'])
+    ex['locus'] = UT.calc_locus_strand(ex)
+    ex = ex.groupby('locus').first().reset_index()
+    sj = PD.DataFrame([x for x in _igen()], columns=GGB.BEDCOLS[:6]+['kind'])
+    sj['locus'] = UT.calc_locus_strand(sj)
+    sj = sj.groupby('locus').first().reset_index()
 
-#     UT.set_info(sj,ex)
-#     UT.set_exon_category(sj, ex)
+    UT.set_info(sj,ex)
+    UT.set_exon_category(sj, ex)
 
-#     # find genes (connected components) set '_gidx'
-#     if graphpre is None:
-#         graphpre = './'+str(uuid.uuid4())+'_'
-#     prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
-#     genes = GP.find_genes4(sj,ex,
-#         filepre=prefix,
-#         np=np,
-#         override=False,
-#         separatese=True)
+    # find genes (connected components) set '_gidx'
+    if graphpre is None:
+        graphpre = './'+str(uuid.uuid4())+'_'
+    prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
+    genes = GP.find_genes4(sj,ex,
+        filepre=prefix,
+        np=np,
+        override=False,
+        separatese=True)
 
-#     return sj, ex
+    return sj, ex
     
-# def kg2exonsj(kg, np=4, graphpre=None):
-#     """Extract exons and junctions from UCSC knownGene.txt.gz 
+def kg2exonsj(kg, np=4, graphpre=None):
+    """Extract exons and junctions from UCSC knownGene.txt.gz 
 
-#     Args:
-#         kg: Pandas.DataFrame containing UCSC knownGene data
+    Args:
+        kg: Pandas.DataFrame containing UCSC knownGene data
 
-#     Returns:
-#         sj, ex: Pandas.DataFrames containing junction and exons
+    Returns:
+        sj, ex: Pandas.DataFrames containing junction and exons
 
-#     """
-#     kg['_ests'] = kg['exstarts'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
-#     kg['_eeds'] = kg['exends'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
+    """
+    kg['_ests'] = kg['exstarts'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
+    kg['_eeds'] = kg['exends'].apply(lambda x: N.array([int(y) for y in x.split(',') if y]))
     
-#     cols =['chr','st','ed','tname','strand']
-#     def _egen():
-#         for chrom,tname,strand,est,eed in UT.izipcols(kg,['chr','name','strand','_ests','_eeds']):
-#             for st,ed in izip(est,eed):
-#                 yield (chrom,st,ed,tname,0,strand)
-#     def _igen():
-#         for chrom,tname,strand,est,eed in UT.izipcols(kg,['chr','name','strand','_ests','_eeds']):
-#             for st,ed in izip(eed[:-1],est[1:]):
-#                 yield (chrom,st+1,ed,tname,0,strand)
-#                 # add 1 to match STAR SJ.tab.out 
-#     ex = PD.DataFrame([x for x in _egen()], columns=GGB.BEDCOLS[:6])
-#     ex['locus'] = UT.calc_locus_strand(ex)
-#     ex = ex.groupby('locus').first().reset_index() # remove dup
-#     sj = PD.DataFrame([x for x in _igen()], columns=GGB.BEDCOLS[:6])
-#     sj['locus'] = UT.calc_locus_strand(sj)
-#     sj = sj.groupby('locus').first().reset_index() # remove dup
+    cols =['chr','st','ed','tname','strand']
+    def _egen():
+        for chrom,tname,strand,est,eed in UT.izipcols(kg,['chr','name','strand','_ests','_eeds']):
+            if len(est)==1:
+                yield (chrom,st,ed,tname,0,strand,'s')
+            else:
+                if strand=='+':
+                    yield (chrom,est[0],eed[0],tname,0,strand,'5')
+                    for st,ed in izip(est[1:-1],eed[1:-1]):
+                        yield (chrom,st,ed,tname,0,strand,'i')
+                    yield (chrom,est[-1],eed[-1],tname,0,strand,'3')
+                else: #'-'
+                    yield (chrom,est[0],eed[0],tname,0,strand,'3')
+                    for st,ed in izip(est[1:-1],eed[1:-1]):
+                        yield (chrom,st,ed,tname,0,strand,'i')
+                    yield (chrom,est[-1],eed[-1],tname,0,strand,'5')
+    def _igen():
+        for chrom,tname,strand,est,eed in UT.izipcols(kg,['chr','name','strand','_ests','_eeds']):
+            for st,ed in izip(eed[:-1],est[1:]):
+                yield (chrom,st+1,ed,tname,0,strand,'j')
+                # add 1 to match STAR SJ.tab.out 
+    ex = PD.DataFrame([x for x in _egen()], columns=GGB.BEDCOLS[:6]+['kind'])
+    ex['locus'] = UT.calc_locus_strand(ex)
+    ex = ex.groupby('locus').first().reset_index() # remove dup
+    sj = PD.DataFrame([x for x in _igen()], columns=GGB.BEDCOLS[:6]+['kind'])
+    sj['locus'] = UT.calc_locus_strand(sj)
+    sj = sj.groupby('locus').first().reset_index() # remove dup
 
-#     UT.set_info(sj,ex)
-#     UT.set_exon_category(sj, ex)
+    UT.set_info(sj,ex)
+    UT.set_exon_category(sj, ex)
 
-#     # find genes (connected components) set '_gidx'
-#     if graphpre is None:
-#         graphpre = './'+str(uuid.uuid4())+'_'
-#     prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
-#     genes = GP.find_genes4(sj,ex,
-#         filepre=prefix,
-#         np=np,
-#         override=False,
-#         separatese=True)
 
-#     return sj, ex
+    # find genes (connected components) set '_gidx'
+    if graphpre is None:
+        graphpre = './'+str(uuid.uuid4())+'_'
+    prefix = os.path.abspath(graphpre) # need unique prefix for parallel processing
+    genes = GP.find_genes4(sj,ex,
+        filepre=prefix,
+        np=np,
+        override=False,
+        separatese=True)
+
+    return sj, ex
 
 def make_sjexci(path, np):
     if path[-3:]=='.gz':
