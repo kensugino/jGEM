@@ -871,18 +871,19 @@ def calc_flux_chr(exdf, bwp):
             for chrom, st, ed, _id in exdfsub[['chr','st','ed', '_id']].values:
                 ecov = ebw[strand].get(chrom,st-1,ed+1)
                 scov = sbw[strand].get(chrom,st-1,ed+1)
-                if strand=='+':
-                    sd = scov[-1]-scov[0]
-                    sin,sout = scov[0],scov[-1]
-                    ein,eout = ecov[0],ecov[-1]
-                    sdin= scov[1]-scov[0]
-                    sdout = scov[-1]-scov[-2]
-                else:
-                    sd = scov[0]-scov[-1]
-                    sin,sout = scov[-1],scov[0]
-                    ein,eout = ecov[-1],ecov[0]
-                    sdout= -scov[1]+scov[0]
-                    sdin = -scov[-1]+scov[-2]
-                recs.append([_id, sd, ecov.mean(), ecov.min(), ecov.max(),
-                             sin,sout,ein,eout,sdin,sdout,chrom,st,ed,strand])
+                if len(ecov)>0 and len(scov)>0: # some samples do not have any read on dm6, chrY
+                    if strand=='+':
+                        sd = scov[-1]-scov[0]
+                        sin,sout = scov[0],scov[-1]
+                        ein,eout = ecov[0],ecov[-1]
+                        sdin= scov[1]-scov[0]
+                        sdout = scov[-1]-scov[-2]
+                    else:
+                        sd = scov[0]-scov[-1]
+                        sin,sout = scov[-1],scov[0]
+                        ein,eout = ecov[-1],ecov[0]
+                        sdout= -scov[1]+scov[0]
+                        sdin = -scov[-1]+scov[-2]
+                    recs.append([_id, sd, ecov.mean(), ecov.min(), ecov.max(),
+                                 sin,sout,ein,eout,sdin,sdout,chrom,st,ed,strand])
     return recs
