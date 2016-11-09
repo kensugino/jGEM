@@ -417,10 +417,10 @@ class ParamFinder(object):
         # save coefs
         p5path = self.dstpre+'.{0}.gap5params.json'.format(self.refcode)
         f = fit5
-        self.write_params(p5path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':covfactor,'zoom':zoom, 'maxsize':m5})
+        self.write_params(p5path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':covfactor,'zoom':zoom, 'maxsize':int(m5)})
         p3path = self.dstpre+'.{0}.gap3params.json'.format(self.refcode)
         f = fit3
-        self.write_params(p3path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':covfactor,'zoom':zoom, 'maxsize':m3})
+        self.write_params(p3path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':covfactor,'zoom':zoom, 'maxsize':int(m3)})
 
         # save scatter plots
         spath = self.dstpre+'.{0}.gap53params'.format(self.refcode)
