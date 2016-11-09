@@ -295,8 +295,8 @@ class ParamFinder(object):
 
     def write_params(self, ppath, lr, Y, Z, cols, dic={},FN0=0):
         cssdic = calc_sensitivity_specificity(Y,Z,FN0)
-        b1 = list(lr.coef_[0])
-        b0 = lr.intercept_[0]
+        b1 = list([float(x) for x in lr.coef_[0]])
+        b0 = float(lr.intercept_[0])
         print('b1={0}, b0={1}'.format(b1,b0))
         params = dict(cols=cols,coef=b1,intercept=b0)
         params.update(dic)
@@ -746,8 +746,18 @@ def calc_sensitivity_specificity(Y,Z,FN0=0):
     sensitivity = float(TP)/(TP+FN1)
     specificity = 1.-float(FP)/(FP+TN)
     print('sensitivity={0:.3f}, specificity={1:.3f}'.format(sensitivity, specificity))
-    return dict(TP=TP,FN=FN,FP=FP,TN=TN,FN0=FN0,FN1=FN1,sensitivity0=sensitivity0,
-        sensitivity=sensitivity,specificity=specificity,mismatch=mismatch)
+    return dict(
+        TP=int(TP),
+        FN=int(FN),
+        FP=int(FP),
+        TN=int(TN),
+        FN0=int(FN0),
+        FN1=int(FN1),
+        sensitivity0=float(sensitivity0),
+        sensitivity=float(sensitivity),
+        specificity=float(specificity),
+        mismatch=int(mismatch),
+        )
 
 
 
