@@ -96,7 +96,10 @@ class ParamFinder(object):
         self.refcode = refcode
         # self.datacode = datacode
         if dstpre is None:
-            dstpre = bwpre
+            if type(bwpre)==type([]):
+                dstpre = bwpre[0]
+            else:
+                dstpre = bwpre
         self.dstpre = dstpre
         self.zoom = zoom # multiply this factor to zoom in to small values
         self.ex = ex = UT.read_pandas(self.refpre+'.ex.txt.gz')
@@ -240,7 +243,7 @@ class ParamFinder(object):
         setb = ['ne_5','ne_3','e5i','e3i']
         setc = ['ne_i','ne_3','ne_5']
         for x in seta:
-            fpath = self.bwpre+'.{0}.{1}.flux.txt.gz'.format(self.refcode,x)
+            fpath = self.dstpre+'.{0}.{1}.flux.txt.gz'.format(self.refcode,x)
             if os.path.exists(fpath):
                 print('reading from cache {0}'.format(fpath))
                 dic[x] = UT.read_pandas(fpath)
@@ -287,7 +290,7 @@ class ParamFinder(object):
         self.write_params(ppath, lr, Y, Z, ['sdiff','smean'], {'sdiffth':sdiffth, 'zoom':zoom}, FN0=FN0)
         # save scatter plots
         spath = self.dstpre+'.{0}.e53params'.format(self.refcode)
-        title = self.bwpre.split('/')[-1]
+        title = self.dstpre.split('/')[-1]
         self.plot_sin_sout(dic, D, Y, Z, D2, Z2, sdiffth, spath+'.0.png', title, alpha=alpha)
         self.plot_sin_sout(dic, D, Y, Z, D2, Z2, sdiffth, spath+'.pdf', title, ptyp='pdf', alpha=alpha)
         self.plot_sin_sout(dic, D, Y, Z, D2, Z2, sdiffth, spath+'.png', title, ptyp='png', alpha=alpha)
@@ -295,8 +298,8 @@ class ParamFinder(object):
 
     def write_params(self, ppath, lr, Y, Z, cols, dic={},FN0=0):
         cssdic = calc_sensitivity_specificity(Y,Z,FN0)
-        b1 = list(lr.coef_[0])
-        b0 = lr.intercept_[0]
+        b1 = list([float(x) for x in lr.coef_[0]])
+        b0 = float(lr.intercept_[0])
         print('b1={0}, b0={1}'.format(b1,b0))
         params = dict(cols=cols,coef=b1,intercept=b0)
         params.update(dic)
@@ -373,8 +376,8 @@ class ParamFinder(object):
 
     def calc_53gap_params(self, covfactor=0, np=10, emaxth=1, eth=1):
         zoom = self.zoom
-        d5path = self.bwpre+'.{0}.{1}.gap5params.txt.gz'.format(self.refcode, covfactor)
-        d3path = self.bwpre+'.{0}.{1}.gap3params.txt.gz'.format(self.refcode, covfactor)
+        d5path = self.dstpre+'.{0}.{1}.gap5params.txt.gz'.format(self.refcode, covfactor)
+        d3path = self.dstpre+'.{0}.{1}.gap3params.txt.gz'.format(self.refcode, covfactor)
         if os.path.exists(d5path):
             print('reading from cache {0}'.format(d5path))
             d5 = UT.read_pandas(d5path)
@@ -417,14 +420,14 @@ class ParamFinder(object):
         # save coefs
         p5path = self.dstpre+'.{0}.gap5params.json'.format(self.refcode)
         f = fit5
-        self.write_params(p5path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':covfactor,'zoom':zoom, 'maxsize':m5})
+        self.write_params(p5path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':covfactor,'zoom':zoom, 'maxsize':int(m5)})
         p3path = self.dstpre+'.{0}.gap3params.json'.format(self.refcode)
         f = fit3
-        self.write_params(p3path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':covfactor,'zoom':zoom, 'maxsize':m3})
+        self.write_params(p3path, f['lr'], f['Y'], f['Z'], [lrx,'lgap'], {'th':covfactor,'zoom':zoom, 'maxsize':int(m3)})
 
         # save scatter plots
         spath = self.dstpre+'.{0}.gap53params'.format(self.refcode)
-        title = self.bwpre.split('/')[-1]
+        title = self.dstpre.split('/')[-1]
         self.plot_gap53_fit(fit5, fit3, spath+'.0.png', title, ptyp='both')
         self.plot_gap53_fit(fit5, fit3, spath+'.pdf', title, ptyp='pdf')
         self.plot_gap53_fit(fit5, fit3, spath+'.png', title, ptyp='png')
@@ -471,8 +474,8 @@ class ParamFinder(object):
     def calc_exon_params(self, np=10, covfactor=0.05):
         zoom = self.zoom
         # get params
-        neipath = self.bwpre+'.{0}.{1}.nei0.params.txt.gz'.format(self.refcode,covfactor)
-        e53path = self.bwpre+'.{0}.{1}.e53.params.txt.gz'.format(self.refcode,covfactor)
+        neipath = self.dstpre+'.{0}.{1}.nei0.params.txt.gz'.format(self.refcode,covfactor)
+        e53path = self.dstpre+'.{0}.{1}.e53.params.txt.gz'.format(self.refcode,covfactor)
         if os.path.exists(neipath):
             print('reading from cache {0}'.format(neipath))
             nei = UT.read_pandas(neipath)
@@ -507,7 +510,7 @@ class ParamFinder(object):
         self.write_params(ppath, lr, Y, Z, ['lemax','lgap','llen','mp'], {'zoom':zoom, 'th':covfactor})
         # make fig
         spath = self.dstpre+'.{0}.exonparams'.format(self.refcode)
-        title = self.bwpre.split('/')[-1]
+        title = self.dstpre.split('/')[-1]
         self.plot_exon_fit(spath+'.0.png', title, X, Y, Z, ptyp='both')
         self.plot_exon_fit(spath+'.pdf', title, X, Y, Z, ptyp='pdf')
         self.plot_exon_fit(spath+'.png', title, X, Y, Z, ptyp='png')
@@ -746,8 +749,18 @@ def calc_sensitivity_specificity(Y,Z,FN0=0):
     sensitivity = float(TP)/(TP+FN1)
     specificity = 1.-float(FP)/(FP+TN)
     print('sensitivity={0:.3f}, specificity={1:.3f}'.format(sensitivity, specificity))
-    return dict(TP=TP,FN=FN,FP=FP,TN=TN,FN0=FN0,FN1=FN1,sensitivity0=sensitivity0,
-        sensitivity=sensitivity,specificity=specificity,mismatch=mismatch)
+    return dict(
+        TP=int(TP),
+        FN=int(FN),
+        FP=int(FP),
+        TN=int(TN),
+        FN0=int(FN0),
+        FN1=int(FN1),
+        sensitivity0=float(sensitivity0),
+        sensitivity=float(sensitivity),
+        specificity=float(specificity),
+        mismatch=int(mismatch),
+        )
 
 
 

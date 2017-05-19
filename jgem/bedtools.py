@@ -547,7 +547,13 @@ def pcode2pos(pcode):
         return tmp
     return [x[::-1] for x in tmp[::-1]]
 
-def process_mapbed(bedpath, dstpre, genome, chromdir, stranded='.', np=10):
+
+def process_mapbed_mp(bedpaths, dstpres, genome, chromdir, stranded='.',np=12):
+    args = [(x,y,genome,chromdir,stranded) for x,y in zip(bedpaths,dstpres)]
+    rslts = UT.process_mp2(process_mapbed, args, np=np, doreduce=False)
+    
+
+def process_mapbed(bedpath, dstpre, genome, chromdir, stranded='.'):
     """
     Args:
         bedpath: path to gzipped BED7 file (converted from BAM)
@@ -586,7 +592,7 @@ def process_mapbed(bedpath, dstpre, genome, chromdir, stranded='.', np=10):
     files0 = [dstpre+'.{0}.bed'.format(c) for c  in chromdf['chr'].values] # to be deleted
     args = [(dstpre, x, genome, chromdir, stranded) for x in chroms]
     # spread to CPUs
-    rslts = UT.process_mp2(_process_mapbed_chr, args, np=np, doreduce=False)
+    rslts = UT.process_mp2(_process_mapbed_chr, args, np=1, doreduce=False)
     # concatenate chr files
     files1 = []
     dstpath = dstpre+'.sjpath.bed'
