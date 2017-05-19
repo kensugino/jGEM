@@ -212,7 +212,7 @@ def calc_ecov_chrom(covci,blocksize):
         stcid = catcherr(stcid, blocksize)
     return e2c
 
-def calc_ecov_mp(covci,fname,np,blocksize=100):
+def calc_ecov_mp(covci,fname,np,blocksize=10):
     """
     WARNING: this assumes _id is assinged according to sorted (chr,st,ed)
     """
@@ -409,7 +409,7 @@ def calc_sjcnt(sjpath1, sjpath2, dstprefix, override=False, np=4):
     pass
 
 # [TODO] don't output chr,st,ed, only eid, ecov
-def calc_ecov(expath, cipath, bwpath, dstprefix, override=False, np=4):
+def calc_ecov(expath, cipath, bwpath, dstprefix, blocksize=10, override=False, np=4):
     """Calculate exon coverages.
 
     Args:
@@ -474,7 +474,7 @@ def calc_ecov(expath, cipath, bwpath, dstprefix, override=False, np=4):
     df['st'] = ccfg['st'].min()
     df['ed'] = ccfg['ed'].max()
     df.reset_index(inplace=True)
-    e2cs = calc_ecov_mp(cc, None, np) # eid(_id) => cov
+    e2cs = calc_ecov_mp(cc, None, np, blocksize) # eid(_id) => cov
     # l2cs = {e2l[x]: e2cs[x] for x in e2cs} # locus2 => cov
     # ex['ecov'] = [l2cs[x] for x in ex['locus2']]
     df['ecov'] = [e2cs[x] for x in df['eid']]
