@@ -26,6 +26,35 @@ from jgem import utils as UT
 from jgem import bigwig as BW
 from jgem import gtfgffbed as GGB
 
+### Weighted NLS #########################################################
+from numpy import diag, sqrt, dot
+
+def wnnls(A,b,w):
+    """Least Square (minimize (b-A*x)^2) solution: x = inv(t(A)*A)*(t(A)*b). 
+    Weighted LS: x = inv(t(A')*A')*(t(A')*b') where:
+        A' = diag(w)*A
+        b' = diag(w)*b
+    """
+    dw = diag(w)
+    Ap = dot(dw, A)
+    bp = dot(dw, b)
+    return nnls(Ap,bp)
+    
+def pnnls(A,b):
+    """For Poisson weight (variance) w_i = 1/sqrt(b_i), so
+        A' = diag(1/sqrt(b))*A
+        b' = diag(1/sqrt(b))*b = sqrt(b)
+        
+    Returns:
+        x: solution
+        e: error (sqrt-ed)
+    """
+    bp = sqrt(b)
+    dw = diag(1./bp)
+    Ap = dot(dw, A)
+    return nnls(Ap,bp)
+    
+
 
 ### All in one func  ##################################################
 
@@ -155,7 +184,9 @@ def calc_ecov_chrom(covci,blocksize):
         for i,n1 in enumerate(c['name1'].values):# fill in rows
             N.put(mat[i], N.array(n1)-emin, 1)
         # solve by NNLS (nonnegative least square)
-        ecov,err = nnls(mat, c['cov'].values)
+        #ecov,err = nnls(mat, c['cov'].values)
+        # 2017-05-19 nnls => pnnls
+        ecov,err = pnnls(mat, c['cov'].values)
         e2c.update(dict(zip(range(emin,emax+1),ecov)))# e -> cov
     def catcherr(stcid, blocksize):
         bs = blocksize
