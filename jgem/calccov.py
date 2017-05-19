@@ -149,6 +149,7 @@ def calc_ecov_chrom(covci,blocksize):
     # name1 ([eids,...])
     # id: cid
     # cov: coverage for cid
+    # 2017-05-19 _find_chunk wasn't finding correct boundary so some exons are put into separate equations and was getting wrong vaules
     covci = covci.sort_values('id')
     if 'name1' not in covci.columns:
         covci['name1'] = covci['name'].astype(str).apply(lambda x: [int(y) for y in x.split(',')])
@@ -156,16 +157,21 @@ def calc_ecov_chrom(covci,blocksize):
         covci['eidmax'] = covci['name1'].apply(lambda x:max(x))
     if 'eidmin' not in covci.columns:
         covci['eidmin'] = covci['name1'].apply(lambda x:min(x))
+    # find boundary fix
+    covci['next_eidmin'] = list(covci['eidmin'].values[1:])+[N.max(covci['eidmax'])+1]
+    covci['boundary'] = covci['eidmax']<covci['next_eidmin'] # eid's are separate here
+    boundaries = covci['boundary'].values
     e2c = {} # dict
     # find chunk boundary with approximate blocksize
     def _find_chunk(st, bs):
         # first take stcid => stcid+blocksize
-        # reduce to self contained chunk => find isolated cid<=>eid (len(name1)==1) instance        
+        # reduce to self contained chunk => find isolated cid<=>eid (len(name1)==1) instance   <=  2017-05-19  this is not true BUG!
         # if final size is too small increase blocksize and try again
         if st+bs+1>=len(covci):
             return len(covci)
         for x in range(st+bs,int(st+bs/2),-1):
-            if len(covci['name1'].iloc[x])==1:# found isolated exon
+            #if len(covci['name1'].iloc[x])==1:# found isolated exon
+            if boundaries[x]==True:
                 return x+1
         # not found => increase blocksize
         if bs>500: # blocksize too big => NNLS take too much time
@@ -197,7 +203,7 @@ def calc_ecov_chrom(covci,blocksize):
                 _calc_ecov(stcid,edcid)
                 done = True
             except RuntimeError:
-                bs = bs/2
+                bs = int(bs/2)
         if bs==0: # unsuccessfull  set to zero
             e2c[stcid] = 0.
             LOG.warning('nnls did not converge for {0}, setting to 0'.format(stcid))
@@ -212,7 +218,7 @@ def calc_ecov_chrom(covci,blocksize):
         stcid = catcherr(stcid, blocksize)
     return e2c
 
-def calc_ecov_mp(covci,fname,np,blocksize=10):
+def calc_ecov_mp(covci,fname,np,blocksize=100):
     """
     WARNING: this assumes _id is assinged according to sorted (chr,st,ed)
     """
@@ -409,7 +415,7 @@ def calc_sjcnt(sjpath1, sjpath2, dstprefix, override=False, np=4):
     pass
 
 # [TODO] don't output chr,st,ed, only eid, ecov
-def calc_ecov(expath, cipath, bwpath, dstprefix, blocksize=10, override=False, np=4):
+def calc_ecov(expath, cipath, bwpath, dstprefix, blocksize=100, override=False, np=4):
     """Calculate exon coverages.
 
     Args:
@@ -471,8 +477,8 @@ def calc_ecov(expath, cipath, bwpath, dstprefix, blocksize=10, override=False, n
     ccf = UT.flattendf(cc[['chr','st','ed','eid']], 'eid')
     ccfg = ccf.groupby('eid')
     df = ccfg[['chr']].first()
-    df['st'] = ccfg['st'].min()
-    df['ed'] = ccfg['ed'].max()
+    #df['st'] = ccfg['st'].min()
+    #df['ed'] = ccfg['ed'].max()
     df.reset_index(inplace=True)
     e2cs = calc_ecov_mp(cc, None, np, blocksize) # eid(_id) => cov
     # l2cs = {e2l[x]: e2cs[x] for x in e2cs} # locus2 => cov
