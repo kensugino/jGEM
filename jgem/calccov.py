@@ -50,7 +50,7 @@ def pnnls(A,b):
         e: error (sqrt-ed)
     """
     bp = sqrt(b)
-    dw = diag(1./bp)
+    dw = diag(1./(bp+1.)) # +1. to avoid inf
     Ap = dot(dw, A)
     return nnls(Ap,bp)
     
