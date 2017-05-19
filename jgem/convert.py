@@ -205,11 +205,18 @@ def gtf2exonsj(gtf, np=12, graphpre=None):
     sj = sj.groupby('locus').first().reset_index()
 
     #cols = ['chr','st','ed','gene_id','sc1','strand']
-    ex = exons #[cols]
-    ex['locus'] = UT.calc_locus_strand(ex)
-    ex = ex.groupby(['locus','kind']).first().reset_index()
+    #ex = exons #[cols]
+    exons['locus'] = UT.calc_locus_strand(exons)
+    ex = exons.groupby(['locus','kind']).first().reset_index() # remove duplicated
     ex['name'] = ex['gene_id']
     ex['st'] = ex['st'] - 1
+    # position id == locus converted to number
+    ex.sort_values(['chr','st','ed'],inplace=True) 
+    ex['_id'] = N.arange(len(ex))
+    exg = ex.groupby(['chr','st','ed'])[['_id','locus']].first()
+    exg['_pid'] = N.arange(len(exg)) # position id
+    cse2pid = dict(zip(exg.index,exg['_pid']))
+    ex['_pid'] = [cse2pid[tuple(x)] for x in ex[['chr','st','ed']].values]
 
     if len(sj)==0:
         ex['_gidx'] = N.arange(len(ex))

@@ -431,6 +431,7 @@ def calc_ecov(expath, cipath, bwpath, dstprefix, blocksize=100, override=False, 
     """
     covcipath = dstprefix+'covci.txt.gz'
     ecovpath = dstprefix+'ecov.txt.gz'
+    ex = UT.read_pandas(expath)
 
     if UT.notstale([expath, cipath], covcipath, override):
         cc = UT.read_pandas(covcipath)
@@ -438,7 +439,7 @@ def calc_ecov(expath, cipath, bwpath, dstprefix, blocksize=100, override=False, 
         if UT.notstale(expath, cipath, False): # you do not want to override ci
             ci = UT.read_pandas(cipath, names=['chr','st','ed','name','id'])
         else:
-            ex = UT.read_pandas(expath)
+            #ex = UT.read_pandas(expath)
             ci = UT.chopintervals(ex, cipath, idcol='_id')
         cc = calc_cov_mp(ci, bwpath, covcipath, np=np)
     # ex = UT.read_pandas(expath)
@@ -471,22 +472,23 @@ def calc_ecov(expath, cipath, bwpath, dstprefix, blocksize=100, override=False, 
 
     if 'id' not in cc.columns:
         cc['id'] = cc['sc1']
-    if 'eid' not in cc.columns:
-        cc['eid'] = cc['name'].astype(str).apply(lambda x: [int(y) for y in x.split(',')])
-        cc['name1'] = cc['eid']
-    ccf = UT.flattendf(cc[['chr','st','ed','eid']], 'eid')
-    ccfg = ccf.groupby('eid')
-    df = ccfg[['chr']].first()
+    if 'pid' not in cc.columns:
+        cc['pid'] = cc['name'].astype(str).apply(lambda x: [int(y) for y in x.split(',')])
+        cc['name1'] = cc['pid']
+    #ccf = UT.flattendf(cc[['chr','st','ed','pid']], 'pid')
+    #ccfg = ccf.groupby('eid')
+    #df = ccfg[['chr']].first()
     #df['st'] = ccfg['st'].min()
     #df['ed'] = ccfg['ed'].max()
-    df.reset_index(inplace=True)
-    e2cs = calc_ecov_mp(cc, None, np, blocksize) # eid(_id) => cov
+    #df.reset_index(inplace=True)
+    df = ex[['_id','_pid']].rename(columns={'_id':'eid','_pid':'pid'})
+    e2cs = calc_ecov_mp(cc, None, np, blocksize) # pid => cov
     # l2cs = {e2l[x]: e2cs[x] for x in e2cs} # locus2 => cov
     # ex['ecov'] = [l2cs[x] for x in ex['locus2']]
-    df['ecov'] = [e2cs[x] for x in df['eid']]
+    df['ecov'] = [e2cs[x] for x in df['pid']]
     # UT.save_tsv_nidx_whead(ex[['_id','ecov']], ecovpath)
     # return ex
-    UT.save_tsv_nidx_whead(df[['eid','ecov']], ecovpath)
+    UT.save_tsv_nidx_whead(df[['eid','pid','ecov']], ecovpath)
     return df
 
 # [TODO] only output _gidx, gcov

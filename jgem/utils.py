@@ -707,7 +707,7 @@ def chroms(genome):
 
 ### Atomic Intervals ##################################################
 
-def chopintervals(exons, fname=None, sort=True, idcol='_id'):
+def chopintervals(exons, fname=None, sort=True, idcol='_id', poscol='_pid'):
     """Separate into intervals where overlaps are constant over each interval.
 
     Args:
@@ -722,9 +722,16 @@ def chopintervals(exons, fname=None, sort=True, idcol='_id'):
     # Assumes st<ed (not even st==ed)
     if sort:
         exons = exons.sort_values(['chr','st','ed'])
-    if idcol=='_id' and '_id' not in exons.columns:
-        exons['_id'] = N.arange(len(exons))
+    if idcol not in exons.columns:
+        exons[idcol] = N.arange(len(exons))
         exons.index = N.arange(len(exons))
+    if poscol not in exons.columns:
+        exg = exons.groupby(['chr','st','ed'])[[idcol]].first()
+        exg['_pid'] = N.arange(len(exg)) # position id
+        cse2pid = dict(zip(exg.index,exg['_pid']))
+        exons['_pid'] = [cse2pid[tuple(x)] for x in exons[['chr','st','ed']].values]
+
+    exu = exons.groupby('_pid').first().reset_index()
     # process by chrom
     def _todf2(df,tgt,kval,idfld):
         tmp = PD.DataFrame(df[tgt].values, columns=['pos'])
@@ -732,11 +739,11 @@ def chopintervals(exons, fname=None, sort=True, idcol='_id'):
         tmp['id'] = df[idfld].astype(str).values
         return tmp
     def _gen():
-        for chrom in exons['chr'].unique():
-            ec = exons[exons['chr']==chrom]
+        for chrom in exu['chr'].unique():
+            ec = exu[exu['chr']==chrom]
             # generate array with positions (st,ed) and kind (st,ed) and id (_id)
-            posarr = PD.concat([_todf2(ec,'st',1,idcol),
-                                _todf2(ec,'ed',-1,idcol)],
+            posarr = PD.concat([_todf2(ec,'st',1,poscol),
+                                _todf2(ec,'ed',-1,poscol)],
                                ignore_index=True).sort_values('pos')
             posarr['cumsum'] = N.cumsum(posarr['kind'])
             p1,cs1,id1 = posarr.iloc[0][['pos','cumsum','id']]
