@@ -36,7 +36,7 @@ SJTABCOLS = [u'chr',u'st',u'ed',u'strand2',u'motif',u'annotated',u'ureads',u'mre
 SJTABMOTIF = {0:'non-canonical',1:'GT/AG',2:'CT/AC',3:'GC/AG',4:'CT/GC',5:'AT/AC',6:'GT/AT'}
 SJTABSTRAND = {1:'+',2:'-',0:'.'}
 
-DEFAULT_GTF_PARSE = [u'gene_id',u'transcript_id',u'exon_number',u'gene_name',u'cov',u'FPKM']
+DEFAULT_GTF_PARSE = [u'gene_id',u'transcript_id',u'exon_number',u'gene_name',u'gene_type']
 
 # SJ.out.tab to SJBED ###################################################################
 
