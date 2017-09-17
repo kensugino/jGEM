@@ -553,7 +553,7 @@ def process_mapbed_mp(bedpaths, dstpres, genome, chromdir, stranded='.',np=12):
     rslts = UT.process_mp2(process_mapbed, args, np=np, doreduce=False)
     
 
-def process_mapbed(bedpath, dstpre, genome, chromdir, stranded='.'):
+def process_mapbed(bedpath, dstpre, genome, chromdir, stranded='.', np=3):
     """
     Args:
         bedpath: path to gzipped BED7 file (converted from BAM)
@@ -592,7 +592,7 @@ def process_mapbed(bedpath, dstpre, genome, chromdir, stranded='.'):
     files0 = [dstpre+'.{0}.bed'.format(c) for c  in chromdf['chr'].values] # to be deleted
     args = [(dstpre, x, genome, chromdir, stranded) for x in chroms]
     # spread to CPUs
-    rslts = UT.process_mp2(_process_mapbed_chr, args, np=1, doreduce=False)
+    rslts = UT.process_mp2(_process_mapbed_chr, args, np=np, doreduce=False)
     # concatenate chr files
     files1 = []
     dstpath = dstpre+'.sjpath.bed'
